@@ -59,7 +59,7 @@ describe("materializeParcelInput (bulk-first, no network)", () => {
     const input = materializeParcelInput(row);
     const fixture = JSON.parse(await readFile(path.join(FIXTURE_DIR, "html", "900001.json"), "utf8"));
     expect(input).toEqual(fixture);
-    expect(input.request).toEqual({ method: "GET", url: "https://traviscad.org/wp-content/largefiles/2026-Certified-Appraisal-Export.zip", multiValueQueryString: {} });
+    expect(input.request).toEqual({ method: "GET", url: "https://traviscad.org/wp-content/largefiles/2026%20Certified%20Appraisal%20Export%20Supp%200_07182026.zip", multiValueQueryString: {} });
     expect(input.geometry.request.multiValueQueryString.resultOffset).toEqual(["0"]);
     expect(input.tcad.py_owner_name).toBe("DOE JOHN A & JANE DOE");
     expect(input).not.toHaveProperty("source_url");
@@ -128,7 +128,7 @@ describe("egress guard and live TNR fetch", () => {
     };
     const geometry = await fetchTnrFeatureForParcel({ propId: "900001", fetchImpl: us, capturedAt: "2026-10-20T00:00:00.000Z" });
     expect(calls[0]).toBe("https://ipinfo.io/country");
-    expect(calls[1]).toContain("FeatureServer/0/query?where=PROP_ID%3D900001");
+    expect(calls[1]).toContain("MapServer/0/query?where=PROP_ID%3D900001");
     expect(geometry.request.multiValueQueryString.where).toEqual(["PROP_ID=900001"]);
     expect(geometry.latitude).toBeCloseTo(30.30215, 4);
     expect(geometry.geoId).toBe("0219080719");

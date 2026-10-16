@@ -52,6 +52,7 @@ describe("owner classification and normalization (decisions.md section 16)", () 
     expect(mapStateCode("Z9", 10)).toMatchObject({ propertyType: "Building", mapped: false });
     expect(mapStateCode("Z9", 0)).toMatchObject({ propertyType: "LandParcel", mapped: false });
     expect(parseDeedDate("2015-06-15")).toBe("2015-06-15");
+    expect(parseDeedDate("04-29-2002")).toBe("2002-04-29");
     expect(parseDeedDate("06/15/2015")).toBe("2015-06-15");
     expect(parseDeedDate("2015-02-30")).toBeNull();
     expect(parseDeedDate("")).toBeNull();
@@ -107,7 +108,7 @@ describe("buildTravisOutput (output contract)", () => {
       state_cd: "A1",
       owner: { classification: "person", printed_name: "DOE JOHN A & JANE DOE", owner_key: "900001:DOE JOHN A & JANE DOE" },
     });
-    expect(property.source_http_request).toEqual({ method: "GET", url: "https://traviscad.org/wp-content/largefiles/2026-Certified-Appraisal-Export.zip" });
+    expect(property.source_http_request).toEqual({ method: "GET", url: "https://traviscad.org/wp-content/largefiles/2026%20Certified%20Appraisal%20Export%20Supp%200_07182026.zip" });
     expect(URL_PATTERN.test(property.source_http_request.url)).toBe(true);
     expect(files["address.json"]).toMatchObject({ unnormalized_address: "804 PARK BLVD, AUSTIN TX 78751", city_name: "AUSTIN", state_code: "TX", postal_code: "78751" });
     expect(files["address.json"]).not.toHaveProperty("county_name");
@@ -122,7 +123,7 @@ describe("buildTravisOutput (output contract)", () => {
     const geometry = files["geometry.json"];
     expect(geometry.latitude).toBeCloseTo(30.30215, 4);
     expect(geometry.polygon).toHaveLength(5);
-    expect(geometry.source_http_request.url).toBe("https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/FeatureServer/0/query");
+    expect(geometry.source_http_request.url).toBe("https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query");
     expect(geometry.source_http_request.multiValueQueryString.where).toEqual(["1=1"]);
     expect(URL_PATTERN.test(geometry.source_http_request.url)).toBe(true);
     for (const [name, body] of Object.entries(files)) {
@@ -143,7 +144,7 @@ describe("buildTravisOutput (output contract)", () => {
     expect(files["company_1.json"]).toEqual({
       name: "LINDELL HOLDINGS LLC",
       sunbiz_document_number: null,
-      source_http_request: { method: "GET", url: "https://traviscad.org/wp-content/largefiles/2026-Certified-Appraisal-Export.zip" },
+      source_http_request: { method: "GET", url: "https://traviscad.org/wp-content/largefiles/2026%20Certified%20Appraisal%20Export%20Supp%200_07182026.zip" },
       request_identifier: "900002",
     });
     expect(files["mailing_address.json"]).toMatchObject({ state_code: "CO", postal_code: "80201" });
@@ -159,6 +160,19 @@ describe("buildTravisOutput (output contract)", () => {
     expect(() => buildTravisOutput({ ...input, request: { method: "GET", url: "" } }, { manifest })).toThrow(/bulk GET actually made/);
     expect(() => buildTravisOutput(input, { manifest: { entries: {} } })).toThrow(/County and Seed/);
     expect(() => buildTravisOutput({ ...input, propId: "R1" }, { manifest })).toThrow(/printed PROP_ID/);
+  });
+
+  it("writes no owner entity or mailing address for an owner the roll flags confidential, but keeps the deed date", async () => {
+    const { rows, manifest, roots } = await fixture();
+    const input = materializeParcelInput({ ...rows[0], source_owner_confidential: "T", source_py_owner_name: "", source_py_addr_line1: "" });
+    const { files, warnings, sourcePayload } = buildTravisOutput(input, { manifest });
+    expect(warnings).toContain("owner flagged confidential by the roll; no owner entity or mailing address written");
+    expect(files).not.toHaveProperty("person_1.json");
+    expect(files).not.toHaveProperty("company_1.json");
+    expect(files).not.toHaveProperty("mailing_address.json");
+    expect(files["sales_history_1.json"]).toMatchObject({ ownership_transfer_date: "2015-06-15" });
+    expect(sourcePayload.owner).toMatchObject({ classification: "confidential", printed_name: null, owner_key: null });
+    assertOutputContract(files, roots);
   });
 
   it("keeps an unsplittable owner out of the entities but in source_payload", async () => {

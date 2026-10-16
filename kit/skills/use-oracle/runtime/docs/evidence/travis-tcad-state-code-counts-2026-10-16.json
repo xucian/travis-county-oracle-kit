@@ -1,0 +1,129 @@
+{
+ "basis": "real-property accounts (prop_type_cd R) per state code = imprv_state_cd, else land_state_cd; PROP.TXT of the 2026 certified export",
+ "by_state_code": {
+  "A1": {
+   "distinct_prop_ids": 290624,
+   "distinct_geo_ids": 290520
+  },
+  "A4": {
+   "distinct_prop_ids": 54675,
+   "distinct_geo_ids": 45893
+  },
+  "C1": {
+   "distinct_prop_ids": 34467,
+   "distinct_geo_ids": 34454
+  },
+  "O1": {
+   "distinct_prop_ids": 13043,
+   "distinct_geo_ids": 13043
+  },
+  "F1": {
+   "distinct_prop_ids": 12351,
+   "distinct_geo_ids": 12240
+  },
+  "B2": {
+   "distinct_prop_ids": 9689,
+   "distinct_geo_ids": 9688
+  },
+  "E1": {
+   "distinct_prop_ids": 6394,
+   "distinct_geo_ids": 6248
+  },
+  "A2": {
+   "distinct_prop_ids": 6006,
+   "distinct_geo_ids": 6000
+  },
+  "D1": {
+   "distinct_prop_ids": 3047,
+   "distinct_geo_ids": 3044
+  },
+  "F4": {
+   "distinct_prop_ids": 2892,
+   "distinct_geo_ids": 2248
+  },
+  "B1": {
+   "distinct_prop_ids": 2194,
+   "distinct_geo_ids": 2169
+  },
+  "A3": {
+   "distinct_prop_ids": 2059,
+   "distinct_geo_ids": 2050
+  },
+  "F5": {
+   "distinct_prop_ids": 1287,
+   "distinct_geo_ids": 1280
+  },
+  "B4": {
+   "distinct_prop_ids": 1105,
+   "distinct_geo_ids": 1105
+  },
+  "F3": {
+   "distinct_prop_ids": 827,
+   "distinct_geo_ids": 819
+  },
+  "E2": {
+   "distinct_prop_ids": 460,
+   "distinct_geo_ids": 452
+  },
+  "E3": {
+   "distinct_prop_ids": 334,
+   "distinct_geo_ids": 331
+  },
+  "D2": {
+   "distinct_prop_ids": 197,
+   "distinct_geo_ids": 197
+  },
+  "B3": {
+   "distinct_prop_ids": 145,
+   "distinct_geo_ids": 145
+  },
+  "F2": {
+   "distinct_prop_ids": 61,
+   "distinct_geo_ids": 54
+  },
+  "A5": {
+   "distinct_prop_ids": 21,
+   "distinct_geo_ids": 21
+  },
+  "J5": {
+   "distinct_prop_ids": 18,
+   "distinct_geo_ids": 13
+  },
+  "A9": {
+   "distinct_prop_ids": 15,
+   "distinct_geo_ids": 15
+  },
+  "J1": {
+   "distinct_prop_ids": 11,
+   "distinct_geo_ids": 11
+  },
+  "J4": {
+   "distinct_prop_ids": 10,
+   "distinct_geo_ids": 10
+  },
+  "J6": {
+   "distinct_prop_ids": 10,
+   "distinct_geo_ids": 10
+  },
+  "J3": {
+   "distinct_prop_ids": 8,
+   "distinct_geo_ids": 8
+  },
+  "M1": {
+   "distinct_prop_ids": 5,
+   "distinct_geo_ids": 5
+  },
+  "J2": {
+   "distinct_prop_ids": 4,
+   "distinct_geo_ids": 4
+  },
+  "X": {
+   "distinct_prop_ids": 1,
+   "distinct_geo_ids": 1
+  },
+  "S1": {
+   "distinct_prop_ids": 1,
+   "distinct_geo_ids": 1
+  }
+ }
+}

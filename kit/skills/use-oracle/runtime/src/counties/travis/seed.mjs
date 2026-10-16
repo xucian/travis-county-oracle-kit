@@ -29,8 +29,9 @@ export const COUNTY_FIPS = "48453";
 export const STATE_CODE = "TX";
 
 export const TCAD_PUBLIC_INFORMATION_URL = "https://traviscad.org/publicinformation";
+/** TNR "TCAD Parcels" layer. A MapServer layer: the FeatureServer extension is not enabled on this service (verified 2026-10-16). */
 export const TNR_PARCEL_LAYER_URL =
-  "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/FeatureServer/0";
+  "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0";
 export const TNR_PARCEL_LAYER_QUERY_URL = `${TNR_PARCEL_LAYER_URL}/query`;
 
 /** Seed-level bounding box (slightly wider than the validation box in `validate.mjs`). */
@@ -42,10 +43,13 @@ export const TRAVIS_SEED_BBOX = Object.freeze({
 });
 
 /**
- * Canonical (lower-case) names of the TCAD export columns a seed row retains.
- * `build-seed.mjs` resolves each one against the Export Layout before the
- * first run and fails loudly on a missing required column; this list never
- * guesses a column name at run time.
+ * Canonical names of the TCAD export fields a seed row retains, spelled as the
+ * PACS Legacy 8.0.33 layout spells them (`docs/travis-county-findings.md`
+ * section 0). `state_cd` is derived (`imprv_state_cd`, else `land_state_cd`),
+ * `tax_year` is `prop_val_yr`, `yr_built`, `living_area_sqft` and `imprv_count`
+ * come from `IMP_DET.TXT`, `abs_subdv_desc` from `ABS_SUBD.TXT`, and
+ * `owner_confidential` is `T` when the roll flags the owner confidential or
+ * address-suppressed (the owner name and mailing address are then blank).
  *
  * @type {readonly string[]}
  */
@@ -54,6 +58,8 @@ export const TCAD_SOURCE_FIELDS = Object.freeze([
   "geo_id",
   "prop_type_cd",
   "state_cd",
+  "imprv_state_cd",
+  "land_state_cd",
   "py_owner_name",
   "py_addr_line1",
   "py_addr_line2",
@@ -61,19 +67,22 @@ export const TCAD_SOURCE_FIELDS = Object.freeze([
   "py_addr_city",
   "py_addr_state",
   "py_addr_zip",
+  "owner_confidential",
   "situs_num",
   "situs_street_prefx",
   "situs_street",
-  "situs_street_sufix",
+  "situs_street_suffix",
   "situs_unit",
   "situs_city",
   "situs_zip",
   "legal_desc",
-  "legal_desc_2",
+  "legal_desc2",
   "legal_acreage",
   "hood_cd",
   "abs_subdv_cd",
   "abs_subdv_desc",
+  "block",
+  "tract_or_lot",
   "land_hstd_val",
   "land_non_hstd_val",
   "imprv_hstd_val",
@@ -82,10 +91,9 @@ export const TCAD_SOURCE_FIELDS = Object.freeze([
   "appraised_val",
   "assessed_val",
   "market_value",
-  "deed_type",
-  "deed_dt",
   "deed_book_id",
   "deed_book_page",
+  "deed_dt",
   "yr_built",
   "imprv_count",
   "living_area_sqft",
@@ -133,7 +141,7 @@ export const SEED_COLUMNS = Object.freeze([
   ...TCAD_SOURCE_FIELDS.map((field) => `source_${field}`),
 ]);
 
-const PROP_ID_PATTERN = /^\d{1,12}$/;
+const PROP_ID_PATTERN = /^[1-9]\d{0,11}$/;
 const GEO_ID_PATTERN = /^\d{10}$/;
 
 /**
@@ -147,10 +155,26 @@ export function toText(value) {
 
 /**
  * @param {unknown} value - Candidate `PROP_ID`.
- * @returns {boolean} True for 1 to 12 digits exactly as printed (leading zeros kept).
+ * @returns {boolean} True for a decoded PROP_ID: a positive decimal integer of up to 12 digits, no padding.
  */
 export function isValidPropId(value) {
   return PROP_ID_PATTERN.test(toText(value));
+}
+
+/**
+ * Decode the export's `prop_id` field (`int(12)`, fixed width, zero padded:
+ * `000000379828`) to the identifier TCAD's property search and the TNR layer
+ * print (`379828`). The padding is the integer field's encoding, not part of
+ * the identifier. Returns null for anything that is not an int(12) value.
+ *
+ * @param {unknown} raw - The field as read from the record.
+ * @returns {string | null} Decoded PROP_ID, or null.
+ */
+export function decodePropId(raw) {
+  const text = toText(raw);
+  if (!/^\d{1,12}$/.test(text)) return null;
+  const decoded = text.replace(/^0+/, "");
+  return decoded === "" ? null : decoded;
 }
 
 /**
@@ -198,7 +222,7 @@ function sourceValueToText(value) {
  * @returns {{ street: string, city: string, zip: string, full: string }} Address parts.
  */
 export function buildSitusAddress(tcad) {
-  const street = [tcad.situs_num, tcad.situs_street_prefx, tcad.situs_street, tcad.situs_street_sufix, tcad.situs_unit]
+  const street = [tcad.situs_num, tcad.situs_street_prefx, tcad.situs_street, tcad.situs_street_suffix, tcad.situs_unit]
     .map(toText)
     .filter((part) => part.length > 0)
     .join(" ");
@@ -426,18 +450,20 @@ export function selectPilotRows(rows, { size = 25, permitGeoIds = new Set() } = 
 
 /**
  * @typedef {object} SeedReconciliationStats
- * @property {number} rowsWritten
- * @property {number} uniquePropIds
- * @property {number} rollRows
- * @property {number} invalidPropIds
- * @property {number} gisFeatures
- * @property {number} gisJoined
- * @property {number} gisUnjoined
+ * @property {number} rowsWritten - Seed rows written (one per real-property account).
+ * @property {number} uniquePropIds - Distinct PROP_IDs among the written rows.
+ * @property {number} rollRows - Real-property (prop_type_cd R) records read.
+ * @property {number} invalidPropIds - R records whose prop_id did not decode.
+ * @property {number} [foldedOwnerRecords] - Additional owner records of an account already written.
+ * @property {number} gisFeatures - TNR features carrying a PROP_ID.
+ * @property {number} gisJoined - Of those, features whose PROP_ID is a written row.
+ * @property {number} gisUnjoined - The rest.
  */
 
 /**
  * Fail closed if a full-seed build's counters do not reconcile:
- * `rollRows = rowsWritten + invalidPropIds` and `gisFeatures = gisJoined + gisUnjoined`.
+ * `rollRows = rowsWritten + invalidPropIds + foldedOwnerRecords` and
+ * `gisFeatures = gisJoined + gisUnjoined`.
  *
  * @param {SeedReconciliationStats} stats - Seed-build counters.
  * @returns {void}
@@ -446,8 +472,11 @@ export function assertSeedReconciliation(stats) {
   if (stats.rowsWritten !== stats.uniquePropIds) {
     throw new Error(`rowsWritten ${stats.rowsWritten} != uniquePropIds ${stats.uniquePropIds}`);
   }
-  if (stats.rollRows !== stats.rowsWritten + stats.invalidPropIds) {
-    throw new Error(`rollRows ${stats.rollRows} != rowsWritten ${stats.rowsWritten} + invalidPropIds ${stats.invalidPropIds}`);
+  const folded = stats.foldedOwnerRecords ?? 0;
+  if (stats.rollRows !== stats.rowsWritten + stats.invalidPropIds + folded) {
+    throw new Error(
+      `rollRows ${stats.rollRows} != rowsWritten ${stats.rowsWritten} + invalidPropIds ${stats.invalidPropIds} + foldedOwnerRecords ${folded}`,
+    );
   }
   if (stats.gisFeatures !== stats.gisJoined + stats.gisUnjoined) {
     throw new Error(`gisFeatures ${stats.gisFeatures} != gisJoined ${stats.gisJoined} + gisUnjoined ${stats.gisUnjoined}`);

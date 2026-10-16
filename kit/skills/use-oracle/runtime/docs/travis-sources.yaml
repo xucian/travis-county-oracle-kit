@@ -2,31 +2,36 @@ county: Travis
 state: TX
 slug: travis
 fips: "48453"
-snapshot_time: "2026-10-16T16:50:00Z"
-egress_at_snapshot: "RO (outside the US); traviscad.org, gis.traviscountytx.gov and data.texas.gov were not requested"
+snapshot_time: "2026-10-16T17:55:00Z"
+egress_at_snapshot: "US (datacenter VPN exit) for the 2026-10-16 US egress window: TCAD exports, TNR counts, Comptroller counts, identifier spot check and portal re-probes; the earlier jurisdiction probes ran from RO"
 
 parcel:
-  canonical_source: TCAD 2026 Certified Appraisal Export (assessed tax roll; PACS appraisal-export layout)
-  canonical_source_url: https://traviscad.org/publicinformation
-  canonical_source_access: bulk download under US egress; cost not stated on the page; a paid file is a human payment decision
+  canonical_source: TCAD 2026 Certified Appraisal Export (PACS Legacy 8.0.33 fixed-width layout, supplement 0, run 2026-07-18) - real-property accounts
+  canonical_source_url: https://traviscad.org/wp-content/largefiles/2026%20Certified%20Appraisal%20Export%20Supp%200_07182026.zip
+  canonical_source_access: free direct download from https://traviscad.org/publicinformation (HTTP 200, no login, no fee, no account); 557,228,168 bytes, sha256 62d0d1cd22b03f31db8d3986160eb181c5d00044df98a303fce9e17a44e9aa02, downloaded 2026-10-16 under US egress
+  layout_url: https://traviscad.org/wp-content/largefiles/Website_Legacy8.0.33-AppraisalExportLayout_06182026.zip
+  improvement_detail_source: IMP_DET.TXT inside the certified export (3,310,160 detail records, 400,963 properties); the separate March 2026 "Improvement Details Report 2026" CSV (https://traviscad.org/wp-content/largefiles/improvement_detail_2026.zip, free) is pre-certification and not used for the seed
   tax_roll_year: 2026
-  tax_roll_status: certified (July 2026) plus supplemental roll exports
-  assessed_parcel_count: null
-  gis_source: Travis County TNR parcel layer, Boundaries_and_Jurisdictions/TCAD_public FeatureServer layer 0 (fields include PROP_ID and geo_id; 1000 features per request)
-  gis_source_url: https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/FeatureServer/0
-  gis_feature_count: null
-  counts_pending: Both counts are read during the US egress window; until then the parcel gate stays BLOCKED by design and no seed, smoke, pilot or full ingest runs.
+  tax_roll_status: certified (supplement 0); later supplemental roll exports exist (Supp 335 of 2026-10-08) and feed incremental runs
+  assessed_parcel_count: 441961
+  assessed_count_basis: distinct prop_id with prop_type_cd R in PROP.TXT (442,039 R records; 78 are additional partial-owner records of the same accounts). Not parcels and excluded from this denominator - 11,744 MH mobile-home accounts (their geo_id is the host parcel's), 39,536 P business-personal-property accounts, 5 MN mineral accounts. PROP.TXT holds 493,324 records, all 2026, all sup_num 0, record length 9922.
+  gis_source: Travis County TNR "TCAD Parcels" layer, Boundaries_and_Jurisdictions/TCAD_public MapServer layer 0 (assembled monthly by TNR from TCAD; fields OBJECTID, PROP_ID integer, geo_id, situs fields, hyperlink, CENTROID_X/Y; maxRecordCount 2000; the FeatureServer endpoint is not enabled - "Server object extension 'featureserver' not found")
+  gis_source_url: https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0
+  gis_feature_count: 386682
+  gis_count_basis: returnCountOnly on MapServer layer 0 with where 1=1 (2026-10-16); 13,130 of the polygons carry no PROP_ID, so 373,552 polygons carry an account id
   discrepancy_threshold_pct: 2.0
-  discrepancy_explanation: pending both counts; condominium and other separately assessed units share polygons, so GIS is expected below the assessed roll
+  discrepancy_pct: 12.51
+  discrepancy_explanation: GIS is 55,279 below the assessed real-property accounts (12.51%). Condominium accounts have no polygon of their own - the regime's land polygon carries none of the unit accounts - 57,567 accounts are condos (state code A4 condos 54,675 plus F4 commercial condos 2,892), and 0 of 40 sampled condo PROP_IDs (20 A4, 20 F4) exist in the layer, while 20 of 20 sampled A1 single-family PROP_IDs do. Of the vacant lots (C1) 16 of 20 sampled exist, consistent with recent splits not yet in the monthly TNR assembly. The remaining non-condo gap (384,394 non-condo accounts against 373,552 polygons with an account id, about 2.8%) is measured exactly by the seed join (gisJoined, gisUnjoined, rowsWithGeometry in the seed manifest).
   separately_assessed_without_geometry: acknowledged
-  identifier_proven: false
+  identifier_proven: true
+  identifier_evidence: 5 PROP_IDs from the export (379828 A1, 583669 A4, 182212 C1, 506701 F1, 237985 B2) resolved on the TCAD property search https://travis.prodigycad.com/property-detail/<PROP_ID> on 2026-10-16 under US egress with the same Geographic ID, type R, state code and situs as the export rows (docs/evidence/travis-identifier-spot-check-2026-10-16.json); 4 of the 5 also exist in the TNR layer with the same geo_id (the condo does not)
   identifier_name: Property ID (PROP_ID)
-  identifier_format: integer-like string as printed by the roll; leading zeros preserved if any
+  identifier_format: decimal integer as TCAD's property search, the TNR layer (esriFieldTypeInteger) and the layer's hyperlink print it (for example 379828). The export field is int(12) fixed width and zero-padded (000000379828); the padding is the integer field's encoding, not part of the identifier, and is removed when the field is decoded.
   secondary_identifier_name: Geographic ID (geo_id)
-  secondary_identifier_format: 10-digit string as printed (for example 0222210299); Austin permits print it as tcad_id
-  join_rule: Treat PROP_ID and geo_id as text; PROP_ID is the seed parcel_id, the lexicon parcel_identifier and the kit request_identifier; permits link to parcels on geo_id exactly as printed; digits-only comparison only after the profile proves it one-to-one over the roll
+  secondary_identifier_format: char(50) printed as a 10-digit string with leading zeros (for example 0282360106) on every R and MH record; Austin permits print it as tcad_id. 1,164 geo_ids are shared by several real accounts (431,536 distinct geo_ids for 441,961 real accounts), so an exact geo_id permit link can have several candidates and stays unlinked as multiple_candidates.
+  join_rule: Treat PROP_ID and geo_id as text after decoding; PROP_ID is the seed parcel_id, the lexicon parcel_identifier and the kit request_identifier; permits link to parcels on geo_id exactly as printed; digits-only comparison only after the profile proves it one-to-one over the roll
   appraisal_access_method: bulk
-  appraisal_safe_throughput: n/a (bulk files); TNR paging at concurrency 1-2
+  appraisal_safe_throughput: n/a (bulk files); TNR paging at concurrency 1 with a 0.5 s delay, 1,000 features per request (about 387 requests)
   geometry_fallbacks:
     - county GIS parcel shapefile download if the service blocks paging
     - City of Austin parcel layer
@@ -110,6 +115,7 @@ permits:
       implementation_status: login-captcha-no-bypass
       austin_feed_rows: 1117
       probe_2026_10_16: HTTP 200 login page (title PublicAccess, reCAPTCHA marker); city site reachable
+      reprobe_us_egress_2026_10_16: unchanged under US egress - HTTP 200 login route with reCAPTCHA; classification stays blocked (login + CAPTCHA)
       records_request:
         recipient_office: City of Pflugerville City Secretary (public information requests) for the Building Inspections and Permits Department
         request_portal_url: https://www.pflugervilletx.gov/building-inspections-permits
@@ -128,6 +134,7 @@ permits:
       implementation_status: captcha-no-bypass
       austin_feed_rows: 2664
       probe_2026_10_16: new portal timed out from non-US egress (unresolved); eTRAKiT answers a redirect notice ("We have a new permitting system")
+      reprobe_us_egress_2026_10_16: reachable under US egress - https://permits.roundrocktexas.gov/portal answers HTTP 200 with an account login card ("Permit Portal"); vendor still unidentified; the city's help page says search needs a CAPTCHA step; classification stays blocked
       records_request:
         recipient_office: City of Round Rock City Clerk (public information requests)
         request_portal_url: https://www.roundrocktexas.gov/city-departments/administration/permit-portal-help/
@@ -145,6 +152,7 @@ permits:
       implementation_status: login-required-no-bypass
       austin_feed_rows: 18
       probe_2026_10_16: city site HTTP 403 Cloudflare block page ("Attention Required"), not a challenge; geo-block versus IP reputation resolved under US egress
+      reprobe_us_egress_2026_10_16: same HTTP 403 Cloudflare "Attention Required" block page under US egress (datacenter VPN exit), so not a geo-block; a WAF/IP-reputation rule; nothing evaded; classification stays blocked
       records_request:
         recipient_office: City of Cedar Park City Secretary (public information requests) for Building Permits and Inspections
         request_portal_url: https://www.cedarparktexas.gov/
@@ -163,6 +171,7 @@ permits:
       implementation_status: block-page-vendor-unverified
       austin_feed_rows: 1
       probe_2026_10_16: HTTP 403 Cloudflare block page ("Attention Required"), not a challenge
+      reprobe_us_egress_2026_10_16: same HTTP 403 Cloudflare "Attention Required" block page under US egress (datacenter VPN exit); not a geo-block; classification stays blocked
       records_request:
         recipient_office: City of Leander Permits and Building Inspection Division
         request_portal_url: https://www.leandertx.gov/permits
@@ -172,15 +181,17 @@ permits:
     - jurisdiction: City of Lakeway
       key: lakeway
       status: blocked
-      vendor: Tyler Civic Self Service (since 2025-11-12; Civic Access predecessor)
+      vendor: Tyler EnerGov Civic Self Service (since 2025-11-12; Civic Access predecessor)
       portal_kind: historical-search
-      portal: https://www.lakeway-tx.gov/1165
+      portal: https://lakewaytx-energovweb.tylerhost.net/apps/selfservice
+      city_page: https://www.lakeway-tx.gov/1165
       historical_records: true
       anonymous_access: false
       adapter: none
-      implementation_status: challenge-page-portal-url-unverified
+      implementation_status: tyler-civic-access-candidate-not-routed (the kit's tyler-civic-access adapter family; routing, tenant verification and a bounded pilot are T4 work)
       austin_feed_rows: 8384
       probe_2026_10_16: HTTP 403 with cf-mitigated challenge ("Just a moment"), a bot challenge; guessed tylerhost hostname did not resolve
+      reprobe_us_egress_2026_10_16: city page HTTP 200 under US egress (no challenge) and links the portal https://lakewaytx-energovweb.tylerhost.net/apps/selfservice, which answers HTTP 200 "SelfService Public Site"; vendor verified Tyler EnerGov; stays blocked only until the kit adapter is routed and certified
       records_request:
         recipient_office: City of Lakeway Building and Development Services
         request_portal_url: https://www.lakeway-tx.gov/
@@ -307,6 +318,7 @@ permits:
       implementation_status: block-page-no-bypass
       austin_feed_rows: 1188
       probe_2026_10_16: GovBuilt HTTP 403 Cloudflare block page; city site HTTP 403 Akamai Access Denied; both block pages, not challenges
+      reprobe_us_egress_2026_10_16: challenge under US egress - GovBuilt answers HTTP 403 with cf-mitigated challenge ("Just a moment"), recorded and not attempted; city site HTTP 403 Akamai Access Denied again; classification stays blocked
       records_request:
         recipient_office: City of Sunset Valley Planning and Development
         request_email: permits@sunsetvalley.org
@@ -476,13 +488,23 @@ permits:
 
 source_inventory:
   property_appraisal_bulk: https://traviscad.org/publicinformation
-  property_geometry: https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/FeatureServer/0
+  property_geometry: https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0
+  property_search: https://travis.prodigycad.com/property-detail/<PROP_ID>
+  appraisal_exports:
+    certified_export: https://traviscad.org/wp-content/largefiles/2026%20Certified%20Appraisal%20Export%20Supp%200_07182026.zip
+    export_layout: https://traviscad.org/wp-content/largefiles/Website_Legacy8.0.33-AppraisalExportLayout_06182026.zip
+    improvement_details_report: https://traviscad.org/wp-content/largefiles/improvement_detail_2026.zip
+    supplemental_export: https://traviscad.org/wp-content/largefiles/travis_SUPP%20335_2026_WEBSITE%20EXPORT_Renamed.zip
+    certified_totals_report: https://traviscad.org/wp-content/uploads/totals_2026_AsOfRollCorr_0_RunID_6885_20260718_171007.pdf
+    cost: free direct downloads (no login, no account, no fee) on 2026-10-16
   permits_bulk: https://data.austintexas.gov/resource/3syk-w9eu
   permits_detail: https://abc.austintexas.gov/web/permit/public-search-other
   corporate_registry_official: Texas Secretary of State (SOSDirect, paid)
   corporate_registry_exception: https://data.texas.gov/resource/9cir-efmm (Comptroller Active Franchise Tax Permit Holders)
-  licensing_electrical_hvac: https://www.tdlr.texas.gov/LicenseSearch/
-  licensing_plumbing: https://www.tsbpe.texas.gov/
+  licensing_electrical_hvac: https://www.tdlr.texas.gov/LicenseSearch/ (HTTP 200 under US egress, "TDLR Active License Search")
+  licensing_plumbing: https://tsbpe.texas.gov/ (HTTP 200 under US egress)
+  corporate_registry_official_access: https://direct.sos.state.tx.us/acct/acct-login.asp (HTTP 200 subscriber login page; paid SOSDirect account)
+  comptroller_taxpayer_detail: https://comptroller.texas.gov/taxes/franchise/account-status/search (the former mycpa.cpa.state.tx.us/coa/ redirects here; HTTP 200 under US egress)
   bbb: https://www.bbb.org/ (not contacted from this machine)
   lexicon_manifest: https://lexicon.elephant.xyz/api/manifest
 
@@ -517,12 +539,15 @@ enrichment:
     access_request: docs/travis-bbb-access-request.md
     observed_coverage: 0_percent
   corporate_registry:
-    status: pending-us-egress
+    status: counted-not-loaded
+    comptroller_rows_statewide_2026_10_16: 3486216
+    comptroller_rows_travis_2026_10_16: 342338
+    comptroller_travis_filter: taxpayer_county_code = 227 (Travis; confirmed by the city distribution - AUSTIN 301,087, PFLUGERVILLE 8,373, LAKEWAY 3,815, W LAKE HILLS 3,699, MANOR 2,912 ...); the code is the taxpayer's mailing-address county, not a business-location claim
     official_source: Texas Secretary of State (paid; human payment decision)
     exception_source: Texas Comptroller Active Franchise Tax Permit Holders (data.texas.gov 9cir-efmm)
     semantics: registry candidates only; never identity; the live lexicon has no corporate_registry group and company carries only sunbiz_document_number, so rows stay in the internal store
   licensing:
-    status: pending-us-egress
+    status: reachable-not-loaded
     authorities: [TDLR (electrical, HVAC), TSBPE (plumbing)]
     roofing_license: none issued by Texas (recorded gap)
     permit_license_numbers: the Austin export prints none, so no license lookup key exists
@@ -536,6 +561,18 @@ lexicon_gaps:
     detail: description, printed status_current, expiresdate and contractor fields have no property_improvement home; kept in source_payload (decisions.md section 5 option ii, else iii)
 
 approved_exceptions:
+  # Only an entry whose gate is exactly a validator gate name (parcel, permit, ...) is read by the
+  # validator. Entries with any other gate value are inactive or awaiting the operator's approval.
+  - gate: parcel-pending-operator-approval
+    status: proposed-awaiting-operator-approval
+    proposed_at: "2026-10-16"
+    approval_action: The operator approves by changing this gate to parcel and this status to approved-by-operator (one command in docs/runbook.md of the assignment repository); until then the validator keeps the parcel gate BLOCKED and no seed is built.
+    reason: The assessed-roll denominator is canonical; the material GIS gap is expected for separately assessed condominium units without unique polygons, and the seed is built from the TCAD certified export, not from GIS.
+    cause: 57,567 condominium accounts (A4 54,675, F4 2,892) have no polygon of their own in the TNR layer (0 of 40 sampled found), plus recent splits not yet in the monthly TNR assembly (C1 16 of 20 sampled found); 13,130 polygons carry no PROP_ID.
+    canonical_denominator: 441,961 real-property accounts (distinct prop_id with prop_type_cd R) in the TCAD 2026 certified export, supplement 0
+    seed_decision: one seed row per real-property account from the TCAD export; the TNR layer supplies a polygon and centroid only where a polygon carries the account's PROP_ID; never seed from GIS
+    excluded_population: none among real-property accounts; MH (11,744), P (39,536) and MN (5) accounts are outside the parcel population because they are not land parcels
+    coverage_effect: accounts without their own polygon (at least the 57,567 condo units) carry no parcel coordinates; radius search reaches them only through a later condo-to-regime join or permit coordinates, reported as a coverage number and never geocoded
   - gate: corporate-registry
     reason: The official Texas corporate registry (Secretary of State) is paid; the Comptroller Active Franchise Tax Permit Holders file is used as the registry candidate source, loads candidates only (never identity), and the SOS purchase stays a human payment decision recorded in the run record.
   - gate: parcel-gis-only-contingency

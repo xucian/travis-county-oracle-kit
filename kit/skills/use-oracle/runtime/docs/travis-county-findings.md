@@ -1,5 +1,74 @@
 # Travis County, TX - county findings
 
+## 0. US egress window, 2026-10-16 (latest; supersedes the "pending" notes below)
+
+Run under US egress (`ipinfo.io/country` = `US`, a datacenter VPN exit), checked immediately before
+every request to traviscad.org, gis.traviscountytx.gov and data.texas.gov. No challenge was met on those
+three hosts; nothing was solved or evaded anywhere; BBB was not contacted.
+
+**TCAD exports: free.** The public-information page links direct downloads on
+`traviscad.org/wp-content/largefiles/` with no login, account or fee (HTTP 200, sizes matching
+`content-length`; receipts with sha256 in `docs/evidence/travis-tcad-downloads-2026-10-16.jsonl`):
+
+| File | URL | Bytes |
+| --- | --- | --- |
+| 2026 Certified Appraisal Export (supplement 0, run 2026-07-18) | `https://traviscad.org/wp-content/largefiles/2026%20Certified%20Appraisal%20Export%20Supp%200_07182026.zip` | 557,228,168 |
+| Export Layout (Legacy 8.0.33, PDF + XLSX) | `https://traviscad.org/wp-content/largefiles/Website_Legacy8.0.33-AppraisalExportLayout_06182026.zip` | 248,399 |
+| Improvement Details Report 2026 (CSV, March 2026, pre-certification) | `https://traviscad.org/wp-content/largefiles/improvement_detail_2026.zip` | 69,367,317 |
+| 2026 Certified Totals Report (PDF) | `https://traviscad.org/wp-content/uploads/totals_2026_AsOfRollCorr_0_RunID_6885_20260718_171007.pdf` | 3,428,565 |
+
+Not downloaded but listed: the 2026 Supplemental Appraisal Roll Export (Supp 335, 2026-10-08), the JSON
+"special" exports and the EARS submissions. Files sit in the gitignored `data/travis/export/`.
+
+**Layout facts.** The certified export is the PACS "Legacy 8.0.33" fixed-width format, not delimited
+text: `PROP.TXT` (4.9 GB, 493,324 records of 9,922 bytes), `IMP_DET.TXT` (2.1 GB, 3,310,160 records of
+622 bytes), `IMP_INFO.TXT`, `LAND_DET.TXT`, `PROP_ENT.TXT` (9.8 GB), `STATE_CD.TXT` and others; field
+positions come from `Legacy8.0.33-AppraisalExportLayout.xlsx`. `prop_id` is an `int(12)` field printed
+zero-padded (`000000379828`); TCAD's property search, the TNR layer (integer field) and the layer's
+hyperlinks all print the integer (`379828`), which is the identifier. `geo_id` is `char(50)` printed as
+10 digits with leading zeros on every R and MH record. Living-area detail types in `IMP_DET.TXT`: `1ST`,
+`2ND`, `3RD`, `4TH`, `5TH`, `ADDL`, `1/2`, `FBSMT`; `yr_built` is valid on 3,245,156 of 3,310,160 details.
+
+**Counts** (evidence files `travis-tcad-prop-counts-2026-10-16.json`, `travis-tcad-state-code-counts-2026-10-16.json`,
+`travis-gis-counts-2026-10-16.json`, `travis-comptroller-counts-2026-10-16.json`):
+
+- Assessed parcel count **441,961** = distinct `prop_id` with `prop_type_cd` `R` (real property) in
+  `PROP.TXT`; 442,039 R records, the 78 extra being partial-owner records. Outside the parcel population:
+  11,744 `MH` mobile-home accounts (their `geo_id` is the host parcel's), 39,536 `P` business personal
+  property accounts, 5 `MN` mineral accounts.
+- TNR GIS feature count **386,682** (`returnCountOnly` on `TCAD_public/MapServer/0`, "TCAD Parcels";
+  the FeatureServer endpoint the design named is not enabled); 13,130 polygons carry no `PROP_ID`.
+- Comptroller Active Franchise Taxpayers: **342,338** rows with `taxpayer_county_code` 227 (Travis) of
+  3,486,216 statewide.
+- Discrepancy: GIS is 55,279 (12.51%) below the assessed accounts, above the 2% threshold. Explanation:
+  57,567 condominium accounts (A4 54,675, F4 2,892) have no polygon of their own (0 of 40 sampled found
+  in the layer; 20 of 20 sampled A1 found; 16 of 20 sampled C1 vacant lots found, recent splits). Geo_ids
+  are shared: 431,536 distinct geo_ids for 441,961 real accounts (1,164 geo_ids carry several accounts),
+  so an exact `tcad_id` link can return several candidates.
+
+**Identifier proof.** 5 PROP_IDs across A1, A4, C1, F1 and B2 resolved on the TCAD property search
+(`https://travis.prodigycad.com/property-detail/<PROP_ID>`) with the export's Geographic ID, type R, state
+code and situs (`travis-identifier-spot-check-2026-10-16.json`); `identifier_proven: true`.
+
+**Readiness: still BLOCKED, on the parcel gate only** (`docs/travis-readiness-2026-10-16-us-egress.json`):
+"GIS 386682 vs assessed 441961 is approximately 12.5% (threshold 2.0%); unresolved material discrepancy".
+The kit requires the cause, canonical denominator, seed decision, excluded population and coverage effect
+to be documented **and approved** above the threshold. They are documented as a proposed exception in
+`travis-sources.yaml` (`gate: parcel-pending-operator-approval`), which the validator ignores until the
+operator approves it; a dry run on a temporary copy with the gate approved returns `PASS` with
+`seed_allowed: true`. The seed was therefore **not built**.
+
+**Portal re-probes under US egress** (`travis-portal-reprobe-us-2026-10-16.txt`): Cedar Park and Leander
+still answer the Cloudflare "Attention Required" block page (so not a geo-block; a WAF/IP-reputation rule
+against the datacenter exit); Sunset Valley GovBuilt now answers a Cloudflare challenge (recorded, not
+attempted) and its city site Akamai "Access Denied"; Pflugerville is unchanged (login + reCAPTCHA);
+Round Rock's `permits.roundrocktexas.gov/portal` answers with an account login card (vendor unidentified);
+Lakeway's city page now loads and links `https://lakewaytx-energovweb.tylerhost.net/apps/selfservice`
+(Tyler EnerGov "SelfService Public Site", HTTP 200), a candidate for the kit's `tyler-civic-access` adapter
+in T4. All six stay `blocked`. TDLR license search, TSBPE, the SOSDirect subscriber login and the
+Comptroller account-status search (`mycpa.cpa.state.tx.us/coa/` now redirects to
+`comptroller.texas.gov/taxes/franchise/account-status/search`) all answer HTTP 200 under US egress.
+
 Written 2026-10-16 during the v1 preparation window (egress outside the US all day: `curl -s
 ipinfo.io/country` returned `RO` before every probe). Everything that needs
 `traviscad.org`, `gis.traviscountytx.gov` or `data.texas.gov` is recorded as **pending the US
@@ -61,8 +130,9 @@ transform proof -> reconcile-export -> pilot publication steps (upload with read
   property search is a Prodigy CAD portal; the per-parcel URL pattern is recorded when first
   observed under US egress, never guessed.
 - Coordinates, in order: (1) TNR parcel layer
-  `https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/FeatureServer/0`
-  (fields include `PROP_ID` and `geo_id`; 1,000 features per request), paged by the seed script
+  `https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0`
+  (the FeatureServer path first assumed is not enabled; fields include `PROP_ID` and `geo_id`;
+  maxRecordCount 2,000, paged at 1,000 per request), paged by the seed script
   with the request actually made recorded per feature page; (2) the county GIS parcel shapefile if
   the service blocks paging; (3) the City of Austin parcel layer. Secondary for parcels without
   geometry: the permit `latitude`/`longitude` (present on 2,018,731 of 2,380,507 permit rows).
@@ -216,7 +286,7 @@ the `__NONE__` sentinel (appraisal only).
 | --- | --- | --- | --- |
 | Socrata permits | 2,380,507 rows | one bulk GET per run (CSV export endpoint, or SODA pages of 50,000 with `$offset`), recorded as the `source_http_request` actually made | minutes; no per-parcel harvest |
 | TCAD export | a handful of files, hundreds of MB | bulk download under US egress | minutes to download; seed build is a local join |
-| TNR parcel layer | roughly 450,000 parcels at 1,000 per request | paged REST queries, concurrency 1-2, recorded per page | about 450 requests, well under an hour |
+| TNR parcel layer | 386,682 polygons at 1,000 per request | paged REST queries (MapServer layer 0, geoJSON), concurrency 1, recorded per page | about 387 requests, well under an hour |
 | Comptroller file | about 3M rows statewide, filter Travis | bulk download | minutes |
 | Transform | per parcel, custom code, no browser | warm single process | thousands of parcels per minute class |
 

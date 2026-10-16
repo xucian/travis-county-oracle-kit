@@ -1,0 +1,224 @@
+{
+ "records": 493324,
+ "record_lengths": {
+  "9922": 493324
+ },
+ "records_by_prop_type_cd": {
+  "R": 442039,
+  "MH": 11744,
+  "P": 39536,
+  "MN": 5
+ },
+ "distinct_prop_id_by_prop_type_cd": {
+  "R": 441961,
+  "MH": 11744,
+  "P": 39536,
+  "MN": 5
+ },
+ "distinct_prop_id_total": 493246,
+ "distinct_geo_id_by_prop_type_cd": {
+  "R": 431536,
+  "MH": 2004,
+  "P": 3434,
+  "MN": 5
+ },
+ "blank_geo_id_records_by_type": {
+  "P": 36102
+ },
+ "geo_id_shapes_top": [
+  [
+   "R/len10/digits",
+   442039
+  ],
+  [
+   "MH/len10/digits",
+   11744
+  ],
+  [
+   "P/len17/mixed",
+   1853
+  ],
+  [
+   "P/len12/digits",
+   866
+  ],
+  [
+   "P/len15/mixed",
+   621
+  ],
+  [
+   "P/len10/digits",
+   50
+  ],
+  [
+   "P/len13/digits",
+   36
+  ],
+  [
+   "P/len14/digits",
+   8
+  ],
+  [
+   "MN/len17/mixed",
+   5
+  ]
+ ],
+ "real_geo_ids_shared_by_several_prop_ids": 1164,
+ "prop_val_yr": {
+  "02026": 493324
+ },
+ "sup_num": {
+  "000000000000": 493324
+ },
+ "partial_owner_flag": {
+  "F": 493212,
+  "T": 112
+ },
+ "prop_ids_with_more_than_one_owner_record": 31,
+ "real_state_code_prefix_top": [
+  [
+   "A1",
+   290375
+  ],
+  [
+   "A4",
+   54537
+  ],
+  [
+   "C1",
+   34949
+  ],
+  [
+   "O1",
+   13165
+  ],
+  [
+   "F1",
+   11682
+  ],
+  [
+   "B2",
+   9704
+  ],
+  [
+   "A2",
+   6250
+  ],
+  [
+   "E1",
+   5647
+  ],
+  [
+   "D1",
+   4502
+  ],
+  [
+   "F4",
+   2923
+  ],
+  [
+   "B1",
+   2272
+  ],
+  [
+   "A3",
+   1833
+  ],
+  [
+   "F5",
+   1661
+  ],
+  [
+   "B4",
+   1102
+  ],
+  [
+   "F3",
+   670
+  ],
+  [
+   "E2",
+   384
+  ],
+  [
+   "B3",
+   148
+  ],
+  [
+   "E3",
+   81
+  ],
+  [
+   "F2",
+   52
+  ],
+  [
+   "A5",
+   23
+  ],
+  [
+   "J5",
+   18
+  ],
+  [
+   "A9",
+   13
+  ],
+  [
+   "J1",
+   11
+  ],
+  [
+   "J4",
+   10
+  ],
+  [
+   "J6",
+   10
+  ]
+ ],
+ "source": {
+  "file": "PROP.TXT",
+  "archive": "2026 Certified Appraisal Export Supp 0_07182026.zip",
+  "layout": "Legacy8.0.33-AppraisalExportLayout.xlsx, sheet Property",
+  "positions": {
+   "prop_id": [
+    1,
+    12
+   ],
+   "prop_type_cd": [
+    13,
+    17
+   ],
+   "prop_val_yr": [
+    18,
+    22
+   ],
+   "sup_num": [
+    23,
+    34
+   ],
+   "geo_id": [
+    547,
+    596
+   ],
+   "partial_owner": [
+    679,
+    679
+   ],
+   "imprv_state_cd": [
+    2732,
+    2741
+   ],
+   "land_state_cd": [
+    2742,
+    2751
+   ]
+  },
+  "counted_at": "2026-10-16"
+ },
+ "assessed_parcel_count": {
+  "value": 441961,
+  "basis": "distinct prop_id with prop_type_cd R"
+ }
+}

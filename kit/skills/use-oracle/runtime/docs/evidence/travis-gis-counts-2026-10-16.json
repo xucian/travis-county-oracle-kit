@@ -1,0 +1,57 @@
+{
+ "queried_at": "2026-10-16",
+ "egress": "US",
+ "layer": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0",
+ "layer_name": "TCAD Parcels",
+ "description": "Obtained from Travis Central Appraisal District (TCAD) and assembled and updated monthly by Travis County Transportation &amp; Natural Resources Department (TNR).",
+ "maxRecordCount": 2000,
+ "fields": [
+  "OBJECTID",
+  "PROP_ID",
+  "geo_id",
+  "situs_num",
+  "situs_street",
+  "situs_zip",
+  "situs_address",
+  "sub_dec",
+  "entities",
+  "tcad_acres",
+  "legal_desc",
+  "hyperlink",
+  "Shape",
+  "Shape.STArea()",
+  "Shape.STLength()",
+  "situs_street_prefx",
+  "situs_street_suffix",
+  "situs_city",
+  "LOTS",
+  "CENTROID_X",
+  "CENTROID_Y"
+ ],
+ "featureserver_endpoint": {
+  "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/FeatureServer/0",
+  "response": "{\"error\":{\"code\":500,\"message\":\"Error handling service request :Server object extension 'featureserver' not found.\"}}"
+ },
+ "feature_count_where_1_1": 386682,
+ "features_with_null_prop_id": 13130,
+ "sample_presence": {
+  "A1": {
+   "sampled": 20,
+   "found": 20
+  },
+  "A4": {
+   "sampled": 20,
+   "found": 0
+  },
+  "F4": {
+   "sampled": 20,
+   "found": 0
+  },
+  "C1": {
+   "sampled": 20,
+   "found": 16
+  }
+ },
+ "sample_method": "the 20 real-property PROP_IDs per state code with the lowest sha256(\"travis-sample:\" + prop_id), queried with where PROP_ID IN (...) and returnCountOnly",
+ "distinct_count_queries": "returnDistinctValues with returnCountOnly answered HTTP 400 \"Failed to execute query\"; the exact join is measured by the seed build"
+}

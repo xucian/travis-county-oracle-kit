@@ -13,6 +13,7 @@ import {
   buildSeed,
   buildSitusAddress,
   classifyStateCodeBand,
+  decodePropId,
   hasInRangeGeometry,
   isValidGeoId,
   isValidPropId,
@@ -46,7 +47,7 @@ function record(overrides = {}) {
       py_owner_name: "DOE JOHN A",
       situs_num: "804",
       situs_street: "PARK",
-      situs_street_sufix: "BLVD",
+      situs_street_suffix: "BLVD",
       situs_city: "Austin",
       situs_zip: "78751-1234",
       legal_acreage: "0.1722",
@@ -58,7 +59,7 @@ function record(overrides = {}) {
     tnr: {
       geometry: SQUARE,
       objectId: "101",
-      request: { method: "GET", url: "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/FeatureServer/0/query", multiValueQueryString: { where: ["1=1"] } },
+      request: { method: "GET", url: "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query", multiValueQueryString: { where: ["1=1"] } },
       snapshotAt: "2026-10-16T00:00:00.000Z",
     },
   };
@@ -67,9 +68,13 @@ function record(overrides = {}) {
 describe("Travis identifiers", () => {
   it("keeps PROP_ID and geo_id as printed text", () => {
     expect(isValidPropId("900001")).toBe(true);
-    expect(isValidPropId("0123")).toBe(true);
+    expect(isValidPropId("0123")).toBe(false);
     expect(isValidPropId("")).toBe(false);
     expect(isValidPropId("12-34")).toBe(false);
+    expect(decodePropId("000000379828")).toBe("379828");
+    expect(decodePropId("379828")).toBe("379828");
+    expect(decodePropId("000000000000")).toBeNull();
+    expect(decodePropId("R-1")).toBeNull();
     expect(isValidGeoId("0219080719")).toBe(true);
     expect(isValidGeoId("219080719")).toBe(false);
   });
@@ -126,7 +131,7 @@ describe("toSeedRow", () => {
     expect(row.county_fips).toBe("48453");
     expect(Number(row.latitude)).toBeCloseTo(30.30215, 4);
     expect(JSON.parse(row.parcel_polygon)).toEqual(SQUARE);
-    expect(row.tnr_url).toContain("FeatureServer/0/query");
+    expect(row.tnr_url).toContain("MapServer/0/query");
     expect(row.source_state_cd).toBe("A1");
     expect(Object.keys(row)).toEqual([...SEED_COLUMNS]);
 
@@ -176,10 +181,11 @@ describe("pilot selection and reconciliation", () => {
   });
 
   it("reconciles roll rows, written rows and GIS features", () => {
-    const good = { rowsWritten: 2, uniquePropIds: 2, rollRows: 3, invalidPropIds: 1, gisFeatures: 3, gisJoined: 2, gisUnjoined: 1 };
+    const good = { rowsWritten: 2, uniquePropIds: 2, rollRows: 4, invalidPropIds: 1, foldedOwnerRecords: 1, gisFeatures: 3, gisJoined: 2, gisUnjoined: 1 };
     expect(() => assertSeedReconciliation(good)).not.toThrow();
+    expect(() => assertSeedReconciliation({ ...good, foldedOwnerRecords: 0 })).toThrow(/foldedOwnerRecords/);
     expect(() => assertSeedReconciliation({ ...good, uniquePropIds: 1 })).toThrow(/uniquePropIds/);
-    expect(() => assertSeedReconciliation({ ...good, rollRows: 4 })).toThrow(/rollRows/);
+    expect(() => assertSeedReconciliation({ ...good, rollRows: 5 })).toThrow(/rollRows/);
     expect(() => assertSeedReconciliation({ ...good, gisUnjoined: 0 })).toThrow(/gisFeatures/);
   });
 

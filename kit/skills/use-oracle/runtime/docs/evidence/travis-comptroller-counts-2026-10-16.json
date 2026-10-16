@@ -1,0 +1,80 @@
+{
+ "queried_at": "2026-10-16",
+ "egress": "US",
+ "dataset": "https://data.texas.gov/resource/9cir-efmm (Active Franchise Taxpayers, Texas Comptroller of Public Accounts)",
+ "rows_statewide": 3486216,
+ "rows_travis_county_code_227": 342338,
+ "austin_city_rows_by_county_code": [
+  {
+   "taxpayer_county_code": "227",
+   "n": "301087"
+  },
+  {
+   "taxpayer_county_code": "246",
+   "n": "11003"
+  },
+  {
+   "taxpayer_county_code": "105",
+   "n": "3244"
+  },
+  {
+   "taxpayer_county_code": "0",
+   "n": "815"
+  },
+  {
+   "taxpayer_county_code": "101",
+   "n": "706"
+  }
+ ],
+ "travis_rows_by_city_top": [
+  {
+   "city": "AUSTIN",
+   "n": "301087"
+  },
+  {
+   "city": "PFLUGERVILLE",
+   "n": "8373"
+  },
+  {
+   "city": "LAKEWAY",
+   "n": "3815"
+  },
+  {
+   "city": "W LAKE HILLS",
+   "n": "3699"
+  },
+  {
+   "city": "MANOR",
+   "n": "2912"
+  },
+  {
+   "city": "LEANDER",
+   "n": "2358"
+  },
+  {
+   "city": "SPICEWOOD",
+   "n": "2066"
+  },
+  {
+   "city": "LAGO VISTA",
+   "n": "1676"
+  },
+  {
+   "city": "BEE CAVE",
+   "n": "1657"
+  },
+  {
+   "city": "CEDAR PARK",
+   "n": "1622"
+  },
+  {
+   "city": "DEL VALLE",
+   "n": "1054"
+  },
+  {
+   "city": "WEST LAKE HILLS",
+   "n": "757"
+  }
+ ],
+ "note": "taxpayer_county_code is the county of the taxpayer mailing address; 227 = Travis"
+}

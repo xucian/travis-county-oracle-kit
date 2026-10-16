@@ -197,7 +197,7 @@ export function mapStateCode(stateCd, improvementValue) {
 }
 
 /**
- * @param {unknown} value - Deed date as printed (`YYYY-MM-DD`, `MM/DD/YYYY`, or with a time).
+ * @param {unknown} value - Deed date as printed: `MM-DD-YYYY` (the Legacy 8.0.33 export), `MM/DD/YYYY`, or `YYYY-MM-DD`.
  * @returns {string | null} `YYYY-MM-DD` for a real calendar date, else null.
  */
 export function parseDeedDate(value) {
@@ -205,7 +205,7 @@ export function parseDeedDate(value) {
   if (raw === null) return null;
   let iso = null;
   const isoMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(raw);
-  const usMatch = /^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(raw);
+  const usMatch = /^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/.exec(raw);
   if (isoMatch) iso = `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
   else if (usMatch) iso = `${usMatch[3]}-${usMatch[1].padStart(2, "0")}-${usMatch[2].padStart(2, "0")}`;
   if (!iso) return null;
@@ -300,13 +300,14 @@ export function buildTravisOutput(input, { manifest }) {
   const stateCd = text(tcad.state_cd);
   const classification = mapStateCode(stateCd, improvementValue);
   if (!classification.mapped) warnings.push(`unmapped state_cd ${String(stateCd)}; property_type fell back to ${classification.propertyType}`);
-  const legal = [text(tcad.legal_desc), text(tcad.legal_desc_2)].filter(Boolean).join(" ");
+  const legal = [text(tcad.legal_desc), text(tcad.legal_desc2)].filter(Boolean).join(" ");
   const builtYear = integer(tcad.yr_built);
   const livingArea = number(tcad.living_area_sqft);
   const acreage = number(tcad.legal_acreage);
   const lotSqft = acreage === null ? null : Math.round(acreage * 43560);
-  const printedOwner = text(tcad.py_owner_name);
-  const ownerClass = classifyOwnerName(printedOwner);
+  const ownerConfidential = text(tcad.owner_confidential) === "T";
+  const printedOwner = ownerConfidential ? null : text(tcad.py_owner_name);
+  const ownerClass = ownerConfidential ? "confidential" : classifyOwnerName(printedOwner);
 
   /** Lexicon-gap fields: never written into a validated entity (the CLI rejects `source_payload`); kept beside the archive. */
   const sourcePayload = {
@@ -498,13 +499,18 @@ export function buildTravisOutput(input, { manifest }) {
       );
     }
     if (deedDate) {
-      files["sales_history_1.json"] = { ownership_transfer_date: deedDate, ...envelope };
-      addRelationship("property_has_sales_history", "relationship_property_has_sales_history_1.json", "property.json", "sales_history_1.json", true);
       addRelationship(`sales_history_has_${ownerKind}`, `relationship_sales_history_1_has_${ownerKind}_1.json`, "sales_history_1.json", ownerFile, true);
     } else {
       addRelationship(`${ownerKind}_has_property`, `relationship_${ownerKind}_1_has_property.json`, ownerFile, "property.json", true);
     }
   }
+  if (deedDate) {
+    // The deed date is a fact about the property whether or not an owner entity is written
+    // (a confidential or unsplittable owner keeps the transfer date, without the owner link).
+    files["sales_history_1.json"] = { ownership_transfer_date: deedDate, ...envelope };
+    addRelationship("property_has_sales_history", "relationship_property_has_sales_history_1.json", "property.json", "sales_history_1.json", true);
+  }
+  if (ownerConfidential) warnings.push("owner flagged confidential by the roll; no owner entity or mailing address written");
 
   // --- Seed data group ------------------------------------------------------------
   files["property_seed.json"] = { parcel_id: propId, ...envelope };

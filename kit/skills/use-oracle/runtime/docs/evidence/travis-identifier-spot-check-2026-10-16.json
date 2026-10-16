@@ -1,0 +1,119 @@
+{
+ "checked_at": "2026-10-16",
+ "egress": "US",
+ "method": "one browser visit per PROP_ID to the TCAD property search (the owning source), read the ACCOUNT and LOCATION sections; no API calls replayed",
+ "all_resolve": true,
+ "checks": [
+  {
+   "prop_id": "379828",
+   "export_printed_prop_id": "000000379828",
+   "state_code_export": "A1",
+   "export": {
+    "geo_id": "0282360106",
+    "situs": "844 WHITEHALL DR",
+    "situs_city": ""
+   },
+   "tcad_property_search": {
+    "url": "https://travis.prodigycad.com/property-detail/379828",
+    "geo_id": "0282360106",
+    "type": "R",
+    "state_code": "A1",
+    "address": "844 WHITEHALL DR, TX 78660"
+   },
+   "tnr_layer": {
+    "geo_id": "0282360106",
+    "situs_address": "844 WHITEHALL DR 78660",
+    "hyperlink": "https://stage.travis.prodigycad.com/property-detail/379828"
+   },
+   "resolves": true
+  },
+  {
+   "prop_id": "583669",
+   "export_printed_prop_id": "000000583669",
+   "state_code_export": "A4",
+   "export": {
+    "geo_id": "0137681242",
+    "situs": "64 WHITE MAGNOLIA CIR",
+    "situs_city": "AUSTIN"
+   },
+   "tcad_property_search": {
+    "url": "https://travis.prodigycad.com/property-detail/583669",
+    "geo_id": "0137681242",
+    "type": "R",
+    "state_code": "A4",
+    "address": "64 WHITE MAGNOLIA CIR, AUSTIN TX 78734"
+   },
+   "tnr_layer": null,
+   "resolves": true
+  },
+  {
+   "prop_id": "182212",
+   "export_printed_prop_id": "000000182212",
+   "state_code_export": "C1",
+   "export": {
+    "geo_id": "0183670314",
+    "situs": "F M RD 1431",
+    "situs_city": ""
+   },
+   "tcad_property_search": {
+    "url": "https://travis.prodigycad.com/property-detail/182212",
+    "geo_id": "0183670314",
+    "type": "R",
+    "state_code": "C1",
+    "address": "F M RD 1431, TX 78645"
+   },
+   "tnr_layer": {
+    "geo_id": "0183670314",
+    "situs_address": "F M RD 1431 78645",
+    "hyperlink": "https://stage.travis.prodigycad.com/property-detail/182212"
+   },
+   "resolves": true
+  },
+  {
+   "prop_id": "506701",
+   "export_printed_prop_id": "000000506701",
+   "state_code_export": "F1",
+   "export": {
+    "geo_id": "0280230106",
+    "situs": "16215 BRATTON LN",
+    "situs_city": ""
+   },
+   "tcad_property_search": {
+    "url": "https://travis.prodigycad.com/property-detail/506701",
+    "geo_id": "0280230106",
+    "type": "R",
+    "state_code": "F1",
+    "address": "16215 BRATTON LN, TX 78728"
+   },
+   "tnr_layer": {
+    "geo_id": "0280230106",
+    "situs_address": "16215 BRATTON LN 78728",
+    "hyperlink": "https://stage.travis.prodigycad.com/property-detail/506701"
+   },
+   "resolves": true
+  },
+  {
+   "prop_id": "237985",
+   "export_printed_prop_id": "000000237985",
+   "state_code_export": "B2",
+   "export": {
+    "geo_id": "0235140248",
+    "situs": "210 W LOLA DR",
+    "situs_city": ""
+   },
+   "tcad_property_search": {
+    "url": "https://travis.prodigycad.com/property-detail/237985",
+    "geo_id": "0235140248",
+    "type": "R",
+    "state_code": "B2",
+    "address": "210 W LOLA DR, TX 78753"
+   },
+   "tnr_layer": {
+    "geo_id": "0235140248",
+    "situs_address": "210 W LOLA DR 78753",
+    "hyperlink": "https://stage.travis.prodigycad.com/property-detail/237985"
+   },
+   "resolves": true
+  }
+ ]
+}
