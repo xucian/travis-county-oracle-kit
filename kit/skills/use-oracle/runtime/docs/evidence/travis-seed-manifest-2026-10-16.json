@@ -1,0 +1,354 @@
+{
+  "schemaVersion": "travis.seed-manifest.v2",
+  "builtAt": "2026-10-16T18:22:43.623Z",
+  "layoutVersion": "Legacy8.0.33",
+  "exportUrl": "https://traviscad.org/wp-content/largefiles/2026%20Certified%20Appraisal%20Export%20Supp%200_07182026.zip",
+  "exportArchive": "2026 Certified Appraisal Export Supp 0_07182026.zip",
+  "exportArchiveSha256": "62d0d1cd22b03f31db8d3986160eb181c5d00044df98a303fce9e17a44e9aa02",
+  "fieldPositions": {
+    "PROP": {
+      "prop_id": [
+        1,
+        12,
+        "int"
+      ],
+      "prop_type_cd": [
+        13,
+        17,
+        "text"
+      ],
+      "prop_val_yr": [
+        18,
+        22,
+        "int"
+      ],
+      "sup_num": [
+        23,
+        34,
+        "int"
+      ],
+      "geo_id": [
+        547,
+        596,
+        "text"
+      ],
+      "py_owner_name": [
+        609,
+        678,
+        "text"
+      ],
+      "partial_owner": [
+        679,
+        679,
+        "text"
+      ],
+      "py_addr_line1": [
+        694,
+        753,
+        "text"
+      ],
+      "py_addr_line2": [
+        754,
+        813,
+        "text"
+      ],
+      "py_addr_line3": [
+        814,
+        873,
+        "text"
+      ],
+      "py_addr_city": [
+        874,
+        923,
+        "text"
+      ],
+      "py_addr_state": [
+        924,
+        973,
+        "text"
+      ],
+      "py_addr_zip": [
+        979,
+        983,
+        "text"
+      ],
+      "py_confidential_flag": [
+        990,
+        990,
+        "text"
+      ],
+      "py_address_suppress_flag": [
+        991,
+        991,
+        "text"
+      ],
+      "situs_street_prefx": [
+        1040,
+        1049,
+        "text"
+      ],
+      "situs_street": [
+        1050,
+        1099,
+        "text"
+      ],
+      "situs_street_suffix": [
+        1100,
+        1109,
+        "text"
+      ],
+      "situs_city": [
+        1110,
+        1139,
+        "text"
+      ],
+      "situs_zip": [
+        1140,
+        1149,
+        "text"
+      ],
+      "legal_desc": [
+        1150,
+        1404,
+        "text"
+      ],
+      "legal_desc2": [
+        1405,
+        1659,
+        "text"
+      ],
+      "legal_acreage": [
+        1660,
+        1675,
+        "dec4"
+      ],
+      "abs_subdv_cd": [
+        1676,
+        1685,
+        "text"
+      ],
+      "hood_cd": [
+        1686,
+        1695,
+        "text"
+      ],
+      "block": [
+        1696,
+        1745,
+        "text"
+      ],
+      "tract_or_lot": [
+        1746,
+        1795,
+        "text"
+      ],
+      "land_hstd_val": [
+        1796,
+        1810,
+        "int"
+      ],
+      "land_non_hstd_val": [
+        1811,
+        1825,
+        "int"
+      ],
+      "imprv_hstd_val": [
+        1826,
+        1840,
+        "int"
+      ],
+      "imprv_non_hstd_val": [
+        1841,
+        1855,
+        "int"
+      ],
+      "ag_use_val": [
+        1856,
+        1870,
+        "int"
+      ],
+      "appraised_val": [
+        1916,
+        1930,
+        "int"
+      ],
+      "assessed_val": [
+        1946,
+        1960,
+        "int"
+      ],
+      "deed_book_id": [
+        1994,
+        2013,
+        "text"
+      ],
+      "deed_book_page": [
+        2014,
+        2033,
+        "text"
+      ],
+      "deed_dt": [
+        2034,
+        2058,
+        "text"
+      ],
+      "imprv_state_cd": [
+        2732,
+        2741,
+        "text"
+      ],
+      "land_state_cd": [
+        2742,
+        2751,
+        "text"
+      ],
+      "market_value": [
+        4214,
+        4227,
+        "int"
+      ],
+      "situs_num": [
+        4460,
+        4474,
+        "text"
+      ],
+      "situs_unit": [
+        4475,
+        4479,
+        "text"
+      ]
+    },
+    "IMP_DET": {
+      "prop_id": [
+        1,
+        12,
+        "int"
+      ],
+      "prop_val_yr": [
+        13,
+        16,
+        "int"
+      ],
+      "imprv_id": [
+        17,
+        28,
+        "int"
+      ],
+      "imprv_det_id": [
+        29,
+        40,
+        "int"
+      ],
+      "imprv_det_type_cd": [
+        41,
+        50,
+        "text"
+      ],
+      "yr_built": [
+        86,
+        89,
+        "int"
+      ],
+      "imprv_det_area": [
+        94,
+        108,
+        "int"
+      ]
+    },
+    "ABS_SUBD": {
+      "abs_subdv_cd": [
+        1,
+        10,
+        "text"
+      ],
+      "abs_subdv_desc": [
+        11,
+        50,
+        "text"
+      ]
+    }
+  },
+  "livingAreaDetailTypes": [
+    "1ST",
+    "2ND",
+    "3RD",
+    "4TH",
+    "5TH",
+    "ADDL",
+    "1/2",
+    "FBSMT"
+  ],
+  "counts": {
+    "propRecords": 493324,
+    "propRecordsByType": {
+      "R": 442039,
+      "MH": 11744,
+      "P": 39536,
+      "MN": 5
+    },
+    "propRecordsByYear": {
+      "2026": 493324
+    },
+    "rollRows": 442039,
+    "rowsWritten": 441961,
+    "uniquePropIds": 441961,
+    "invalidPropIds": 0,
+    "foldedOwnerRecords": 78,
+    "gisFeatures": 373552,
+    "gisJoined": 373541,
+    "gisUnjoined": 11,
+    "assessedParcelCount": 441961,
+    "confidentialOwners": 0,
+    "foldedOwnerPropIds": 31,
+    "improvementDetailRecords": 3310160,
+    "improvementDetailBadLength": 0,
+    "propertiesWithImprovementDetails": 400963,
+    "subdivisionCodes": 28378,
+    "gisFeatureCount": 386682,
+    "gisFeaturesWithoutPropId": 13130,
+    "gisPages": 387,
+    "gisDistinctPropIds": 373524,
+    "rowsWithGeometry": 373513,
+    "rowsWithoutGeometry": 68448
+  },
+  "tcadIdNormalizationProof": {
+    "normalizationVersion": "travis-tcad-id-digits-v1",
+    "checkedCount": 441961,
+    "distinctGeoIds": 431536,
+    "distinctDigits": 431536,
+    "oneToOne": true,
+    "collisions": []
+  },
+  "pilot": {
+    "path": "data/seeds/travis-pilot.csv",
+    "size": 25,
+    "propIds": [
+      "897804",
+      "119247",
+      "503197",
+      "928530",
+      "219803",
+      "1012070",
+      "106280",
+      "955150",
+      "377261",
+      "547839",
+      "981340",
+      "353308",
+      "374234",
+      "485011",
+      "748284",
+      "959870",
+      "1004959",
+      "230816",
+      "206865",
+      "506698",
+      "1003794",
+      "830704",
+      "358940",
+      "105452",
+      "374454"
+    ]
+  },
+  "output": "data/seeds/travis.csv"
+}
