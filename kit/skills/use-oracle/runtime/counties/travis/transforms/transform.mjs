@@ -38,15 +38,24 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const TRANSFORM_VERSION = "travis-transform-v1";
+export const TRANSFORM_VERSION = "travis-transform-v2";
 export const PARCEL_INPUT_SCHEMA_VERSION = "travis.parcel-input.v1";
 export const COUNTY_JURISDICTION = "Travis";
 export const STATE_CODE = "TX";
-export const OWNER_CLASSIFICATION_VERSION = "travis-owner-classification-v1";
+export const OWNER_CLASSIFICATION_VERSION = "travis-owner-classification-v2";
+export const STATE_CODE_MAPPING_VERSION = "travis-state-code-v1";
 /** Lexicon-gap sidecar written beside `data/`, never inside it (the CLI rejects `source_payload` on validated entities). */
 export const SOURCE_PAYLOAD_FILENAME = "source-payload.json";
 
-/** Owner-name tokens that mark a company (checked as whole tokens). */
+/**
+ * Owner-name tokens that mark a company (checked as whole tokens). The v2 additions come from the
+ * whole 2026 roll: words that sit almost only in company-classified owner strings (trust forms
+ * such as REVOCABLE and LIVING, whose "TRUST" the roll's 30-character owner field often cuts off;
+ * districts, schools, churches, associations; truncated forms such as ASSOCIATI), excluding words
+ * that are also common given names or surnames in the roll (AUSTIN, CHRISTIAN, PARISH, STREET,
+ * NORTH, PLAZA, LOAN ...). Where a word is mostly organizational, company is the safer error: the
+ * company keeps the owner string, a wrong person split would invent a name.
+ */
 export const COMPANY_TOKENS = Object.freeze([
   "LLC", "L.L.C.", "LLLP", "LLP", "PLLC", "INC", "INC.", "CORP", "CORP.", "CORPORATION", "CO", "CO.", "COMPANY",
   "LTD", "LTD.", "LP", "L.P.", "LIMITED", "PARTNERSHIP", "PARTNERS", "TRUST", "TRUSTEE", "TRUSTEES", "TR",
@@ -54,10 +63,56 @@ export const COMPANY_TOKENS = Object.freeze([
   "INVESTMENTS", "ENTERPRISES", "GROUP", "FUND", "FOUNDATION", "USA", "ISD", "DISTRICT", "AUTHORITY",
   "UNIVERSITY", "HOSPITAL", "REALTY", "VENTURES", "CAPITAL", "DEVELOPMENT", "HOMES", "BUILDERS", "ESTATES",
   "CONDOMINIUMS", "APARTMENTS", "MANAGEMENT", "SERVICES", "SYSTEMS", "NATIONAL", "FEDERAL", "STATE", "CITY", "COUNTY",
-  "GOVERNMENT", "UNITED",
+  "GOVERNMENT", "UNITED", "ESTATE", "TRST", "TRSTS", "TRSTES", "TRS",
+  "INCORPORATED", "TRUSTS", "REVOCABLE", "IRREVOCABLE", "LIVING", "FAMILY", "TESTAMENTARY", "EXEMPT", "GST",
+  "OF", "THE", "PUBLIC", "SCHOOL", "SCHOOLS", "COLLEGE", "ACADEMY", "SEMINARY", "MUNICIPAL", "UTILITY", "MUD",
+  "COMMUNITY", "NEIGHBORHOOD", "HOMEOWNERS", "OWNERS", "MASTER", "HOUSING", "FINANCE", "EQUITY", "HOMEBUYER",
+  "SERIES", "VENTURE", "CONSTRUCTION", "MEDICAL", "COMMERCIAL", "INVESTMENT", "ASSOCIATES", "INDUSTRIES",
+  "PRODUCTIONS", "CENTER", "PROPERTY", "CONGREGATION", "FELLOWSHIP", "BAPTIST", "METHODIST", "CATHOLIC",
+  "LUTHERAN", "PRESBYTERIAN", "EPISCOPAL", "DIOCESE", "MISSIONARY", "CONSERVANCY", "CEMETERY", "TRANSPORTATION",
+  "RAILROAD", "RAILWAY", "AT", "ON", "RESIDENTIAL", "WATER", "SUPPLY", "SECTION", "PHASE", "PATIO", "COMMITTEE", "CLUB",
+  "SOCIETY", "INSURANCE", "MORTGAGE", "CREDIT", "AGENCY", "INSTITUTE", "INTERNATIONAL", "COOPERATIVE", "RENTAL",
+  "RENTALS", "RETAIL", "OFFICE", "CONDOMINIUM", "TOWNHOUSE", "TOWNHOMES", "COMMUNITIES", "DEVELOPERS", "INVESTORS",
+  "HOMEOWNER", "OWNER", "ASSOCIAT", "ASSOCIATI", "ASSOCIATIO", "ASSO", "CORPORA", "CORPORAT", "CORPORATIO",
+  "BUILDING", "STATION", "FARMS", "CHAPEL", "JOINT",
 ]);
 
+/** Spaced entity-form and district abbreviations as the roll prints them (L L C, L P, I S D, M U D, L C R A, W C I D). */
+const COMPANY_PATTERNS = Object.freeze([/\bL ?L ?C\b/, /\bL ?L ?P\b/, /\bL ?P$/, /\bI ?S ?D\b/, /\bM ?U ?D\b/, /\bL ?C ?R ?A\b/, /\bW ?C ?I ?D\b/]);
+
 const COMPANY_PHRASES = Object.freeze(["CITY OF", "COUNTY OF", "STATE OF", "ESTATE OF", "UNITED STATES"]);
+
+/**
+ * Roll annotations that qualify an owner without naming one (whole words,
+ * removed before classification and splitting): et al., et ux., et vir, life
+ * estate, the Veterans Land Board marker, and anything after a care-of `%`.
+ * The printed string stays in the sidecar.
+ */
+const OWNER_ANNOTATIONS = Object.freeze([
+  /\(LIFE ESTATE\)/g,
+  /\bLIFE ESTATE\b/g,
+  /\bLIFE EST\b/g,
+  /\bET ?AL\b/g,
+  /\bET ?UX\b/g,
+  /\bET ?VIR\b/g,
+  /\(VLB\)/g,
+]);
+
+/**
+ * Remove the roll's annotations from an owner string: the care-of tail after
+ * `%`, the qualifiers above, and a trailing `&`; collapse whitespace.
+ *
+ * @param {string} printed - Owner string as printed.
+ * @returns {string} The owner name without annotations (upper case kept).
+ */
+export function stripOwnerAnnotations(printed) {
+  let name = printed.toUpperCase().split("%")[0];
+  for (const pattern of OWNER_ANNOTATIONS) name = name.replace(pattern, " ");
+  name = name.replace(/\s+/g, " ").trim();
+  name = name.replace(/[\s&,/-]+$/g, "").trim();
+  return name;
+}
+
 const SUFFIXES = Object.freeze({ JR: "Jr.", "JR.": "Jr.", SR: "Sr.", "SR.": "Sr.", II: "II", III: "III", IV: "IV" });
 
 /**
@@ -113,8 +168,10 @@ const NAME_TOKEN = /^[A-Z][a-z]*([ \-',.][A-Za-z][a-z]*)*$/;
 export function classifyOwnerName(printed) {
   const name = text(printed);
   if (name === null) return "unknown";
-  const upper = name.toUpperCase();
+  const upper = stripOwnerAnnotations(name);
+  if (upper === "") return "unknown";
   if (COMPANY_PHRASES.some((phrase) => upper.includes(phrase))) return "company";
+  if (COMPANY_PATTERNS.some((pattern) => pattern.test(upper))) return "company";
   const tokens = upper.split(/[\s,]+/).filter(Boolean);
   if (tokens.some((token) => COMPANY_TOKENS.includes(token))) return "company";
   if (/\d/.test(upper)) return "company";
@@ -130,7 +187,7 @@ export function classifyOwnerName(printed) {
  * @returns {{ first_name: string, last_name: string, middle_name: string | null, suffix_name: string | null } | null} Fields, or null when the string cannot be split into a valid person.
  */
 export function splitPersonName(printed) {
-  const primary = printed.split("&")[0].trim();
+  const primary = stripOwnerAnnotations(printed).split("&")[0].trim();
   const rawTokens = primary.split(/\s+/).filter(Boolean);
   let suffix = null;
   const tokens = [];
@@ -148,52 +205,65 @@ export function splitPersonName(printed) {
   return { first_name: first, last_name: last, middle_name: middle, suffix_name: suffix };
 }
 
-/** TCAD state/property class code to lexicon `property_type` (exact codes; anything else falls back by improvement value). */
-export const PROPERTY_TYPE_BY_STATE_CODE = Object.freeze({
-  A1: "SingleFamily",
-  A2: "ManufacturedHome",
-  A3: "Condominium",
-  A4: "Townhouse",
-  B1: "Apartment",
-  B2: "Duplex",
-  B3: "3Units",
-  B4: "4Units",
-  C1: "VacantLand",
-  C2: "VacantLand",
-  C3: "VacantLand",
-  E1: "SingleFamily",
-  E2: "ManufacturedHome",
-  F1: "Building",
-  F2: "Building",
-  M1: "MobileHome",
-});
-
-/** TCAD state/property class prefix to lexicon `property_usage_type`. */
-export const USAGE_TYPE_BY_STATE_PREFIX = Object.freeze({
-  A: "Residential",
-  B: "Residential",
-  E: "Residential",
-  D: "Agricultural",
-  F1: "Commercial",
-  F2: "Industrial",
-  F: "Commercial",
-  J: "Utility",
-  M: "Residential",
+/**
+ * TCAD state codes (STATE_CD.TXT of the 2026 certified export, descriptions
+ * quoted) to lexicon `property_type` and `property_usage_type`. A null
+ * `propertyType` means "by improvement value": `Building` when improved,
+ * else `LandParcel`. A null usage means the code does not determine one; the
+ * raw code stays in the sidecar. Version: {@link STATE_CODE_MAPPING_VERSION}.
+ */
+export const TCAD_STATE_CODE_MAPPING = Object.freeze({
+  A1: { description: "SINGLE FAMILY RESIDENCE", propertyType: "SingleFamily", usageType: "Residential" },
+  A2: { description: "SINGLE FAMILY RESIDENCE MH", propertyType: "ManufacturedHome", usageType: "Residential" },
+  A3: { description: "SINGLE FAMILY RESIDENCE DETAILS", propertyType: "MiscellaneousResidential", usageType: "Residential" },
+  A4: { description: "CONDOS", propertyType: "Condominium", usageType: "Residential" },
+  A5: { description: "CONDOS DETAILS", propertyType: "Condominium", usageType: "Residential" },
+  A9: { description: "HS COMMERCIAL HIGHEST & BEST USE", propertyType: "SingleFamily", usageType: "Residential" },
+  B1: { description: "MULTIFAMILY", propertyType: "MultipleFamily", usageType: "Residential" },
+  B2: { description: "DUPLEX", propertyType: "Duplex", usageType: "Residential" },
+  B3: { description: "TRI-PLEX", propertyType: "3Units", usageType: "Residential" },
+  B4: { description: "FOUR-PLEX", propertyType: "4Units", usageType: "Residential" },
+  B5: { description: "MULTIFAMILY WITH HS", propertyType: "MultipleFamily", usageType: "Residential" },
+  C1: { description: "VACANT LOT", propertyType: "VacantLand", usageType: null },
+  C2: { description: "COLONIA PROPERTY", propertyType: "VacantLand", usageType: null },
+  D1: { description: "ACREAGE (AG) 1-D / 1-D-1", propertyType: "LandParcel", usageType: "Agricultural" },
+  D2: { description: "IMPR DETAIL ON D1 LAND", propertyType: "Building", usageType: "Agricultural" },
+  D3: { description: "AG 1-D", propertyType: "LandParcel", usageType: "Agricultural" },
+  E1: { description: "FARM AND RANCH IMPR ON NON-AG LAND", propertyType: null, usageType: null },
+  E2: { description: "FARM AND RANCH IMPR MH ON NON-AG LAND", propertyType: "ManufacturedHome", usageType: null },
+  E3: { description: "FARM AND RANCH IMPR MISC ON NON-AG LAND", propertyType: null, usageType: null },
+  F1: { description: "COMMERCIAL IMPROVED", propertyType: "Building", usageType: "Commercial" },
+  F2: { description: "INDUSTRIAL MAJOR MANUFACTURING IMPROVED", propertyType: "Building", usageType: "Industrial" },
+  F3: { description: "COMMERCIAL DETAILS", propertyType: null, usageType: "Commercial" },
+  F4: { description: "COMMERCIAL CONDO", propertyType: "Unit", usageType: "Commercial" },
+  F5: { description: "COMMERCIAL RES CONVERSION", propertyType: "Building", usageType: "Commercial" },
+  J1: { description: "UTILITY (WATER)", propertyType: null, usageType: "Utility" },
+  J2: { description: "UTILITY (GAS)", propertyType: null, usageType: "Utility" },
+  J3: { description: "UTILITY (ELECTRIC)", propertyType: null, usageType: "Utility" },
+  J4: { description: "UTILITY (TELEPHONE)", propertyType: null, usageType: "TelecommunicationsFacility" },
+  J5: { description: "UTILITY (RAILROADS)", propertyType: null, usageType: "Railroad" },
+  J6: { description: "UTILITY (PIPELINES)", propertyType: null, usageType: "Utility" },
+  J7: { description: "UTILITY (CABLE)", propertyType: null, usageType: "Utility" },
+  J8: { description: "UTILITY (OTHER)", propertyType: null, usageType: "Utility" },
+  M1: { description: "TANGIBLE PERSONAL PROP MH", propertyType: "ManufacturedHome", usageType: "Residential" },
+  O1: { description: "RESIDENTIAL INVENTORY", propertyType: null, usageType: "Residential" },
+  S1: { description: "SPECIAL INVENTORY", propertyType: null, usageType: null },
+  X: { description: "TOTALLY EXEMPT PROPERTY", propertyType: null, usageType: null },
 });
 
 /**
- * @param {string | null} stateCd - TCAD state code.
+ * @param {string | null} stateCd - TCAD state code (imprv_state_cd, else land_state_cd).
  * @param {number | null} improvementValue - Improvement value, when printed.
- * @returns {{ propertyType: string, usageType: string | null, buildStatus: string | null, mapped: boolean }} Lexicon classification.
+ * @returns {{ propertyType: string, usageType: string | null, buildStatus: string | null, mapped: boolean, description: string | null }} Lexicon classification.
  */
 export function mapStateCode(stateCd, improvementValue) {
   const code = (stateCd ?? "").toUpperCase();
-  const propertyType = PROPERTY_TYPE_BY_STATE_CODE[code] ?? null;
-  const usageType = USAGE_TYPE_BY_STATE_PREFIX[code] ?? USAGE_TYPE_BY_STATE_PREFIX[code.charAt(0)] ?? null;
+  const entry = TCAD_STATE_CODE_MAPPING[code] ?? null;
   const improved = improvementValue !== null && improvementValue > 0;
   const buildStatus = code.startsWith("C") ? "VacantLand" : improved ? "Improved" : improvementValue === null ? null : "VacantLand";
-  if (propertyType) return { propertyType, usageType, buildStatus, mapped: true };
-  return { propertyType: improved ? "Building" : "LandParcel", usageType, buildStatus, mapped: false };
+  const byImprovement = improved ? "Building" : "LandParcel";
+  if (!entry) return { propertyType: byImprovement, usageType: null, buildStatus, mapped: false, description: null };
+  return { propertyType: entry.propertyType ?? byImprovement, usageType: entry.usageType, buildStatus, mapped: true, description: entry.description };
 }
 
 /**
@@ -288,6 +358,10 @@ export function buildTravisOutput(input, { manifest }) {
     }
   };
 
+  if (text(tcad.situs_street) === null) {
+    throw new Error("no situs address: the roll prints no situs street for this account");
+  }
+
   // --- property -------------------------------------------------------------
   const improvementValue =
     number(tcad.imprv_hstd_val) === null && number(tcad.imprv_non_hstd_val) === null
@@ -299,11 +373,12 @@ export function buildTravisOutput(input, { manifest }) {
       : (number(tcad.land_hstd_val) ?? 0) + (number(tcad.land_non_hstd_val) ?? 0);
   const stateCd = text(tcad.state_cd);
   const classification = mapStateCode(stateCd, improvementValue);
-  if (!classification.mapped) warnings.push(`unmapped state_cd ${String(stateCd)}; property_type fell back to ${classification.propertyType}`);
+  if (!classification.mapped) warnings.push(`unmapped state_cd ${String(stateCd)}; property_type fell back to ${classification.propertyType}, usage null`);
   const legal = [text(tcad.legal_desc), text(tcad.legal_desc2)].filter(Boolean).join(" ");
   const builtYear = integer(tcad.yr_built);
   const livingArea = number(tcad.living_area_sqft);
-  const acreage = number(tcad.legal_acreage);
+  // A zero legal acreage means the roll prints none (platted lots); it is never a lot of 0 square feet.
+  const acreage = number(tcad.legal_acreage) !== null && number(tcad.legal_acreage) > 0 ? number(tcad.legal_acreage) : null;
   const lotSqft = acreage === null ? null : Math.round(acreage * 43560);
   const ownerConfidential = text(tcad.owner_confidential) === "T";
   const printedOwner = ownerConfidential ? null : text(tcad.py_owner_name);
@@ -317,12 +392,22 @@ export function buildTravisOutput(input, { manifest }) {
     geo_id: geoId,
     state_cd: stateCd,
     prop_type_cd: text(tcad.prop_type_cd),
+    state_code_mapping_version: STATE_CODE_MAPPING_VERSION,
+    state_cd_description: classification.description,
+    imprv_state_cd: text(tcad.imprv_state_cd),
+    land_state_cd: text(tcad.land_state_cd),
     hood_cd: text(tcad.hood_cd),
     abs_subdv_cd: text(tcad.abs_subdv_cd),
     situs_city: text(input.situs?.city),
+    appraised_val: number(tcad.appraised_val),
+    legal_acreage: number(tcad.legal_acreage),
+    deed_book_id: text(tcad.deed_book_id),
+    deed_book_page: text(tcad.deed_book_page),
+    imprv_count: integer(tcad.imprv_count),
     owner: {
       classification_version: OWNER_CLASSIFICATION_VERSION,
       printed_name: printedOwner,
+      name_without_annotations: printedOwner === null ? null : stripOwnerAnnotations(printedOwner),
       classification: ownerClass,
       owner_key: printedOwner === null ? null : `${propId}:${printedOwner}`,
     },
@@ -338,9 +423,11 @@ export function buildTravisOutput(input, { manifest }) {
     property_effective_built_year: null,
     property_legal_description_text: legal || null,
     subdivision: text(tcad.abs_subdv_desc),
-    livable_floor_area: livingArea === null ? null : String(livingArea),
+    // The lexicon pattern needs two or more digits; a living area under 10 sqft is not a living area.
+    livable_floor_area: livingArea !== null && livingArea >= 10 ? String(Math.round(livingArea)) : null,
     area_under_air: null,
-    total_area: lotSqft === null ? null : String(lotSqft),
+    // total_area is building area; the roll gives living area only, so it stays null (never the lot area).
+    total_area: null,
     number_of_units: null,
     number_of_units_type: null,
     structure_form: null,
@@ -360,8 +447,10 @@ export function buildTravisOutput(input, { manifest }) {
     unnormalized_address: text(situs.address),
     city_name: text(situs.city) ? String(situs.city).toUpperCase().replace(/[^A-Z\s\-']/g, "") || null : null,
     state_code: STATE_CODE,
-    postal_code: zip && /^\d{5}$/.test(zip) ? zip : null,
+    postal_code: zip && /^\d{5}/.test(zip) ? zip.slice(0, 5) : null,
     country_code: "US",
+    block: text(tcad.block),
+    lot: text(tcad.tract_or_lot),
     latitude: centroid?.latitude ?? null,
     longitude: centroid?.longitude ?? null,
     ...envelope,
@@ -420,18 +509,18 @@ export function buildTravisOutput(input, { manifest }) {
   const appraised = number(tcad.appraised_val);
   if (taxYear !== null && (market !== null || assessed !== null || appraised !== null)) {
     const taxName = `tax_${taxYear}.json`;
-    // `property_taxable_value_amount` is a non-nullable number in the live schema: the roll's
-    // assessed value is the pre-exemption taxable basis (exemptions are per taxing entity in the
-    // export's entity file, not loaded in v1). Amounts the roll does not print are omitted.
-    const taxableBasis = assessed ?? appraised ?? market;
+    // The roll prints market, appraised and assessed values per account. Taxable values are per
+    // taxing entity (PROP_ENT.TXT, not read in v1), so `property_taxable_value_amount` is omitted
+    // rather than proxied from the assessed value. Non-nullable amounts the roll does not print are
+    // omitted; nullable ones are written as null.
+    const assessedAmount = assessed ?? appraised;
     const agricultural = number(tcad.ag_use_val);
     files[taxName] = {
       tax_year: taxYear,
-      property_market_value_amount: market,
-      property_assessed_value_amount: assessed ?? appraised,
+      ...(market !== null ? { property_market_value_amount: market } : {}),
+      ...(assessedAmount !== null ? { property_assessed_value_amount: assessedAmount } : {}),
       property_building_amount: improvementValue,
       property_land_amount: landValue,
-      property_taxable_value_amount: taxableBasis,
       ...(agricultural !== null && agricultural > 0 ? { agricultural_valuation_amount: agricultural } : {}),
       monthly_tax_amount: null,
       yearly_tax_amount: null,
@@ -452,7 +541,8 @@ export function buildTravisOutput(input, { manifest }) {
   if (ownerClass === "company") {
     ownerFile = "company_1.json";
     ownerKind = "company";
-    files[ownerFile] = { name: printedOwner, sunbiz_document_number: null, ...envelope };
+    // `company.name` has no lexicon pattern: the owner string without the roll's annotations, upper case kept.
+    files[ownerFile] = { name: stripOwnerAnnotations(printedOwner), sunbiz_document_number: null, ...envelope };
   } else if (ownerClass === "person") {
     const person = splitPersonName(printedOwner);
     if (person) {

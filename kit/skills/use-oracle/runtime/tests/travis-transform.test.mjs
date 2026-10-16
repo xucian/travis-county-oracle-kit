@@ -14,6 +14,7 @@ import {
   parseDeedDate,
   resolveDataGroupCids,
   splitPersonName,
+  stripOwnerAnnotations,
   toTitleCase,
 } from "../counties/travis/transforms/transform.mjs";
 
@@ -56,6 +57,66 @@ describe("owner classification and normalization (decisions.md section 16)", () 
     expect(parseDeedDate("06/15/2015")).toBe("2015-06-15");
     expect(parseDeedDate("2015-02-30")).toBeNull();
     expect(parseDeedDate("")).toBeNull();
+  });
+});
+
+describe("v2 rules: owner annotations, TCAD state codes, areas, situs (T2 pilot findings)", () => {
+  it("removes the roll's owner annotations before classifying and splitting, on whole words only", () => {
+    expect(stripOwnerAnnotations("SMITH JOHN ETAL")).toBe("SMITH JOHN");
+    expect(stripOwnerAnnotations("SMITH JOHN ET AL")).toBe("SMITH JOHN");
+    expect(stripOwnerAnnotations("DOE JANE (LIFE ESTATE)")).toBe("DOE JANE");
+    expect(stripOwnerAnnotations("DOE JANE LIFE ESTATE &")).toBe("DOE JANE");
+    expect(stripOwnerAnnotations("ACME HOLDINGS LLC % JOHN DOE")).toBe("ACME HOLDINGS LLC");
+    expect(stripOwnerAnnotations("LLOBET ALAN")).toBe("LLOBET ALAN");
+    expect(classifyOwnerName("SMITH JOHN ETAL")).toBe("person");
+    expect(splitPersonName("SMITH JOHN ETAL")).toEqual({ first_name: "John", last_name: "Smith", middle_name: null, suffix_name: null });
+    expect(splitPersonName("DOE JANE M LIFE ESTATE")).toEqual({ first_name: "Jane", last_name: "Doe", middle_name: "M", suffix_name: null });
+    expect(splitPersonName("LLOBET ALAN")).toEqual({ first_name: "Alan", last_name: "Llobet", middle_name: null, suffix_name: null });
+    expect(classifyOwnerName("DOE JOHN ESTATE")).toBe("company");
+    expect(classifyOwnerName("DOE JOHN TRST")).toBe("company");
+    expect(classifyOwnerName("DOE JANE LIFE ESTATE")).toBe("person");
+    expect(classifyOwnerName("ETAL")).toBe("unknown");
+  });
+
+  it("classifies the roll's organizational owners, including spaced abbreviations and truncated trust names", () => {
+    for (const owner of ["GSGB L P", "PFLUGERVILLE I S D", "LAKEWAY M U D", "L C R A", "COSSA GREBMORF L L C", "ENGLISH JOANNE K REVOCABLE", "SOUTHERN PACIFIC TRANSPORTATION", "AUSTIN PUBLIC SCHOOLS", "PALISADES ON BARTON CREEK"]) {
+      expect(classifyOwnerName(owner), owner).toBe("company");
+    }
+    for (const owner of ["STOWELL AUSTIN & STEPHANIE", "TAYLOR CHRISTIAN CADE", "PARISH DOUGLAS W", "PLAZA VALERIE MICHELLE", "SMITH JOHN L"]) {
+      expect(classifyOwnerName(owner), owner).toBe("person");
+    }
+  });
+
+  it("maps TCAD's own state codes (STATE_CD.TXT), not the Florida-style table", () => {
+    expect(mapStateCode("A3", 1000)).toMatchObject({ propertyType: "MiscellaneousResidential", usageType: "Residential", mapped: true });
+    expect(mapStateCode("A4", 250000)).toMatchObject({ propertyType: "Condominium", usageType: "Residential" });
+    expect(mapStateCode("A5", 0)).toMatchObject({ propertyType: "Condominium" });
+    expect(mapStateCode("B1", 1)).toMatchObject({ propertyType: "MultipleFamily", usageType: "Residential" });
+    expect(mapStateCode("B3", 1)).toMatchObject({ propertyType: "3Units" });
+    expect(mapStateCode("D1", 0)).toMatchObject({ propertyType: "LandParcel", usageType: "Agricultural" });
+    expect(mapStateCode("E1", 90000)).toMatchObject({ propertyType: "Building", usageType: null, mapped: true });
+    expect(mapStateCode("F4", 1)).toMatchObject({ propertyType: "Unit", usageType: "Commercial" });
+    expect(mapStateCode("J4", 1)).toMatchObject({ usageType: "TelecommunicationsFacility" });
+    expect(mapStateCode("J5", 0)).toMatchObject({ propertyType: "LandParcel", usageType: "Railroad" });
+    expect(mapStateCode("O1", 0)).toMatchObject({ propertyType: "LandParcel", usageType: "Residential", buildStatus: "VacantLand" });
+    expect(mapStateCode("X", 0)).toMatchObject({ propertyType: "LandParcel", usageType: null, mapped: true });
+  });
+
+  it("writes no lot for a zero legal acreage, no living area under 10 sqft, and keeps the raw codes in the sidecar", async () => {
+    const { rows, manifest, roots } = await fixture();
+    const input = materializeParcelInput({ ...rows[0], source_legal_acreage: "0", source_living_area_sqft: "0" });
+    const { files, sourcePayload } = buildTravisOutput(input, { manifest });
+    expect(files).not.toHaveProperty("lot.json");
+    expect(files["property.json"]).toMatchObject({ livable_floor_area: null, total_area: null });
+    expect(sourcePayload).toMatchObject({ legal_acreage: 0, state_cd: "A1", state_cd_description: "SINGLE FAMILY RESIDENCE", imprv_state_cd: "A1" });
+    const checked = assertOutputContract(files, roots);
+    expect(checked.rootKeys).not.toContain("property_has_lot");
+  });
+
+  it("fails an account whose roll row prints no situs street instead of inventing an address", async () => {
+    const { rows, manifest } = await fixture();
+    const input = materializeParcelInput({ ...rows[0], address: "", source_situs_num: "", source_situs_street: "", source_situs_street_suffix: "" });
+    expect(() => buildTravisOutput(input, { manifest })).toThrow(/no situs address/);
   });
 });
 
@@ -110,13 +171,17 @@ describe("buildTravisOutput (output contract)", () => {
     });
     expect(property.source_http_request).toEqual({ method: "GET", url: "https://traviscad.org/wp-content/largefiles/2026%20Certified%20Appraisal%20Export%20Supp%200_07182026.zip" });
     expect(URL_PATTERN.test(property.source_http_request.url)).toBe(true);
-    expect(files["address.json"]).toMatchObject({ unnormalized_address: "804 PARK BLVD, AUSTIN TX 78751", city_name: "AUSTIN", state_code: "TX", postal_code: "78751" });
+    expect(files["address.json"]).toMatchObject({ unnormalized_address: "804 PARK BLVD, AUSTIN TX 78751", city_name: "AUSTIN", state_code: "TX", postal_code: "78751", block: "A", lot: "1" });
+    // total_area is building area: the roll prints living area only, and the lot area lives on the lot.
+    expect(property).toMatchObject({ livable_floor_area: "1800", total_area: null });
     expect(files["address.json"]).not.toHaveProperty("county_name");
     expect(files["person_1.json"]).toMatchObject({ first_name: "John", last_name: "Doe", middle_name: "A", suffix_name: null, birth_date: null });
     expect(files["mailing_address.json"]).toMatchObject({ unnormalized_address: "804 PARK BLVD, AUSTIN TX 78751", state_code: "TX", postal_code: "78751" });
     expect(files["sales_history_1.json"]).toMatchObject({ ownership_transfer_date: "2015-06-15" });
     expect(files["sales_history_1.json"]).not.toHaveProperty("purchase_price_amount");
-    expect(files["tax_2026.json"]).toMatchObject({ tax_year: 2026, property_market_value_amount: 600000, property_assessed_value_amount: 580000, property_taxable_value_amount: 580000, property_land_amount: 250000, property_building_amount: 350000 });
+    expect(files["tax_2026.json"]).toMatchObject({ tax_year: 2026, property_market_value_amount: 600000, property_assessed_value_amount: 580000, property_land_amount: 250000, property_building_amount: 350000 });
+    // Taxable values are per taxing entity in the export; the transform never proxies them from the assessed value.
+    expect(files["tax_2026.json"]).not.toHaveProperty("property_taxable_value_amount");
     expect(files["tax_2026.json"]).not.toHaveProperty("agricultural_valuation_amount");
     expect(files["lot.json"]).toMatchObject({ lot_area_sqft: 7501, lot_size_acre: 0.1722, lot_type: "LessThanOrEqualToOneQuarterAcre" });
 
@@ -150,6 +215,9 @@ describe("buildTravisOutput (output contract)", () => {
     expect(files["mailing_address.json"]).toMatchObject({ state_code: "CO", postal_code: "80201" });
     expect(files["property.json"]).toMatchObject({ property_type: "Building", property_usage_type: "Commercial" });
     expect(files["address.json"].latitude).toBeNull();
+    // Blank situs city: the city is never derived from the ZIP, the mailing address or GIS.
+    expect(files["address.json"]).toMatchObject({ unnormalized_address: "2206 LINDELL AVE, TX 78704", city_name: null, postal_code: "78704", block: "3", lot: "7" });
+    expect(files["unnormalized_address.json"].full_address).toBe("2206 LINDELL AVE, TX 78704");
     expect(files["unnormalized_address.json"].latitude).toBeNull();
   });
 

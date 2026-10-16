@@ -309,8 +309,10 @@ run record.
    key, neighborhood code) to a per-parcel sidecar `source-payload.json` beside `data/`, which
    the internal reconciliation reads and the archive never carries; option (iii) (the deploy
    re-reads the public exports for the non-lexicon columns) is the path for the hosted layer.
-   `tax.property_taxable_value_amount` is a non-nullable number in the live schema; the
-   transform writes the roll's assessed value as the pre-exemption taxable basis.
+   `tax.property_taxable_value_amount` is an optional, non-nullable number in the live
+   schema. Taxable values are per taxing entity in the export (`PROP_ENT.TXT`, not read in
+   v1), so from transform v2 (T2, 2026-10-17) the field is omitted rather than proxied from
+   the assessed value (v1 wrote the assessed value there).
 3. After that change the same validate run reports **exactly one error per property, the
    county enum** (item 1): the Seed and County roots, every relationship, the person and
    company owners, the address, tax, lot, geometry and sales-history entities all validate
@@ -342,3 +344,35 @@ run record.
 - Comptroller cache for T3: 342,338 Travis rows (`taxpayer_county_code = '227'`) in 7 pages under
   `data/travis/comptroller/`, each with its request, time, status, SHA-256 and row count in
   `docs/evidence/travis-comptroller-cache-receipts-2026-10-16.jsonl`. No further VPN window is needed until run 2.
+
+## 10. T2 transform proof (2026-10-16 UTC, offline, CLI 1.58.1 at `44bb182`)
+
+- **Validation by class.** Pilot attempt 1 (`20261016T214212Z`, transform v1): 31 error rows on 25 of 25
+  properties: 25 `county_jurisdiction` (the enum, expected), 3 `property.total_area` pattern `.*\d{2,}.*`
+  (value `"0"`), 3 `lot.lot_area_sqft` minimum 1 (value 0). Final pilot (`20261016T215528Z`, transform v2):
+  25 error rows, one per property, all `/relationships/property_seed/to/county_jurisdiction` (value `Travis`).
+  The County group validates on every property; the enum is the only error class left.
+- **Transform v2** (`travis-transform-v2`): `total_area` is building area and stays null (v1 wrote the lot area);
+  no `lot` when the roll prints 0 legal acreage (73,334 roll rows); `livable_floor_area` only from 10 sqft
+  (554 rows print 1-9 sqft); `tax.property_taxable_value_amount` omitted (see 8.2); TCAD's own state-code table
+  (`travis-state-code-v1`, quoted from the export's `STATE_CD.TXT`) replaces the Florida-style one; `address.block`
+  and `address.lot` from `block` and `tract_or_lot`; a row with no situs street fails permanently ("no situs
+  address", 25 rows) instead of seeding the PROP_ID as an address.
+- **Field coverage** (`docs/evidence/travis-t2-field-coverage-20261016.json`, enforced by
+  `tests/travis-field-coverage.test.mjs`): 51 export fields read (42 `PROP.TXT`, 7 `IMP_DET.TXT`, 2 `ABS_SUBD.TXT`):
+  29 to lexicon fields, 7 to lexicon fields plus the sidecar, 9 to the sidecar only (lexicon gaps: `geo_id`,
+  `prop_type_cd`, `hood_cd`, `abs_subdv_cd`, `deed_book_id`, `deed_book_page`, `imprv_id` as `imprv_count`, and the
+  two confidentiality flags as the owner classification), 6 for seed building only (`sup_num`, `partial_owner`,
+  `IMP_DET` `prop_id`, `prop_val_yr` and `imprv_det_id`, and the `ABS_SUBD` join key). Export fields with a lexicon home that v1 does not read are listed there (`ten_percent_cap`,
+  `PROP_ENT.TXT` taxable values, `LAND_DET.TXT` land size, `IMP_ATR.TXT` roof covering, `IMP_INFO.TXT`).
+- **Unmapped-code inventory.** 31 state codes occur in the roll, all mapped; 0 rows unmapped, 0 blank. Table
+  codes absent from the roll: B5, C2, D3, J7, J8. `STATE_CD.TXT` codes outside the table (personal property,
+  minerals, rolling stock; never R accounts): G1-G3, J9, L1, L2, M2, N1, N2.
+- **Owners** (`travis-owner-classification-v2`, whole roll): 97,689 company, 343,972 person, 300 unsplittable
+  (printed string in the sidecar only), 0 confidential. v1 had put ESTATE (1,765), LIFE (1,567) and ETAL (1,213)
+  into middle names; v2 removes the roll's annotations on whole words first, and its added company words come from
+  the roll itself (words that sit almost only in company-classified strings, excluding common given names and
+  surnames). The roll's owner field is cut at 30 characters ("... REVOCABLE", "... MUNICIPAL UTILITY D").
+- **Blank situs city (58.9% of the roll).** `address.json` uses the lexicon's unnormalized branch, where
+  `city_name` is optional: written only when the roll prints a situs city, otherwise null; never derived from the
+  ZIP, the mailing address or the GIS layer; the structured branch (city required) is not used.

@@ -24,6 +24,7 @@
 
 import AdmZipCtor from "adm-zip";
 import { mkdir, readdir, readFile, writeFile, access } from "node:fs/promises";
+import { performance } from "node:perf_hooks";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { readTransformedZipJsonFiles, writeQueryTableParquet, buildCoverageSnapshot } from "../../core/query-table.mjs";
@@ -226,7 +227,7 @@ export async function resolveLexiconManifest({ htmlDir, allowNetwork = false, fe
 export function classifyTravisFailure(error) {
   const message = (error instanceof Error ? error.message : String(error)).toLowerCase();
   if (
-    /not a printed prop_id|not the printed prop_id|does not match requested|outside the travis bbox|unsupported parcel input schema|is required|refusing to guess|egress country|county_jurisdiction|missing data-group root|must carry label|links to missing|is not linked|http 403|http 404|http 400/.test(
+    /not a printed prop_id|not the printed prop_id|does not match requested|no situs address|outside the travis bbox|unsupported parcel input schema|is required|refusing to guess|egress country|county_jurisdiction|missing data-group root|must carry label|links to missing|is not linked|http 403|http 404|http 400/.test(
       message,
     )
   ) {
@@ -320,14 +321,21 @@ export async function captureAndTransform({
   fetchImpl = globalThis.fetch,
 }) {
   await mkdir(outputDir, { recursive: true });
+  const runStarted = performance.now();
+  const manifestStarted = performance.now();
   const resolved = await resolveLexiconManifest({ htmlDir, allowNetwork: liveFetch, fetchImpl });
+  const lexiconManifestResolveMs = performance.now() - manifestStarted;
   /** @type {ParcelTransformResult[]} */
   const results = [];
+  /** @type {{ parcelId: string, materializeMs: number, transformMs: number, checkMs: number, zipMs: number }[]} */
+  const parcelTimings = [];
   let geometryCount = 0;
   for (const row of seedRows) {
     const parcelId = toText(row.parcel_id) || toText(row.source_identifier);
     const parcelDir = path.join(outputDir, parcelId || "_invalid");
     await mkdir(parcelDir, { recursive: true });
+    const timing = { parcelId, materializeMs: 0, transformMs: 0, checkMs: 0, zipMs: 0 };
+    let stageStarted = performance.now();
     try {
       const fixturePath = path.join(htmlDir ?? "", `${parcelId}.json`);
       let input;
@@ -358,7 +366,11 @@ export async function captureAndTransform({
         "utf8",
       );
 
+      timing.materializeMs = performance.now() - stageStarted;
+      stageStarted = performance.now();
       const transform = await writeTravisTransform({ workDir: parcelDir, input, manifest: resolved.manifest });
+      timing.transformMs = performance.now() - stageStarted;
+      stageStarted = performance.now();
       const files = Object.fromEntries(
         await Promise.all(transform.files.map(async (name) => [name, JSON.parse(await readFile(path.join(transform.dataDir, name), "utf8"))])),
       );
@@ -369,8 +381,11 @@ export async function captureAndTransform({
       const points = files["geometry.json"] ? collectGeometryPoints(files["geometry.json"]) : [];
       assertGeometryInCounty(points);
       if (points.length > 0) geometryCount += 1;
+      timing.checkMs = performance.now() - stageStarted;
+      stageStarted = performance.now();
 
       await zipDataDirectory(transform.dataDir, path.join(parcelDir, "transformed.zip"));
+      timing.zipMs = performance.now() - stageStarted;
       await writeFile(
         path.join(parcelDir, "transform-receipt.json"),
         `${JSON.stringify({ inputSource, warnings: transform.warnings, roots: transform.roots, files: transform.files, sourcePayloadPath: transform.sourcePayloadPath }, null, 2)}\n`,
@@ -390,6 +405,7 @@ export async function captureAndTransform({
       await appendFailure(outputDir, jobId, { parcelId, error: message, classification: failureClass, attempts: 1, at: new Date().toISOString(), jobId });
       results.push({ parcelId, transformSuccess: false, classification, propertyUsageType: null, error: message });
     }
+    parcelTimings.push(timing);
   }
   const reconciled = {
     seedRows: seedRows.length,
@@ -407,9 +423,39 @@ export async function captureAndTransform({
     geometryCount,
     results,
     reconciled,
+    timings: summarizeTimings({ parcelTimings, lexiconManifestResolveMs, totalMs: performance.now() - runStarted }),
   };
   await writeFile(path.join(outputDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
   return manifest;
+}
+
+/**
+ * Summarize per-parcel stage timings (milliseconds, rounded to 0.1 ms).
+ *
+ * @param {{ parcelTimings: { parcelId: string, materializeMs: number, transformMs: number, checkMs: number, zipMs: number }[], lexiconManifestResolveMs: number, totalMs: number }} input - Raw timings.
+ * @returns {object} Totals, p50/p95 per stage and the per-parcel rows.
+ */
+export function summarizeTimings({ parcelTimings, lexiconManifestResolveMs, totalMs }) {
+  const round = (value) => Math.round(value * 10) / 10;
+  const stages = ["materializeMs", "transformMs", "checkMs", "zipMs"];
+  const quantile = (values, q) => {
+    if (values.length === 0) return null;
+    const sorted = [...values].sort((left, right) => left - right);
+    return round(sorted[Math.min(sorted.length - 1, Math.ceil(q * sorted.length) - 1)]);
+  };
+  const perStage = {};
+  for (const stage of stages) {
+    const values = parcelTimings.map((timing) => timing[stage]);
+    perStage[stage] = { total: round(values.reduce((sum, value) => sum + value, 0)), p50: quantile(values, 0.5), p95: quantile(values, 0.95) };
+  }
+  return {
+    unit: "ms",
+    totalMs: round(totalMs),
+    lexiconManifestResolveMs: round(lexiconManifestResolveMs),
+    parcels: parcelTimings.length,
+    perStage,
+    perParcel: parcelTimings.map((timing) => Object.fromEntries(Object.entries(timing).map(([key, value]) => [key, typeof value === "number" ? round(value) : value]))),
+  };
 }
 
 /**

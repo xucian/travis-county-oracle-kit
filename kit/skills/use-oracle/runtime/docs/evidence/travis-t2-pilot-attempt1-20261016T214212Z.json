@@ -1,0 +1,234 @@
+{
+ "run_id": "20261016T214212Z",
+ "attempt": 1,
+ "kind": "25-parcel appraisal-only pilot (offline, no --live-fetch; permit eligibility __NONE__: no permit harvest exists for Travis yet)",
+ "seed": {
+  "path": "data/seeds/travis-pilot.csv",
+  "sha256": "0a75f9e99f029c6ca4dba57a4a6bba6d7333c8b88b459c20312d880385ce7f3d",
+  "rows": 25
+ },
+ "lexicon_manifest_sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+ "reconciled": {
+  "seedRows": 25,
+  "success": 25,
+  "permanentFailure": 0,
+  "retryableFailure": 0
+ },
+ "seed_equals_success_plus_failures": true,
+ "geometry_count": 13,
+ "reconcile_export": {
+  "rowCount": 25,
+  "expectedCount": 25
+ },
+ "timings_wall_seconds": {
+  "lexicon_manifest_fetch": 0.456,
+  "ingest": 0.629,
+  "reconcile_export": 0.518
+ },
+ "timings_ingest_ms": {
+  "unit": "ms",
+  "totalMs": 191,
+  "lexiconManifestResolveMs": 0.7,
+  "parcels": 25,
+  "perStage": {
+   "materializeMs": {
+    "total": 16.9,
+    "p50": 0.5,
+    "p95": 0.9
+   },
+   "transformMs": {
+    "total": 85.6,
+    "p50": 3.1,
+    "p95": 5.4
+   },
+   "checkMs": {
+    "total": 20.9,
+    "p50": 0.7,
+    "p95": 1.6
+   },
+   "zipMs": {
+    "total": 59.2,
+    "p50": 2.2,
+    "p95": 2.5
+   }
+  },
+  "perParcel": [
+   {
+    "parcelId": "897804",
+    "materializeMs": 4,
+    "transformMs": 5.6,
+    "checkMs": 1.6,
+    "zipMs": 7.4
+   },
+   {
+    "parcelId": "119247",
+    "materializeMs": 0.6,
+    "transformMs": 3.1,
+    "checkMs": 0.7,
+    "zipMs": 2.2
+   },
+   {
+    "parcelId": "503197",
+    "materializeMs": 0.5,
+    "transformMs": 3.2,
+    "checkMs": 0.8,
+    "zipMs": 2.3
+   },
+   {
+    "parcelId": "928530",
+    "materializeMs": 0.5,
+    "transformMs": 2.7,
+    "checkMs": 0.6,
+    "zipMs": 2
+   },
+   {
+    "parcelId": "219803",
+    "materializeMs": 0.5,
+    "transformMs": 4.8,
+    "checkMs": 0.7,
+    "zipMs": 2.3
+   },
+   {
+    "parcelId": "1012070",
+    "materializeMs": 0.5,
+    "transformMs": 2.8,
+    "checkMs": 0.8,
+    "zipMs": 2.1
+   },
+   {
+    "parcelId": "106280",
+    "materializeMs": 0.5,
+    "transformMs": 3.3,
+    "checkMs": 0.7,
+    "zipMs": 2.5
+   },
+   {
+    "parcelId": "955150",
+    "materializeMs": 0.5,
+    "transformMs": 2.6,
+    "checkMs": 0.6,
+    "zipMs": 2
+   },
+   {
+    "parcelId": "377261",
+    "materializeMs": 0.5,
+    "transformMs": 5.4,
+    "checkMs": 0.7,
+    "zipMs": 2.5
+   },
+   {
+    "parcelId": "547839",
+    "materializeMs": 0.9,
+    "transformMs": 3.7,
+    "checkMs": 0.9,
+    "zipMs": 2.4
+   },
+   {
+    "parcelId": "981340",
+    "materializeMs": 0.5,
+    "transformMs": 2.5,
+    "checkMs": 0.6,
+    "zipMs": 1.9
+   },
+   {
+    "parcelId": "353308",
+    "materializeMs": 0.5,
+    "transformMs": 3.8,
+    "checkMs": 0.7,
+    "zipMs": 2.3
+   },
+   {
+    "parcelId": "374234",
+    "materializeMs": 0.5,
+    "transformMs": 3.5,
+    "checkMs": 0.7,
+    "zipMs": 2
+   },
+   {
+    "parcelId": "485011",
+    "materializeMs": 0.6,
+    "transformMs": 3.1,
+    "checkMs": 0.7,
+    "zipMs": 2.2
+   },
+   {
+    "parcelId": "748284",
+    "materializeMs": 0.4,
+    "transformMs": 2.4,
+    "checkMs": 0.6,
+    "zipMs": 1.9
+   },
+   {
+    "parcelId": "959870",
+    "materializeMs": 0.8,
+    "transformMs": 5,
+    "checkMs": 1.2,
+    "zipMs": 2.4
+   },
+   {
+    "parcelId": "1004959",
+    "materializeMs": 0.6,
+    "transformMs": 2.7,
+    "checkMs": 0.7,
+    "zipMs": 1.9
+   },
+   {
+    "parcelId": "230816",
+    "materializeMs": 0.6,
+    "transformMs": 3.5,
+    "checkMs": 0.9,
+    "zipMs": 2.2
+   },
+   {
+    "parcelId": "206865",
+    "materializeMs": 0.5,
+    "transformMs": 2.7,
+    "checkMs": 0.7,
+    "zipMs": 2.1
+   },
+   {
+    "parcelId": "506698",
+    "materializeMs": 0.5,
+    "transformMs": 3.1,
+    "checkMs": 0.8,
+    "zipMs": 2.2
+   },
+   {
+    "parcelId": "1003794",
+    "materializeMs": 0.5,
+    "transformMs": 3,
+    "checkMs": 0.7,
+    "zipMs": 1.9
+   },
+   {
+    "parcelId": "830704",
+    "materializeMs": 0.4,
+    "transformMs": 4,
+    "checkMs": 0.9,
+    "zipMs": 2.4
+   },
+   {
+    "parcelId": "358940",
+    "materializeMs": 0.5,
+    "transformMs": 2.7,
+    "checkMs": 1.9,
+    "zipMs": 2.1
+   },
+   {
+    "parcelId": "105452",
+    "materializeMs": 0.6,
+    "transformMs": 3.8,
+    "checkMs": 0.8,
+    "zipMs": 2
+   },
+   {
+    "parcelId": "374454",
+    "materializeMs": 0.5,
+    "transformMs": 2.6,
+    "checkMs": 0.7,
+    "zipMs": 1.9
+   }
+  ]
+ },
+ "note": "Attempt 1 runs the transform as committed at ab38b10 plus timing instrumentation; validation and fixes follow in step 3, then the pilot is re-run."
+}

@@ -1,0 +1,1064 @@
+{
+ "schemaVersion": "travis.t2-field-coverage.v1",
+ "generated_at": "2026-10-16T21:58:53.949Z",
+ "transform_version": "travis-transform-v2",
+ "field_coverage_version": "travis-field-coverage-v1",
+ "state_code_mapping_version": "travis-state-code-v1",
+ "owner_classification_version": "travis-owner-classification-v2",
+ "enforced_by": "tests/travis-field-coverage.test.mjs (every read field has an entry; every named target is written)",
+ "roll": {
+  "rows": 441961,
+  "source": "data/seeds/travis.csv (2026 certified export, supplement 0)"
+ },
+ "fields_read": {
+  "total": 51,
+  "by_status": {
+   "lexicon+sidecar": 7,
+   "sidecar": 9,
+   "lexicon": 29,
+   "seed building only": 6
+  }
+ },
+ "fields": [
+  {
+   "file": "PROP.TXT",
+   "field": "prop_id",
+   "status": "lexicon+sidecar",
+   "lexicon": [
+    "property.parcel_identifier",
+    "parcel.parcel_identifier",
+    "property_seed.parcel_id",
+    "property.request_identifier"
+   ],
+   "sidecar": [
+    "prop_id"
+   ],
+   "note": "int(12) printed zero-padded; the identifier is the integer (decisions 19, 21)"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "prop_type_cd",
+   "status": "sidecar (lexicon gap)",
+   "lexicon": [],
+   "sidecar": [
+    "prop_type_cd"
+   ],
+   "note": "only R (real property) accounts become seed rows"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "prop_val_yr",
+   "status": "lexicon",
+   "lexicon": [
+    "tax.tax_year"
+   ],
+   "sidecar": [],
+   "note": "appraisal year of the certified roll"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "sup_num",
+   "status": "seed building only (read)",
+   "lexicon": [],
+   "sidecar": [],
+   "note": "supplement number; the certified export is supplement 0"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "geo_id",
+   "status": "sidecar (lexicon gap)",
+   "lexicon": [],
+   "sidecar": [
+    "geo_id"
+   ],
+   "note": "lexicon gap: no lexicon field; the permit link key (decision 16)"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "py_owner_name",
+   "status": "lexicon+sidecar",
+   "lexicon": [
+    "person.first_name",
+    "person.last_name",
+    "person.middle_name",
+    "person.suffix_name",
+    "company.name"
+   ],
+   "sidecar": [
+    "owner.printed_name",
+    "owner.name_without_annotations",
+    "owner.owner_key",
+    "owner.classification"
+   ],
+   "note": "travis-owner-classification-v2; the printed string stays in the sidecar (decision 16)"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "partial_owner",
+   "status": "seed building only (fold)",
+   "lexicon": [],
+   "sidecar": [],
+   "note": "additional owner records of one account are folded into its seed row and counted"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "py_addr_line1",
+   "status": "lexicon",
+   "lexicon": [
+    "mailing_address.unnormalized_address"
+   ],
+   "sidecar": [],
+   "note": "joined with lines 2-3 and the locality"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "py_addr_line2",
+   "status": "lexicon",
+   "lexicon": [
+    "mailing_address.unnormalized_address"
+   ],
+   "sidecar": []
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "py_addr_line3",
+   "status": "lexicon",
+   "lexicon": [
+    "mailing_address.unnormalized_address"
+   ],
+   "sidecar": []
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "py_addr_city",
+   "status": "lexicon",
+   "lexicon": [
+    "mailing_address.city_name",
+    "mailing_address.unnormalized_address"
+   ],
+   "sidecar": []
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "py_addr_state",
+   "status": "lexicon",
+   "lexicon": [
+    "mailing_address.state_code",
+    "mailing_address.unnormalized_address"
+   ],
+   "sidecar": [],
+   "note": "two-letter codes only"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "py_addr_zip",
+   "status": "lexicon",
+   "lexicon": [
+    "mailing_address.postal_code",
+    "mailing_address.unnormalized_address"
+   ],
+   "sidecar": [],
+   "note": "first five digits"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "py_confidential_flag",
+   "status": "sidecar (lexicon gap)",
+   "lexicon": [],
+   "sidecar": [
+    "owner.classification"
+   ],
+   "note": "a confidential owner writes no owner entity or mailing address"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "py_address_suppress_flag",
+   "status": "sidecar (lexicon gap)",
+   "lexicon": [],
+   "sidecar": [
+    "owner.classification"
+   ],
+   "note": "treated like the confidential flag"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "situs_street_prefx",
+   "status": "lexicon",
+   "lexicon": [
+    "address.unnormalized_address",
+    "unnormalized_address.full_address"
+   ],
+   "sidecar": []
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "situs_street",
+   "status": "lexicon",
+   "lexicon": [
+    "address.unnormalized_address",
+    "unnormalized_address.full_address"
+   ],
+   "sidecar": [],
+   "note": "blank street: permanent failure \"no situs address\" (25 roll rows)"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "situs_street_suffix",
+   "status": "lexicon",
+   "lexicon": [
+    "address.unnormalized_address",
+    "unnormalized_address.full_address"
+   ],
+   "sidecar": []
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "situs_city",
+   "status": "lexicon+sidecar",
+   "lexicon": [
+    "address.city_name",
+    "address.unnormalized_address",
+    "unnormalized_address.full_address"
+   ],
+   "sidecar": [
+    "situs_city"
+   ],
+   "note": "blank on 58.9% of the roll: city_name null, never derived"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "situs_zip",
+   "status": "lexicon",
+   "lexicon": [
+    "address.postal_code",
+    "address.unnormalized_address",
+    "unnormalized_address.full_address"
+   ],
+   "sidecar": [],
+   "note": "first five digits"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "legal_desc",
+   "status": "lexicon",
+   "lexicon": [
+    "property.property_legal_description_text"
+   ],
+   "sidecar": []
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "legal_desc2",
+   "status": "lexicon",
+   "lexicon": [
+    "property.property_legal_description_text"
+   ],
+   "sidecar": [],
+   "note": "empty on every 2026 row"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "legal_acreage",
+   "status": "lexicon+sidecar",
+   "lexicon": [
+    "lot.lot_size_acre",
+    "lot.lot_area_sqft"
+   ],
+   "sidecar": [
+    "legal_acreage"
+   ],
+   "note": "no lot entity when 0; sqft = acres x 43,560"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "abs_subdv_cd",
+   "status": "sidecar (lexicon gap)",
+   "lexicon": [],
+   "sidecar": [
+    "abs_subdv_cd"
+   ],
+   "note": "join key to ABS_SUBD.TXT"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "hood_cd",
+   "status": "sidecar (lexicon gap)",
+   "lexicon": [],
+   "sidecar": [
+    "hood_cd"
+   ],
+   "note": "lexicon gap: no neighborhood field on property"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "block",
+   "status": "lexicon",
+   "lexicon": [
+    "address.block"
+   ],
+   "sidecar": []
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "tract_or_lot",
+   "status": "lexicon",
+   "lexicon": [
+    "address.lot"
+   ],
+   "sidecar": []
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "land_hstd_val",
+   "status": "lexicon",
+   "lexicon": [
+    "tax.property_land_amount"
+   ],
+   "sidecar": [],
+   "note": "homestead plus non-homestead land value"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "land_non_hstd_val",
+   "status": "lexicon",
+   "lexicon": [
+    "tax.property_land_amount"
+   ],
+   "sidecar": []
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "imprv_hstd_val",
+   "status": "lexicon",
+   "lexicon": [
+    "tax.property_building_amount",
+    "property.build_status"
+   ],
+   "sidecar": [],
+   "note": "homestead plus non-homestead improvement value"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "imprv_non_hstd_val",
+   "status": "lexicon",
+   "lexicon": [
+    "tax.property_building_amount",
+    "property.build_status"
+   ],
+   "sidecar": []
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "ag_use_val",
+   "status": "lexicon",
+   "lexicon": [
+    "tax.agricultural_valuation_amount"
+   ],
+   "sidecar": [],
+   "note": "written when greater than 0"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "appraised_val",
+   "status": "lexicon+sidecar",
+   "lexicon": [
+    "tax.property_assessed_value_amount"
+   ],
+   "sidecar": [
+    "appraised_val"
+   ],
+   "note": "assessed-value fallback only when assessed_val is not printed"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "assessed_val",
+   "status": "lexicon",
+   "lexicon": [
+    "tax.property_assessed_value_amount"
+   ],
+   "sidecar": [],
+   "note": "taxable values are per entity (PROP_ENT.TXT, not read): property_taxable_value_amount omitted"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "deed_book_id",
+   "status": "sidecar (lexicon gap)",
+   "lexicon": [],
+   "sidecar": [
+    "deed_book_id"
+   ],
+   "note": "lexicon deed not written: book printed on 4 rows, a page alone names no instrument"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "deed_book_page",
+   "status": "sidecar (lexicon gap)",
+   "lexicon": [],
+   "sidecar": [
+    "deed_book_page"
+   ]
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "deed_dt",
+   "status": "lexicon",
+   "lexicon": [
+    "sales_history.ownership_transfer_date"
+   ],
+   "sidecar": [],
+   "note": "MM-DD-YYYY; blank on 17,954 rows (no sales_history)"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "imprv_state_cd",
+   "status": "lexicon+sidecar",
+   "lexicon": [
+    "property.property_type",
+    "property.property_usage_type"
+   ],
+   "sidecar": [
+    "imprv_state_cd",
+    "state_cd",
+    "state_cd_description"
+   ],
+   "note": "travis-state-code-v1 (STATE_CD.TXT); improvement code first"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "land_state_cd",
+   "status": "lexicon+sidecar",
+   "lexicon": [
+    "property.property_type",
+    "property.property_usage_type"
+   ],
+   "sidecar": [
+    "land_state_cd",
+    "state_cd",
+    "state_cd_description"
+   ],
+   "note": "used when no improvement code is printed"
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "market_value",
+   "status": "lexicon",
+   "lexicon": [
+    "tax.property_market_value_amount"
+   ],
+   "sidecar": []
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "situs_num",
+   "status": "lexicon",
+   "lexicon": [
+    "address.unnormalized_address",
+    "unnormalized_address.full_address"
+   ],
+   "sidecar": []
+  },
+  {
+   "file": "PROP.TXT",
+   "field": "situs_unit",
+   "status": "lexicon",
+   "lexicon": [
+    "address.unnormalized_address",
+    "unnormalized_address.full_address"
+   ],
+   "sidecar": []
+  },
+  {
+   "file": "IMP_DET.TXT",
+   "field": "prop_id",
+   "status": "seed building only (join)",
+   "lexicon": [],
+   "sidecar": [],
+   "note": "join key"
+  },
+  {
+   "file": "IMP_DET.TXT",
+   "field": "prop_val_yr",
+   "status": "seed building only (read)",
+   "lexicon": [],
+   "sidecar": []
+  },
+  {
+   "file": "IMP_DET.TXT",
+   "field": "imprv_id",
+   "status": "sidecar (lexicon gap)",
+   "lexicon": [],
+   "sidecar": [
+    "imprv_count"
+   ],
+   "note": "distinct improvements per account"
+  },
+  {
+   "file": "IMP_DET.TXT",
+   "field": "imprv_det_id",
+   "status": "seed building only (read)",
+   "lexicon": [],
+   "sidecar": []
+  },
+  {
+   "file": "IMP_DET.TXT",
+   "field": "imprv_det_type_cd",
+   "status": "lexicon",
+   "lexicon": [
+    "property.livable_floor_area",
+    "property.property_structure_built_year"
+   ],
+   "sidecar": [],
+   "note": "living-area detail types 1ST, 2ND, 3RD, 4TH, 5TH, ADDL, 1/2, FBSMT"
+  },
+  {
+   "file": "IMP_DET.TXT",
+   "field": "yr_built",
+   "status": "lexicon",
+   "lexicon": [
+    "property.property_structure_built_year"
+   ],
+   "sidecar": [],
+   "note": "earliest living-area year, else earliest of any detail; feeds the roof-age default"
+  },
+  {
+   "file": "IMP_DET.TXT",
+   "field": "imprv_det_area",
+   "status": "lexicon",
+   "lexicon": [
+    "property.livable_floor_area"
+   ],
+   "sidecar": [],
+   "note": "sum of living-area details; written when 10 sqft or more"
+  },
+  {
+   "file": "ABS_SUBD.TXT",
+   "field": "abs_subdv_cd",
+   "status": "seed building only (join)",
+   "lexicon": [],
+   "sidecar": [],
+   "note": "join key"
+  },
+  {
+   "file": "ABS_SUBD.TXT",
+   "field": "abs_subdv_desc",
+   "status": "lexicon",
+   "lexicon": [
+    "property.subdivision"
+   ],
+   "sidecar": []
+  }
+ ],
+ "export_fields_not_read_with_lexicon_home": [
+  {
+   "file": "PROP.TXT",
+   "field": "ten_percent_cap",
+   "lexicon": "tax.homestead_cap_loss_amount"
+  },
+  {
+   "file": "PROP_ENT.TXT",
+   "field": "per-entity taxable values and exemptions",
+   "lexicon": "tax.property_taxable_value_amount, tax.<entity>_taxable_value_amount, tax.property_exemption_amount"
+  },
+  {
+   "file": "LAND_DET.TXT",
+   "field": "land segment size",
+   "lexicon": "lot.lot_area_sqft for platted lots printed with 0 legal acreage"
+  },
+  {
+   "file": "IMP_ATR.TXT",
+   "field": "improvement attributes (roof covering, exterior wall)",
+   "lexicon": "structure.roof_covering_material, structure.exterior_wall_material"
+  },
+  {
+   "file": "IMP_INFO.TXT",
+   "field": "improvement type and class",
+   "lexicon": "structure / property.structure_form"
+  }
+ ],
+ "state_codes": {
+  "in_roll": 31,
+  "mapped_in_roll": 31,
+  "unmapped_rows": 0,
+  "blank_state_cd_rows": 0,
+  "inventory": [
+   {
+    "code": "A1",
+    "rows": 290624,
+    "description": "SINGLE FAMILY RESIDENCE",
+    "mapped": true,
+    "property_type_improved": "SingleFamily",
+    "property_type_unimproved": "SingleFamily",
+    "usage_type": "Residential"
+   },
+   {
+    "code": "A4",
+    "rows": 54675,
+    "description": "CONDOS",
+    "mapped": true,
+    "property_type_improved": "Condominium",
+    "property_type_unimproved": "Condominium",
+    "usage_type": "Residential"
+   },
+   {
+    "code": "C1",
+    "rows": 34467,
+    "description": "VACANT LOT",
+    "mapped": true,
+    "property_type_improved": "VacantLand",
+    "property_type_unimproved": "VacantLand",
+    "usage_type": null
+   },
+   {
+    "code": "O1",
+    "rows": 13043,
+    "description": "RESIDENTIAL INVENTORY",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "LandParcel",
+    "usage_type": "Residential"
+   },
+   {
+    "code": "F1",
+    "rows": 12351,
+    "description": "COMMERCIAL IMPROVED",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "Building",
+    "usage_type": "Commercial"
+   },
+   {
+    "code": "B2",
+    "rows": 9689,
+    "description": "DUPLEX",
+    "mapped": true,
+    "property_type_improved": "Duplex",
+    "property_type_unimproved": "Duplex",
+    "usage_type": "Residential"
+   },
+   {
+    "code": "E1",
+    "rows": 6394,
+    "description": "FARM AND RANCH IMPR ON NON-AG LAND",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "LandParcel",
+    "usage_type": null
+   },
+   {
+    "code": "A2",
+    "rows": 6006,
+    "description": "SINGLE FAMILY RESIDENCE MH",
+    "mapped": true,
+    "property_type_improved": "ManufacturedHome",
+    "property_type_unimproved": "ManufacturedHome",
+    "usage_type": "Residential"
+   },
+   {
+    "code": "D1",
+    "rows": 3047,
+    "description": "ACREAGE (AG) 1-D / 1-D-1",
+    "mapped": true,
+    "property_type_improved": "LandParcel",
+    "property_type_unimproved": "LandParcel",
+    "usage_type": "Agricultural"
+   },
+   {
+    "code": "F4",
+    "rows": 2892,
+    "description": "COMMERCIAL CONDO",
+    "mapped": true,
+    "property_type_improved": "Unit",
+    "property_type_unimproved": "Unit",
+    "usage_type": "Commercial"
+   },
+   {
+    "code": "B1",
+    "rows": 2194,
+    "description": "MULTIFAMILY",
+    "mapped": true,
+    "property_type_improved": "MultipleFamily",
+    "property_type_unimproved": "MultipleFamily",
+    "usage_type": "Residential"
+   },
+   {
+    "code": "A3",
+    "rows": 2059,
+    "description": "SINGLE FAMILY RESIDENCE DETAILS",
+    "mapped": true,
+    "property_type_improved": "MiscellaneousResidential",
+    "property_type_unimproved": "MiscellaneousResidential",
+    "usage_type": "Residential"
+   },
+   {
+    "code": "F5",
+    "rows": 1287,
+    "description": "COMMERCIAL RES CONVERSION",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "Building",
+    "usage_type": "Commercial"
+   },
+   {
+    "code": "B4",
+    "rows": 1105,
+    "description": "FOUR-PLEX",
+    "mapped": true,
+    "property_type_improved": "4Units",
+    "property_type_unimproved": "4Units",
+    "usage_type": "Residential"
+   },
+   {
+    "code": "F3",
+    "rows": 827,
+    "description": "COMMERCIAL DETAILS",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "LandParcel",
+    "usage_type": "Commercial"
+   },
+   {
+    "code": "E2",
+    "rows": 460,
+    "description": "FARM AND RANCH IMPR MH ON NON-AG LAND",
+    "mapped": true,
+    "property_type_improved": "ManufacturedHome",
+    "property_type_unimproved": "ManufacturedHome",
+    "usage_type": null
+   },
+   {
+    "code": "E3",
+    "rows": 334,
+    "description": "FARM AND RANCH IMPR MISC ON NON-AG LAND",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "LandParcel",
+    "usage_type": null
+   },
+   {
+    "code": "D2",
+    "rows": 197,
+    "description": "IMPR DETAIL ON D1 LAND",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "Building",
+    "usage_type": "Agricultural"
+   },
+   {
+    "code": "B3",
+    "rows": 145,
+    "description": "TRI-PLEX",
+    "mapped": true,
+    "property_type_improved": "3Units",
+    "property_type_unimproved": "3Units",
+    "usage_type": "Residential"
+   },
+   {
+    "code": "F2",
+    "rows": 61,
+    "description": "INDUSTRIAL MAJOR MANUFACTURING IMPROVED",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "Building",
+    "usage_type": "Industrial"
+   },
+   {
+    "code": "A5",
+    "rows": 21,
+    "description": "CONDOS DETAILS",
+    "mapped": true,
+    "property_type_improved": "Condominium",
+    "property_type_unimproved": "Condominium",
+    "usage_type": "Residential"
+   },
+   {
+    "code": "J5",
+    "rows": 18,
+    "description": "UTILITY (RAILROADS)",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "LandParcel",
+    "usage_type": "Railroad"
+   },
+   {
+    "code": "A9",
+    "rows": 15,
+    "description": "HS COMMERCIAL HIGHEST & BEST USE",
+    "mapped": true,
+    "property_type_improved": "SingleFamily",
+    "property_type_unimproved": "SingleFamily",
+    "usage_type": "Residential"
+   },
+   {
+    "code": "J1",
+    "rows": 11,
+    "description": "UTILITY (WATER)",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "LandParcel",
+    "usage_type": "Utility"
+   },
+   {
+    "code": "J4",
+    "rows": 10,
+    "description": "UTILITY (TELEPHONE)",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "LandParcel",
+    "usage_type": "TelecommunicationsFacility"
+   },
+   {
+    "code": "J6",
+    "rows": 10,
+    "description": "UTILITY (PIPELINES)",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "LandParcel",
+    "usage_type": "Utility"
+   },
+   {
+    "code": "J3",
+    "rows": 8,
+    "description": "UTILITY (ELECTRIC)",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "LandParcel",
+    "usage_type": "Utility"
+   },
+   {
+    "code": "M1",
+    "rows": 5,
+    "description": "TANGIBLE PERSONAL PROP MH",
+    "mapped": true,
+    "property_type_improved": "ManufacturedHome",
+    "property_type_unimproved": "ManufacturedHome",
+    "usage_type": "Residential"
+   },
+   {
+    "code": "J2",
+    "rows": 4,
+    "description": "UTILITY (GAS)",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "LandParcel",
+    "usage_type": "Utility"
+   },
+   {
+    "code": "X",
+    "rows": 1,
+    "description": "TOTALLY EXEMPT PROPERTY",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "LandParcel",
+    "usage_type": null
+   },
+   {
+    "code": "S1",
+    "rows": 1,
+    "description": "SPECIAL INVENTORY",
+    "mapped": true,
+    "property_type_improved": "Building",
+    "property_type_unimproved": "LandParcel",
+    "usage_type": null
+   }
+  ],
+  "table_codes_absent_from_roll": [
+   "B5",
+   "C2",
+   "D3",
+   "J7",
+   "J8"
+  ],
+  "state_cd_txt_codes_outside_table": [
+   "G1",
+   "G2",
+   "G3",
+   "J9",
+   "L1",
+   "L2",
+   "M2",
+   "N1",
+   "N2"
+  ],
+  "note": "Codes outside the table are personal property, minerals and rolling stock; only R accounts are seeded. An unmapped code falls back by improvement value with usage null and a warning; the raw codes stay in the sidecar."
+ },
+ "owners": {
+  "v2": {
+   "rows": 441961,
+   "company": 97689,
+   "person_split": 343972,
+   "person_unsplittable": 300,
+   "unknown": 0,
+   "confidential": 0
+  },
+  "v1_for_comparison": {
+   "company": 91872,
+   "person_split": 349596,
+   "person_unsplittable": 493
+  },
+  "v1_middle_name_pollution": {
+   "ESTATE": 1765,
+   "LIFE": 1567,
+   "ETAL": 1213
+  },
+  "v2_top_middle_tokens": [
+   [
+    "ANN",
+    1989
+   ],
+   [
+    "LEE",
+    1675
+   ],
+   [
+    "MARIE",
+    1556
+   ],
+   [
+    "MICHAEL",
+    1421
+   ],
+   [
+    "LYNN",
+    1081
+   ],
+   [
+    "JAMES",
+    1079
+   ],
+   [
+    "DAVID",
+    1022
+   ],
+   [
+    "ELIZABETH",
+    918
+   ],
+   [
+    "SCOTT",
+    812
+   ],
+   [
+    "JOHN",
+    758
+   ]
+  ],
+  "unsplittable_shapes_v2": [
+   [
+    "W",
+    66
+   ],
+   [
+    "W & W W",
+    37
+   ],
+   [
+    "W & W",
+    20
+   ],
+   [
+    "W-W",
+    14
+   ],
+   [
+    "W W, W",
+    12
+   ],
+   [
+    "W & W W W",
+    8
+   ],
+   [
+    "W&W W W W",
+    8
+   ],
+   [
+    "W/W",
+    7
+   ],
+   [
+    "W @ W W",
+    6
+   ],
+   [
+    "W - W W",
+    6
+   ]
+  ],
+  "rule": "annotations removed on whole words before classifying (care-of tail after %, ETAL/ET AL, ETUX/ET UX, ETVIR/ET VIR, LIFE ESTATE/LIFE EST, (VLB), trailing &); company by token, phrase, spaced abbreviation (L L C, L P, I S D, M U D, L C R A, W C I D) or digit; else LAST FIRST MIDDLE before & as a person; unsplittable owners keep the printed string in the sidecar only"
+ },
+ "situs": {
+  "blank_city_rows": 260376,
+  "blank_city_share": 0.5891,
+  "blank_city_by_state_prefix": {
+   "F": 16016,
+   "B": 11790,
+   "C": 30626,
+   "A": 182485,
+   "E": 6240,
+   "D": 3172,
+   "J": 61,
+   "O": 9983,
+   "M": 1,
+   "X": 1,
+   "S": 1
+  },
+  "blank_city_handling": "address.json uses the lexicon unnormalized branch, where city_name is optional: city_name is written only when the roll prints a situs city (upper case), otherwise null; it is never derived from the ZIP, the mailing address or the GIS layer, and the structured branch (city_name required) is not used. unnormalized_address and full_address omit the city segment.",
+  "no_situs_street_rows": 25,
+  "no_situs_street_by_state_code": [
+   [
+    "C1",
+    7
+   ],
+   [
+    "J5",
+    6
+   ],
+   [
+    "D1",
+    4
+   ],
+   [
+    "E1",
+    2
+   ],
+   [
+    "A1",
+    2
+   ],
+   [
+    "A3",
+    1
+   ],
+   [
+    "J6",
+    1
+   ],
+   [
+    "F3",
+    1
+   ],
+   [
+    "O1",
+    1
+   ]
+  ],
+  "no_situs_street_handling": "permanent failure \"no situs address\"; the PROP_ID is never seeded as an address",
+  "zip_blank_rows": 14
+ },
+ "presence": {
+  "legal_acreage_positive": 368627,
+  "legal_acreage_zero_or_blank_no_lot": 73334,
+  "living_area_ge_10": 385722,
+  "living_area_under_10_not_written": 554,
+  "living_area_blank": 55685,
+  "yr_built_present": 389122,
+  "block_present": 309593,
+  "tract_or_lot_present": 410370,
+  "deed_dt_present": 424007,
+  "deed_dt_blank": 17954,
+  "ag_use_val_positive": 4566,
+  "assessed_val_blank": 0,
+  "market_value_blank": 0,
+  "tnr_geometry_present": 373513
+ }
+}

@@ -1,0 +1,65 @@
+{
+ "run_id": "20261016T214105Z",
+ "kind": "one-parcel smoke (offline, no --live-fetch)",
+ "job_id": "travis-ingest",
+ "command": "node bin/elephant-county.mjs ingest --county travis --seed data/travis/runs/20261016T214105Z-smoke/seed-smoke.csv --html-dir data/travis/runs/20261016T214105Z-smoke/html --output data/travis/runs/20261016T214105Z-smoke --as-of-date 2026-10-17",
+ "egress": "RO (no request to traviscad.org, gis.traviscountytx.gov or data.texas.gov; inputs are the seed row and its cached TNR page reference)",
+ "lexicon_manifest": {
+  "url": "https://lexicon.elephant.xyz/api/manifest",
+  "saved_as": "lexicon-manifest.json in the run directory",
+  "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+  "county_cid": "bafkreia6tjziby3upxmidymud5iusd32urrztslgrudkwysc7ydmxoekuq",
+  "seed_cid": "bafkreibhurphpjdq33ysit57jtzmdldgngepsdbsw4vm7esawth2ezgaxu"
+ },
+ "parcel": "830704 (A1, with TNR geometry)",
+ "reconciled": {
+  "seedRows": 1,
+  "success": 1,
+  "permanentFailure": 0,
+  "retryableFailure": 0
+ },
+ "results": [
+  {
+   "parcelId": "830704",
+   "transformSuccess": true,
+   "classification": "success",
+   "propertyUsageType": "Residential",
+   "error": null
+  }
+ ],
+ "wall_seconds": 0.58,
+ "transformed_files": [
+  "address.json",
+  "bafkreia6tjziby3upxmidymud5iusd32urrztslgrudkwysc7ydmxoekuq.json",
+  "bafkreibhurphpjdq33ysit57jtzmdldgngepsdbsw4vm7esawth2ezgaxu.json",
+  "geometry.json",
+  "lot.json",
+  "mailing_address.json",
+  "parcel.json",
+  "person_1.json",
+  "property.json",
+  "property_seed.json",
+  "relationship_address_has_geometry.json",
+  "relationship_address_has_parcel.json",
+  "relationship_parcel_has_geometry.json",
+  "relationship_person_1_has_mailing_address.json",
+  "relationship_property_has_address.json",
+  "relationship_property_has_lot.json",
+  "relationship_property_has_parcel.json",
+  "relationship_property_has_sales_history_1.json",
+  "relationship_property_has_tax_2026.json",
+  "relationship_property_seed_has_unnormalized_address.json",
+  "relationship_sales_history_1_has_person_1.json",
+  "sales_history_1.json",
+  "tax_2026.json",
+  "unnormalized_address.json"
+ ],
+ "transformed_zip_sha256": "5be071fc285bbec2494ae6bcaa132f9dabf645edc696201acbd7a58c0752bc13",
+ "inspection": [
+  "County and Seed roots present and named by the live manifest CIDs; 9 County relationship keys, 2 Seed keys",
+  "person_1: HEONG ANN -> first_name Ann, last_name Heong (pattern-valid); printed string only in the sidecar",
+  "address: unnormalized branch, city_name null because the roll prints no situs city for this account; postal_code 78754",
+  "geometry: TNR centroid and 6-vertex polygon, source_http_request = the MapServer page query that returned the feature (resultOffset 252000)",
+  "to fix before the pilot validation: lot.json written with lot_area_sqft 0 and lot_size_acre 0 (legal_acreage 0 means not printed for platted lots); property.total_area \"0\" (total_area is building area, not lot area); tax.property_taxable_value_amount copied from assessed value (not a taxable value)"
+ ]
+}

@@ -39,7 +39,7 @@
   "state_cd": "A1",
   "built_year": 1998,
   "livable_floor_area": 1800,
-  "total_area": 7501,
+  "total_area": null,
   "assessed_value": 580000,
   "market_value": 600000,
   "land_value": 250000,

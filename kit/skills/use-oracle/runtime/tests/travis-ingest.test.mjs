@@ -191,24 +191,28 @@ describe("captureAndTransform (fixture, no network)", () => {
       await mkdir(htmlDir, { recursive: true });
       await writeFile(path.join(tempDir, "lexicon-manifest.json"), await readFile(path.join(FIXTURE_DIR, "lexicon-manifest.json")));
       // A pre-materialized input for 900004 that fails inside the transform for a transient-looking reason.
-      await writeFile(path.join(htmlDir, "900004.json"), JSON.stringify({ schemaVersion: "travis.parcel-input.v1", propId: "900004", request: { method: "GET", url: "https://example.invalid/export.zip" }, tcad: {}, situs: {}, geometry: { latitude: 30.3, longitude: -97.7, request: null } }), "utf8");
+      await writeFile(path.join(htmlDir, "900004.json"), JSON.stringify({ schemaVersion: "travis.parcel-input.v1", propId: "900004", request: { method: "GET", url: "https://example.invalid/export.zip" }, tcad: { situs_street: "LINDELL" }, situs: { address: "1 LINDELL AVE" }, geometry: { latitude: 30.3, longitude: -97.7, request: null } }), "utf8");
+      // A roll row with no situs street: no address to seed, so a permanent failure (never an invented address).
+      const noSitusRow = { ...commercialRow, parcel_id: "900006", source_identifier: "900006", source_prop_id: "900006", address: "", source_situs_num: "", source_situs_street: "", source_situs_street_suffix: "" };
       const outputDir = path.join(tempDir, "ingest");
       const jobId = "travis-reconcile-test";
-      const manifest = await captureAndTransform({ seedRows: [fixtureRow, permanentRow, retryableRow], htmlDir, outputDir, liveFetch: false, jobId, asOfDate: "2026-09-14" });
-      expect(manifest.reconciled.seedRows).toBe(3);
+      const manifest = await captureAndTransform({ seedRows: [fixtureRow, permanentRow, retryableRow, noSitusRow], htmlDir, outputDir, liveFetch: false, jobId, asOfDate: "2026-09-14" });
+      expect(manifest.reconciled.seedRows).toBe(4);
       expect(manifest.reconciled.success).toBe(2);
-      expect(manifest.reconciled.permanentFailure + manifest.reconciled.retryableFailure).toBe(1);
+      expect(manifest.reconciled.permanentFailure + manifest.reconciled.retryableFailure).toBe(2);
       const byId = Object.fromEntries(manifest.results.map((result) => [result.parcelId, result]));
       expect(byId["900003"].classification).toBe("permanent_failure");
       expect(byId["900003"].error).toMatch(/outside the Travis bbox/);
       expect(byId["900004"].classification).toBe("success");
+      expect(byId["900006"].classification).toBe("permanent_failure");
+      expect(byId["900006"].error).toMatch(/no situs address/);
       const validation = await validateRun(manifest);
       expect(validation.valid).toBe(true);
       expect(validation.checked).toBe(2);
       const { failuresPath } = runStatePaths(outputDir, jobId);
-      expect((await readFile(failuresPath, "utf8")).trim().split("\n")).toHaveLength(1);
+      expect((await readFile(failuresPath, "utf8")).trim().split("\n")).toHaveLength(2);
       expect(await loadRetryableFailures(outputDir, jobId)).toHaveLength(0);
-      expect(await loadRetryableFailures(outputDir, jobId, { includePermanent: true })).toHaveLength(1);
+      expect(await loadRetryableFailures(outputDir, jobId, { includePermanent: true })).toHaveLength(2);
     } finally {
       await rm(tempDir, { recursive: true, force: true });
     }
@@ -218,6 +222,7 @@ describe("captureAndTransform (fixture, no network)", () => {
     expect(classifyTravisFailure(new Error("coordinate 40,-97 is outside the Travis bbox"))).toBe("permanent");
     expect(classifyTravisFailure(new Error("TNR feature PROP_ID 1 does not match requested 2"))).toBe("permanent");
     expect(classifyTravisFailure(new Error("egress country is RO, not US"))).toBe("permanent");
+    expect(classifyTravisFailure(new Error("no situs address: the roll prints no situs street for this account"))).toBe("permanent");
     expect(classifyTravisFailure(new Error("fetch failed: ECONNRESET"))).toBe("transient");
     expect(classifyTravisFailure(new Error("something unexpected"))).toBe("unknown");
   });
