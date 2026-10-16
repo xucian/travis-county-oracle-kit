@@ -1,0 +1,101 @@
+[
+ {
+  "status_current": "Final",
+  "n": "2010089"
+ },
+ {
+  "status_current": "Expired",
+  "n": "169695"
+ },
+ {
+  "status_current": "VOID",
+  "n": "153347"
+ },
+ {
+  "status_current": "Active",
+  "n": "27891"
+ },
+ {
+  "status_current": "Withdrawn",
+  "n": "17795"
+ },
+ {
+  "status_current": "Cancelled",
+  "n": "675"
+ },
+ {
+  "status_current": "Pending",
+  "n": "237"
+ },
+ {
+  "status_current": "Cancelled - Contractor Required",
+  "n": "132"
+ },
+ {
+  "status_current": "Closed",
+  "n": "129"
+ },
+ {
+  "status_current": "Aborted",
+  "n": "121"
+ },
+ {
+  "status_current": "Inactive Pending Revision",
+  "n": "97"
+ },
+ {
+  "status_current": "On Hold",
+  "n": "70"
+ },
+ {
+  "status_current": "Pending Permit",
+  "n": "57"
+ },
+ {
+  "status_current": "Re Review",
+  "n": "55"
+ },
+ {
+  "status_current": "Denied but Closed",
+  "n": "43"
+ },
+ {
+  "status_current": "Suspended",
+  "n": "26"
+ },
+ {
+  "n": "14"
+ },
+ {
+  "status_current": "Expired - License",
+  "n": "13"
+ },
+ {
+  "status_current": "Cancelled - New Permit Required",
+  "n": "9"
+ },
+ {
+  "status_current": "New Permit Required",
+  "n": "3"
+ },
+ {
+  "status_current": "Inactive Contractor",
+  "n": "3"
+ },
+ {
+  "status_current": "Revoked",
+  "n": "2"
+ },
+ {
+  "status_current": "Application Incomplete",
+  "n": "2"
+ },
+ {
+  "status_current": "Rejected",
+  "n": "1"
+ },
+ {
+  "status_current": "Awaiting Upload",
+  "n": "1"
+ }
+]

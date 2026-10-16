@@ -1,0 +1,51 @@
+egress=RO probed_at=2026-10-16T15:44:16Z
+austin-abc-public-search | 200 https://abc.austintexas.gov/web/permit/public-search-other text/html | server= |  | markers=Incapsula, | title= | err=
+austin-abc-home | 200 https://abc.austintexas.gov/citizenportal/app/ text/html;charset=UTF-8 | server= |  | markers=Incapsula,reCaptcha,recaptcha, | title=Citizen Portal | err=
+austin-socrata-dataset | 200 https://data.austintexas.gov/Building-and-Development/Issued-Construction-Permits/3syk-w9eu text/html; charset=utf-8 | server=Server: nginx |  | markers=blocked,captcha,forbidden,recaptcha, | title= | err=
+travis-county-apply | 200 https://www.traviscountytx.gov/tnr/development-services/apply-for-a-permit text/html; charset=utf-8 | server=server: cloudflare |  | markers=cloudflare,forbidden, | title=Apply for a Permit | Travis County, Texas | err=
+travis-county-dev-services | 200 https://www.traviscountytx.gov/tnr/development-services text/html; charset=utf-8 | server=server: cloudflare |  | markers=cloudflare,forbidden, | title=Development Services | Travis County, Texas | err=
+mgo-home | 200 https://landing.mgoconnect.org/ text/html | server=server: AmazonS3 |  | markers= | title=MyGovernmentOnline (MGO) — Permitting, Code Enforcement & Public Works | err=
+mgoconnect-home | 200 https://www.mgoconnect.org/ text/html | server=server: Microsoft-IIS/10.0 |  | markers= | title=MGO Connect | err=
+pflugerville-permits | 404 https://www.pflugervilletx.gov/city-government/development-services-center/building-inspections-permits text/html; charset=utf-8 | server=server: evolve |  | markers= | title=Pflugerville, TX - Official Website | err=
+pflugerville-home | 200 https://www.pflugervilletx.gov/ text/html; charset=utf-8 | server=server: evolve |  | markers= | title=Pflugerville, TX - Official Website | Official Website | err=
+pflugerville-energov | 000 https://pflugervilletx-energovpub.tylerhost.net/apps/selfservice  | server= |  | markers= | title= | err=curl: (6) Could not resolve host: pflugervilletx-energovpub.tylerhost.net
+roundrock-portal-help | 200 https://www.roundrocktexas.gov/city-departments/administration/permit-portal-help/ text/html; charset=UTF-8 | server=server: cloudflare |  | markers=captcha, | title=Permit Portal Help - City of Round Rock | err=
+cedarpark-permits | 403 https://www.cedarparktexas.gov/676/Search-for-a-Permit-PDF text/html; charset=UTF-8 | server=Server: cloudflare |  | markers=Attention Required,Cloudflare,blocked,captcha,cloudflare, | title=Attention Required! | Cloudflare | err=
+leander-permits | 403 https://www.leandertx.gov/permits text/html; charset=UTF-8 | server=Server: cloudflare |  | markers=Attention Required,Cloudflare,blocked,captcha,cloudflare, | title=Attention Required! | Cloudflare | err=
+lakeway-permits | 403 https://www.lakeway-tx.gov/1165 text/html; charset=UTF-8 | server=server: cloudflare | cf-mitigated: challenge | markers=Just a moment,__cf_chl,cloudflare, | title=Just a moment... | err=
+lakeway-civic-access | 000 https://lakewaytx-energovpub.tylerhost.net/apps/selfservice  | server= |  | markers= | title= | err=curl: (6) Could not resolve host: lakewaytx-energovpub.tylerhost.net
+beecave-mgo | 404 https://www.beecavetexas.gov/government/departments/planning_development/application_center/my_government_online text/html | server= |  | markers= | title=404 - File or directory not found. | err=
+manor-govwell | 200 https://app.govwell.com/manor text/html | server=server: GovWell |  | markers= | title=GovWell | err=
+manor-guidelines | 403 https://www.manortx.gov/223/Residential-Building-Permit-Guidelines-P text/html; charset=UTF-8 | server=server: cloudflare | cf-mitigated: challenge | markers=Just a moment,__cf_chl,cloudflare, | title=Just a moment... | err=
+lagovista-services | 200 https://lagovistatexas.gov/101/Services text/html; charset=utf-8 | server= |  | markers= | title=Services | Lago Vista, TX | err=
+mypermitnow-home | 200 https://www.mypermitnow.org/login.aspx?ReturnUrl=%2f text/html; charset=utf-8 | server=server: Microsoft-IIS/10.0 |  | markers=cloudflare, | title=  	Government Permitting Software - Land Management and More   | err=
+jonestown-dev | 403 https://www.jonestowntx.gov/205/Development-Services text/html; charset=UTF-8 | server=server: cloudflare | cf-mitigated: challenge | markers=Just a moment,__cf_chl,cloudflare, | title=Just a moment... | err=
+elgin-building | 200 https://www.elgintexas.gov/908/Building-Division text/html; charset=utf-8 | server= |  | markers= | title=Building Division | Elgin, TX | err=
+westlakehills-home | 200 https://www.westlakehills.org/ text/html; charset=utf-8 | server= |  | markers= | title=West Lake Hills, TX - Official Website | Official Website | err=
+rollingwood-planning | 404 https://rollingwoodtx.gov/node/133 text/html; charset=utf-8 | server= |  | markers= | title=Custom404 • Rollingwood, TX • CivicEngage | err=
+sunsetvalley-govbuilt | 403 https://sunsetvalleytx.govbuilt.com/ text/html | server=server: cloudflare |  | markers=Blocked, | title= | err=
+sunsetvalley-permits | 403 https://www.sunsetvalley.gov/departments/planning-development/building-and-sign-permits text/html | server=server: AkamaiGHost |  | markers=Access Denied, | title=<TITLE>Access Denied | err=
+creedmoor-home | 403 https://www.cityofcreedmoortx.gov/ text/html; charset=UTF-8 | server=server: cloudflare | cf-mitigated: challenge | markers=Just a moment,__cf_chl,cloudflare, | title=Just a moment... | err=
+mustangridge-forms | 200 https://www.mustangridgetx.gov/planning/page/forms text/html; charset=UTF-8 | server=server: cloudflare |  | markers= | title=Forms | Mustang Ridge TX | err=
+webberville-directory | 200 https://permitsaige.com/directory/tx/webberville-tx text/html; charset=utf-8 | server=server: Netlify |  | markers=forbidden, | title=Webberville, TX Building Permits — Village of Webberville Building/Permitting Department - Permit Saige | err=
+sanleanna-home | 200 https://sanleannatx.com/ text/html; charset=UTF-8 | server=server: Apache |  | markers= | title=Village of San Leanna &#8211; Phone: 512-280-3898 | err=
+pointventure-permits | 301 https://vopv.org/building-and-permits text/html; charset=UTF-8 | server=server: cloudflare |  | markers= | title= | err=curl: (28) Connection timed out after 24873 milliseconds
+briarcliff-home | 200 https://www.briarclifftx.com/home/ text/html; charset=UTF-8 | server=server: Apache |  | markers= | title=Service not Available | err=
+thehills-code | 200 https://thehillstx.gov/2255/Code-of-Ordinances text/html; charset=utf-8 | server= |  | markers= | title=Code of Ordinances | The Hills, TX | err=
+volente-home | 200 https://www.villageofvolente-tx.gov/ text/html | server= |  | markers=cloudflare, | title=Volente, TX | err=
+tdlr-license-search | 000 https://www.tdlr.texas.gov/LicenseSearch/  | server= |  | markers= | title= | err=curl: (6) Could not resolve host: www.tdlr.texas.gov
+tsbpe-home | 000 https://www.tsbpe.texas.gov/  | server= |  | markers= | title= | err=curl: (6) Could not resolve host: www.tsbpe.texas.gov
+sos-direct | 000 https://direct.sos.state.tx.us/acct/acct-login.asp  | server= |  | markers= | title= | err=curl: (6) Could not resolve host: direct.sos.state.tx.us
+sos-home | 000 https://www.sos.state.tx.us/corp/sosda/index.shtml  | server= |  | markers= | title= | err=curl: (6) Could not resolve host: www.sos.state.tx.us
+comptroller-franchise-search | 000 https://mycpa.cpa.state.tx.us/coa/  | server= |  | markers= | title= | err=curl: (6) Could not resolve host: mycpa.cpa.state.tx.us
+done
+egress=RO probed_at=2026-10-16T16:44:45Z
+pflugerville-ams-publicaccess | 200 https://ams.pflugervilletx.gov/PublicAccess?currentRoutePath=/template/login.aspx text/html; charset=utf-8 | server=server: Microsoft-IIS/10.0 |  | markers=recaptcha, | title=PublicAccess | err=
+roundrock-permits-portal | 000 https://permits.roundrocktexas.gov/  | server= |  | markers= | title= | err=curl: (28) Connection timed out after 25005 milliseconds
+roundrock-etrakit | 200 https://etrakit.roundrocktexas.gov/etrakit/ text/html | server= |  | markers= | title=We have a new permitting system! | err=
+lagovista-permitting | 200 https://tx-lagovista.civicplus.com/165/Permitting text/html; charset=utf-8 | server= |  | markers= | title=Permitting | Lago Vista, TX | err=
+westlakehills-building | 200 https://www.westlakehills.org/95/Building-Development text/html; charset=utf-8 | server= |  | markers= | title=Building &amp; Development | West Lake Hills, TX - Official Website | err=
+elgin-mgo-login | 200 https://www.mgoconnect.org/auth/login text/html | server=server: Microsoft-IIS/10.0 |  | markers= | title=MGO Connect | err=
+travis-tnr-open-records | 200 https://www.traviscountytx.gov/tnr/tnr-open-records text/html; charset=utf-8 | server=server: cloudflare |  | markers=cloudflare,forbidden, | title=TNR Open Records | Travis County, Texas | err=
+pointventure-vopv | 000 https://vopv.org/building-and-permits  | server= |  | markers= | title= | err=curl: (28) Connection timed out after 25005 milliseconds
+done

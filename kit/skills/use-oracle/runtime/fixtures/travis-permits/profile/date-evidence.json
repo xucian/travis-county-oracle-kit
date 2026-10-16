@@ -1,0 +1,19 @@
+{
+  "version": "travis-date-evidence-v1",
+  "as_of_date": "2026-10-16",
+  "cases": [
+    {"raw": "2025-02-28T00:00:00.000", "not_before": "2023-03-14", "expected_state": "confirmed_present", "expected_value": "2025-02-28", "reason": "valid"},
+    {"raw": "2021-05-25T00:00:00.000", "not_before": null, "expected_state": "confirmed_present", "expected_value": "2021-05-25", "reason": "valid"},
+    {"raw": "2021-05-25", "not_before": null, "expected_state": "confirmed_present", "expected_value": "2021-05-25", "reason": "valid"},
+    {"raw": "", "not_before": null, "expected_state": "unknown", "expected_value": null, "reason": "blank"},
+    {"raw": null, "not_before": null, "expected_state": "unknown", "expected_value": null, "reason": "blank"},
+    {"raw": "   ", "not_before": null, "expected_state": "unknown", "expected_value": null, "reason": "blank"},
+    {"raw": "1900-05-03T00:00:00.000", "not_before": "1998-01-05", "expected_state": "invalid_quarantined", "expected_value": "1900-05-03T00:00:00.000", "reason": "before_applied_date", "note": "the export's minimum completed_date; a migration artifact"},
+    {"raw": "1899-12-31T00:00:00.000", "not_before": null, "expected_state": "invalid_quarantined", "expected_value": "1899-12-31T00:00:00.000", "reason": "before_earliest_plausible_date"},
+    {"raw": "2026-10-17T00:00:00.000", "not_before": null, "expected_state": "invalid_quarantined", "expected_value": "2026-10-17T00:00:00.000", "reason": "future"},
+    {"raw": "2021-02-30T00:00:00.000", "not_before": null, "expected_state": "invalid_quarantined", "expected_value": "2021-02-30T00:00:00.000", "reason": "malformed"},
+    {"raw": "05/25/2021", "not_before": null, "expected_state": "invalid_quarantined", "expected_value": "05/25/2021", "reason": "malformed"},
+    {"raw": "2021-01-01T00:00:00.000", "not_before": "2021-02-02", "expected_state": "invalid_quarantined", "expected_value": "2021-01-01T00:00:00.000", "reason": "before_applied_date"},
+    {"raw": "2026-10-16T00:00:00.000", "not_before": null, "expected_state": "confirmed_present", "expected_value": "2026-10-16", "reason": "valid", "note": "the as-of day itself is not future"}
+  ]
+}

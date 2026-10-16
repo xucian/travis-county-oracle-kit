@@ -1,0 +1,44 @@
+[{"jurisdiction":"AUSTIN 2 MILE ETJ","permittype":"EP","n":"60850","first_year":"1979","last_year":"2026"}
+,{"jurisdiction":"AUSTIN 2 MILE ETJ","permittype":"PP","n":"32367","first_year":"1979","last_year":"2026"}
+,{"jurisdiction":"AUSTIN 2 MILE ETJ","permittype":"MP","n":"23239","first_year":"1979","last_year":"2026"}
+,{"jurisdiction":"AUSTIN 2 MILE ETJ","permittype":"BP","n":"10226","first_year":"1979","last_year":"2026"}
+,{"jurisdiction":"AUSTIN 2 MILE ETJ","permittype":"DS","n":"926","first_year":"1980","last_year":"2026"}
+,{"jurisdiction":"AUSTIN LTD","permittype":"EP","n":"21875","first_year":"1980","last_year":"2026"}
+,{"jurisdiction":"AUSTIN LTD","permittype":"PP","n":"17151","first_year":"1980","last_year":"2026"}
+,{"jurisdiction":"AUSTIN LTD","permittype":"BP","n":"14660","first_year":"1980","last_year":"2026"}
+,{"jurisdiction":"AUSTIN LTD","permittype":"MP","n":"12960","first_year":"1980","last_year":"2026"}
+,{"jurisdiction":"AUSTIN LTD","permittype":"DS","n":"1871","first_year":"1980","last_year":"2025"}
+,{"jurisdiction":"BEE CAVE FULL PURPOSE","permittype":"EP","n":"4171","first_year":"1980","last_year":"2026"}
+,{"jurisdiction":"BEE CAVE FULL PURPOSE","permittype":"MP","n":"454","first_year":"1980","last_year":"2015"}
+,{"jurisdiction":"BEE CAVE FULL PURPOSE","permittype":"PP","n":"111","first_year":"1982","last_year":"2026"}
+,{"jurisdiction":"BEE CAVE FULL PURPOSE","permittype":"BP","n":"85","first_year":"1984","last_year":"2005"}
+,{"jurisdiction":"BEE CAVE FULL PURPOSE","permittype":"DS","n":"1","first_year":"2026","last_year":"2026"}
+,{"jurisdiction":"LAKEWAY FULL PURPOSE","permittype":"EP","n":"5323","first_year":"1980","last_year":"2026"}
+,{"jurisdiction":"LAKEWAY FULL PURPOSE","permittype":"MP","n":"1155","first_year":"1980","last_year":"2015"}
+,{"jurisdiction":"LAKEWAY FULL PURPOSE","permittype":"PP","n":"172","first_year":"1980","last_year":"2026"}
+,{"jurisdiction":"LAKEWAY FULL PURPOSE","permittype":"BP","n":"170","first_year":"1981","last_year":"2005"}
+,{"jurisdiction":"LAKEWAY FULL PURPOSE","permittype":"DS","n":"5","first_year":"1986","last_year":"1993"}
+,{"jurisdiction":"PFLUGERVILLE FULL PURPOSE","permittype":"EP","n":"597","first_year":"1980","last_year":"2026"}
+,{"jurisdiction":"PFLUGERVILLE FULL PURPOSE","permittype":"MP","n":"435","first_year":"1980","last_year":"2015"}
+,{"jurisdiction":"PFLUGERVILLE FULL PURPOSE","permittype":"PP","n":"55","first_year":"1980","last_year":"2024"}
+,{"jurisdiction":"PFLUGERVILLE FULL PURPOSE","permittype":"BP","n":"27","first_year":"1983","last_year":"2005"}
+,{"jurisdiction":"PFLUGERVILLE FULL PURPOSE","permittype":"DS","n":"3","first_year":"1992","last_year":"2013"}
+,{"jurisdiction":"ROLLINGWOOD FULL PURPOSE","permittype":"EP","n":"1363","first_year":"1980","last_year":"2026"}
+,{"jurisdiction":"ROLLINGWOOD FULL PURPOSE","permittype":"MP","n":"520","first_year":"1980","last_year":"2015"}
+,{"jurisdiction":"ROLLINGWOOD FULL PURPOSE","permittype":"PP","n":"80","first_year":"1980","last_year":"2023"}
+,{"jurisdiction":"ROLLINGWOOD FULL PURPOSE","permittype":"BP","n":"29","first_year":"1980","last_year":"2024"}
+,{"jurisdiction":"ROLLINGWOOD FULL PURPOSE","permittype":"DS","n":"4","first_year":"1981","last_year":"1987"}
+,{"jurisdiction":"SUNSET VALLEY FULL PURPOSE","permittype":"EP","n":"779","first_year":"1981","last_year":"2026"}
+,{"jurisdiction":"SUNSET VALLEY FULL PURPOSE","permittype":"MP","n":"254","first_year":"1981","last_year":"2015"}
+,{"jurisdiction":"SUNSET VALLEY FULL PURPOSE","permittype":"PP","n":"64","first_year":"1982","last_year":"2026"}
+,{"jurisdiction":"SUNSET VALLEY FULL PURPOSE","permittype":"BP","n":"23","first_year":"1981","last_year":"2013"}
+,{"jurisdiction":"SUNSET VALLEY FULL PURPOSE","permittype":"DS","n":"7","first_year":"1990","last_year":"2015"}
+,{"jurisdiction":"THE HILLS FULL PURPOSE","permittype":"EP","n":"795","first_year":"1984","last_year":"2026"}
+,{"jurisdiction":"THE HILLS FULL PURPOSE","permittype":"MP","n":"405","first_year":"1984","last_year":"2014"}
+,{"jurisdiction":"THE HILLS FULL PURPOSE","permittype":"PP","n":"32","first_year":"1985","last_year":"2022"}
+,{"jurisdiction":"THE HILLS FULL PURPOSE","permittype":"BP","n":"21","first_year":"1984","last_year":"2005"}
+,{"jurisdiction":"WEST LAKE HILLS FULL PURPOSE","permittype":"EP","n":"3214","first_year":"1980","last_year":"2026"}
+,{"jurisdiction":"WEST LAKE HILLS FULL PURPOSE","permittype":"MP","n":"1592","first_year":"1980","last_year":"2017"}
+,{"jurisdiction":"WEST LAKE HILLS FULL PURPOSE","permittype":"PP","n":"217","first_year":"1980","last_year":"2026"}
+,{"jurisdiction":"WEST LAKE HILLS FULL PURPOSE","permittype":"BP","n":"88","first_year":"1981","last_year":"2019"}
+,{"jurisdiction":"WEST LAKE HILLS FULL PURPOSE","permittype":"DS","n":"2","first_year":"1997","last_year":"2023"}]

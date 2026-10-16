@@ -1,0 +1,205 @@
+[
+ {
+  "permit_class": "R- 101 Single Family Houses",
+  "n": "115189"
+ },
+ {
+  "permit_class": "C-1000 Commercial Remodel",
+  "n": "111873"
+ },
+ {
+  "permit_class": "R- 435 Renovations/Remodel",
+  "n": "98615"
+ },
+ {
+  "permit_class": "R- 434 Addition & Alterations",
+  "n": "46852"
+ },
+ {
+  "permit_class": "Residential",
+  "n": "20196"
+ },
+ {
+  "permit_class": "C- 329 Com Structures Other Than Bldg",
+  "n": "15378"
+ },
+ {
+  "permit_class": "R- 645 Demolition One Family Homes",
+  "n": "13153"
+ },
+ {
+  "permit_class": "R- 329 Res Structures Other Than Bldg",
+  "n": "12760"
+ },
+ {
+  "permit_class": "C-1001 Commercial Finish Out",
+  "n": "8374"
+ },
+ {
+  "permit_class": "C- 105 Five or More Family Bldgs",
+  "n": "8039"
+ },
+ {
+  "permit_class": "R- 103 Two Family Bldgs",
+  "n": "6728"
+ },
+ {
+  "permit_class": "R- 438 Residential Garage/Carport Addn",
+  "n": "6396"
+ },
+ {
+  "permit_class": "Commercial",
+  "n": "5538"
+ },
+ {
+  "permit_class": "C- 328 Commercial Other Nonresident Bldg",
+  "n": "5139"
+ },
+ {
+  "permit_class": "C- 324 Office, Bank & Professional Bldgs",
+  "n": "4993"
+ },
+ {
+  "n": "4887"
+ },
+ {
+  "permit_class": "C- 437 Addn, Alter, Convn-NonRes",
+  "n": "4439"
+ },
+ {
+  "permit_class": "R- 649 Demolition All Other Bldgs Res",
+  "n": "3938"
+ },
+ {
+  "permit_class": "C- 649 Demolition All Other Bldgs Com",
+  "n": "3680"
+ },
+ {
+  "permit_class": "R- 102 Secondary Apartment",
+  "n": "3244"
+ },
+ {
+  "permit_class": "C- 327 Stores & Customer Services",
+  "n": "3178"
+ },
+ {
+  "permit_class": "R- 330  Accessory Use to Primary",
+  "n": "2837"
+ },
+ {
+  "permit_class": "C- 101 Single Family Houses",
+  "n": "2310"
+ },
+ {
+  "permit_class": "R-2001 Relocation Residential",
+  "n": "1742"
+ },
+ {
+  "permit_class": "C- 104 Three & Four Family Bldgs",
+  "n": "1616"
+ },
+ {
+  "permit_class": "C- 326 Schools & Other Educational Bldgs",
+  "n": "1534"
+ },
+ {
+  "permit_class": "C- 321 Pkg Garage Bldg & Open Deck",
+  "n": "1055"
+ },
+ {
+  "permit_class": "C- 318 Amusement, Social & Rec Bldgs",
+  "n": "899"
+ },
+ {
+  "permit_class": "Sign Permit",
+  "n": "817"
+ },
+ {
+  "permit_class": "R- 439 Addition Mobile Home",
+  "n": "760"
+ },
+ {
+  "permit_class": "R- 646 Demolition Two Family Bldgs",
+  "n": "506"
+ },
+ {
+  "permit_class": "R- 437 Residential Boat Dock",
+  "n": "486"
+ },
+ {
+  "permit_class": "C- 320 Industrial Bldgs",
+  "n": "463"
+ },
+ {
+  "permit_class": "C- 322 Service Station & Repair Garage",
+  "n": "450"
+ },
+ {
+  "permit_class": "R- 438 Residential Retaining Wall",
+  "n": "431"
+ },
+ {
+  "permit_class": "C- 319 Churches and Othr Religious Bldgs",
+  "n": "355"
+ },
+ {
+  "permit_class": "C- 213 Hotels, Motels, & Tourist Cabins",
+  "n": "339"
+ },
+ {
+  "permit_class": "C- 103 Two Family Bldgs",
+  "n": "312"
+ },
+ {
+  "permit_class": "C- 325 Public Works & Utilities Bldgs",
+  "n": "260"
+ },
+ {
+  "permit_class": "C-1002 Commercial Remodel & Finish Out",
+  "n": "254"
+ },
+ {
+  "permit_class": "C- 106 Mixed Use",
+  "n": "238"
+ },
+ {
+  "permit_class": "C- 214 Other Nonhousekeeping Shelter",
+  "n": "232"
+ },
+ {
+  "permit_class": "C- 323 Hospital & Institutional Bldgs",
+  "n": "192"
+ },
+ {
+  "permit_class": "R- 436 Addn to increase housing units",
+  "n": "150"
+ },
+ {
+  "permit_class": "C-2000 Relocation Commercial",
+  "n": "140"
+ },
+ {
+  "permit_class": "C- 648 Demolition 5 or More Family Bldgs",
+  "n": "127"
+ },
+ {
+  "permit_class": "R- 328 Resident Other Nonresident Bldg",
+  "n": "112"
+ },
+ {
+  "permit_class": "C- 647 Demolition 3 and 4 Family Bldgs",
+  "n": "49"
+ },
+ {
+  "permit_class": "C-2003 Commercial Retaining Wall",
+  "n": "26"
+ },
+ {
+  "permit_class": "C-2002 Commercial Boat Dock",
+  "n": "16"
+ },
+ {
+  "permit_class": "R- 440 Connect Mobile Home",
+  "n": "9"
+ }
+]

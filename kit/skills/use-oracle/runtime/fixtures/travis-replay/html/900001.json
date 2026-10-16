@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "travis.parcel-input.v1",
+  "propId": "900001",
+  "geoId": "0219080719",
+  "request": {
+    "method": "GET",
+    "url": "https://traviscad.org/wp-content/largefiles/2026-Certified-Appraisal-Export.zip",
+    "multiValueQueryString": {}
+  },
+  "snapshot": {
+    "sourceUrl": "https://traviscad.org/publicinformation",
+    "sourceItemId": "2026-Certified-Appraisal-Export.zip",
+    "sourceRevision": "fixture-sha256-0000000000000000000000000000000000000000000000000000000000000000",
+    "snapshotAt": "2026-10-16T00:00:00.000Z"
+  },
+  "tcad": {
+    "prop_id": "900001",
+    "geo_id": "0219080719",
+    "prop_type_cd": "R",
+    "state_cd": "A1",
+    "py_owner_name": "DOE JOHN A & JANE DOE",
+    "py_addr_line1": "804 PARK BLVD",
+    "py_addr_line2": null,
+    "py_addr_line3": null,
+    "py_addr_city": "AUSTIN",
+    "py_addr_state": "TX",
+    "py_addr_zip": "78751",
+    "situs_num": "804",
+    "situs_street_prefx": null,
+    "situs_street": "PARK",
+    "situs_street_sufix": "BLVD",
+    "situs_unit": null,
+    "situs_city": "AUSTIN",
+    "situs_zip": "78751",
+    "legal_desc": "LOT 1 BLK A FIXTURE ADDN",
+    "legal_desc_2": null,
+    "legal_acreage": "0.1722",
+    "hood_cd": "A0001",
+    "abs_subdv_cd": "S1234",
+    "abs_subdv_desc": "FIXTURE ADDN",
+    "land_hstd_val": "250000",
+    "land_non_hstd_val": "0",
+    "imprv_hstd_val": "350000",
+    "imprv_non_hstd_val": "0",
+    "ag_use_val": "0",
+    "appraised_val": "600000",
+    "assessed_val": "580000",
+    "market_value": "600000",
+    "deed_type": "WD",
+    "deed_dt": "2015-06-15",
+    "deed_book_id": null,
+    "deed_book_page": null,
+    "yr_built": "1998",
+    "imprv_count": "1",
+    "living_area_sqft": "1800",
+    "tax_year": "2026"
+  },
+  "situs": {
+    "address": "804 PARK BLVD, AUSTIN TX 78751",
+    "city": "AUSTIN",
+    "state": "TX",
+    "zip": "78751"
+  },
+  "geometry": {
+    "latitude": 30.30214745556966,
+    "longitude": -97.72239179423724,
+    "polygon": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -97.723,
+            30.3018
+          ],
+          [
+            -97.7218,
+            30.3018
+          ],
+          [
+            -97.7218,
+            30.3025
+          ],
+          [
+            -97.723,
+            30.3025
+          ],
+          [
+            -97.723,
+            30.3018
+          ]
+        ]
+      ]
+    },
+    "objectId": "101",
+    "snapshotAt": "2026-10-16T00:00:00.000Z",
+    "request": {
+      "method": "GET",
+      "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/FeatureServer/0/query",
+      "multiValueQueryString": {
+        "where": [
+          "1=1"
+        ],
+        "outFields": [
+          "OBJECTID,PROP_ID,geo_id"
+        ],
+        "returnGeometry": [
+          "true"
+        ],
+        "outSR": [
+          "4326"
+        ],
+        "f": [
+          "geojson"
+        ],
+        "resultOffset": [
+          "0"
+        ],
+        "resultRecordCount": [
+          "1000"
+        ]
+      }
+    }
+  }
+}

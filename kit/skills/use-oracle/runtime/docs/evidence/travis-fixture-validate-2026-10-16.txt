@@ -1,0 +1,7 @@
+elephant-cli 1.58.1 (44bb182) validate ./properties --output-csv ./errors.csv ; input = fixtures/travis-replay transformed output for 900001 and 900002 (synthetic parcels) ; run 2026-10-16 from the assignment repository's project-local CLI ; manifest https://lexicon.elephant.xyz/api/manifest
+first run (before the sidecar change): 7 errors = 2x county_jurisdiction enum, 3x unexpected property 'source_payload' on property, 2x tax.property_taxable_value_amount must be number
+second run (committed transform): 2 errors = county_jurisdiction enum only
+CSV error reports finalized during error handling.
+Properties processed: 2, succeeded: 0, failed: 2
+❌ 2 of 2 properties failed: 900001, 900002
+validate exit: 1

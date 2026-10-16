@@ -1,0 +1,29 @@
+diff --git a/skills/use-oracle/runtime/.gitignore b/skills/use-oracle/runtime/.gitignore
+index 3ee096d..df2e6fc 100644
+--- a/skills/use-oracle/runtime/.gitignore
++++ b/skills/use-oracle/runtime/.gitignore
+@@ -7,3 +7,4 @@ local-output/
+ .env
+ .env.*
+ !.env.example
++data/
+diff --git a/skills/use-oracle/runtime/bin/elephant-county.mjs b/skills/use-oracle/runtime/bin/elephant-county.mjs
+index 6124866..a482edb 100644
+--- a/skills/use-oracle/runtime/bin/elephant-county.mjs
++++ b/skills/use-oracle/runtime/bin/elephant-county.mjs
+@@ -21,6 +21,7 @@ import { parseCsvRecords } from "../src/core/csv.mjs";
+ import { runReplay } from "../src/core/replay.mjs";
+ import { pinellasAdapter } from "../src/counties/pinellas/adapter.mjs";
+ import { duvalAdapter } from "../src/counties/duval/adapter.mjs";
++import { travisAdapter } from "../src/counties/travis/adapter.mjs";
+ import { requireEnrichmentProfile } from "../src/counties/enrichment-profiles.mjs";
+ import {
+   filterSunbizDirectory,
+@@ -69,6 +70,7 @@ const RUNTIME_DIR = path.resolve(
+ const ADAPTERS = {
+   pinellas: pinellasAdapter,
+   duval: duvalAdapter,
++  travis: travisAdapter,
+ };
+ 
+ /**

@@ -1,0 +1,53 @@
+[
+ {
+  "work_class": "New",
+  "n": "193684"
+ },
+ {
+  "work_class": "Remodel",
+  "n": "187681"
+ },
+ {
+  "work_class": "Repair",
+  "n": "51080"
+ },
+ {
+  "work_class": "Addition",
+  "n": "29442"
+ },
+ {
+  "work_class": "Addition and Remodel",
+  "n": "22339"
+ },
+ {
+  "work_class": "Demolition",
+  "n": "21446"
+ },
+ {
+  "n": "5510"
+ },
+ {
+  "work_class": "Interior Demo Non-Structural",
+  "n": "4309"
+ },
+ {
+  "work_class": "Life Safety",
+  "n": "2499"
+ },
+ {
+  "work_class": "Relocation",
+  "n": "1889"
+ },
+ {
+  "work_class": "Shell",
+  "n": "1417"
+ },
+ {
+  "work_class": "Remodel Mobile Home",
+  "n": "9"
+ },
+ {
+  "work_class": "Fireline",
+  "n": "1"
+ }
+]

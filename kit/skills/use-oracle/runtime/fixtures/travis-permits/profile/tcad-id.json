@@ -1,0 +1,26 @@
+{
+  "version": "travis-tcad-id-digits-v1",
+  "evidence_cases": [
+    {"raw": "0219080719", "expected_state": "confirmed_present", "expected_value": "0219080719"},
+    {"raw": "0403010404", "expected_state": "confirmed_present", "expected_value": "0403010404"},
+    {"raw": " 0252060207 ", "expected_state": "confirmed_present", "expected_value": "0252060207", "note": "surrounding whitespace only"},
+    {"raw": "", "expected_state": "unknown", "expected_value": null},
+    {"raw": null, "expected_state": "unknown", "expected_value": null},
+    {"raw": "1234567", "expected_state": "invalid_quarantined", "expected_value": "1234567", "reason": "digits_length_7", "note": "103,843 rows on 2026-10-16"},
+    {"raw": "123456789", "expected_state": "invalid_quarantined", "expected_value": "123456789", "reason": "digits_length_9"},
+    {"raw": "02-1908-0719", "expected_state": "invalid_quarantined", "expected_value": "02-1908-0719", "reason": "non_numeric", "note": "a dashed form is never silently stripped; the fallback needs the proof"},
+    {"raw": "0", "expected_state": "invalid_quarantined", "expected_value": "0", "reason": "digits_length_1"}
+  ],
+  "proof_cases": [
+    {"name": "one-to-one roll", "geo_ids": ["0219080719", "0403010404", "0252060207"], "expected_one_to_one": true, "expected_collisions": 0},
+    {"name": "dashed and undashed forms collapse", "geo_ids": ["0219080719", "02-1908-0719", "0403010404"], "expected_one_to_one": false, "expected_collisions": 1},
+    {"name": "blanks are skipped", "geo_ids": ["", "0219080719", null], "expected_one_to_one": true, "expected_checked": 1}
+  ],
+  "link_cases": [
+    {"name": "exact match", "tcad_id": "0219080719", "parcels_by_geo_id": {"0219080719": ["123456"]}, "expected_property_id": "123456", "expected_match_method": "exact", "expected_unlinked_reason": null},
+    {"name": "no candidate", "tcad_id": "0999999999", "parcels_by_geo_id": {"0219080719": ["123456"]}, "expected_property_id": null, "expected_match_method": null, "expected_unlinked_reason": "no_candidate"},
+    {"name": "multiple candidates", "tcad_id": "0219080719", "parcels_by_geo_id": {"0219080719": ["123456", "123457"]}, "expected_property_id": null, "expected_match_method": null, "expected_unlinked_reason": "multiple_candidates"},
+    {"name": "quarantined id never links", "tcad_id": "1234567", "parcels_by_geo_id": {"1234567": ["123456"]}, "expected_property_id": null, "expected_match_method": null, "expected_unlinked_reason": "invalid_quarantined"},
+    {"name": "blank id", "tcad_id": "", "parcels_by_geo_id": {}, "expected_property_id": null, "expected_match_method": null, "expected_unlinked_reason": "no_candidate"}
+  ]
+}

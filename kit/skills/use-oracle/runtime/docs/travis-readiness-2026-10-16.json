@@ -1,0 +1,63 @@
+{
+  "overall": "BLOCKED",
+  "catalog": {
+    "county": "Travis",
+    "slug": "travis",
+    "state": "TX",
+    "fips": "48453"
+  },
+  "gates": [
+    {
+      "gate": "catalog_metadata",
+      "status": "PASS",
+      "evidence": "Travis TX slug=travis fips=48453",
+      "required_action": null
+    },
+    {
+      "gate": "parcel",
+      "status": "BLOCKED",
+      "evidence": "canonical assessed-property count is missing; GIS is not a substitute denominator",
+      "required_action": "Record tax-roll/NAL counts, explain any GIS gap, address geometry-null units, and do not seed from GIS alone when the gap is material",
+      "blocker_owner": "county-discovery"
+    },
+    {
+      "gate": "permit",
+      "status": "PASS",
+      "evidence": "23/23 jurisdictions classified",
+      "required_action": null
+    },
+    {
+      "gate": "destination",
+      "status": "NOT_APPLICABLE",
+      "evidence": "writes_in_scope is false",
+      "required_action": null
+    },
+    {
+      "gate": "enrichment",
+      "status": "PASS",
+      "evidence": "BBB advertised-count claim is bounded",
+      "required_action": null
+    }
+  ],
+  "preparation_allowed": true,
+  "execution_allowed": false,
+  "auto_advance_required": true,
+  "required_blocker_actions": [
+    {
+      "gate": "parcel",
+      "owner": "county-discovery",
+      "required_action": "Record tax-roll/NAL counts, explain any GIS gap, address geometry-null units, and do not seed from GIS alone when the gap is material"
+    }
+  ],
+  "next_automated_actions": [
+    "Continue bounded source and jurisdiction enumeration",
+    "Continue adapter fingerprinting, scaffolds, fixtures, and bounded tests",
+    "Continue AWS BBB runtime, internal destination, upload-node, and Atlas PR readiness",
+    "Prepare named API or records requests for blocked sources"
+  ],
+  "next_automated_action": "Continue bounded source and jurisdiction enumeration",
+  "next_permissible_automated_action": "Continue bounded source and jurisdiction enumeration",
+  "seed_allowed": false,
+  "ingest_allowed": false,
+  "catalog_path": "skills/use-oracle/runtime/docs/travis-sources.yaml"
+}

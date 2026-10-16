@@ -1,0 +1,27 @@
+[
+ {
+  "permittype": "EP",
+  "permit_type_desc": "Electrical Permit",
+  "n": "689064"
+ },
+ {
+  "permittype": "PP",
+  "permit_type_desc": "Plumbing Permit",
+  "n": "546969"
+ },
+ {
+  "permittype": "BP",
+  "permit_type_desc": "Building Permit",
+  "n": "521306"
+ },
+ {
+  "permittype": "MP",
+  "permit_type_desc": "Mechanical Permit",
+  "n": "506523"
+ },
+ {
+  "permittype": "DS",
+  "permit_type_desc": "Driveway / Sidewalks",
+  "n": "116645"
+ }
+]

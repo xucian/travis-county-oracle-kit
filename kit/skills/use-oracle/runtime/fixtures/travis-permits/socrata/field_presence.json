@@ -1,0 +1,18 @@
+[
+ {
+  "n": "2380507",
+  "with_tcad": "2317488",
+  "with_completed": "2182013",
+  "with_company": "1191571",
+  "with_contractor_name": "1243046",
+  "with_phone": "1363655",
+  "with_lat": "2018731",
+  "with_expires": "2379720",
+  "with_issue": "2380507",
+  "min_completed": "1900-05-03T00:00:00.000",
+  "max_completed": "2026-10-15T00:00:00.000",
+  "min_applied": "1921-09-20T00:00:00.000",
+  "max_applied": "2026-10-15T00:00:00.000",
+  "min_issue": "1921-09-20T00:00:00.000"
+ }
+]
