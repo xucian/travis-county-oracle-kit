@@ -563,8 +563,8 @@ lexicon_gaps:
 approved_exceptions:
   # Only an entry whose gate is exactly a validator gate name (parcel, permit, ...) is read by the
   # validator. Entries with any other gate value are inactive or awaiting the operator's approval.
-  - gate: parcel-pending-operator-approval
-    status: proposed-awaiting-operator-approval
+  - gate: parcel
+    status: approved-by-operator
     proposed_at: "2026-10-16"
     approval_action: The operator approves by changing this gate to parcel and this status to approved-by-operator (one command in docs/runbook.md of the assignment repository); until then the validator keeps the parcel gate BLOCKED and no seed is built.
     reason: The assessed-roll denominator is canonical; the material GIS gap is expected for separately assessed condominium units without unique polygons, and the seed is built from the TCAD certified export, not from GIS.

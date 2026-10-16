@@ -328,3 +328,17 @@ run record.
    `property_improvement_has_contractor` edge.
 8. Unincorporated Travis County has no roofing-permit ledger at all (county authority), which
    the API reports as `availability: unsupported` for that jurisdiction.
+
+## 9. T1 completion under US egress (2026-10-16, 21:23)
+
+- The operator approved the parcel exception; the readiness validator printed `PASS` (`seed_allowed: true`) before and
+  again right after seeding.
+- Seed: `data/seeds/travis.csv`, 441,961 rows = the assessed real-property count; 441,961 distinct `parcel_id`, no
+  duplicates, all digits, no leading zeros; 373,513 rows (84.5%) carry a TNR feature with the page query that
+  returned it, 68,448 do not (at least the 57,567 condo units, plus recent splits). TNR paged in 387 pages;
+  11 TNR features carry a PROP_ID absent from the roll. `tcad_id` digits-only normalization proven one-to-one over
+  431,536 distinct geographic ids (no collisions). Pilot seed: 25 rows, all in the seed, 13 with geometry.
+  Summary: `docs/evidence/travis-seed-manifest-2026-10-16.json`.
+- Comptroller cache for T3: 342,338 Travis rows (`taxpayer_county_code = '227'`) in 7 pages under
+  `data/travis/comptroller/`, each with its request, time, status, SHA-256 and row count in
+  `docs/evidence/travis-comptroller-cache-receipts-2026-10-16.jsonl`. No further VPN window is needed until run 2.
