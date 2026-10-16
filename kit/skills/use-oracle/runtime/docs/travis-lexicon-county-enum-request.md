@@ -1,8 +1,10 @@
-# Lexicon request: add `Travis` to the county enums (draft, not submitted)
+# Lexicon request: add `Travis` to the county enums (submitted as elephant-xyz/lexicon#194)
 
-Status: **drafted 2026-10-16, not submitted.** Opening the pull request against
-`https://github.com/elephant-xyz/lexicon` is an operator action; it is listed as a v1
-blocker because without it no Travis property validates.
+Status: **submitted 2026-10-16** as https://github.com/elephant-xyz/lexicon/pull/194 from the operator's
+fork (`xucian/lexicon`, branch `add-travis-county`): the same three-file change as Ellis (#171). The
+repository's `tests/model/modelComposition.test.ts` fails on any lexicon edit since #189 pinned the
+source digest; the pull request asks the maintainers to rebuild the composition or name the governed
+Model route. Validation is re-run once the published manifest includes `Travis`.
 
 ## Finding
 
