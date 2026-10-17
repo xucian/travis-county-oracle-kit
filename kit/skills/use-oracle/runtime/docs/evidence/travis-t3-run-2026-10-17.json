@@ -618,8 +618,8 @@
  "tests": {
   "command": "npx vitest run tests/travis-*",
   "test_files": 16,
-  "tests": 146,
-  "passed": 146,
+  "tests": 147,
+  "passed": 147,
   "failed": 0,
   "matcher_tests": "tests/travis-name-matcher.test.mjs unchanged and passing"
  },

@@ -113,7 +113,7 @@ export async function verifyReceiptLog(logPath, { dialect = "rfc4180" } = {}) {
     const target = path.join(dir, receipt.file);
     const where = `${relative(dir)}/${receipt.file}`;
     /** @type {Record<string, any>} */
-    const result = { file: receipt.file, kind: receipt.kind ?? null, status: receipt.status, content_type: receipt.content_type ?? null, receipt_bytes: receipt.bytes, receipt_sha256: receipt.sha256, receipt_rows: receipt.rows ?? null };
+    const result = { file: receipt.file, kind: receipt.kind ?? null, status: receipt.status, fetched_at: receipt.fetched_at ?? null, content_type: receipt.content_type ?? null, receipt_bytes: receipt.bytes, receipt_sha256: receipt.sha256, receipt_rows: receipt.rows ?? null };
     if (!existsSync(target)) {
       mismatches.push(`${where}: file missing`);
       files.push({ ...result, exists: false });
@@ -237,7 +237,16 @@ export async function verifyWindow({ windowDir, runStamp }) {
   for (const source of run.sources) {
     const sourceDir = path.join(windowDir, source.key);
     const sourceLogs = verifiedLogs.filter((result) => result.absDir === path.resolve(sourceDir) || result.absDir.startsWith(`${path.resolve(sourceDir)}${path.sep}`));
-    const dataFiles = sourceLogs.flatMap((result) => result.files.filter((file) => DATA_KINDS.has(file.kind) || file.kind === "probe"));
+    // The files this run recorded: a Socrata version directory's pages, the files the run names, or (a probe) the
+    // receipts fetched during the run. Earlier captures in the same directory are verified above but not summed here.
+    const captureDir = typeof source.detail?.capture === "string" ? path.resolve(RUNTIME_ROOT, source.detail.capture) : null;
+    const named = new Set([...(Array.isArray(source.detail?.files) ? source.detail.files.map((entry) => entry.file) : []), ...(typeof source.detail?.file === "string" ? [source.detail.file] : [])]);
+    const inRun = (file) => file.fetched_at >= run.started_at && file.fetched_at <= run.finished_at;
+    const runLogs = captureDir ? sourceLogs.filter((result) => result.absDir === captureDir) : sourceLogs;
+    const socrataCapture = captureDir !== null && existsSync(path.join(captureDir, "capture.json"));
+    const dataFiles = runLogs.flatMap((result) =>
+      result.files.filter((file) => (DATA_KINDS.has(file.kind) || file.kind === "probe") && (socrataCapture || captureDir === null || (named.size > 0 ? named.has(file.file) : inRun(file)))),
+    );
     const csvFiles = dataFiles.filter((file) => file.class === "csv");
     const rows = csvFiles.reduce((sum, file) => sum + file.parsed_rows, 0);
     const bytes = dataFiles.reduce((sum, file) => sum + (file.bytes ?? 0), 0);
@@ -246,6 +255,7 @@ export async function verifyWindow({ windowDir, runStamp }) {
       key: source.key,
       run_status: source.status,
       receipt_logs: sourceLogs.map((result) => result.dir),
+      run_capture: captureDir ? relative(captureDir) : null,
       files_verified: sourceLogs.reduce((sum, result) => sum + result.files.length, 0),
       data_files: dataFiles.length,
       csv_files: csvFiles.length,

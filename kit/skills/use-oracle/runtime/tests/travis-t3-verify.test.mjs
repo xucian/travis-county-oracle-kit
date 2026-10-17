@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createHash } from "node:crypto";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -146,6 +146,29 @@ describe("T3 window verification", () => {
       const report = await verifyWindow({ windowDir: root, runStamp: "20261017T160716Z" });
       expect(report.ok).toBe(false);
       expect(report.mismatches.some((line) => /page-00000\.csv: full parse finds 2 rows, receipt says 3/.test(line))).toBe(true);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("verifies a later TSBPE re-run against its own file, with the earlier HTML page beside it", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "t3-verify-rerun-"));
+    try {
+      await writeWindow(root);
+      const tsbpe = path.join(root, "tsbpe-responsible-master-plumber", "d20261017");
+      const csv = '"License Number","Name","Company"\n"RMP-1","PAT PLUMBER","PIPES LLC"\n';
+      await writeFile(path.join(tsbpe, "responsible-master-plumber-RMP.csv"), csv);
+      const log = path.join(tsbpe, "receipts.jsonl");
+      await appendFile(log, `${receipt({ kind: "file", file: "responsible-master-plumber-RMP.csv", fetched_at: "2026-10-18T10:00:01.000Z", bytes: Buffer.byteLength(csv), sha256: sha256(csv), rows: 1, content_type: "text/csv" })}\n`);
+      expect((await readFile(log, "utf8")).trim().split("\n")).toHaveLength(2);
+      await writeFile(
+        path.join(root, "runs", "20261018T100000Z.json"),
+        JSON.stringify({ started_at: "2026-10-18T10:00:00.000Z", finished_at: "2026-10-18T10:00:03.000Z", seconds: 3, egress: "US at every check", egress_checks: 3, requests: 2, counts: { ok: 1, failed: 0 }, exit_code: 0, sources: [{ key: "tsbpe-responsible-master-plumber", status: "ok", rows: 1, bytes: Buffer.byteLength(csv), detail: { capture: path.relative(path.join(path.dirname(new URL(import.meta.url).pathname), ".."), tsbpe), file: "responsible-master-plumber-RMP.csv" } }] }),
+      );
+      const report = await verifyWindow({ windowDir: root, runStamp: "20261018T100000Z" });
+      expect(report.mismatches).toEqual([]);
+      const source = report.sources.find((entry) => entry.key === "tsbpe-responsible-master-plumber");
+      expect(source).toMatchObject({ rows_parsed: 1, bytes: Buffer.byteLength(csv), not_csv_files: [], run_record_matches: true });
     } finally {
       await rm(root, { recursive: true, force: true });
     }
