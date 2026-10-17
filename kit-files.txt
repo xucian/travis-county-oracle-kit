@@ -29,6 +29,8 @@ skills/use-oracle/runtime/docs/evidence/travis-tcad-prop-counts-2026-10-16.json
 skills/use-oracle/runtime/docs/evidence/travis-tcad-state-code-counts-2026-10-16.json
 skills/use-oracle/runtime/docs/travis-bbb-access-request.md
 skills/use-oracle/runtime/docs/travis-county-findings.md
+skills/use-oracle/runtime/docs/travis-elephant-cli-issue-property-seed-table-collision.md
+skills/use-oracle/runtime/docs/travis-kit-gap-reports.md
 skills/use-oracle/runtime/docs/travis-lexicon-county-enum-request.md
 skills/use-oracle/runtime/docs/travis-readiness-2026-10-16-us-egress.json
 skills/use-oracle/runtime/docs/travis-readiness-2026-10-16.json
