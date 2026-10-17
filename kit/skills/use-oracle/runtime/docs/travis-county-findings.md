@@ -295,11 +295,15 @@ run record.
 
 ## 8. Risks and findings that gate later steps
 
-1. **Lexicon county enum (blocker for T2 validation).** The live `unnormalized_address.county_jurisdiction`
-   (required) and `address.county_name` enums (140 members) do not include `Travis`; see
-   `docs/travis-lexicon-county-enum-request.md`. Until the enum merges every Travis property
-   fails `elephant-cli validate` on exactly that error; no hash or upload happens before it
-   validates.
+1. **Lexicon county enum (a county-label gap, not a validation blocker).** The live
+   `unnormalized_address.county_jurisdiction` (required) and `address.county_name` enums (140 members)
+   do not include `Travis`; see `docs/travis-lexicon-county-enum-request.md` (lexicon#194). Corrected
+   2026-10-17 (assignment decisions.md section 22): the earlier premise that every Travis property
+   fails `validate` until the enum merges held only while the Seed root carried `unnormalized_address`.
+   The Travis archive now uses the Seed root `elephant-cli transform` writes (`address_has_parcel`
+   only), omits `address.county_name` and writes no `unnormalized_address`, and validates against the
+   live manifest with 0 errors (run of record `20261017T072132Z`). No field in it names the county;
+   the Atlas page, the run record and the README manifest do.
 2. **`source_payload` does not survive `elephant-cli validate`** (decisions.md section 5,
    option (ii)). Every live class schema is `additionalProperties: false` without a
    `source_payload` property, and `elephant-cli validate` 1.58.1 (commit `44bb182`) on the
@@ -313,8 +317,9 @@ run record.
    schema. Taxable values are per taxing entity in the export (`PROP_ENT.TXT`, not read in
    v1), so from transform v2 (T2, 2026-10-17) the field is omitted rather than proxied from
    the assessed value (v1 wrote the assessed value there).
-3. After that change the same validate run reports **exactly one error per property, the
-   county enum** (item 1): the Seed and County roots, every relationship, the person and
+3. After that change the same validate run reported **exactly one error per property, the
+   county enum** (item 1), because the Seed root then carried `unnormalized_address`; with the Seed
+   root `address_has_parcel` only it reports none (section 11): the Seed and County roots, every relationship, the person and
    company owners, the address, tax, lot, geometry and sales-history entities all validate
    against the live lexicon through the CLI's own schema resolution (the `tax` and
    `property_improvement` class CIDs were not retrievable from the public gateways by hand
@@ -351,7 +356,9 @@ run record.
   properties: 25 `county_jurisdiction` (the enum, expected), 3 `property.total_area` pattern `.*\d{2,}.*`
   (value `"0"`), 3 `lot.lot_area_sqft` minimum 1 (value 0). Final pilot (`20261016T215528Z`, transform v2):
   25 error rows, one per property, all `/relationships/property_seed/to/county_jurisdiction` (value `Travis`).
-  The County group validates on every property; the enum is the only error class left.
+  The County group validates on every property; the enum is the only error class left. Superseded
+  2026-10-17 (section 11): with the Seed root `address_has_parcel` only, the run of record validates
+  with 0 errors against the live manifest.
 - **Transform v2** (`travis-transform-v2`): `total_area` is building area and stays null (v1 wrote the lot area);
   no `lot` when the roll prints 0 legal acreage (73,334 roll rows); `livable_floor_area` only from 10 sqft
   (554 rows print 1-9 sqft); `tax.property_taxable_value_amount` omitted (see 8.2); TCAD's own state-code table
@@ -376,3 +383,19 @@ run record.
 - **Blank situs city (58.9% of the roll).** `address.json` uses the lexicon's unnormalized branch, where
   `city_name` is optional: written only when the roll prints a situs city, otherwise null; never derived from the
   ZIP, the mailing address or the GIS layer; the structured branch (city required) is not used.
+
+## 11. T2 option B (2026-10-17): the run of record against the live manifest
+
+- **Seed root** `address_has_parcel` only, as `elephant-cli transform` writes it (#251); `property_seed` and
+  `unnormalized_address` are not written into `data/` (transform v3; assignment decisions.md section 22).
+  The full Seed root validated only against an amended lexicon served locally, and `export-tables` at
+  `44bb182` refuses it ("table property_seed has two schemas in this car").
+- **Run of record `20261017T072132Z`** (live manifest sha256 `7084b933…`, no overrides): smoke (830704) 1 of 1;
+  pilot 25 = 25 + 0 + 0, 13 with geometry; `validate` 25 of 25, 0 errors; `travis-county.car` 471 blocks, root
+  `baguqeerahe3ecgiyigcgdg6gmxqsmc5ylzlucf4kb3n5xcqi5tvtiebpv2ta`, CAR checks integrity, root, index, graph,
+  lexicon and orphans 0; `export-tables --part-size 128m` 23 tables in 23 parts, 444 rows, root
+  `baguqeeram5hefoyihxelublnx3hzdmbdxg5gavyukspzevkwnii7b5zexipq`; every emitted class and relationship key has a
+  table. Evidence: `docs/evidence/travis-t2-run-20261017T072132Z.json`.
+- **County label gap.** `address.county_name` is omitted until lexicon#194 is live; the wrong-county guard is
+  `assertTravisIdentity` (seed county and FIPS, request identifiers, source hosts, address state and county,
+  geometry bbox).

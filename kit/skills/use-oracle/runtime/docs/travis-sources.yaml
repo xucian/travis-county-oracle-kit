@@ -554,7 +554,7 @@ enrichment:
 
 lexicon_gaps:
   - id: lexicon-gap-county-enum
-    detail: unnormalized_address.county_jurisdiction (required) and address.county_name enums lack Travis; request drafted in docs/travis-lexicon-county-enum-request.md; blocks elephant-cli validate until merged
+    detail: unnormalized_address.county_jurisdiction (required) and address.county_name enums lack Travis (lexicon#194, docs/travis-lexicon-county-enum-request.md). Not a validation blocker (assignment decisions.md section 22, 2026-10-17); the Seed root is address_has_parcel only, address.county_name is omitted and no unnormalized_address is written, so the archive validates against the live manifest; no field in it names the county (the Atlas page, the run record and the README manifest do)
   - id: lexicon-gap-geo-id
     detail: geo_id has no lexicon home; kept in source_payload on property and permit
   - id: lexicon-gap-permit-product-fields

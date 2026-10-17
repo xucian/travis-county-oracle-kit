@@ -1,5 +1,6 @@
 {
  "schemaVersion": "travis.run-record.v1",
+ "status": "evidence only: superseded by the run of record 20261017T072132Z",
  "contract": "docs/api-contract.md Run (frozen at de08901); T2 fills the appraisal subset, publication fields stay empty until the lexicon merges",
  "run_id": "20261016T215528Z",
  "kind": "T2 appraisal-only pilot, 25 parcels, offline (no --live-fetch); no permit, registry or enrichment track",
@@ -303,7 +304,8 @@
    "incomplete_reason": "county_enum_pending",
    "detail": "unnormalized_address.county_jurisdiction and address.county_name lack Travis until elephant-xyz/lexicon#194 merges; no hash, CAR, export-tables or upload before validate passes",
    "evidence": "validate/travis-county-errors.csv",
-   "records_request": null
+   "records_request": null,
+   "corrected": "2026-10-17 (assignment decisions.md section 22): the missing enum value blocks only the county label. With the Seed root address_has_parcel only, validate, hash and export-tables pass against the live manifest (run of record 20261017T072132Z); this limitation held only for this run's Seed root, which carried unnormalized_address."
   }
  ],
  "groups": {},
@@ -582,6 +584,7 @@
    "state": "OPEN",
    "merged_at": null
   },
-  "result": "validate does not pass, so no hash, CAR validation or export-tables ran; nothing uploaded"
+  "result": "validate does not pass, so no hash, CAR validation or export-tables ran; nothing uploaded",
+  "corrected": "the gate assumed validation waits for lexicon#194; it does not (decisions.md section 22)"
  }
 }

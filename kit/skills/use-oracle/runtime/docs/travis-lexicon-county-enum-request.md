@@ -4,7 +4,10 @@ Status: **submitted 2026-10-16** as https://github.com/elephant-xyz/lexicon/pull
 fork (`xucian/lexicon`, branch `add-travis-county`): the same three-file change as Ellis (#171). The
 repository's `tests/model/modelComposition.test.ts` fails on any lexicon edit since #189 pinned the
 source digest; the pull request asks the maintainers to rebuild the composition or name the governed
-Model route. Validation is re-run once the published manifest includes `Travis`.
+Model route. Validation does not wait for it (assignment decisions.md section 22, 2026-10-17): once the
+published manifest includes `Travis`, the county label is added in a new run with new CIDs. The pull
+request stays open; its Why is to be replaced by the text in the suggested body below (operator
+approval; not posted by the agent).
 
 ## Finding
 
@@ -25,11 +28,13 @@ repository (`classes[17].properties.county_jurisdiction.enum` and
 `classes[19].properties.county_name.enum` at the `main` revision read on 2026-10-16; no
 occurrence of the string `"Travis"` in the file).
 
-Consequence: the Seed data group every Travis archive must carry requires an
-`unnormalized_address` entity with `county_jurisdiction`, so `elephant-cli validate` fails
-on every Travis property until the enum includes `Travis`. The transform omits
-`address.county_name` meanwhile (allowed, optional) and records the omission as a lexicon
-gap; it cannot omit `county_jurisdiction`.
+Consequence (corrected 2026-10-17): without `Travis` a Travis record cannot name its county.
+`address.county_name` has to be omitted, and `unnormalized_address` cannot be written, because its
+`county_jurisdiction` is required. Validation is not blocked: the Travis archives use the Seed root
+that `elephant-cli transform` writes (`address_has_parcel` only), so they validate against the current
+manifest (run of record `20261017T072132Z`: 25 of 25, 0 errors), but no field in them names the county.
+The earlier premise, that the Seed group requires `unnormalized_address` and so every Travis property
+fails validation until the enum merges, held only for a Seed root that carries it.
 
 ## Requested change
 
@@ -42,16 +47,17 @@ Suggested pull-request title: `feat: add Travis County, TX to the county enums`.
 Suggested body:
 
 ```text
-Adds "Travis" to unnormalized_address.county_jurisdiction and address.county_name.
-Travis County, TX (FIPS 48453) is being onboarded through the Oracle county pipeline;
-the Seed data group requires county_jurisdiction, so every Travis property fails
-validation until the enum carries the county. No other schema changes.
+Adds "Travis" to unnormalized_address.county_jurisdiction and address.county_name. No other schema changes.
+
+**Why:** Travis County, TX (FIPS 48453) is being onboarded to an Oracle pipeline. Without `Travis` in these enums a Travis record cannot name its county: `address.county_name` has to be omitted, and `unnormalized_address` cannot be written, because its `county_jurisdiction` is required. The Travis archives use the Seed root that `elephant-cli transform` writes (`address_has_parcel` only), so they validate against the current manifest, but no field in them names the county. Source: the Travis Central Appraisal District's 2026 certified appraisal export (https://traviscad.org/publicinformation).
 ```
 
 ## Until it merges
 
-- The Travis adapter keeps `county_jurisdiction: "Travis"` in the output (the correct value)
-  and treats the resulting enum error as the known lexicon gap `lexicon-gap-county-enum`;
-  the first `elephant-cli validate` of the pilot is expected to report it on every property
-  and nothing else. The validation CSV is kept as evidence.
-- No hash, upload or Atlas registration happens on an archive that failed validation.
+- The archive omits `address.county_name` and writes no `unnormalized_address`; the adapter keeps
+  `county_jurisdiction: "Travis"` internal (its seed files beside `data/`), and `assertTravisIdentity` fails
+  closed on a wrong-county record (lexicon gap `lexicon-gap-county-enum`).
+- `validate`, `hash`, CAR validation and `export-tables` run against the live manifest; the county is named
+  by the Atlas page, the run record and the README manifest.
+- After the merge, adding `address.county_name` is a new snapshot with new CIDs: a new run, prior CIDs
+  untouched.
