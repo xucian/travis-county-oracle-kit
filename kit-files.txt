@@ -63,6 +63,7 @@ skills/use-oracle/runtime/src/counties/travis/enrichment-profile.mjs
 skills/use-oracle/runtime/src/counties/travis/field-coverage.mjs
 skills/use-oracle/runtime/src/counties/travis/lexicon-reproduce.ts
 skills/use-oracle/runtime/src/counties/travis/permit-profile.mjs
+skills/use-oracle/runtime/src/counties/travis/publish.mjs
 skills/use-oracle/runtime/src/counties/travis/query-table.mjs
 skills/use-oracle/runtime/src/counties/travis/seed.mjs
 skills/use-oracle/runtime/src/counties/travis/validate.mjs
@@ -71,6 +72,7 @@ skills/use-oracle/runtime/tests/travis-build-seed.test.mjs
 skills/use-oracle/runtime/tests/travis-field-coverage.test.mjs
 skills/use-oracle/runtime/tests/travis-ingest.test.mjs
 skills/use-oracle/runtime/tests/travis-permit-profile.test.mjs
+skills/use-oracle/runtime/tests/travis-publish.test.mjs
 skills/use-oracle/runtime/tests/travis-query-table.test.mjs
 skills/use-oracle/runtime/tests/travis-seed.test.mjs
 skills/use-oracle/runtime/tests/travis-transform.test.mjs
