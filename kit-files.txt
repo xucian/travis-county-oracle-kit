@@ -51,6 +51,7 @@ skills/use-oracle/runtime/fixtures/travis-replay/html/900001.json
 skills/use-oracle/runtime/fixtures/travis-replay/lexicon-manifest.json
 skills/use-oracle/runtime/fixtures/travis-replay/seed.csv
 skills/use-oracle/runtime/src/counties/travis/adapter.mjs
+skills/use-oracle/runtime/src/counties/travis/amended-lexicon-server.mjs
 skills/use-oracle/runtime/src/counties/travis/build-seed.mjs
 skills/use-oracle/runtime/src/counties/travis/enrichment-profile.mjs
 skills/use-oracle/runtime/src/counties/travis/field-coverage.mjs
@@ -59,6 +60,7 @@ skills/use-oracle/runtime/src/counties/travis/permit-profile.mjs
 skills/use-oracle/runtime/src/counties/travis/query-table.mjs
 skills/use-oracle/runtime/src/counties/travis/seed.mjs
 skills/use-oracle/runtime/src/counties/travis/validate.mjs
+skills/use-oracle/runtime/tests/travis-amended-lexicon-server.test.mjs
 skills/use-oracle/runtime/tests/travis-build-seed.test.mjs
 skills/use-oracle/runtime/tests/travis-field-coverage.test.mjs
 skills/use-oracle/runtime/tests/travis-ingest.test.mjs
