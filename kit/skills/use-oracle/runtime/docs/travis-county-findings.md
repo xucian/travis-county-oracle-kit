@@ -396,6 +396,13 @@ run record.
   lexicon and orphans 0; `export-tables --part-size 128m` 23 tables in 23 parts, 444 rows, root
   `baguqeeram5hefoyihxelublnx3hzdmbdxg5gavyukspzevkwnii7b5zexipq`; every emitted class and relationship key has a
   table. Evidence: `docs/evidence/travis-t2-run-20261017T072132Z.json`.
+- **v1 pilot publication (2026-10-17, on the operator's go).** Public-sequence step 5 only: both roots uploaded to
+  Filebase over Kubo RPC and read back as recorded (archive 471 blocks; tables 23 parts pointing back at the archive);
+  Filebase `pin/ls` holds all 25 CIDs and cid.contact lists its provider records. Pinata pin-by-CID is refused on this
+  account's plan (HTTP 403 `PAID_FEATURE_ONLY`), so there is no second pin. ipfs.io and dweb.link left every check
+  unverified, nothing mismatched: both stopped serving backend clients (retired 2026-09-21; 429 or a redirect to a
+  failing `trustless-gateway.link`). Manifest CID `bafkreiaasx5bscxhvcpfyza2hzlwyfrmqrss6roa4btefom2usxopm2a44`. No
+  Atlas PR. Evidence: the run record's `publication`; helper `src/counties/travis/publish.mjs`.
 - **County label gap.** `address.county_name` is omitted until lexicon#194 is live; the wrong-county guard is
   `assertTravisIdentity` (seed county and FIPS, request identifiers, source hosts, address state and county,
   geometry bbox).
