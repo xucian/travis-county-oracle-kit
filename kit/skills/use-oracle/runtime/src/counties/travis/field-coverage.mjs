@@ -15,7 +15,7 @@ const entry = (lexicon, sidecar, seed, note) => Object.freeze({ lexicon: Object.
 /** @type {Readonly<Record<"PROP" | "IMP_DET" | "ABS_SUBD", Readonly<Record<string, { lexicon: readonly string[], sidecar: readonly string[], seed: string | null, note: string }>>>>} */
 export const TRAVIS_FIELD_COVERAGE = Object.freeze({
   PROP: Object.freeze({
-    prop_id: entry(["property.parcel_identifier", "parcel.parcel_identifier", "property_seed.parcel_id", "property.request_identifier"], ["prop_id"], "parcel_id", "int(12) printed zero-padded; the identifier is the integer (decisions 19, 21)"),
+    prop_id: entry(["property.parcel_identifier", "parcel.parcel_identifier", "property.request_identifier"], ["prop_id"], "parcel_id", "int(12) printed zero-padded; the identifier is the integer (decisions 19, 21)"),
     prop_type_cd: entry([], ["prop_type_cd"], "filter", "only R (real property) accounts become seed rows"),
     prop_val_yr: entry(["tax.tax_year"], [], "tax_year", "appraisal year of the certified roll"),
     sup_num: entry([], [], "read", "supplement number; the certified export is supplement 0"),
@@ -30,11 +30,11 @@ export const TRAVIS_FIELD_COVERAGE = Object.freeze({
     py_addr_zip: entry(["mailing_address.postal_code", "mailing_address.unnormalized_address"], [], null, "first five digits"),
     py_confidential_flag: entry([], ["owner.classification"], "owner_confidential", "a confidential owner writes no owner entity or mailing address"),
     py_address_suppress_flag: entry([], ["owner.classification"], "owner_confidential", "treated like the confidential flag"),
-    situs_street_prefx: entry(["address.unnormalized_address", "unnormalized_address.full_address"], [], "address", ""),
-    situs_street: entry(["address.unnormalized_address", "unnormalized_address.full_address"], [], "address", "blank street: permanent failure \"no situs address\" (25 roll rows)"),
-    situs_street_suffix: entry(["address.unnormalized_address", "unnormalized_address.full_address"], [], "address", ""),
-    situs_city: entry(["address.city_name", "address.unnormalized_address", "unnormalized_address.full_address"], ["situs_city"], "city", "blank on 58.9% of the roll: city_name null, never derived"),
-    situs_zip: entry(["address.postal_code", "address.unnormalized_address", "unnormalized_address.full_address"], [], "zip", "first five digits"),
+    situs_street_prefx: entry(["address.unnormalized_address"], [], "address", ""),
+    situs_street: entry(["address.unnormalized_address"], [], "address", "blank street: permanent failure \"no situs address\" (25 roll rows)"),
+    situs_street_suffix: entry(["address.unnormalized_address"], [], "address", ""),
+    situs_city: entry(["address.city_name", "address.unnormalized_address"], ["situs_city"], "city", "blank on 58.9% of the roll: city_name null, never derived"),
+    situs_zip: entry(["address.postal_code", "address.unnormalized_address"], [], "zip", "first five digits"),
     legal_desc: entry(["property.property_legal_description_text"], [], null, ""),
     legal_desc2: entry(["property.property_legal_description_text"], [], null, "empty on every 2026 row"),
     legal_acreage: entry(["lot.lot_size_acre", "lot.lot_area_sqft"], ["legal_acreage"], null, "no lot entity when 0; sqft = acres x 43,560"),
@@ -55,8 +55,8 @@ export const TRAVIS_FIELD_COVERAGE = Object.freeze({
     imprv_state_cd: entry(["property.property_type", "property.property_usage_type"], ["imprv_state_cd", "state_cd", "state_cd_description"], "state_cd", "travis-state-code-v1 (STATE_CD.TXT); improvement code first"),
     land_state_cd: entry(["property.property_type", "property.property_usage_type"], ["land_state_cd", "state_cd", "state_cd_description"], "state_cd", "used when no improvement code is printed"),
     market_value: entry(["tax.property_market_value_amount"], [], null, ""),
-    situs_num: entry(["address.unnormalized_address", "unnormalized_address.full_address"], [], "address", ""),
-    situs_unit: entry(["address.unnormalized_address", "unnormalized_address.full_address"], [], "address", ""),
+    situs_num: entry(["address.unnormalized_address"], [], "address", ""),
+    situs_unit: entry(["address.unnormalized_address"], [], "address", ""),
   }),
   IMP_DET: Object.freeze({
     prop_id: entry([], [], "join", "join key"),

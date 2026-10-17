@@ -375,9 +375,6 @@ export async function captureAndTransform({
         await Promise.all(transform.files.map(async (name) => [name, JSON.parse(await readFile(path.join(transform.dataDir, name), "utf8"))])),
       );
       assertOutputContract(files, transform.roots);
-      if (files["unnormalized_address.json"]?.county_jurisdiction !== COUNTY_NAME) {
-        throw new Error(`unnormalized_address.county_jurisdiction must be ${COUNTY_NAME}`);
-      }
       const points = files["geometry.json"] ? collectGeometryPoints(files["geometry.json"]) : [];
       assertGeometryInCounty(points);
       if (points.length > 0) geometryCount += 1;

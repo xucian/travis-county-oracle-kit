@@ -138,7 +138,6 @@ describe("buildTravisOutput (output contract)", () => {
         "property_has_parcel",
         "property_has_sales_history",
         "property_has_tax",
-        "property_seed",
         "sales_history_has_person",
       ].sort(),
     );
@@ -146,9 +145,12 @@ describe("buildTravisOutput (output contract)", () => {
     const seedRoot = files[`${roots.seedCid}.json`];
     expect(seedRoot.label).toBe("Seed");
     expect(Object.keys(seedRoot)).toEqual(["label", "relationships"]);
-    expect(files["property_seed.json"]).toMatchObject({ parcel_id: "900001", request_identifier: "900001" });
-    expect(files["unnormalized_address.json"]).toMatchObject({ full_address: "804 PARK BLVD, AUSTIN TX 78751", county_jurisdiction: "Travis" });
+    // The Seed root elephant-cli transform writes itself (#251): address_has_parcel only (decisions.md section 22).
+    expect(seedRoot.relationships).toEqual({ address_has_parcel: { "/": "./relationship_address_has_parcel.json" } });
     expect(files["relationship_address_has_parcel.json"]).toEqual({ from: { "/": "./address.json" }, to: { "/": "./parcel.json" } });
+    expect(files).not.toHaveProperty("property_seed.json");
+    expect(files).not.toHaveProperty("unnormalized_address.json");
+    expect(Object.keys(files).some((name) => name.includes("property_seed"))).toBe(false);
 
     const property = files["property.json"];
     expect(property).toMatchObject({
@@ -217,8 +219,7 @@ describe("buildTravisOutput (output contract)", () => {
     expect(files["address.json"].latitude).toBeNull();
     // Blank situs city: the city is never derived from the ZIP, the mailing address or GIS.
     expect(files["address.json"]).toMatchObject({ unnormalized_address: "2206 LINDELL AVE, TX 78704", city_name: null, postal_code: "78704", block: "3", lot: "7" });
-    expect(files["unnormalized_address.json"].full_address).toBe("2206 LINDELL AVE, TX 78704");
-    expect(files["unnormalized_address.json"].latitude).toBeNull();
+    expect(files).not.toHaveProperty("unnormalized_address.json");
   });
 
   it("fails closed on a wrong input schema, a missing bulk request, or a manifest without the groups", async () => {

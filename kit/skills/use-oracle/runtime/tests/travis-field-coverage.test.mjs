@@ -14,8 +14,6 @@ const FIXTURE_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), ".."
 const CLASS_FILES = {
   property: (name) => name === "property.json",
   parcel: (name) => name === "parcel.json",
-  property_seed: (name) => name === "property_seed.json",
-  unnormalized_address: (name) => name === "unnormalized_address.json",
   address: (name) => name === "address.json",
   mailing_address: (name) => name === "mailing_address.json",
   person: (name) => /^person_\d+\.json$/.test(name),

@@ -163,7 +163,12 @@ describe("captureAndTransform (fixture, no network)", () => {
       const files = readAllTransformedZipJsonFiles(zipPath);
       expect(files[`${manifest.lexiconManifest.countyCid}.json`].label).toBe("County");
       expect(files[`${manifest.lexiconManifest.seedCid}.json`].label).toBe("Seed");
-      expect(files["unnormalized_address.json"].county_jurisdiction).toBe("Travis");
+      expect(files[`${manifest.lexiconManifest.seedCid}.json`].relationships).toEqual({ address_has_parcel: { "/": "./relationship_address_has_parcel.json" } });
+      expect(files).not.toHaveProperty("property_seed.json");
+      expect(files).not.toHaveProperty("unnormalized_address.json");
+      // The internal seed files stay beside data/, never inside the archive.
+      const internalSeed = JSON.parse(await readFile(path.join(outputDir, "900001", "unnormalized_address.json"), "utf8"));
+      expect(internalSeed.county_jurisdiction).toBe("Travis");
 
       const receipt = JSON.parse(await readFile(path.join(outputDir, "900001", "transform-receipt.json"), "utf8"));
       expect(receipt.inputSource).toBe("pre-materialized");

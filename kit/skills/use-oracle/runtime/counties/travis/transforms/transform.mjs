@@ -6,8 +6,12 @@
  *
  * - the County data group (`property`, `address`, `parcel`, `geometry`, `lot`,
  *   `tax`, `sales_history`, owner `person`/`company` with a mailing address),
- * - the Seed data group (`property_seed`, `unnormalized_address` with
- *   `county_jurisdiction`, `address_has_parcel`),
+ * - the Seed data-group root with `address_has_parcel` only (the County
+ *   group's `address.json` to `parcel.json`): the root `elephant-cli transform`
+ *   writes itself (`writeSeedGroup`, elephant-cli #251). `property_seed` and
+ *   `unnormalized_address` are never written into `data/` (assignment
+ *   decisions.md section 22); the adapter keeps them beside `data/` for
+ *   internal use only,
  * - every relationship as `{from, to}` relative links,
  * - both data-group roots, named by the schema CIDs of the live manifest the
  *   caller resolved (never hardcoded here).
@@ -40,7 +44,6 @@ import { pathToFileURL } from "node:url";
 
 export const TRANSFORM_VERSION = "travis-transform-v2";
 export const PARCEL_INPUT_SCHEMA_VERSION = "travis.parcel-input.v1";
-export const COUNTY_JURISDICTION = "Travis";
 export const STATE_CODE = "TX";
 export const OWNER_CLASSIFICATION_VERSION = "travis-owner-classification-v2";
 export const STATE_CODE_MAPPING_VERSION = "travis-state-code-v1";
@@ -602,27 +605,13 @@ export function buildTravisOutput(input, { manifest }) {
   }
   if (ownerConfidential) warnings.push("owner flagged confidential by the roll; no owner entity or mailing address written");
 
-  // --- Seed data group ------------------------------------------------------------
-  files["property_seed.json"] = { parcel_id: propId, ...envelope };
-  files["unnormalized_address.json"] = {
-    full_address: text(situs.address) ?? propId,
-    county_jurisdiction: COUNTY_JURISDICTION,
-    latitude: centroid?.latitude ?? null,
-    longitude: centroid?.longitude ?? null,
-    ...envelope,
-  };
-  files["relationship_property_seed_has_unnormalized_address.json"] = {
-    from: link("property_seed.json"),
-    to: link("unnormalized_address.json"),
-  };
+  // --- Seed data group: address_has_parcel only, as `elephant-cli transform` writes it (#251) ---
+  // No property_seed or unnormalized_address in data/: the live county enum lacks Travis, and the
+  // CLI's export-tables refuses the Seed group's property_seed key (decisions.md section 22).
   files["relationship_address_has_parcel.json"] = { from: link("address.json"), to: link("parcel.json") };
-
   files[`${roots.seedCid}.json`] = {
     label: "Seed",
-    relationships: {
-      property_seed: link("relationship_property_seed_has_unnormalized_address.json"),
-      address_has_parcel: link("relationship_address_has_parcel.json"),
-    },
+    relationships: { address_has_parcel: link("relationship_address_has_parcel.json") },
   };
   files[`${roots.countyCid}.json`] = { label: "County", relationships: countyRelationships };
 
