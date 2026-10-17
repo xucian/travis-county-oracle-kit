@@ -1,0 +1,623 @@
+{
+ "schemaVersion": "travis.run-record.v1",
+ "contract": "docs/api-contract.md Run (frozen at de08901); T2 fills the appraisal subset and the CAR/tables fields; no Atlas fields (no Atlas PR against an amended lexicon)",
+ "run_id": "20261017T052903Z",
+ "kind": "T2 appraisal-only pilot, 25 parcels, offline (no --live-fetch), against the amended lexicon a0c05c5-plus-travis (assignment decisions.md section 22)",
+ "started_at": "2026-10-17T05:29:03Z",
+ "finished_at": "2026-10-17T05:29:17Z",
+ "window": {
+  "tcad-2026-certified-appraisal-export": {
+   "from": null,
+   "to": "2026-07-18"
+  },
+  "tnr-tcad-public-parcels": {
+   "from": null,
+   "to": "2026-10-16"
+  }
+ },
+ "sources": [
+  {
+   "dataset": "tcad-2026-certified-appraisal-export-supp-0",
+   "url": "https://traviscad.org/wp-content/largefiles/2026%20Certified%20Appraisal%20Export%20Supp%200_07182026.zip",
+   "watermark": "certified roll, supplement 0, run 2026-07-18 (members dated 2026-07-20)",
+   "fetched_at": "2026-10-16T17:42:52Z",
+   "sha256": "62d0d1cd22b03f31db8d3986160eb181c5d00044df98a303fce9e17a44e9aa02",
+   "availability": "supported_full",
+   "source_access_status": "ok",
+   "bytes": 557228168,
+   "egress_at_fetch": "US",
+   "cached_archive_sha256_matches": true
+  },
+  {
+   "dataset": "tnr-tcad-public-parcels",
+   "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query",
+   "watermark": "OBJECTID-ordered paging, 1,000 per page, snapshot 2026-10-16T18:15:22.035Z",
+   "fetched_at": "2026-10-16T18:15:22.035Z",
+   "sha256": null,
+   "sha256_note": "one SHA-256 per page receipt; the pages this run used are in tnr_pages",
+   "availability": "supported_partial",
+   "source_access_status": "ok"
+  },
+  {
+   "dataset": "elephant-lexicon-manifest-amended",
+   "url": "http://127.0.0.1:8790/api/manifest",
+   "watermark": "a0c05c5-plus-travis: the live manifest (sha256 7084b933...) with 15 CIDs replaced; Travis in both county enums",
+   "fetched_at": "2026-10-17T05:29:03Z",
+   "sha256": "f0e2cdd2afcfe9be24447aa1d80f3af8a3c8a4daa8dcdc9634ea4e3b7d1392c2",
+   "availability": "supported_full",
+   "source_access_status": "ok"
+  }
+ ],
+ "tnr_pages": [
+  {
+   "page": 109,
+   "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query",
+   "resultOffset": "109000",
+   "fetched_at": "2026-10-16T18:15:22.035Z",
+   "status": 200,
+   "byte_length": 579527,
+   "sha256": "ecfa507de5f0975201ff59d9065b120a6a74e58f1bb47060eddd57a3ede849e5",
+   "cached_body_sha256_matches": true,
+   "parcels": [
+    {
+     "prop_id": "230816",
+     "object_id": "109677",
+     "feature_present": true
+    }
+   ]
+  },
+  {
+   "page": 132,
+   "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query",
+   "resultOffset": "132000",
+   "fetched_at": "2026-10-16T18:15:22.035Z",
+   "status": 200,
+   "byte_length": 2114642,
+   "sha256": "789f50e74cdb0306f7665ee8390f6e7d95ca6fef2902b7e46965d4682e094235",
+   "cached_body_sha256_matches": true,
+   "parcels": [
+    {
+     "prop_id": "106280",
+     "object_id": "132599",
+     "feature_present": true
+    }
+   ]
+  },
+  {
+   "page": 217,
+   "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query",
+   "resultOffset": "217000",
+   "fetched_at": "2026-10-16T18:15:22.035Z",
+   "status": 200,
+   "byte_length": 732849,
+   "sha256": "88197f4991325ceb8d57611d5421bc574b433c3cf738fbedda9bb747672cf142",
+   "cached_body_sha256_matches": true,
+   "parcels": [
+    {
+     "prop_id": "353308",
+     "object_id": "217789",
+     "feature_present": true
+    }
+   ]
+  },
+  {
+   "page": 242,
+   "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query",
+   "resultOffset": "242000",
+   "fetched_at": "2026-10-16T18:15:22.035Z",
+   "status": 200,
+   "byte_length": 701891,
+   "sha256": "95b971b0f38e4456b30731cba7efa2d60f36c387ecc3e7c3e79b9026ffce4018",
+   "cached_body_sha256_matches": true,
+   "parcels": [
+    {
+     "prop_id": "219803",
+     "object_id": "242213",
+     "feature_present": true
+    }
+   ]
+  },
+  {
+   "page": 248,
+   "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query",
+   "resultOffset": "248000",
+   "fetched_at": "2026-10-16T18:15:22.035Z",
+   "status": 200,
+   "byte_length": 901528,
+   "sha256": "c384a7b599a7d0871f1e7037a7e92630081e053aee35e66532241923b692067d",
+   "cached_body_sha256_matches": true,
+   "parcels": [
+    {
+     "prop_id": "105452",
+     "object_id": "248162",
+     "feature_present": true
+    }
+   ]
+  },
+  {
+   "page": 252,
+   "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query",
+   "resultOffset": "252000",
+   "fetched_at": "2026-10-16T18:15:22.035Z",
+   "status": 200,
+   "byte_length": 582604,
+   "sha256": "a408a7380ae6988646afed6bb04dbdbcbb833d63dfa1115bc755617333df598c",
+   "cached_body_sha256_matches": true,
+   "parcels": [
+    {
+     "prop_id": "830704",
+     "object_id": "252152",
+     "feature_present": true
+    }
+   ]
+  },
+  {
+   "page": 314,
+   "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query",
+   "resultOffset": "314000",
+   "fetched_at": "2026-10-16T18:15:22.035Z",
+   "status": 200,
+   "byte_length": 733698,
+   "sha256": "3e1ac78088b2cc654ce73d3180775c58e9e2d89faa18b5afcf3512aef4bf42f4",
+   "cached_body_sha256_matches": true,
+   "parcels": [
+    {
+     "prop_id": "897804",
+     "object_id": "314606",
+     "feature_present": true
+    }
+   ]
+  },
+  {
+   "page": 319,
+   "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query",
+   "resultOffset": "319000",
+   "fetched_at": "2026-10-16T18:15:22.035Z",
+   "status": 200,
+   "byte_length": 1553402,
+   "sha256": "3816de9e2daee66293168b3d0770baf81fe55708c46b24d0d56ded36ead15916",
+   "cached_body_sha256_matches": true,
+   "parcels": [
+    {
+     "prop_id": "485011",
+     "object_id": "319194",
+     "feature_present": true
+    }
+   ]
+  },
+  {
+   "page": 334,
+   "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query",
+   "resultOffset": "334000",
+   "fetched_at": "2026-10-16T18:15:22.035Z",
+   "status": 200,
+   "byte_length": 845778,
+   "sha256": "03681e6b152e6010491c9253b1fa72e56a0f540133c16d5a084cf5ff39bf112f",
+   "cached_body_sha256_matches": true,
+   "parcels": [
+    {
+     "prop_id": "377261",
+     "object_id": "334721",
+     "feature_present": true
+    }
+   ]
+  },
+  {
+   "page": 345,
+   "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query",
+   "resultOffset": "345000",
+   "fetched_at": "2026-10-16T18:15:22.035Z",
+   "status": 200,
+   "byte_length": 561824,
+   "sha256": "e83981e8399869eb0f59d3bbf668cf807e1df6a4666e75a082f1275dbf9e0a1f",
+   "cached_body_sha256_matches": true,
+   "parcels": [
+    {
+     "prop_id": "959870",
+     "object_id": "345921",
+     "feature_present": true
+    }
+   ]
+  },
+  {
+   "page": 348,
+   "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query",
+   "resultOffset": "348000",
+   "fetched_at": "2026-10-16T18:15:22.035Z",
+   "status": 200,
+   "byte_length": 632982,
+   "sha256": "5cde19fd1fca29275cc69fc081a877fa172cfe1d157369f222b0826e0123bd75",
+   "cached_body_sha256_matches": true,
+   "parcels": [
+    {
+     "prop_id": "506698",
+     "object_id": "348823",
+     "feature_present": true
+    }
+   ]
+  },
+  {
+   "page": 373,
+   "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query",
+   "resultOffset": "373000",
+   "fetched_at": "2026-10-16T18:15:22.035Z",
+   "status": 200,
+   "byte_length": 1678776,
+   "sha256": "10836ac88c88f5289b093d336e96c35a3133f71b790b92498811937d860643cd",
+   "cached_body_sha256_matches": true,
+   "parcels": [
+    {
+     "prop_id": "503197",
+     "object_id": "373124",
+     "feature_present": true
+    }
+   ]
+  },
+  {
+   "page": 374,
+   "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0/query",
+   "resultOffset": "374000",
+   "fetched_at": "2026-10-16T18:15:22.035Z",
+   "status": 200,
+   "byte_length": 6047261,
+   "sha256": "be5bc63de02157f3866a5c8a9a56bd749ffefff3848ac4cc3d724bc0f0e1c041",
+   "cached_body_sha256_matches": true,
+   "parcels": [
+    {
+     "prop_id": "547839",
+     "object_id": "374197",
+     "feature_present": true
+    }
+   ]
+  }
+ ],
+ "seed": {
+  "path": "data/seeds/travis-pilot.csv (copied to the run directory as seed-pilot.csv)",
+  "sha256": "0a75f9e99f029c6ca4dba57a4a6bba6d7333c8b88b459c20312d880385ce7f3d",
+  "rows": 25,
+  "with_geometry": 13
+ },
+ "loader_watermarks": [],
+ "loader_watermarks_note": "no Query DB load in T2; reconcile-export wrote the internal query-table Parquet and coverage only",
+ "tombstones_consumed": {
+  "dead": 0,
+  "invalid": 0
+ },
+ "counts": {
+  "appraisal": {
+   "seed": 25,
+   "ready": 25,
+   "dead": 0,
+   "invalid": 0,
+   "retryable": 0,
+   "reconciles": true,
+   "geometry": 13,
+   "reconcile_export_rows": 25
+  }
+ },
+ "limitations": [
+  {
+   "source": "lexicon",
+   "availability": "supported_partial",
+   "source_access_status": "ok",
+   "incomplete_reason": "amended_lexicon",
+   "detail": "validated and hashed against the lexicon as amended by elephant-xyz/lexicon#194 (live state a0c05c5 plus its two enum lines); the 15 amended schemas must be pinned before or with the upload; no Atlas PR against an amended lexicon",
+   "evidence": "docs/evidence/travis-t2-lexicon-amended-a0c05c5-plus-travis.json",
+   "records_request": null
+  }
+ ],
+ "groups": {},
+ "manifest_cid": null,
+ "atlas": null,
+ "cars": [],
+ "gateway_checks": [],
+ "timings": {
+  "unit": "s",
+  "lexicon_manifest_fetch": 0.02,
+  "ingest": 0.68,
+  "reconcile_export": 0.43,
+  "validate": 11.29,
+  "ingest_stages_ms": {
+   "totalMs": 166.9,
+   "lexiconManifestResolveMs": 1.4,
+   "parcels": 25,
+   "perStage": {
+    "materializeMs": {
+     "total": 12.7,
+     "p50": 0.5,
+     "p95": 0.9
+    },
+    "transformMs": {
+     "total": 71.9,
+     "p50": 2.7,
+     "p95": 4.2
+    },
+    "checkMs": {
+     "total": 17.3,
+     "p50": 0.7,
+     "p95": 0.9
+    },
+    "zipMs": {
+     "total": 52.8,
+     "p50": 1.9,
+     "p95": 3.6
+    }
+   }
+  }
+ },
+ "cli_commit": "44bb182 (@elephant-xyz/cli 1.58.1, project-local)",
+ "lexicon_manifest_url": "http://127.0.0.1:8790/api/manifest (local, amended; official: https://lexicon.elephant.xyz/api/manifest)",
+ "kit_commit": "c6cbd19",
+ "readiness_report": {
+  "overall": "PASS",
+  "gates": {
+   "catalog_metadata": "PASS",
+   "parcel": "PASS",
+   "permit": "PASS",
+   "destination": "NOT_APPLICABLE",
+   "enrichment": "PASS"
+  },
+  "catalog_sha256": "90f97a53aef6a2d31f4965a90f017cbde461c24196182c35ccf786075997fbbc",
+  "note": "catalog unchanged since e75a234 (operator approval); same PASS as before the run"
+ },
+ "validation": {
+  "cli": "elephant-cli validate ./county --output-csv ./travis-county-errors.csv (ELEPHANT_SCHEMA_MANIFEST_URL and ELEPHANT_IPFS_GATEWAYS on the local amended lexicon)",
+  "summary": "Properties processed: 25, succeeded: 25, failed: 0",
+  "error_rows": 0,
+  "attempts": [
+   {
+    "run_id": "20261016T214212Z",
+    "transform_version": "travis-transform-v1",
+    "error_rows": 31,
+    "classes": [
+     {
+      "path": "/relationships/property_seed/to/county_jurisdiction",
+      "count": 25,
+      "kind": "county enum (expected)"
+     },
+     {
+      "path": "property.total_area",
+      "count": 3,
+      "kind": "pattern .*\\d{2,}.* (value \"0\")"
+     },
+     {
+      "path": "lot.lot_area_sqft",
+      "count": 3,
+      "kind": "minimum 1 (value 0)"
+     }
+    ]
+   },
+   {
+    "run_id": "20261016T215139Z",
+    "transform_version": "travis-transform-v2 (before the second owner-word round)",
+    "error_rows": 25,
+    "classes": [
+     {
+      "path": "/relationships/property_seed/to/county_jurisdiction",
+      "count": 25,
+      "kind": "county enum (expected)"
+     }
+    ]
+   },
+   {
+    "run_id": "20261016T215528Z",
+    "transform_version": "travis-transform-v2",
+    "error_rows": 25,
+    "classes": [
+     {
+      "path": "/relationships/property_seed/to/county_jurisdiction",
+      "message": "must be one of",
+      "count": 25
+     }
+    ]
+   },
+   {
+    "run_id": "20261017T052903Z",
+    "transform_version": "travis-transform-v2",
+    "lexicon": "a0c05c5-plus-travis (amended)",
+    "error_rows": 0,
+    "classes": []
+   }
+  ]
+ },
+ "transform": {
+  "transform_version": "travis-transform-v2",
+  "owner_classification_version": "travis-owner-classification-v2",
+  "state_code_mapping_version": "travis-state-code-v1",
+  "field_coverage": "docs/evidence/travis-t2-field-coverage-20261016.json"
+ },
+ "captures": [
+  {
+   "prop_id": "897804",
+   "input_json_sha256": "95165a9b456c6c269abce482db8e1770765a5e6147c431a9cba9b8ba8d12c0d8",
+   "source_payload_sha256": "12e88675c9e760a8ddc437a4177fb661b6dec5030a675fbee41dd82f6fd38f28",
+   "transformed_zip_sha256": "86f728b75e1ef532d725cc2bb2c04d95afaac13c4968a226b8a4dc93b3e165d1"
+  },
+  {
+   "prop_id": "119247",
+   "input_json_sha256": "6bf534443bb0ad5c92f6296e05616886452dfda9f4ccf2363cb63ce944b5d5a4",
+   "source_payload_sha256": "2db5306f8ec96e0651eb414920ea11668a3be7136d84a8b526af1da3de28e843",
+   "transformed_zip_sha256": "19d17133c959c3ad01932ce68dbd1c8d86193c7dc494f155078e34a875a52bc0"
+  },
+  {
+   "prop_id": "503197",
+   "input_json_sha256": "8ce14ffa05bd2354cc7dd69ef39d93c86df3c5de118fe66b4e30845a27f7f15f",
+   "source_payload_sha256": "65b5adbcd410fb2e4fecd61c625e6a5a364f2cdfbe25b02e63b042bd158fc5b0",
+   "transformed_zip_sha256": "2516078c570414eb751a740db37dbab3494b51dae0d2117c6e6d4ee726857693"
+  },
+  {
+   "prop_id": "928530",
+   "input_json_sha256": "08b2c61fd879a6b74769fdbaef3f0472f840b72099e2fdbf4f42da6c2a6ccf0f",
+   "source_payload_sha256": "5b39fae8f696994a98f9d45959d7dc946985af57dd324dca8cc9635091173ec9",
+   "transformed_zip_sha256": "8eb3c1d962dbfe52edf33b17cce7e602f69cdc30c5f2c92af2c41f3208cd61e0"
+  },
+  {
+   "prop_id": "219803",
+   "input_json_sha256": "5aa7d699ebfbda42e0792a341f5947f1400ad978f37a7db4dbb61745acc70719",
+   "source_payload_sha256": "7e1c4b1cd8204214b92514a87eed803cc22f0a5d3620a3955281a40fa926e3cc",
+   "transformed_zip_sha256": "4a2aaa4aa07e62040b061b3de9181017513e34d118074c7b013e3a2aa34b1024"
+  },
+  {
+   "prop_id": "1012070",
+   "input_json_sha256": "562906804bc2f0e07b519f26166779cd783b0bca5029c4614f68fbaa67c4eb46",
+   "source_payload_sha256": "87faa9ce7983399d9211f02daa2b92ff497b560948ba70f880ae045b38eeba8f",
+   "transformed_zip_sha256": "4b1f1a0e4bfa96c4aea7f61ada69e34b01b6d6d4484ccb8dbaf276c0151a5ba3"
+  },
+  {
+   "prop_id": "106280",
+   "input_json_sha256": "381bb8f18f7a0b50c37a1173cee6e46c752404cf0fde674b8bb84b57f51e3c67",
+   "source_payload_sha256": "f1dfa3cbde0c3f500c51232931a61523560cfc87f88e39a37e20575b6635259a",
+   "transformed_zip_sha256": "6302549451ea58e9376e09c21786b5c15efb0c01aa756e469f63c7daa2639c87"
+  },
+  {
+   "prop_id": "955150",
+   "input_json_sha256": "8f4921744fed0e1fd0cde9db940c9883d483fe4c6b1aecf917ac5479b08e14a3",
+   "source_payload_sha256": "e4347fbad0d104584a6c5410ee86405da7688b33a322f530e7548d69d86b6351",
+   "transformed_zip_sha256": "1ef849278cffc63cba374a8b413bda61ff5c9a246940acfd895fa616fae5f7e7"
+  },
+  {
+   "prop_id": "377261",
+   "input_json_sha256": "9b469d6bbb7b118543852ef2db9da539bce18c96123b2556fd0d35bcf4fe509d",
+   "source_payload_sha256": "27197011b164a1f95a83f7058366ab169c3ec697a1b2d5c5a6ceafd0c3bc5631",
+   "transformed_zip_sha256": "8d74d5ee7243b26e55d18f28eeedb5042e10aea7daf6f9dd31f82aa05e685cf1"
+  },
+  {
+   "prop_id": "547839",
+   "input_json_sha256": "687d4261d171c36c98b29cd65b18b27253de38d60430f2947cd20f2be493076a",
+   "source_payload_sha256": "13bb420c098bf7bcf132d948b6abb5955291578d801d311cc98a2e143ef6a31f",
+   "transformed_zip_sha256": "c9e7a68bfcc54341a26d3d019f8782a2df7ee1b602be42d2e4ea56faeab8f9ec"
+  },
+  {
+   "prop_id": "981340",
+   "input_json_sha256": "89fad82d33fc29e8587d8530e093b94fbcb23506914f85b8dd839481aa904f0d",
+   "source_payload_sha256": "6aae193614a79e0dcc3ead2878d975df4e7466abb21313500420fb497cebf2b7",
+   "transformed_zip_sha256": "70f3713df78c9ddeed0a590a255cc7be337c2c5a76a516f7f53b9dcfdec9e20a"
+  },
+  {
+   "prop_id": "353308",
+   "input_json_sha256": "07fd2d7eac5a137b581c0a3722973398e35c645803d2d6cda8961d4fcc080b73",
+   "source_payload_sha256": "d267acada127b9ee6f24b129a981edd2ffd5ca81cc93aa5d6fc51f2fb3db3a1b",
+   "transformed_zip_sha256": "6ded48251b6252bc1abd00329b586f2017b08f2ee9a2b0057aa44adfd63984f1"
+  },
+  {
+   "prop_id": "374234",
+   "input_json_sha256": "f3df6e04ec2e0528975028592bca2e09bddbce792629297e75fff50687423cf9",
+   "source_payload_sha256": "16e4a6cd78235728c2a4e42522cab05c0e5d3083a848ecd18a96275510a88021",
+   "transformed_zip_sha256": "88479e3c25210a3b0dd08a9b2c2e52d282e37c7a70d0cc4002b84080f6f48622"
+  },
+  {
+   "prop_id": "485011",
+   "input_json_sha256": "f959c14c79d00f4ce5a9b275bde62f5a4fc87d9c5f2913322fbe5cde9fb16526",
+   "source_payload_sha256": "c26c558370debf3f4bd71e9b40b1134e88544bad9861572c740dfe2402f4bf3d",
+   "transformed_zip_sha256": "0c7a4b8b3a3cbea7d234e71ae30053c01ecb2a7ae27a85386b24b515ae0e6206"
+  },
+  {
+   "prop_id": "748284",
+   "input_json_sha256": "901727305030290b5bb769b110b969a166e092eee0fcd3fbba8026bc102e2b12",
+   "source_payload_sha256": "d7f1e8191db64c4d1fcc0394219bc2533705a306456cee43c2c475bca6471e7b",
+   "transformed_zip_sha256": "7f6e9ff7be5f0a7702484c63306315c2903712a33e7f90b2e1d6d42ef0886aab"
+  },
+  {
+   "prop_id": "959870",
+   "input_json_sha256": "2a716b645650647b5b82ff7f88dbfd24f56abe8572f27636b4589e56d4d57d9d",
+   "source_payload_sha256": "c0708dad53ac7a47f88157e6ccace56ff9803b4c8f76ecde011006500ffc7687",
+   "transformed_zip_sha256": "321c735310b9156e272fc560b422b4e29e91cd190d42a0046891c66aac1c0e8e"
+  },
+  {
+   "prop_id": "1004959",
+   "input_json_sha256": "361eed607729325fd5327c44f265a5cfed75e3f2319fe2304ce054f78dc5d17d",
+   "source_payload_sha256": "d289a35f379c90929db83bd105acbd243eaa2b291347b41efdb504c98225f5c6",
+   "transformed_zip_sha256": "3b87e6ad1a2521ca9dae0c1b915f41ce50592e3e2ba0d133a9063bbe2cd02df7"
+  },
+  {
+   "prop_id": "230816",
+   "input_json_sha256": "9e38cb0be5c81a9e2eb3c95731b6f93a6545fa0f753787d1a0a173b0d9ff7a61",
+   "source_payload_sha256": "5a90b09bea49db35a5ad2450cdc570c69188b04a0d4e0e39b2ecdd1ff7b453dc",
+   "transformed_zip_sha256": "3fd09b538f04ee82046648ab308d51474a5bf36be4ec66b836d110b349f15348"
+  },
+  {
+   "prop_id": "206865",
+   "input_json_sha256": "17b8ad8cff50d57f56faafff7ed4929493e0f58c59a2406ce655ef87dbff6454",
+   "source_payload_sha256": "01748f74e764980fed33bce5dbcfd66de2297e98c2f97916f9c95eeb63e2d5d6",
+   "transformed_zip_sha256": "4c5c0bbf2682813378dd075ef1f89e4e44ce7a61db9c9e1b04306831aa06f245"
+  },
+  {
+   "prop_id": "506698",
+   "input_json_sha256": "df79d210afb270f70e61ec47d08e18f0a1e744d4d7d7ecd4fbcb5b53432107e5",
+   "source_payload_sha256": "094a32cc204db5c5d36780d113d2d2913ce5f62bed4a326f41c076d66c460d5d",
+   "transformed_zip_sha256": "6a0abb86d807672dea4a294b5fe9ff192e96de9318d33fc003c78f7b743387ef"
+  },
+  {
+   "prop_id": "1003794",
+   "input_json_sha256": "c64e1f1834f48822a0dd46e19046e4869212a30a7db15e93bedd45f2ad66bf5b",
+   "source_payload_sha256": "1a1dc6b55bc8275be1c81d765084bcd74a9a177be0ca7f9ad5722dd39b829748",
+   "transformed_zip_sha256": "14d662952262234acb7a0c9c05cf3579416cabf1978bc2ea4a3d8bc3e9ff750d"
+  },
+  {
+   "prop_id": "830704",
+   "input_json_sha256": "3c56b5b312c637b55380d827160f3fb4c14aaf6a8b8f7c370f8de3705c176948",
+   "source_payload_sha256": "21e66a09aa5e97078ad6f42f76cc2add52a295086db6ce35a766a76317280b56",
+   "transformed_zip_sha256": "c9bfae600e4c4d00219cc124b181f50a55d0c16790cfd7e7ad99617b5ac7ae92"
+  },
+  {
+   "prop_id": "358940",
+   "input_json_sha256": "5abecc306ae066e5a3364ae86e13d4779f5cf3f8fa7fc93f6ae8d8756a1ead28",
+   "source_payload_sha256": "dde94e9e931d52b0e59bcf0fd96c712f21d0edc715c0d26a8134fa4c631b2e33",
+   "transformed_zip_sha256": "4cb1ebd31953d93cb06d692ae69b860b6991cd8d4ff52a4f8b9ed679cef44c51"
+  },
+  {
+   "prop_id": "105452",
+   "input_json_sha256": "4b220129847d99721e0fe341a6ce163c04a0c7c7eea909118b00f773b3feb258",
+   "source_payload_sha256": "2eea733957d69c792c38d1c732657ccadfa25a1b4f15760513efb36499f29ca8",
+   "transformed_zip_sha256": "8ab994649cda46a69fc58e160944bf8b0213b3bb9fddac1cdd57e6a9e6543d30"
+  },
+  {
+   "prop_id": "374454",
+   "input_json_sha256": "5125c57bb4e61b737cabedb03b3d3de8e68860a7aca6559db06321e9d0ac3001",
+   "source_payload_sha256": "9010f6b943366cfa0acb16b075987849f36d4df860032b51f049143decaa5730",
+   "transformed_zip_sha256": "6e54fd569ff25294a77d26056f2d10e799977ef3b28ce8dc5d4157ca3b7f193d"
+  }
+ ],
+ "lexicon": {
+  "name": "a0c05c5-plus-travis",
+  "construction": {
+   "base": {
+    "repository": "elephant-xyz/lexicon",
+    "commit": "a0c05c5",
+    "file": "src/data/lexicon.json",
+    "sha256": "f2efa4f21846d30e0d8c1e4df801a1638c38c85c3f04db16260c79512c6d2a67",
+    "why": "the live publication state: its build reproduces all 159 live manifest CIDs (docs/evidence/travis-t2-lexicon-reproduction-20261016.json)"
+   },
+   "patch": {
+    "source": "commit 04943fc on the fork branch add-travis-county (head 96224d6), the change of elephant-xyz/lexicon#194",
+    "command": "git diff 04943fc^ 04943fc -- src/data/lexicon.json",
+    "sha256": "8052c5428963fedaabb0177a42ae27196eaefc8629ba2fe127e56b0196cc3906",
+    "content": "adds \"Travis\" after \"Ellis\" to unnormalized_address.county_jurisdiction and to address.county_name (two enum lines)"
+   },
+   "amended_lexicon_json_sha256": "b73d67f92efe3587decc8b995f4a20cc57b020d3e6f7cf024e2e78eae1556099",
+   "not_used": "the fork branch as is: upstream main also carries #178 and #181, never published, which change the relationship class and 12 more data groups"
+  },
+  "amended_manifest_sha256": "f0e2cdd2afcfe9be24447aa1d80f3af8a3c8a4daa8dcdc9634ea4e3b7d1392c2",
+  "live_manifest_sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+  "changed": 15,
+  "unchanged_verified_identical": 144,
+  "fork": {
+   "repository": "elephant-xyz/lexicon fork, branch add-travis-county",
+   "head": "96224d6",
+   "travis_change_commit": "04943fc",
+   "pull_request": "https://github.com/elephant-xyz/lexicon/pull/194 (open)"
+  },
+  "evidence": "docs/evidence/travis-t2-lexicon-amended-a0c05c5-plus-travis.json",
+  "served_by": "src/counties/travis/amended-lexicon-server.mjs on 127.0.0.1:8790 (ELEPHANT_SCHEMA_MANIFEST_URL, ELEPHANT_IPFS_GATEWAYS)",
+  "server_stats": {
+   "local": 11,
+   "gateway": 0,
+   "failed": 0,
+   "manifest": 2
+  },
+  "data_group_roots_in_output": [
+   "bafkreial73icc2ozqfx2uxemlku6y64rqdwtzc55fexca5izb5brbgro6m",
+   "bafkreigyrx3yshn4zudxhpcsxd7ylza4ltga3unddqrqjftndl7dptr7ki"
+  ]
+ }
+}
