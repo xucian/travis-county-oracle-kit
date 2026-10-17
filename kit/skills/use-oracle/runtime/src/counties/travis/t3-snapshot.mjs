@@ -636,6 +636,17 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
   const uncovered = currentIndex.filter((entry) => !covered.has(`${entry.path}\u0000${entry.artifact_hash}`));
   const filterUnchanged = (prior?.row_filter ?? null) === filterLabel;
   const snapshotIntact = prior !== null && existsSync(parquetPath) && sha256Hex(await readFile(parquetPath)) === prior.snapshot.sha256;
+  // A snapshot written under another privacy rule version is rewritten, even when no row's class changes.
+  let storedPrivacyVersion = null;
+  if (snapshotIntact && baseSource.privacy) {
+    const metadataReader = await ParquetReader.openFile(parquetPath);
+    try {
+      storedPrivacyVersion = metadataReader.getMetadata()["t3.privacy_version"] ?? null;
+    } finally {
+      await metadataReader.close();
+    }
+  }
+  const privacyRuleChanged = Boolean(baseSource.privacy) && snapshotIntact && storedPrivacyVersion !== baseSource.privacy.version;
   const previousKeys = snapshotIntact ? await readSnapshotKeys(source, parquetPath) : new Map();
 
   // One streaming pass: keys and counts always; the Parquet is written to a temporary file and kept only on a merge.
@@ -715,7 +726,7 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
   // A removed key whose every row is still in the capture under another key was re-keyed, not removed from the source.
   const nextHashes = new Set([...nextKeys.values()].flat());
   const rekeyedKeys = new Set(diff.removedKeys.filter((key) => (previousKeys.get(key) ?? []).every((hash) => nextHashes.has(hash))));
-  const unchangedCapture = snapshotIntact && filterUnchanged && uncovered.length === 0 && diff.new === 0 && diff.changed === 0 && diff.removed === 0;
+  const unchangedCapture = snapshotIntact && filterUnchanged && !privacyRuleChanged && uncovered.length === 0 && diff.new === 0 && diff.changed === 0 && diff.removed === 0;
   let merged = false;
   /** Digest of the snapshot this load rebuilt; on a no-op re-load it must equal the snapshot on disk (determinism). */
   const rebuiltSha256 = sha256Hex(await readFile(temporaryPath));
@@ -780,6 +791,7 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
       snapshot,
       normalizer_version: NORMALIZER_VERSION,
       ...(keyFingerprint ? { record_id_version: RECORD_ID_VERSION, record_id_key_fingerprint: keyFingerprint } : {}),
+      ...(source.privacy ? { privacy_version: source.privacy.version } : {}),
     };
     await writeFile(watermarkPath, `${JSON.stringify(watermark, null, 1)}\n`);
   }
@@ -893,6 +905,7 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
             ...(uncovered.length > 0 ? [`${uncovered.length} capture artifacts not in the hash index`] : []),
             ...(diff.new + diff.changed + diff.removed > 0 ? ["content diff"] : []),
             ...(filterUnchanged ? [] : ["row filter changed"]),
+            ...(privacyRuleChanged ? [`privacy rule changed (${storedPrivacyVersion ?? "none"} -> ${baseSource.privacy.version})`] : []),
           ].join("; ")
       : "the hash index covers every (path, artifact hash) and the content diff is empty",
     prior_snapshot: priorSnapshot,

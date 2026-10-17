@@ -15,7 +15,7 @@
  *                        Travis cache on the first run): new, changed and tombstoned taxpayers, and where the tombstoned
  *                        ones went (another county in the statewide file, or gone from the file)
  *   sales-tax            jrea-zgmq Travis outlets (outlet_county_code 227) -> registry `tx-comptroller-sales-tax-travis`
- *                        under the privacy rule `travis-t3-privacy.v1` (no sole owner's taxpayer number is stored)
+ *                        under the privacy rule (`travis-t3-privacy.v2`: no sole owner's taxpayer number is stored)
  *   veteran              2vfr-72e4 statewide -> registry `tx-sos-veteran-owned-business`
  *   veteran-join         veteran rows joined to the franchise statewide rows by SOS file number
  *                        (`travis-sos-file-number-join.v1`); the Travis subset is the rows joined to a Travis taxpayer
@@ -25,7 +25,7 @@
  *                        columns resolved from its header; until a CSV capture exists the step reports
  *                        `awaiting_capture` (the HTML page saved by the 2026-10-17 run is set aside, never loaded)
  *   layouts              the Comptroller record layouts (jrea-zgmq, 9cir-efmm) checked against the privacy rule
- *                        `travis-t3-privacy.v1` and the organization codes the data prints; `awaiting_capture` until the
+ *                        (`travis-t3-privacy.v2`) and the organization codes the data prints; `awaiting_capture` until the
  *                        window fetches them (decisions.md section 24.4)
  *   name-index           the matcher's normalized-name index of every loaded snapshot -> `data/travis/matcher/`
  *                        (`travis-exact-unique-normalized-name.v1`; the franchise index is statewide), with collision
@@ -419,9 +419,34 @@ export const STEPS = {
       if (!existsSync(file)) return {};
       return JSON.parse(await readFile(file, "utf8")).counts?.distributions?.[column] ?? {};
     };
+    // First digit of every taxpayer number left visible, by organization type (withheld numbers are not in the snapshot).
+    const firstDigitsOf = async (name, typeColumn) => {
+      const file = path.join(ctx.registryDir, `${name}.parquet`);
+      /** @type {Record<string, Record<string, number>>} */
+      const digits = {};
+      if (!existsSync(file)) return digits;
+      const reader = await ParquetReader.openFile(file);
+      try {
+        const cursor = reader.getCursor([["taxpayer_number__trimmed"], [`${typeColumn}__trimmed`]]);
+        let record = await cursor.next();
+        while (record) {
+          const number = record.taxpayer_number__trimmed;
+          if (typeof number === "string" && number !== "") {
+            const type = String(record[`${typeColumn}__trimmed`] ?? "(null)");
+            digits[type] ??= {};
+            digits[type][number[0]] = (digits[type][number[0]] ?? 0) + 1;
+          }
+          record = await cursor.next();
+        }
+      } finally {
+        await reader.close();
+      }
+      return digits;
+    };
     const check = await checkRecordLayouts({
       windowDir: ctx.windowDir,
       observedByDataset: { "jrea-zgmq": await observedOf("tx-comptroller-sales-tax-travis", "taxpayer_organization_type"), "9cir-efmm": await observedOf("tx-comptroller-franchise-tax-statewide", "taxpayer_organizational_type") },
+      firstDigitsByDataset: { "jrea-zgmq": await firstDigitsOf("tx-comptroller-sales-tax-travis", "taxpayer_organization_type"), "9cir-efmm": await firstDigitsOf("tx-comptroller-franchise-tax-statewide", "taxpayer_organizational_type") },
     });
     const result = { ...check, ...(check.capture ? { capture: relative(check.capture) } : {}) };
     await mkdir(ctx.registryDir, { recursive: true });

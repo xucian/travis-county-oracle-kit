@@ -5,10 +5,12 @@ import { entityKeyOf, resolveColumnSet } from "../src/counties/travis/t3-snapsho
 
 describe("T3 source rules", () => {
   it("classes sole owners of the sales-tax file as individual_owner and nothing else", () => {
-    expect(PRIVACY_VERSION).toBe("travis-t3-privacy.v1");
-    expect(INDIVIDUAL_OWNER_TYPES).toEqual(["IS"]);
+    expect(PRIVACY_VERSION).toBe("travis-t3-privacy.v2");
+    expect(INDIVIDUAL_OWNER_TYPES).toEqual(["IS", "S"]);
     expect(salesTaxPrivacyClass({ taxpayer_organization_type__trimmed: "IS" })).toBe("individual_owner");
-    for (const type of ["CL", "CT", "PL", "PI", "ES", "TR", "GS", null]) expect(salesTaxPrivacyClass({ taxpayer_organization_type__trimmed: type })).toBeNull();
+    expect(salesTaxPrivacyClass({ taxpayer_organization_type__trimmed: "S" })).toBe("individual_owner");
+    // Partnerships, estates and trusts are entities with their own numbers (decisions.md section 24.4).
+    for (const type of ["CL", "CT", "PL", "PI", "PZ", "ES", "TR", "GS", "P", null]) expect(salesTaxPrivacyClass({ taxpayer_organization_type__trimmed: type })).toBeNull();
     expect(T3_SOURCES["tx-comptroller-sales-tax"].privacy).toMatchObject({ version: PRIVACY_VERSION, withheldColumns: ["taxpayer_number"] });
     // The franchise file prints entities only; no privacy rule applies to it.
     expect(T3_SOURCES["tx-comptroller-franchise-tax"].privacy).toBeUndefined();
@@ -57,6 +59,19 @@ describe("T3 source rules", () => {
     expect(() => resolveTsbpeColumns(fields(none), none)).toThrow(/no license number column/);
     const two = ["License Number", "Lic No", "Name"];
     expect(() => resolveTsbpeColumns(fields(two), two)).toThrow(/several license number columns/);
+    const twoCompanies = ["License Number", "Name", "Company", "Employer"];
+    expect(() => resolveTsbpeColumns(fields(twoCompanies), twoCompanies)).toThrow(/several company columns/);
+  });
+
+  it("reads the Responsible Master Plumber header captured on 2026-10-17, taking the plumbing company, not the insurer", () => {
+    const printed = ["RANK", "LICENSE_NBR", "LIC_STATUS", "LICENSE_DATE", "EXPIRATION_DTE", "LAST_NAME", "FIRST_NAME", "MIDDLE_NAME", "SUFFIX", "ADDR1", "ADDR2", "ADDR3", "CITY", "STATE", "ZIP", "PHONE", "COUNTY", "MEDGAS_ENDR", "MRF_ENDR", "WS_ENDR", "INS_EXPIRY_DTE", "PLUMB_COMPANY", "INSURANCE_COMPANY"];
+    const resolved = resolveTsbpeColumns(printed.map(snapshotFieldName), printed);
+    expect(resolved.keyColumns).toEqual(["license_nbr"]);
+    expect(resolved.nameColumns).toEqual(["plumb_company__trimmed"]);
+    expect(resolved.roles).toMatchObject({ license_number: "license_nbr", holder_name: null, first_name: "first_name", middle_name: "middle_name", last_name: "last_name", company: "plumb_company", county: "county" });
+    expect(resolved.extraMatchNames({ first_name__trimmed: "PAT", middle_name__trimmed: "Q", last_name__trimmed: "PLUMBER" })).toEqual(["PAT Q PLUMBER"]);
+    expect(resolved.scopeOf({ county__trimmed: "Travis" })).toBe("travis");
+    expect(resolved.scopeOf({ county__trimmed: "HARRIS" })).toBe("out_of_county");
   });
 
   it("gives franchise rows the account status page by taxpayer number and every other row none", () => {

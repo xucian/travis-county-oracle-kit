@@ -6,6 +6,7 @@ import path from "node:path";
 import AdmZip from "adm-zip";
 
 import { checkRecordLayouts, compareLayout, docxXmlToText, findNumberForms, findOrganizationCodes } from "../src/counties/travis/t3-layouts.mjs";
+import { INDIVIDUAL_OWNER_TYPES, PRIVACY_VERSION } from "../src/counties/travis/t3-sources.mjs";
 
 const hasPdftotext = (() => {
   try {
@@ -16,26 +17,63 @@ const hasPdftotext = (() => {
   }
 })();
 
-/** A DOCX whose document is a table of rows (cells separated) plus paragraphs. */
-function docx(rows, paragraphs = []) {
-  const cell = (text) => `<w:tc><w:p><w:r><w:t>${text.replace(/&/g, "&amp;")}</w:t></w:r></w:p></w:tc>`;
-  const table = `<w:tbl>${rows.map((row) => `<w:tr>${row.map(cell).join("")}</w:tr>`).join("")}</w:tbl>`;
-  const body = `${paragraphs.map((text) => `<w:p><w:r><w:t>${text}</w:t></w:r></w:p>`).join("")}${table}`;
+/** The organization table both Comptroller layouts print (an excerpt, in their order and spelling). */
+const ORG_TABLE = [
+  ["AB", "TEXAS BUSINESS ASSOC"],
+  ["C", "CORPORATION"],
+  ["CL", "TEXAS LIMITED LIABILITY COMPANY"],
+  ["CT", "TEXAS PROFIT CORPORATION"],
+  ["ES", "ESTATE"],
+  ["IS", "INDIVIDUAL - SOLE OWNER"],
+  ["J", "JOINT VENTURE"],
+  ["L", "LIMITED (LIABILITY) COMPANY"],
+  ["M", "LIMITED (LIABILITY) PARTNERSHIP"],
+  ["O", "OTHER"],
+  ["P", "GENERAL PARTNERSHIP"],
+  ["PI", "IND GENERAL PRTNSHP"],
+  ["PZ", "IND SUCCESSOR PRTSHP"],
+  ["S", "SOLE PROPRIETORSHIP"],
+  ["TR", "TRUST"],
+  ["UK", "UNKNOWN"],
+];
+const row = ([code, description]) => `${code.padEnd(12)}${description}`;
+
+/** The franchise layout's shape: one paragraph per line, Courier text with runs of spaces, later one-letter tables. */
+function franchiseDocx(table = ORG_TABLE) {
+  const lines = [
+    "Taxpayer Organizational Type",
+    "Record Type Code",
+    "FIELD VALUES:",
+    "",
+    "Taxpayer Organization Type:",
+    ...table.map((entry) => `${row(entry)}            `),
+    "",
+    "Record Type Code:",
+    "  U = Secretary of State (SOS) File Number",
+    "  X = Comptroller Assigned File Number",
+    "",
+    "SOS Status Code:",
+    "    A = Active",
+    "    F = Forfeited Franchise Tax",
+  ];
+  const paragraph = (text) => `<w:p><w:pPr><w:pStyle w:val="PlainText"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Courier New"/></w:rPr><w:t xml:space="preserve">${text.replace(/&/g, "&amp;")}</w:t></w:r></w:p>`;
   const zip = new AdmZip();
   zip.addFile("[Content_Types].xml", Buffer.from("<Types/>"));
-  zip.addFile("word/document.xml", Buffer.from(`<?xml version="1.0"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${body}</w:body></w:document>`));
+  zip.addFile("word/document.xml", Buffer.from(`<?xml version="1.0"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${lines.map(paragraph).join("")}</w:body></w:document>`));
   return zip.toBuffer();
 }
 
-/** A one-page PDF with each line as positioned text (code and description at separate x positions). */
-function pdf(lines) {
-  const ops = lines.map(([code, description], index) => `BT /F1 10 Tf 72 ${720 - index * 14} Td (${code}) Tj ET BT /F1 10 Tf 140 ${720 - index * 14} Td (${description}) Tj ET`).join("\n");
+/** The sales-tax layout's shape as a one-page PDF: code and description at separate x positions, then later tables. */
+function salesPdf(table = ORG_TABLE) {
+  const lines = [["", "FIELD VALUES:"], ["", ""], ["", "Taxpayer Organization Type:"], ["", ""], ...table, ["", ""], ["", "Outlet Inside/Outside City Limits Indicator"], ["  Y", "= Inside City Limits"], ["  N", "= Not Inside City Limits"]];
+  const text = (x, y, value) => (value === "" ? "" : `BT /F1 10 Tf ${x} ${y} Td (${value.replace(/([()\\])/g, "\\$1")}) Tj ET`);
+  const ops = lines.map(([code, description], index) => [text(72, 740 - index * 12, code.trim()), text(code.trim() === "" ? 72 : 144, 740 - index * 12, description)].join(" ")).join("\n");
   const objects = [
     "<< /Type /Catalog /Pages 2 0 R >>",
     "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
     "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>",
     `<< /Length ${Buffer.byteLength(ops)} >>\nstream\n${ops}\nendstream`,
-    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+    "<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>",
   ];
   let body = "%PDF-1.4\n";
   const offsets = [];
@@ -49,66 +87,87 @@ function pdf(lines) {
 }
 
 async function writeLayouts(windowDir, files) {
-  const dir = path.join(windowDir, "comptroller-record-layouts", "d20261018");
+  const dir = path.join(windowDir, "comptroller-record-layouts", "d20261017");
   await mkdir(dir, { recursive: true });
   for (const { name, bytes } of files) await writeFile(path.join(dir, name), bytes);
   const datasets = files.map(({ datasetId, name }) => ({ dataset_id: datasetId, status: "ok", files: [{ attachment: name, kept: name, tried: [] }] }));
-  await writeFile(path.join(dir, "resolution-20261018T100000Z.json"), JSON.stringify({ datasets }));
+  await writeFile(path.join(dir, "resolution-20261017T192341Z.json"), JSON.stringify({ datasets }));
 }
 
-const OBSERVED = { "jrea-zgmq": { IS: 9471, CL: 23967, CT: 5779 }, "9cir-efmm": { CL: 2281735, CT: 333220 } };
+const OBSERVED = { "jrea-zgmq": { IS: 9471, CL: 23967, CT: 5779, PI: 365, ES: 1, TR: 4 }, "9cir-efmm": { CL: 2281735, CT: 333220 } };
+const VISIBLE_DIGITS = { "jrea-zgmq": { CL: { 3: 23055, 1: 912 }, PI: { 3: 301, 1: 64 }, ES: { 3: 1 }, TR: { 3: 3, 1: 1 } }, "9cir-efmm": { CL: { 3: 2000000, 1: 281735 } } };
 
 describe("T3 record layout check", () => {
-  it("reads codes and number forms from DOCX text", () => {
-    const text = docxXmlToText('<w:p><w:r><w:t>ORGANIZATION TYPE</w:t></w:r></w:p><w:tbl><w:tr><w:tc><w:p><w:r><w:t>IS</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Individual - Sole Owner</w:t></w:r></w:p></w:tc></w:tr></w:tbl>');
-    expect(findOrganizationCodes(text)).toEqual({ IS: "Individual - Sole Owner" });
-    expect(findOrganizationCodes("CL - Texas Limited Liability Company\nCT = Texas Profit Corporation\nNOTE: x\nAB")).toEqual({ CL: "Texas Limited Liability Company", CT: "Texas Profit Corporation" });
-    expect(findNumberForms("Taxpayer Number  11 digits\nThe first digit 2 means a Social Security number\nOther")).toEqual(["Taxpayer Number 11 digits", "The first digit 2 means a Social Security number"]);
+  it("reads only the organization section: one- and two-letter codes, never the later one-letter tables", () => {
+    const text = docxXmlToText(new AdmZip(franchiseDocx()).getEntry("word/document.xml").getData().toString("utf8"));
+    expect(text).toContain("AB          TEXAS BUSINESS ASSOC");
+    const codes = findOrganizationCodes(text);
+    expect(Object.keys(codes)).toEqual(ORG_TABLE.map(([code]) => code));
+    expect(codes).toMatchObject({ C: "CORPORATION", S: "SOLE PROPRIETORSHIP", IS: "INDIVIDUAL - SOLE OWNER", PI: "IND GENERAL PRTNSHP" });
+    for (const later of ["U", "X", "A", "F"]) expect(codes[later]).toBeUndefined();
+    // The field list names the column without a colon; that is not the section heading.
+    expect(findOrganizationCodes("Taxpayer Organizational Type\nIS          INDIVIDUAL - SOLE OWNER")).toEqual({});
+    // The section ends at the first non-blank line that is not a code row.
+    expect(findOrganizationCodes("Taxpayer Organization Type:\n\nIS          INDIVIDUAL - SOLE OWNER\n\nOutlet NAICS Code:\n  Y = Inside City Limits")).toEqual({ IS: "INDIVIDUAL - SOLE OWNER" });
+    // A single space is not a separator: running text is not a row.
+    expect(findOrganizationCodes("Taxpayer Organization Type:\nIS INDIVIDUAL - SOLE OWNER")).toEqual({});
+    expect(findNumberForms("Taxpayer Number  11 digits\nOther")).toEqual(["Taxpayer Number 11 digits"]);
   });
 
-  it("finds a second sole-owner code, a differently described IS and unlisted codes", () => {
-    const base = { datasetId: "jrea-zgmq", numberForms: [], observed: OBSERVED["jrea-zgmq"], governsTheRule: true };
-    expect(compareLayout({ ...base, codes: { IS: "Individual - Sole Owner", CL: "Texas Limited Liability Company", CT: "Texas Profit Corporation", PI: "General Partnership of Individuals" } }).changes).toEqual([]);
-    const differs = compareLayout({ ...base, codes: { IS: "Investment Society", SP: "Sole Proprietor", CL: "Texas Limited Liability Company" } });
-    expect(differs.changes).toEqual([
-      "SP is described as a sole owner or individual (Sole Proprietor) but the rule does not withhold it",
-      'IS is described as "Investment Society", not as a sole owner',
-      "codes the data prints but the layout does not list: CT",
-    ]);
+  it("is consistent for the real table under the rule, and names every reason it would not be", () => {
+    expect(PRIVACY_VERSION).toBe("travis-t3-privacy.v2");
+    expect(INDIVIDUAL_OWNER_TYPES).toEqual(["IS", "S"]);
+    const codes = Object.fromEntries(ORG_TABLE);
+    const base = { datasetId: "jrea-zgmq", numberForms: [], observed: OBSERVED["jrea-zgmq"], governsTheRule: true, firstDigits: VISIBLE_DIGITS["jrea-zgmq"] };
+    const ok = compareLayout({ ...base, codes });
+    expect(ok).toMatchObject({ sole_owner_codes: ["IS", "S"], changes: [] });
+    expect(ok.codes_mentioning_individuals.map((entry) => entry.code)).toEqual(["IS", "PI", "PZ", "S"]);
+    expect(compareLayout({ ...base, codes: { ...codes, SP: "SOLE PROPRIETOR - SPOUSE" } }).changes).toEqual(["SP is described as a sole owner or individual (SOLE PROPRIETOR - SPOUSE) but the rule does not withhold it"]);
+    const withoutS = Object.fromEntries(ORG_TABLE.filter(([code]) => code !== "S"));
+    expect(compareLayout({ ...base, codes: withoutS }).changes).toEqual(["S is not in the layout's code table"]);
+    expect(compareLayout({ ...base, codes, firstDigits: { PI: { 2: 1, 3: 300 } } }).changes).toEqual(["1 PI rows print a taxpayer number with the leading 2 of SSN-based numbers and are not withheld"]);
+    expect(compareLayout({ ...base, codes, observed: { ...OBSERVED["jrea-zgmq"], QQ: 2 } }).changes).toEqual(["codes the data prints but the layout does not list: QQ"]);
   });
 
-  it("reports awaiting_capture until the layouts land, then consistent for layouts that match the rule", async () => {
+  it("reports awaiting_capture, then partial, then consistent for the two real layout shapes", async () => {
     const windowDir = await mkdtemp(path.join(tmpdir(), "t3-layouts-"));
     try {
-      expect(await checkRecordLayouts({ windowDir, observedByDataset: OBSERVED })).toMatchObject({ status: "awaiting_capture", privacy_rule: "travis-t3-privacy.v1", individual_owner_types: ["IS"] });
-      const sales = docx([["IS", "Individual - Sole Owner"], ["CL", "Texas Limited Liability Company"], ["CT", "Texas Profit Corporation"]], ["Taxpayer Number: 11 digits; the first digit 1 is an FEIN, 2 a Social Security number, 3 Comptroller-assigned"]);
-      await writeLayouts(windowDir, [{ datasetId: "jrea-zgmq", name: "jrea-zgmq-layout.docx", bytes: sales }]);
-      const partial = await checkRecordLayouts({ windowDir, observedByDataset: OBSERVED });
-      expect(partial).toMatchObject({ status: "partial", datasets_without_layout: ["9cir-efmm"] });
-      expect(partial.layouts[0]).toMatchObject({ sole_owner_codes: ["IS"], changes: [], ssn_lines: [expect.stringMatching(/Social Security/)] });
-      const franchise = docx([["CL", "Texas Limited Liability Company"], ["CT", "Texas Profit Corporation"]]);
+      expect(await checkRecordLayouts({ windowDir, observedByDataset: OBSERVED })).toMatchObject({ status: "awaiting_capture", privacy_rule: "travis-t3-privacy.v2", individual_owner_types: ["IS", "S"] });
+      await writeLayouts(windowDir, [{ datasetId: "9cir-efmm", name: "9cir-efmm-Franchise_Layout.docx", bytes: franchiseDocx() }]);
+      expect(await checkRecordLayouts({ windowDir, observedByDataset: OBSERVED })).toMatchObject({ status: "partial", datasets_without_layout: ["jrea-zgmq"] });
       await writeLayouts(windowDir, [
-        { datasetId: "jrea-zgmq", name: "jrea-zgmq-layout.docx", bytes: sales },
-        { datasetId: "9cir-efmm", name: "9cir-efmm-layout.docx", bytes: franchise },
+        { datasetId: "jrea-zgmq", name: "jrea-zgmq-layout.docx", bytes: franchiseDocx() },
+        { datasetId: "9cir-efmm", name: "9cir-efmm-Franchise_Layout.docx", bytes: franchiseDocx() },
       ]);
-      expect(await checkRecordLayouts({ windowDir, observedByDataset: OBSERVED })).toMatchObject({ status: "consistent", changes: [] });
+      const result = await checkRecordLayouts({ windowDir, observedByDataset: OBSERVED, firstDigitsByDataset: VISIBLE_DIGITS });
+      expect(result).toMatchObject({ status: "consistent", changes: [] });
+      expect(result.layouts.map((layout) => [layout.dataset_id, layout.codes_found, layout.sole_owner_codes])).toEqual([
+        ["jrea-zgmq", ORG_TABLE.length, ["IS", "S"]],
+        ["9cir-efmm", ORG_TABLE.length, ["IS", "S"]],
+      ]);
     } finally {
       await rm(windowDir, { recursive: true, force: true });
     }
   });
 
-  it.skipIf(!hasPdftotext)("reads a PDF layout with pdftotext and reports a change", async () => {
+  it.skipIf(!hasPdftotext)("reads the sales-tax PDF layout with pdftotext, S included, later tables excluded", async () => {
     const windowDir = await mkdtemp(path.join(tmpdir(), "t3-layouts-pdf-"));
     try {
-      const sales = pdf([["IS", "Individual - Sole Owner"], ["SP", "Sole Proprietorship - Spouse"], ["CL", "Texas Limited Liability Company"], ["CT", "Texas Profit Corporation"]]);
-      const franchise = docx([["CL", "Texas Limited Liability Company"], ["CT", "Texas Profit Corporation"]]);
       await writeLayouts(windowDir, [
-        { datasetId: "jrea-zgmq", name: "jrea-zgmq-layout.pdf", bytes: sales },
-        { datasetId: "9cir-efmm", name: "9cir-efmm-layout.docx", bytes: franchise },
+        { datasetId: "jrea-zgmq", name: "jrea-zgmq-Active_Sales_Tax_Permit_Record_Layout.pdf", bytes: salesPdf() },
+        { datasetId: "9cir-efmm", name: "9cir-efmm-Franchise_Layout.docx", bytes: franchiseDocx() },
       ]);
-      const result = await checkRecordLayouts({ windowDir, observedByDataset: OBSERVED });
-      expect(result.layouts[0]).toMatchObject({ method: "pdftotext -layout", sole_owner_codes: ["IS", "SP"] });
-      expect(result).toMatchObject({ status: "differs", changes: ["jrea-zgmq: SP is described as a sole owner or individual (Sole Proprietorship - Spouse) but the rule does not withhold it"] });
+      const result = await checkRecordLayouts({ windowDir, observedByDataset: OBSERVED, firstDigitsByDataset: VISIBLE_DIGITS });
+      const sales = result.layouts.find((layout) => layout.dataset_id === "jrea-zgmq");
+      expect(sales).toMatchObject({ method: "pdftotext -layout", codes_found: ORG_TABLE.length, sole_owner_codes: ["IS", "S"] });
+      expect(sales.codes.Y).toBeUndefined();
+      expect(result.status).toBe("consistent");
+      // The same layout without S, under the rule that withholds S: a change.
+      await writeLayouts(windowDir, [
+        { datasetId: "jrea-zgmq", name: "jrea-zgmq-Active_Sales_Tax_Permit_Record_Layout.pdf", bytes: salesPdf(ORG_TABLE.filter(([code]) => code !== "S")) },
+        { datasetId: "9cir-efmm", name: "9cir-efmm-Franchise_Layout.docx", bytes: franchiseDocx() },
+      ]);
+      expect(await checkRecordLayouts({ windowDir, observedByDataset: OBSERVED })).toMatchObject({ status: "differs", changes: ["jrea-zgmq: S is not in the layout's code table"] });
     } finally {
       await rm(windowDir, { recursive: true, force: true });
     }

@@ -1,0 +1,456 @@
+{
+ "kind": "travis-t3-record-layouts",
+ "recorded_at": "2026-10-17T19:41:22.929Z",
+ "ruling": "assignment docs/decisions.md section 24.4 (operator, 2026-10-17: capture the layouts and classify by them); PI, PZ, ES and TR ruled by the oracle agent on the operator's delegation",
+ "window_run": "data/travis/t3-window/runs/20261017T192341Z.json (US egress; TSBPE and the two layouts; t3-verify OK, 112 files)",
+ "layouts": {
+  "jrea-zgmq-Active_Sales_Tax_Permit_Record_Layout.pdf": {
+   "bytes": 31279,
+   "sha256": "6bde21e5f48ae482f6dbdfdfe8e1505935b80cb5ae97d5ff0c8644542fb72465",
+   "url": "https://data.texas.gov/api/views/jrea-zgmq/files/c1cf06f3-4a69-4489-b1c7-84de30a269d8",
+   "fetched_at": "2026-10-17T19:23:43.408Z",
+   "egress": "US"
+  },
+  "9cir-efmm-Franchise_Layout.docx": {
+   "bytes": 17587,
+   "sha256": "e10bd50110427c0d137e49950c4788d14324752e398e2b4bc1de00efac366abc",
+   "url": "https://data.texas.gov/api/views/9cir-efmm/files/297f2282-33fe-4e7b-86de-10f6ae5f07e3",
+   "fetched_at": "2026-10-17T19:23:44.411Z",
+   "egress": "US"
+  }
+ },
+ "check": {
+  "version": "travis-t3-layout-check.v1",
+  "status": "consistent",
+  "changes": [],
+  "per_layout": [
+   {
+    "dataset_id": "jrea-zgmq",
+    "file": "jrea-zgmq-Active_Sales_Tax_Permit_Record_Layout.pdf",
+    "method": "pdftotext -layout",
+    "codes_found": 79,
+    "sole_owner_codes": [
+     "IS",
+     "S"
+    ],
+    "codes_mentioning_individuals": [
+     {
+      "code": "IS",
+      "description": "INDIVIDUAL - SOLE OWNER"
+     },
+     {
+      "code": "PI",
+      "description": "IND GENERAL PRTNSHP"
+     },
+     {
+      "code": "PZ",
+      "description": "IND SUCCESSOR PRTSHP"
+     },
+     {
+      "code": "S",
+      "description": "SOLE PROPRIETORSHIP"
+     }
+    ],
+    "observed_codes": 39,
+    "observed_codes_missing_from_layout": [],
+    "ssn_lines": [],
+    "number_form_lines": [
+     "Taxpayer Number"
+    ],
+    "first_digits_of_visible_numbers": {
+     "CT": {
+      "1": 3008,
+      "3": 2771
+     },
+     "CL": {
+      "1": 912,
+      "3": 23055
+     },
+     "CN": {
+      "1": 496,
+      "3": 471
+     },
+     "PF": {
+      "1": 179,
+      "3": 68
+     },
+     "PL": {
+      "1": 495,
+      "3": 275
+     },
+     "CF": {
+      "1": 1628,
+      "3": 1652
+     },
+     "PB": {
+      "1": 70,
+      "3": 37
+     },
+     "PI": {
+      "1": 64,
+      "3": 301
+     },
+     "AP": {
+      "1": 48,
+      "3": 49
+     },
+     "CI": {
+      "1": 978,
+      "3": 2198
+     },
+     "AR": {
+      "1": 97,
+      "3": 65
+     },
+     "GT": {
+      "1": 5,
+      "3": 68
+     },
+     "GS": {
+      "1": 188,
+      "3": 1
+     },
+     "PV": {
+      "1": 4,
+      "3": 21
+     },
+     "CM": {
+      "1": 28,
+      "3": 21
+     },
+     "TR": {
+      "1": 1,
+      "3": 3
+     },
+     "GP": {
+      "1": 9,
+      "3": 1
+     },
+     "CS": {
+      "1": 22,
+      "3": 2
+     },
+     "CU": {
+      "1": 3,
+      "3": 37
+     },
+     "CP": {
+      "1": 38,
+      "3": 67
+     },
+     "GC": {
+      "1": 46
+     },
+     "GU": {
+      "1": 1,
+      "3": 6
+     },
+     "FO": {
+      "1": 8
+     },
+     "FS": {
+      "1": 8
+     },
+     "FF": {
+      "1": 11
+     },
+     "AB": {
+      "1": 1,
+      "3": 3
+     },
+     "CR": {
+      "1": 3
+     },
+     "FJ": {
+      "1": 9
+     },
+     "FC": {
+      "1": 1
+     },
+     "GM": {
+      "1": 2
+     },
+     "GF": {
+      "1": 1,
+      "3": 2
+     },
+     "ES": {
+      "3": 1
+     },
+     "FB": {
+      "1": 1
+     },
+     "PW": {
+      "3": 2
+     },
+     "GO": {
+      "1": 6
+     },
+     "TH": {
+      "1": 2
+     },
+     "AF": {
+      "1": 1,
+      "3": 1
+     },
+     "GY": {
+      "1": 2
+     }
+    }
+   },
+   {
+    "dataset_id": "9cir-efmm",
+    "file": "9cir-efmm-Franchise_Layout.docx",
+    "method": "docx word/document.xml",
+    "codes_found": 79,
+    "sole_owner_codes": [
+     "IS",
+     "S"
+    ],
+    "codes_mentioning_individuals": [
+     {
+      "code": "IS",
+      "description": "INDIVIDUAL - SOLE OWNER"
+     },
+     {
+      "code": "PI",
+      "description": "IND GENERAL PRTNSHP"
+     },
+     {
+      "code": "PZ",
+      "description": "IND SUCCESSOR PRTSHP"
+     },
+     {
+      "code": "S",
+      "description": "SOLE PROPRIETORSHIP"
+     }
+    ],
+    "observed_codes": 29,
+    "observed_codes_missing_from_layout": [],
+    "ssn_lines": [],
+    "number_form_lines": [
+     "Taxpayer Number",
+     "X = Comptroller Assigned File Number",
+     "is the SOS, COA or Comptroller Assigned File Number."
+    ],
+    "first_digits_of_visible_numbers": {
+     "CF": {
+      "1": 43836,
+      "3": 138948
+     },
+     "CM": {
+      "1": 3974,
+      "3": 13324
+     },
+     "CI": {
+      "1": 19401,
+      "3": 227343
+     },
+     "CT": {
+      "1": 94697,
+      "3": 238523
+     },
+     "CN": {
+      "1": 34575,
+      "3": 172382
+     },
+     "CL": {
+      "1": 57369,
+      "3": 2224366
+     },
+     "PL": {
+      "1": 12114,
+      "3": 106988
+     },
+     "CP": {
+      "1": 4292,
+      "3": 11409
+     },
+     "PI": {
+      "1": 325,
+      "3": 983
+     },
+     "AP": {
+      "1": 1823,
+      "3": 13259
+     },
+     "PB": {
+      "1": 2400,
+      "3": 7274
+     },
+     "AR": {
+      "1": 4066,
+      "3": 16198
+     },
+     "PF": {
+      "1": 2414,
+      "3": 20381
+     },
+     "TR": {
+      "1": 1165,
+      "3": 2654
+     },
+     "CU": {
+      "1": 228,
+      "3": 3247
+     },
+     "AF": {
+      "1": 931,
+      "3": 3936
+     },
+     "TF": {
+      "1": 58,
+      "3": 660
+     },
+     "PV": {
+      "1": 526,
+      "3": 623
+     },
+     "HF": {
+      "1": 27,
+      "3": 41
+     },
+     "AB": {
+      "1": 32,
+      "3": 284
+     },
+     "PW": {
+      "1": 52,
+      "3": 266
+     },
+     "AC": {
+      "1": 4,
+      "3": 94
+     },
+     "TH": {
+      "1": 11,
+      "3": 12
+     },
+     "CW": {
+      "1": 8
+     },
+     "ST": {
+      "1": 5,
+      "3": 1
+     },
+     "CX": {
+      "1": 1,
+      "3": 2
+     },
+     "PZ": {
+      "3": 1
+     },
+     "TI": {
+      "1": 9,
+      "3": 117
+     },
+     "SF": {
+      "1": 2,
+      "3": 1
+     }
+    }
+   }
+  ]
+ },
+ "checker_fixes": [
+  "findOrganizationCodes reads only the 'Taxpayer Organization(al) Type:' section and takes one- and two-letter codes; it missed S SOLE PROPRIETORSHIP (and C, J, L, M, O, P) before, in both layouts",
+  "docxXmlToText keeps runs of spaces; the franchise DOCX separates code and description by them, so no row matched before"
+ ],
+ "layout_facts": {
+  "same_table_in_both": true,
+  "codes": 79,
+  "one_letter_codes": [
+   "C",
+   "J",
+   "L",
+   "M",
+   "O",
+   "P",
+   "S"
+  ],
+  "sole_owner_codes": [
+   "IS (INDIVIDUAL - SOLE OWNER)",
+   "S (SOLE PROPRIETORSHIP)"
+  ],
+  "ssn_mentioned": false,
+  "later_one_letter_tables_not_read": [
+   "Record Type Code (U, V, X)",
+   "SOS Status Code (A ... Z)",
+   "Right to Transact (A, D, N, I, U)",
+   "Outlet Inside/Outside City Limits (Y, N)"
+  ]
+ },
+ "privacy_rule": {
+  "from": "travis-t3-privacy.v1 (IS)",
+  "to": "travis-t3-privacy.v2 (IS, S)",
+  "rows_affected_2026_10_17": 0,
+  "apply_load": {
+   "record": "data/travis/t3-loads/20261017T194122Z.json",
+   "merge_reason": "privacy rule changed (travis-t3-privacy.v1 -> travis-t3-privacy.v2)",
+   "diff": {
+    "against": "snapshot on disk",
+    "new": 0,
+    "changed": 0,
+    "unchanged": 49025,
+    "removed": 0,
+    "rekeyed": 0,
+    "tombstoned": 0
+   },
+   "prior_snapshot": {
+    "path": "data/travis/registry/history/tx-comptroller-sales-tax-travis.e98bb767e1813384.parquet",
+    "sha256": "e98bb767e1813384a1effbeba8c2c32e61284e4c3768d4bc21a3344403941325",
+    "hash_index_path": "data/travis/registry/history/tx-comptroller-sales-tax-travis.e98bb767e1813384.hash-index.json"
+   },
+   "snapshot": {
+    "path": "data/travis/registry/tx-comptroller-sales-tax-travis.parquet",
+    "sha256": "8cc5583a80d5c20f3ba9bfdb36b620ebffa1b3589626ca6e8e0f2824d8aec295",
+    "bytes": 13698689,
+    "rows": 49025
+   },
+   "watermark_privacy_version": "travis-t3-privacy.v2"
+  },
+  "reload": {
+   "record": "data/travis/t3-loads/20261017T194307Z.json",
+   "all_no_op": true,
+   "sales_tax_merged": false
+  }
+ },
+ "visible_types_ruled": {
+  "PI": {
+   "description": "IND GENERAL PRTNSHP",
+   "travis_rows": 365,
+   "travis_taxpayers": 348,
+   "first_digit": {
+    "3": 301,
+    "1": 64
+   },
+   "statewide_franchise_rows": 1308,
+   "withheld": false
+  },
+  "PZ": {
+   "description": "IND SUCCESSOR PRTSHP",
+   "travis_rows": 0,
+   "statewide_franchise_rows": 1,
+   "withheld": false
+  },
+  "ES": {
+   "description": "ESTATE",
+   "travis_rows": 1,
+   "first_digit": {
+    "3": 1
+   },
+   "withheld": false
+  },
+  "TR": {
+   "description": "TRUST",
+   "travis_rows": 4,
+   "first_digit": {
+    "3": 3,
+    "1": 1
+   },
+   "withheld": false
+  },
+  "leading_2_anywhere": 0
+ },
+ "private_boundary": "layout text is the Comptroller's public documentation; data figures are counts only"
+}

@@ -7,6 +7,7 @@ import path from "node:path";
 import { ParquetReader } from "@dsnp/parquetjs";
 
 import { recordIdKeyFingerprint, recordIdOf, withheldRecordIdOf } from "../src/counties/travis/record-ids.mjs";
+import { T3_SOURCES } from "../src/counties/travis/t3-sources.mjs";
 
 import { NORMALIZER_VERSION, changedColumnCounts, loadSnapshot, normalizeRecord, parseCsvRecordSpans, readCaptureReceipts, redactedRowText, selectCaptureReceipts, verifyCapture } from "../src/counties/travis/t3-snapshot.mjs";
 
@@ -244,7 +245,7 @@ describe("T3 snapshot normalizer", () => {
       const output = path.join(dir, "registry");
       const recordIdKey = Buffer.alloc(32, 7);
       const report = await loadSnapshot({ sourceKey: "tx-comptroller-sales-tax", captureDir: dir, outputDir: output, name: "sales-travis", recordIdKey, now: "2026-10-17T00:00:00.000Z" });
-      expect(report.privacy).toMatchObject({ version: "travis-t3-privacy.v1", withheld_columns: ["taxpayer_number"], rows_by_class: { individual_owner: 1 }, record_id_key_fingerprint: recordIdKeyFingerprint(recordIdKey), withheld_record_ids: { rows: 1, distinct: 1, shared_by_several_rows: 0 } });
+      expect(report.privacy).toMatchObject({ version: "travis-t3-privacy.v2", withheld_columns: ["taxpayer_number"], rows_by_class: { individual_owner: 1 }, record_id_key_fingerprint: recordIdKeyFingerprint(recordIdKey), withheld_record_ids: { rows: 1, distinct: 1, shared_by_several_rows: 0 } });
       expect(report.counts).toMatchObject({ rows: 2, distinct_keys: 2, rows_without_key: 0 });
       expect(report.watermark).toMatchObject({ record_id_version: "travis-record-id.v1", record_id_key_fingerprint: recordIdKeyFingerprint(recordIdKey) });
       const keyedId = withheldRecordIdOf(recordIdKey, "tx-comptroller-sales-tax", ["32055555555", "00001"]);
@@ -291,5 +292,30 @@ describe("T3 snapshot normalizer", () => {
     const fields = [{ value: "1", quoted: true }, { value: "A", quoted: true }];
     expect(redactedRowText('"1","A"', fields, new Set([0]))).toBe('"","A"');
     expect(() => redactedRowText('"1", "A"', fields, new Set([0]))).toThrow(/canonical/);
+  });
+
+  it("rewrites a snapshot written under another privacy rule version, with nothing else changed", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "t3-privacy-version-"));
+    const source = T3_SOURCES["tx-comptroller-sales-tax"];
+    const rule = source.privacy;
+    try {
+      const header = '"taxpayer_number","taxpayer_name","taxpayer_organization_type","outlet_number","outlet_name","outlet_county_code"';
+      const text = `${header}\n"32055555555","PAT SMITH","IS","00001","PAT SMITH LAWN","227"\n"32011111111","ACME ROOFING LLC","CL","00001","ACME ROOFING","227"\n`;
+      await writeFile(path.join(dir, "page-00000.csv"), text);
+      await writeFile(path.join(dir, "receipts.jsonl"), `${JSON.stringify({ kind: "page", file: "page-00000.csv", url: "https://data.texas.gov/resource/jrea-zgmq.csv?%24offset=0", fetched_at: "2026-10-17T16:07:22.000Z", status: 200, bytes: Buffer.byteLength(text), sha256: sha256(text), rows: 2, content_type: "text/csv" })}\n`);
+      const params = { sourceKey: "tx-comptroller-sales-tax", captureDir: dir, outputDir: path.join(dir, "registry"), name: "sales-travis", recordIdKey: Buffer.alloc(32, 7) };
+      source.privacy = { ...rule, version: "travis-t3-privacy.v1" };
+      const old = await loadSnapshot({ ...params, now: "2026-10-17T00:00:00.000Z" });
+      source.privacy = rule;
+      const rewritten = await loadSnapshot({ ...params, now: "2026-10-18T00:00:00.000Z" });
+      expect(rewritten).toMatchObject({ merged: true, merge_reason: "privacy rule changed (travis-t3-privacy.v1 -> travis-t3-privacy.v2)", diff: { new: 0, changed: 0, unchanged: 2, removed: 0 }, prior_snapshot: { sha256: old.snapshot.sha256 } });
+      expect(rewritten.watermark.privacy_version).toBe("travis-t3-privacy.v2");
+      expect(rewritten.snapshot.sha256).not.toBe(old.snapshot.sha256);
+      const again = await loadSnapshot({ ...params, now: "2026-10-19T00:00:00.000Z" });
+      expect(again).toMatchObject({ merged: false, rebuild_matches_snapshot: true });
+    } finally {
+      source.privacy = rule;
+      await rm(dir, { recursive: true, force: true });
+    }
   });
 });

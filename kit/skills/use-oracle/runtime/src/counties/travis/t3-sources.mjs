@@ -156,15 +156,17 @@ export function tdlrPermitRole(licenseType) {
 /**
  * Column roles of a TSBPE licensee list, whose header is first seen when the capture lands. The license number field
  * must be exactly one; the licensee is one full-name field or first and last name fields; the company field is
- * optional. Anything else stops the load with the printed header, so a mapping can be added instead of guessed.
+ * optional. The insurer's name is not the licensee's company: the Responsible Master Plumber list captured on 2026-10-17
+ * prints `PLUMB_COMPANY` and `INSURANCE_COMPANY`. Anything else stops the load with the printed header, so a mapping
+ * can be added instead of guessed.
  *
  * @param {string[]} fields - Snapshot field names.
  * @param {string[]} printed - Header as printed.
  * @returns {ResolvedColumns} Roles.
  */
 export function resolveTsbpeColumns(fields, printed) {
-  const one = (pattern, role, optional = false) => {
-    const found = fields.filter((field) => pattern.test(field));
+  const one = (pattern, role, optional = false, exclude = null) => {
+    const found = fields.filter((field) => pattern.test(field) && !(exclude && exclude.test(field)));
     if (found.length === 1) return found[0];
     if (found.length === 0 && optional) return null;
     throw new Error(`TSBPE header: ${found.length === 0 ? "no" : "several"} ${role} column${found.length > 1 ? `s (${found.join(", ")})` : ""}; printed header ${JSON.stringify(printed)}; add its column roles to t3-sources.mjs`);
@@ -176,7 +178,7 @@ export function resolveTsbpeColumns(fields, printed) {
   const middle = fields.find((field) => /^(middle|mi)(_name|_initial)?$/.test(field)) ?? null;
   if (fullName.length > 1) throw new Error(`TSBPE header: several name columns (${fullName.join(", ")}); printed header ${JSON.stringify(printed)}`);
   if (fullName.length === 0 && !(first && last)) throw new Error(`TSBPE header: no licensee name column; printed header ${JSON.stringify(printed)}; add its column roles to t3-sources.mjs`);
-  const company = one(/company|business|employer|firm/, "company", true);
+  const company = one(/company|business|employer|firm/, "company", true, /insur/);
   const county = fields.find((field) => /county/.test(field)) ?? null;
   const nameColumns = [...(fullName.length === 1 ? [`${fullName[0]}__trimmed`] : []), ...(company ? [`${company}__trimmed`] : [])];
   return {
@@ -202,20 +204,25 @@ export function resolveTsbpeColumns(fields, printed) {
  *   its keyed `business_record_id` (record-ids.mjs, decisions.md section 24.2).
  */
 
-/** Version of the privacy rules below. */
-export const PRIVACY_VERSION = "travis-t3-privacy.v1";
+/**
+ * Version of the privacy rules below. v1 (2026-10-17): `IS`. v2 (2026-10-17, after the record layouts were captured,
+ * assignment decisions.md section 24.4): `IS` and `S`.
+ */
+export const PRIVACY_VERSION = "travis-t3-privacy.v2";
 
 /**
  * Comptroller organization types whose taxpayer number could derive from a Social Security number: only a natural
- * person has one, and the sole owner (`IS`) is the only natural-person type the sales-tax permit file prints (9,471 of
- * the 49,025 Travis outlets of 2026-10-17; no `IS` name carries an entity word). Partnerships, estates and trusts get an
- * employer number or a Comptroller-assigned number. The rule withholds the number of every `IS` row whatever its form:
- * a row's first digit is not proof of how its number was assigned.
+ * person has one. Both record layouts (jrea-zgmq and 9cir-efmm, captured 2026-10-17) define two sole-owner types:
+ * `IS` "INDIVIDUAL - SOLE OWNER" (9,471 of the 49,025 Travis outlets of 2026-10-17) and `S` "SOLE PROPRIETORSHIP" (0
+ * rows). Partnerships (`PI` "IND GENERAL PRTNSHP", `PZ` "IND SUCCESSOR PRTSHP"), estates (`ES`) and trusts (`TR`) are
+ * entities with an employer or Comptroller-assigned number and stay visible (decisions.md section 24.4). The rule
+ * withholds the number of every sole-owner row whatever its form: a row's first digit is not proof of how its number
+ * was assigned.
  */
-export const INDIVIDUAL_OWNER_TYPES = Object.freeze(["IS"]);
+export const INDIVIDUAL_OWNER_TYPES = Object.freeze(["IS", "S"]);
 
 /**
- * Privacy class of a sales-tax row (`travis-t3-privacy.v1`).
+ * Privacy class of a sales-tax row (`travis-t3-privacy.v2`).
  *
  * @param {Record<string, unknown>} row - Normalized row (trimmed values under `<column>__trimmed`).
  * @returns {"individual_owner" | null} `individual_owner` when the taxpayer is a sole owner.

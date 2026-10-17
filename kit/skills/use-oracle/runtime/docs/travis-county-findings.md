@@ -462,3 +462,7 @@ capture; the run record is `docs/evidence/travis-t3-run-2026-10-17.json`.
   would have given 9,471 outlets 22 ids. TDLR licenses are keyed by type, subtype and number. The two Comptroller record
   layouts come in the next window with TSBPE (`--only tsbpe-responsible-master-plumber,comptroller-record-layouts`) and
   are checked offline against the privacy rule.
+- **Second window (run `20261017T192341Z`).** TSBPE's Responsible Master Plumber list: 9,378 licenses, 278 in Travis
+  (`PLUMB_COMPANY` is the company; `INSURANCE_COMPANY` the insurer). Both record layouts print the same 79 organization
+  codes, one-letter codes included, with two sole-owner types (`IS`, `S`) and no SSN statement; the privacy rule became
+  `travis-t3-privacy.v2` (`IS`, `S`; 0 rows changed). Partnerships (`PI`, `PZ`), estates and trusts stay visible.

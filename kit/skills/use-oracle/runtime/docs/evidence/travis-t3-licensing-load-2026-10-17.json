@@ -812,23 +812,187 @@
   }
  },
  "tsbpe": {
-  "status": "awaiting one window re-run",
-  "step_result": {
-   "status": "awaiting_capture",
-   "set_aside": [
+  "status": "captured and loaded 2026-10-17",
+  "window_run": "data/travis/t3-window/runs/20261017T192341Z.json (US egress; https://tsbpe.texas.gov/download-csv/RMP/)",
+  "load_record": "data/travis/t3-loads/20261017T192657Z.json (kit 7b84696: the company column is PLUMB_COMPANY; INSURANCE_COMPANY is the insurer)",
+  "load": {
+   "name": "tsbpe-responsible-master-plumber",
+   "scope": "statewide Responsible Master Plumber list of 20261017 (tsbpe.texas.gov, under US egress)",
+   "csv_dialect": "unescaped-quotes",
+   "column_sets": [
     {
-     "file": "responsible-master-plumber-responsible-master-plumber.csv",
-     "reason": "html_not_csv",
-     "sha256": "d13dd7d5d169eb3999de0af63220ef9c848e762766fa674b59b74184863e32e0",
-     "dir": "data/travis/t3-window/tsbpe-responsible-master-plumber/d20261017"
+     "version": "derived:15d967e1bc5c",
+     "header_sha256": "15d967e1bc5cfa6383a7b27087686617f42cd126e71caad7c6ab55473511c5c8",
+     "printed": [
+      "RANK",
+      "LICENSE_NBR",
+      "LIC_STATUS",
+      "LICENSE_DATE",
+      "EXPIRATION_DTE",
+      "LAST_NAME",
+      "FIRST_NAME",
+      "MIDDLE_NAME",
+      "SUFFIX",
+      "ADDR1",
+      "ADDR2",
+      "ADDR3",
+      "CITY",
+      "STATE",
+      "ZIP",
+      "PHONE",
+      "COUNTY",
+      "MEDGAS_ENDR",
+      "MRF_ENDR",
+      "WS_ENDR",
+      "INS_EXPIRY_DTE",
+      "PLUMB_COMPANY",
+      "INSURANCE_COMPANY"
+     ],
+     "fields": [
+      "rank",
+      "license_nbr",
+      "lic_status",
+      "license_date",
+      "expiration_dte",
+      "last_name",
+      "first_name",
+      "middle_name",
+      "suffix",
+      "addr1",
+      "addr2",
+      "addr3",
+      "city",
+      "state",
+      "zip",
+      "phone",
+      "county",
+      "medgas_endr",
+      "mrf_endr",
+      "ws_endr",
+      "ins_expiry_dte",
+      "plumb_company",
+      "insurance_company"
+     ],
+     "files": [
+      "responsible-master-plumber-RMP.csv"
+     ]
     }
    ],
-   "detail": "no CSV capture yet (set aside: data/travis/t3-window/tsbpe-responsible-master-plumber/d20261017/responsible-master-plumber-responsible-master-plumber.csv html_not_csv); run the window command node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber under US egress, then this step again"
+   "resolved_columns": {
+    "key_columns": [
+     "license_nbr"
+    ],
+    "name_columns": [
+     "plumb_company__trimmed"
+    ],
+    "match_name_version": "tsbpe-first-middle-last.v1",
+    "roles": {
+     "license_number": "license_nbr",
+     "holder_name": null,
+     "first_name": "first_name",
+     "middle_name": "middle_name",
+     "last_name": "last_name",
+     "company": "plumb_company",
+     "county": "county"
+    }
+   },
+   "counts": {
+    "rows": 9378,
+    "rows_filtered_out": 0,
+    "filtered_out_by_scope": {},
+    "distinct_keys": 9378,
+    "rows_without_key": 0,
+    "duplicate_keys": 0,
+    "rows_under_duplicate_keys": 0,
+    "present_non_blank": {
+     "rank": 9378,
+     "license_nbr": 9378,
+     "lic_status": 9378,
+     "license_date": 9378,
+     "expiration_dte": 9378,
+     "last_name": 9378,
+     "first_name": 9378,
+     "middle_name": 7422,
+     "suffix": 859,
+     "addr1": 4832,
+     "addr2": 291,
+     "addr3": 19,
+     "city": 4832,
+     "state": 9378,
+     "zip": 4832,
+     "phone": 4743,
+     "county": 9359,
+     "medgas_endr": 9378,
+     "mrf_endr": 9378,
+     "ws_endr": 9378,
+     "ins_expiry_dte": 9367,
+     "plumb_company": 9368,
+     "insurance_company": 9366
+    },
+    "by_scope": {
+     "out_of_county": 9100,
+     "travis": 278
+    },
+    "distributions": {}
+   },
+   "names": {
+    "matcher_version": "travis-exact-unique-normalized-name.v1",
+    "source": "tsbpe-responsible-master-plumber",
+    "normalized_names": 17918,
+    "entity_keys": 9378,
+    "unique_names": 17282,
+    "non_unique_names": 636,
+    "keys_under_non_unique_names": 1440,
+    "rows_indexed": 9378,
+    "rows_without_name": 0,
+    "by_scope": {
+     "out_of_county": 9100,
+     "travis": 278
+    },
+    "name_columns": [
+     "plumb_company__trimmed"
+    ],
+    "match_name_version": "tsbpe-first-middle-last.v1",
+    "rows_with_derived_name": 9368
+   },
+   "diff": {
+    "against": "nothing (first load)",
+    "new": 9378,
+    "changed": 0,
+    "unchanged": 0,
+    "removed": 0,
+    "rekeyed": 0,
+    "tombstoned": 0
+   },
+   "snapshot": {
+    "path": "data/travis/licensing/tsbpe-responsible-master-plumber.parquet",
+    "sha256": "11cf66bb169e5b27bf627a4113d01a84c0ee9c231f9ba4a58da9c1a2ed73954b",
+    "bytes": 2316967,
+    "rows": 9378
+   },
+   "watermark": {
+    "track": "licensing",
+    "source": "tsbpe-responsible-master-plumber",
+    "dataset": "tsbpe-responsible-master-plumber (free licensee list CSV from tsbpe.texas.gov/free-licensee-list/)",
+    "scope": "statewide Responsible Master Plumber list of 20261017 (tsbpe.texas.gov, under US egress)",
+    "path": "data/travis/t3-window/tsbpe-responsible-master-plumber/d20261017/",
+    "artifact_hash": "4196678bb625364fc2f27653d74321fa82704be21b057cc2fdcbcc8e3abd94a4",
+    "merged_count": 1,
+    "merged_rows": 9378,
+    "last_merged_at": "2026-10-17T19:26:57.934Z",
+    "hash_index_path": "data/travis/licensing/tsbpe-responsible-master-plumber.hash-index.json",
+    "snapshot": {
+     "path": "data/travis/licensing/tsbpe-responsible-master-plumber.parquet",
+     "sha256": "11cf66bb169e5b27bf627a4113d01a84c0ee9c231f9ba4a58da9c1a2ed73954b",
+     "bytes": 2316967,
+     "rows": 9378
+    },
+    "normalizer_version": "travis-t3-source-snapshot.v1"
+   },
+   "duration_seconds": 0.8
   },
-  "why": "the 2026-10-17 run followed the site menu's description page named 'Responsible Master Plumber' and saved its HTML (210,552 bytes, sha256 d13dd7d5d169eb39..., kept on disk as evidence, set aside by the loader as html_not_csv); kit commit 8af4bc3 takes https://tsbpe.texas.gov/download-csv/RMP/ ('Responsible Master Plumber List') instead",
-  "window_command": "cd /Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime && node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber",
-  "after_the_window": "node src/counties/travis/t3-verify.mjs (latest run) and node src/counties/travis/t3-load.mjs --only tsbpe: the loader reads the header, resolves the license number, licensee and company columns (resolveTsbpeColumns; it stops with the printed header if it cannot) and loads the licensing snapshot tsbpe-responsible-master-plumber",
-  "retry_from_ro": "data/travis/t3-window/runs/20261017T162511Z.json: egress RO, stopped before any request (exit 3)"
+  "first_run": "the 2026-10-17 run 20261017T160716Z saved the site menu's description page (HTML, 210,552 bytes, kept as evidence, set aside by the loader)",
+  "personal_contact_columns": "addr1, addr2, addr3, city, state, zip and phone are the licensee's own contact fields: kept in the private snapshot, never served"
  },
  "reload": {
   "loaded_at": "2026-10-17T17:26:44.090Z",

@@ -33,11 +33,13 @@ skills/use-oracle/runtime/docs/evidence/travis-t3-name-index-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-t3-prepared-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-t3-readiness-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-t3-readiness-window-2026-10-17.json
+skills/use-oracle/runtime/docs/evidence/travis-t3-record-layouts-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-t3-registry-load-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-t3-run-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-t3-sales-tax-load-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-t3-veteran-owned-load-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-t3-window-verify-20261017T160716Z.json
+skills/use-oracle/runtime/docs/evidence/travis-t3-window-verify-20261017T192341Z.json
 skills/use-oracle/runtime/docs/evidence/travis-t3-withheld-record-ids-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-tcad-downloads-2026-10-16.jsonl
 skills/use-oracle/runtime/docs/evidence/travis-tcad-prop-counts-2026-10-16.json

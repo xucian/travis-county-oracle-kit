@@ -537,8 +537,8 @@ official_identity:
       - key: tsbpe-responsible-master-plumber
         authority: Texas State Board of Plumbing Examiners
         source: free licensee lists, the Responsible Master Plumber CSV with the last known company, https://tsbpe.texas.gov/download-csv/RMP/ (link "Responsible Master Plumber List" on https://tsbpe.texas.gov/free-licensee-list/)
-        status: awaiting one window re-run - the 2026-10-17 run saved the site menu's description page (HTML, kept as evidence, set aside by the loader); the resolver takes /download-csv/RMP/ since kit commit 8af4bc3; the loader resolves the license number, licensee and company columns from the header when the CSV lands
-        window_command: cd /Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime && node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber,comptroller-record-layouts
+        columns: 23 printed (LICENSE_NBR the key, FIRST/MIDDLE/LAST_NAME the licensee, PLUMB_COMPANY the company; INSURANCE_COMPANY is the insurer, not a company role); ADDR1-3, CITY, STATE, ZIP and PHONE are the licensee's own contact fields, kept private and never served
+        status: captured 2026-10-17 (window run 20261017T192341Z, after the first run saved the site menu's description page) and loaded - 9,378 licenses, 278 in Travis (kit 7b84696)
       - key: austin-row-contractor-licenses
         authority: City of Austin Transportation and Public Works
         source: Active Right of Way Contractor License Holders (data.austintexas.gov 8d92-wsiw; 5 columns; 469 rows captured 2026-10-17, data updated 2026-10-17T07:05:35Z)
@@ -547,7 +547,7 @@ official_identity:
     - key: tx-comptroller-sales-tax
       source: Texas Comptroller Active Sales Tax Permit Holders (data.texas.gov jrea-zgmq; outlet addresses, outlet county, NAICS, permit and first-sale dates, entity types outside franchise tax)
       scope: Travis outlets, outlet_county_code 227 (read from the dataset's grouped codes at fetch time)
-      privacy: travis-t3-privacy.v1 - taxpayer_organization_type IS (sole owner, the only natural-person type) is individual_owner; its taxpayer number is withheld from every derived store (null in the snapshot, row hash over the row with that cell emptied) and never served; 9,471 of 49,025 outlets; no number in the capture has the SSN-based leading 2, but the record layout was not captured, so every IS number is withheld; record ids (assignment decisions.md section 24.2) - business_record_id of a withheld row is the keyed travis-record-id.v1 digest (HMAC-SHA256 under the record-id key, fingerprint a85dc5bf94154a97, over taxpayer and outlet number), row_sha256 the hash of the row with the number emptied
+      privacy: travis-t3-privacy.v2 - taxpayer_organization_type IS (INDIVIDUAL - SOLE OWNER) and S (SOLE PROPRIETORSHIP, 0 Travis rows), the two sole-owner types of both record layouts, are individual_owner; PI, PZ, ES and TR stay visible (entities with their own numbers, decisions.md section 24.4); its taxpayer number is withheld from every derived store (null in the snapshot, row hash over the row with that cell emptied) and never served; 9,471 of 49,025 outlets; no number in the capture has the SSN-based leading 2 and neither layout mentions SSNs, but every sole-owner number is withheld whatever its form; record ids (assignment decisions.md section 24.2) - business_record_id of a withheld row is the keyed travis-record-id.v1 digest (HMAC-SHA256 under the record-id key, fingerprint a85dc5bf94154a97, over taxpayer and outlet number), row_sha256 the hash of the row with the number emptied
       status: loaded 2026-10-17 - 49,025 outlets of 42,216 taxpayers, rowsUpdatedAt 2026-10-17T10:31:10Z (docs/evidence/travis-t3-sales-tax-load-2026-10-17.json)
     - key: tx-sos-veteran-owned-business
       source: Texas Secretary of State Veteran Owned Business (data.texas.gov 2vfr-72e4)
@@ -559,10 +559,10 @@ official_identity:
     approved_at: "2026-10-17"
     approval_record: assignment repository docs/decisions.md section 24.4
     source: the record layouts attached to jrea-zgmq ("Active Sales Tax Permit Record Layout.pdf", asset c1cf06f3-4a69-4489-b1c7-84de30a269d8 in the metadata of 2026-10-17) and 9cir-efmm ("Franchise Layout.docx", asset 297f2282-33fe-4e7b-86de-10f6ae5f07e3), resolved at fetch time from each dataset's metadata (the captured metadata when that request fails), from https://data.texas.gov/api/views/<id>/files/<assetId>, the asset endpoint as fallback
-    purpose: confirm the organization codes and taxpayer number forms the privacy rule travis-t3-privacy.v1 relies on (IS the only individual-owner type)
+    purpose: confirm the organization codes and taxpayer number forms the privacy rule relies on
     offline_check: node --max-old-space-size=16384 src/counties/travis/t3-load.mjs --only layouts (travis-t3-layout-check.v1; consistent, differs, partial, unreadable or awaiting_capture)
-    status: awaiting the next US window, fetched together with the TSBPE re-run
-    window_command: cd /Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime && node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber,comptroller-record-layouts
+    status: captured 2026-10-17 (window run 20261017T192341Z) and checked - consistent with travis-t3-privacy.v2 (79 codes, the same table in both; sole-owner codes IS and S; no SSN mentioned; no visible number with the leading 2); docs/evidence/travis-t3-record-layouts-2026-10-17.json
+    window_command: cd /Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime && node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber,comptroller-record-layouts (resumable)
   matcher:
     version: travis-exact-unique-normalized-name.v1
     indexes: runtime data/travis/matcher/ (travis-t3-name-index.v1); franchise universe statewide - 3,450,553 normalized names, 33,159 shared; Travis alone 628 shared; 336,439 Travis taxpayers hold a statewide-unique name, 5,891 a shared one (docs/evidence/travis-t3-name-index-2026-10-17.json)

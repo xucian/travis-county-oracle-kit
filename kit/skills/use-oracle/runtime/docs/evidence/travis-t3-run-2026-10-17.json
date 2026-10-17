@@ -1,11 +1,11 @@
 {
  "kind": "travis-t3-official-identity-baseline",
  "increment": "T3",
- "status": "observed: the US-window captures are verified and loaded offline; the four rulings of assignment decisions.md section 24 are applied; TSBPE and the two Comptroller record layouts await one window; the operator runs the hand-off checklist (assignment docs/runbook.md section 5)",
- "recorded_at": "2026-10-17T19:00:54.481Z",
+ "status": "observed: both US-window runs are verified and every source is loaded offline; the rulings of assignment decisions.md section 24 are applied; the operator runs the hand-off checklist (assignment docs/runbook.md section 5)",
+ "recorded_at": "2026-10-17T19:46:12.867Z",
  "decisions": "assignment docs/decisions.md section 23 (approved 2026-10-17) and section 24 (ruled 2026-10-17: 24.1, 24.3, 24.4 by the operator, 24.2 by the oracle agent on the operator's delegation)",
  "kit_branch": "travis",
- "kit_commit_before_this_record": "5acb3174829f4849c3b050d8769a8899cae8e8e5",
+ "kit_commit_before_this_record": "ea96125f085bdca1762f5ca5d685beecd2747cae",
  "window_run": {
   "record": "data/travis/t3-window/runs/20261017T160716Z.json",
   "started_at": "2026-10-17T16:07:16.568Z",
@@ -27,22 +27,71 @@
    "data/travis/t3-window/runs/20261017T162511Z.json (both stopped before any request, exit 3)"
   ]
  },
+ "window_run_2": {
+  "record": "data/travis/t3-window/runs/20261017T192341Z.json",
+  "started_at": "2026-10-17T19:23:41.301Z",
+  "seconds": 3.624,
+  "egress": "US at every check",
+  "egress_checks": 7,
+  "requests": 6,
+  "counts": {
+   "ok": 2,
+   "failed": 0,
+   "inconsistent": 0,
+   "stopped": 0
+  },
+  "exit_code": 0,
+  "sources": [
+   {
+    "key": "tsbpe-responsible-master-plumber",
+    "status": "ok",
+    "rows": 9378,
+    "bytes": 1984334
+   },
+   {
+    "key": "comptroller-record-layouts",
+    "status": "ok",
+    "rows": null,
+    "bytes": 48866
+   }
+  ]
+ },
  "verification": {
-  "evidence": "docs/evidence/travis-t3-window-verify-20261017T160716Z.json",
-  "command": "node src/counties/travis/t3-verify.mjs --run 20261017T160716Z",
+  "evidence": "docs/evidence/travis-t3-window-verify-20261017T160716Z.json (first run) and docs/evidence/travis-t3-window-verify-20261017T192341Z.json (second run; every file of both runs)",
+  "command": "node src/counties/travis/t3-verify.mjs --run <stamp>",
   "ok": true,
   "mismatches": 0,
   "totals": {
-   "receipt_logs": 9,
-   "receipts": 106,
-   "files_verified": 106,
-   "bytes_verified": 885732310,
-   "csv_files": 88,
-   "csv_rows_parsed": 4451607,
+   "receipt_logs": 10,
+   "receipts": 112,
+   "files_verified": 112,
+   "bytes_verified": 888048490,
+   "csv_files": 89,
+   "csv_rows_parsed": 4460985,
    "not_csv_files": 1,
    "attempts_not_answered": 0
   },
-  "per_source": [
+  "per_source_run_2": [
+   {
+    "key": "tsbpe-responsible-master-plumber",
+    "run_status": "ok",
+    "files_verified": 4,
+    "rows_parsed": 9378,
+    "bytes": 1984334,
+    "not_csv_files": [],
+    "run_record_matches": true
+   },
+   {
+    "key": "comptroller-record-layouts",
+    "run_status": "ok",
+    "files_verified": 4,
+    "rows_parsed": 0,
+    "bytes": 48866,
+    "not_csv_files": [],
+    "run_record_matches": true
+   }
+  ],
+  "per_source_run_1": [
    {
     "key": "tx-comptroller-franchise-tax",
     "run_status": "ok",
@@ -180,9 +229,26 @@
    "dataset": "tsbpe-responsible-master-plumber",
    "scope": "statewide",
    "url": "https://tsbpe.texas.gov/download-csv/RMP/",
-   "availability": "unsupported",
-   "source_access_status": "pending_window_re_run",
-   "incomplete_reason": "the 2026-10-17 run saved the site menu description page (HTML) instead of the CSV; the resolver is fixed (kit 8af4bc3); one US-window re-run captures it"
+   "watermark": "captured 2026-10-17 (run 20261017T192341Z)",
+   "sha256": "4196678bb625364fc2f27653d74321fa82704be21b057cc2fdcbcc8e3abd94a4",
+   "rows": 9378,
+   "travis_rows": 278,
+   "availability": "supported_full",
+   "source_access_status": "available (US egress)",
+   "note": "the first run saved the site menu description page (HTML, kept as evidence); the second run took /download-csv/RMP/; the licensee address and phone columns stay private"
+  },
+  {
+   "dataset": "comptroller-record-layouts",
+   "scope": "the jrea-zgmq and 9cir-efmm record layouts",
+   "url": "https://data.texas.gov/api/views/<id>/files/<assetId>",
+   "watermark": "captured 2026-10-17 (run 20261017T192341Z)",
+   "sha256": {
+    "jrea-zgmq-Active_Sales_Tax_Permit_Record_Layout.pdf": "6bde21e5f48ae482f6dbdfdfe8e1505935b80cb5ae97d5ff0c8644542fb72465",
+    "9cir-efmm-Franchise_Layout.docx": "e10bd50110427c0d137e49950c4788d14324752e398e2b4bc1de00efac366abc"
+   },
+   "availability": "supported_full",
+   "source_access_status": "available (US egress)",
+   "note": "checked offline: consistent with travis-t3-privacy.v2"
   },
   {
    "dataset": "austin-row-contractor-licenses/8d92-wsiw",
@@ -233,9 +299,9 @@
    "artifact_hash": "d3da6f3d4a52824f2bd7bb18a71f6e1adce89abce03ba2454086170d31ea5994",
    "merged_count": 1,
    "merged_rows": 49025,
-   "last_merged_at": "2026-10-17T18:45:06.767Z",
+   "last_merged_at": "2026-10-17T19:41:22.929Z",
    "row_filter": null,
-   "snapshot_sha256": "e98bb767e1813384a1effbeba8c2c32e61284e4c3768d4bc21a3344403941325"
+   "snapshot_sha256": "8cc5583a80d5c20f3ba9bfdb36b620ebffa1b3589626ca6e8e0f2824d8aec295"
   },
   {
    "track": "registry",
@@ -269,11 +335,23 @@
    "last_merged_at": "2026-10-17T17:25:43.873Z",
    "row_filter": null,
    "snapshot_sha256": "2e3ab26003d6f366153373fa97c93797961b3e2049d4dfbb00b7cb57127ec6e8"
+  },
+  {
+   "track": "licensing",
+   "name": "tsbpe-responsible-master-plumber",
+   "path": "data/travis/t3-window/tsbpe-responsible-master-plumber/d20261017/",
+   "artifact_hash": "4196678bb625364fc2f27653d74321fa82704be21b057cc2fdcbcc8e3abd94a4",
+   "merged_count": 1,
+   "merged_rows": 9378,
+   "last_merged_at": "2026-10-17T19:26:57.934Z",
+   "row_filter": null,
+   "snapshot_sha256": "11cf66bb169e5b27bf627a4113d01a84c0ee9c231f9ba4a58da9c1a2ed73954b"
   }
  ],
  "watermark_files": {
-  "registry": "90b7f2087f141e27436b61a9bcb574fc93cc925cd5fce8d9ed7f6409458c4eac",
-  "licensing": "6de1f4ba50b30e91bb0f2b4e63988190f05ae5cbb67157a0638550bbcb43928f"
+  "registry": "beb3d529a29be56ff5d65f4abfcac514aae6a04a8ddd63284dea9cd0c266386a",
+  "licensing": "ff62b02911d77a554720740141f6eb406478ffb29a22993de99b9385282e3e14",
+  "unchanged_by_the_reload": true
  },
  "counts": {
   "franchise_statewide_rows": 3487662,
@@ -312,7 +390,8 @@
    }
   },
   "austin_row_licenses": 469,
-  "tsbpe_rows": null
+  "tsbpe_rows": 9378,
+  "tsbpe_travis_rows": 278
  },
  "deltas": {
   "franchise_travis_against_2026_10_16": {
@@ -417,15 +496,15 @@
   "evidence": "docs/evidence/travis-t3-detail-url-2026-10-17.json"
  },
  "privacy": {
-  "rule": "travis-t3-privacy.v1",
-  "class": "individual_owner = sales-tax taxpayer_organization_type IS",
+  "rule": "travis-t3-privacy.v2",
+  "class": "individual_owner = sales-tax taxpayer_organization_type IS or S (the two sole-owner types of the record layouts)",
   "rows": {
    "individual_owner": 9471
   },
   "record_ids": "keyed (decisions.md section 24.2)",
   "check": {
    "source": "tx-comptroller-sales-tax",
-   "privacy_version": "travis-t3-privacy.v1",
+   "privacy_version": "travis-t3-privacy.v2",
    "classed_rows_in_capture": 9471,
    "withheld_values_in_capture": 9088,
    "snapshot_rows": 49025,
@@ -459,16 +538,8 @@
  "limitations": [
   {
    "source": "tsbpe-responsible-master-plumber",
-   "availability": "unsupported",
-   "source_access_status": "pending_window_re_run",
-   "detail": "one US window: cd /Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime && node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber,comptroller-record-layouts; then t3-verify.mjs and t3-load.mjs --only tsbpe,layouts,name-index,record-ids offline",
-   "evidence": "docs/evidence/travis-t3-licensing-load-2026-10-17.json"
-  },
-  {
-   "source": "comptroller-record-layouts",
-   "availability": "unsupported",
-   "source_access_status": "pending_window",
-   "detail": "the jrea-zgmq and 9cir-efmm record layouts (organization codes, taxpayer number forms) come with the TSBPE re-run; until then the privacy rule rests on the code names and the data (decisions.md section 24.4)"
+   "availability": "supported_full",
+   "detail": "current licensees only (no history); the licensee address and phone are private and never served"
   },
   {
    "source": "permit license numbers",
@@ -499,7 +570,7 @@
   {
    "source": "tx-comptroller-sales-tax/jrea-zgmq",
    "availability": "supported_full",
-   "detail": "sole owners' taxpayer numbers are withheld from every derived store; the dataset record layout (organization codes, number forms) was not captured"
+   "detail": "sole owners' (IS, S) taxpayer numbers are withheld from every derived store, as the record layout defines the types"
   },
   {
    "source": "tx-sos-veteran-owned-business/2vfr-72e4",
@@ -516,7 +587,7 @@
   "24.1": "approved (operator): the SOS file number left-padded to 10 digits is the exact SOS file number (travis-sos-file-number-join.v1)",
   "24.2": "ruled (oracle, delegated): a withheld row keeps business_record_id = first 32 hex of HMAC-SHA256 under the record-id key over the printed key (travis-record-id.v1) and row_sha256 = SHA-256 of the row with the withheld cells emptied; collisions on the 9,471 rows: plain recipe with the number emptied 22 ids (9,464 rows collapsed), taxpayer name plus outlet 4 shared ids (8 rows), redacted row and outlet fields 0 today but not guaranteed, keyed digest 0 by construction; evidence docs/evidence/travis-t3-withheld-record-ids-2026-10-17.json",
   "24.3": "approved (operator): TDLR license key (type, subtype, number), a blank subtype the empty string",
-  "24.4": "approved (operator): the jrea-zgmq and 9cir-efmm record layouts in the next window with TSBPE (source comptroller-record-layouts), checked offline against travis-t3-privacy.v1 (travis-t3-layout-check.v1)"
+  "24.4": "approved (operator): the record layouts captured with TSBPE (run 20261017T192341Z) and checked offline (travis-t3-layout-check.v1): 79 codes, sole-owner types IS and S, no SSN mentioned; rule travis-t3-privacy.v2 withholds IS and S (0 S rows); PI, PZ, ES and TR not withheld (oracle, delegated): entities with their own numbers, first digits 3 and 1, never 2"
  },
  "record_ids": {
   "version": "travis-record-id.v1",
@@ -593,24 +664,35 @@
     "records_under_shared_ids": 0,
     "records_printed_on_several_rows": 0,
     "rows_of_records_printed_on_several_rows": 0
+   },
+   "tsbpe-responsible-master-plumber": {
+    "recipe": "travis-record-id.v1",
+    "rows": 9378,
+    "distinct_records": 9378,
+    "distinct_ids": 9378,
+    "keyed_ids_of_withheld_rows": 0,
+    "rows_without_id": 0,
+    "ids_shared_by_different_records": 0,
+    "records_under_shared_ids": 0,
+    "records_printed_on_several_rows": 0,
+    "rows_of_records_printed_on_several_rows": 0
    }
   },
   "status": "no collapsed records"
  },
  "layouts": {
-  "status": "awaiting_capture",
-  "detail": "no record layout captured yet; the window command fetches them with the TSBPE re-run",
-  "check_version": "travis-t3-layout-check.v1"
+  "status": "consistent",
+  "detail": "2 layouts read; the privacy rule holds",
+  "check_version": "travis-t3-layout-check.v1",
+  "privacy_rule": "travis-t3-privacy.v2",
+  "evidence": "docs/evidence/travis-t3-record-layouts-2026-10-17.json"
  },
  "reload": {
-  "record": "data/travis/t3-loads/20261017T190054Z.json",
-  "loaded_at": "2026-10-17T19:00:54.481Z",
+  "record": "data/travis/t3-loads/20261017T194612Z.json",
+  "loaded_at": "2026-10-17T19:46:12.867Z",
   "all_no_op": true,
-  "awaiting_capture": [
-   "tsbpe",
-   "layouts"
-  ],
-  "seconds": 525.277,
+  "awaiting_capture": [],
+  "seconds": 522.69,
   "steps": {
    "franchise-statewide": {
     "merged": false,
@@ -625,8 +707,8 @@
     },
     "rebuild_matches_snapshot": true,
     "snapshot_sha256": "2a102105f56edd3fd8afb157f72781ea3e573de98627fc025d49083f4d0ddda8",
-    "watermark_sha256": "90b7f2087f141e27436b61a9bcb574fc93cc925cd5fce8d9ed7f6409458c4eac",
-    "seconds": 303.5
+    "watermark_sha256": "beb3d529a29be56ff5d65f4abfcac514aae6a04a8ddd63284dea9cd0c266386a",
+    "seconds": 296
    },
    "franchise-travis": {
     "merged": false,
@@ -641,8 +723,8 @@
     },
     "rebuild_matches_snapshot": true,
     "snapshot_sha256": "942e8645eec3d86f87347b82d554e58c44112c64e1c171b99c8f8e6e6c62a968",
-    "watermark_sha256": "90b7f2087f141e27436b61a9bcb574fc93cc925cd5fce8d9ed7f6409458c4eac",
-    "seconds": 50.1
+    "watermark_sha256": "beb3d529a29be56ff5d65f4abfcac514aae6a04a8ddd63284dea9cd0c266386a",
+    "seconds": 49.8
    },
    "sales-tax": {
     "merged": false,
@@ -656,9 +738,9 @@
      "tombstoned": 0
     },
     "rebuild_matches_snapshot": true,
-    "snapshot_sha256": "e98bb767e1813384a1effbeba8c2c32e61284e4c3768d4bc21a3344403941325",
-    "watermark_sha256": "90b7f2087f141e27436b61a9bcb574fc93cc925cd5fce8d9ed7f6409458c4eac",
-    "seconds": 3.6
+    "snapshot_sha256": "8cc5583a80d5c20f3ba9bfdb36b620ebffa1b3589626ca6e8e0f2824d8aec295",
+    "watermark_sha256": "beb3d529a29be56ff5d65f4abfcac514aae6a04a8ddd63284dea9cd0c266386a",
+    "seconds": 3.4
    },
    "veteran": {
     "merged": false,
@@ -673,8 +755,8 @@
     },
     "rebuild_matches_snapshot": true,
     "snapshot_sha256": "988727bb91ca5e23aa43d9aea26fc0c39826d819430025a0711ca39d5e401ef2",
-    "watermark_sha256": "90b7f2087f141e27436b61a9bcb574fc93cc925cd5fce8d9ed7f6409458c4eac",
-    "seconds": 2
+    "watermark_sha256": "beb3d529a29be56ff5d65f4abfcac514aae6a04a8ddd63284dea9cd0c266386a",
+    "seconds": 1.8
    },
    "veteran-join": {
     "status": "unchanged",
@@ -693,29 +775,43 @@
     },
     "rebuild_matches_snapshot": true,
     "snapshot_sha256": "2e3ab26003d6f366153373fa97c93797961b3e2049d4dfbb00b7cb57127ec6e8",
-    "watermark_sha256": "6de1f4ba50b30e91bb0f2b4e63988190f05ae5cbb67157a0638550bbcb43928f",
-    "seconds": 58
+    "watermark_sha256": "ff62b02911d77a554720740141f6eb406478ffb29a22993de99b9385282e3e14",
+    "seconds": 59.6
    },
    "tsbpe": {
-    "status": "awaiting_capture",
-    "detail": "no CSV capture yet (set aside: data/travis/t3-window/tsbpe-responsible-master-plumber/d20261017/responsible-master-plumber-responsible-master-plumber.csv html_not_csv); run the window command node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber under US egress, then this step again"
+    "merged": false,
+    "diff": {
+     "against": "snapshot on disk",
+     "new": 0,
+     "changed": 0,
+     "unchanged": 9378,
+     "removed": 0,
+     "rekeyed": 0,
+     "tombstoned": 0
+    },
+    "rebuild_matches_snapshot": true,
+    "snapshot_sha256": "11cf66bb169e5b27bf627a4113d01a84c0ee9c231f9ba4a58da9c1a2ed73954b",
+    "watermark_sha256": "ff62b02911d77a554720740141f6eb406478ffb29a22993de99b9385282e3e14",
+    "seconds": 0.6
    },
    "layouts": {
-    "status": "awaiting_capture",
-    "detail": "no record layout captured yet; the window command fetches them with the TSBPE re-run"
+    "status": "consistent",
+    "detail": "2 layouts read; the privacy rule holds"
    },
    "name-index": {
     "status": "unchanged",
-    "detail": "5 indexes, not yet built (no snapshot): tsbpe-responsible-master-plumber; tx-comptroller-franchise-tax-statewide 33159 non-unique of 3450553; tx-comptroller-sales-tax-travis 1143 non-unique of 63006; tx-sos-veteran-owned-business 42 non-unique of 27163; tdlr-license-files 41722 non-unique of 414175; austin-row-contractor-licenses 1 non-unique of 533"
+    "detail": "6 indexes; tx-comptroller-franchise-tax-statewide 33159 non-unique of 3450553; tx-comptroller-sales-tax-travis 1143 non-unique of 63006; tx-sos-veteran-owned-business 42 non-unique of 27163; tdlr-license-files 41722 non-unique of 414175; tsbpe-responsible-master-plumber 636 non-unique of 17918; austin-row-contractor-licenses 1 non-unique of 533"
    },
    "record-ids": {
     "status": "no collapsed records",
-    "detail": "tx-comptroller-franchise-tax-statewide 3487631 ids for 3487631 records; tx-comptroller-franchise-tax-travis 342333 ids for 342333 records; tx-comptroller-sales-tax-travis 49025 ids for 49025 records; tx-sos-veteran-owned-business 27205 ids for 27205 records; tdlr-license-files 459993 ids for 459993 records; austin-row-contractor-licenses 469 ids for 469 records"
+    "detail": "tx-comptroller-franchise-tax-statewide 3487631 ids for 3487631 records; tx-comptroller-franchise-tax-travis 342333 ids for 342333 records; tx-comptroller-sales-tax-travis 49025 ids for 49025 records; tx-sos-veteran-owned-business 27205 ids for 27205 records; tdlr-license-files 459993 ids for 459993 records; austin-row-contractor-licenses 469 ids for 469 records; tsbpe-responsible-master-plumber 9378 ids for 9378 records"
    }
   }
  },
  "evidence": [
   "docs/evidence/travis-t3-window-verify-20261017T160716Z.json",
+  "docs/evidence/travis-t3-window-verify-20261017T192341Z.json",
+  "docs/evidence/travis-t3-record-layouts-2026-10-17.json",
   "docs/evidence/travis-t3-withheld-record-ids-2026-10-17.json",
   "docs/evidence/travis-t3-franchise-load-2026-10-17.json",
   "docs/evidence/travis-t3-sales-tax-load-2026-10-17.json",
@@ -734,19 +830,14 @@
  "tests": {
   "command": "npx vitest run tests/travis-*",
   "test_files": 18,
-  "tests": 157,
-  "passed": 157,
-  "failed": 0,
-  "matcher_tests": "tests/travis-name-matcher.test.mjs unchanged and passing"
+  "tests": 159,
+  "passed": 159,
+  "failed": 0
  },
- "window_command_next": "cd /Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime && node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber,comptroller-record-layouts",
- "after_the_window": [
-  "node src/counties/travis/t3-verify.mjs",
-  "node --max-old-space-size=16384 src/counties/travis/t3-load.mjs --only tsbpe,layouts,name-index,record-ids"
- ],
  "record_id_key": {
   "file": "runtime data/travis/keys/record-id.key (gitignored, mode 0600)",
   "fingerprint": "a85dc5bf94154a97",
   "operator_action": "keep one copy off the machine"
- }
+ },
+ "window_rerun": "cd /Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime && node src/counties/travis/t3-vpn-fetch.mjs [--only <source,source>] (VPN on; resumable)"
 }
