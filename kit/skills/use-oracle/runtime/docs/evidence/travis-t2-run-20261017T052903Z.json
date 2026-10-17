@@ -1,5 +1,6 @@
 {
  "schemaVersion": "travis.run-record.v1",
+ "status": "evidence only: superseded by the run of record 20261017T072132Z (assignment decisions.md section 22, option B); validated against an amended lexicon served on 127.0.0.1, never published or pinned",
  "contract": "docs/api-contract.md Run (frozen at de08901); T2 fills the appraisal subset and the CAR/tables fields; no Atlas fields (no Atlas PR against an amended lexicon)",
  "run_id": "20261017T052903Z",
  "kind": "T2 appraisal-only pilot, 25 parcels, offline (no --live-fetch), against the amended lexicon a0c05c5-plus-travis (assignment decisions.md section 22)",
@@ -295,17 +296,7 @@
    "reconcile_export_rows": 25
   }
  },
- "limitations": [
-  {
-   "source": "lexicon",
-   "availability": "supported_partial",
-   "source_access_status": "ok",
-   "incomplete_reason": "amended_lexicon",
-   "detail": "validated and hashed against the lexicon as amended by elephant-xyz/lexicon#194 (live state a0c05c5 plus its two enum lines); the 15 amended schemas must be pinned before or with the upload; no Atlas PR against an amended lexicon",
-   "evidence": "docs/evidence/travis-t2-lexicon-amended-a0c05c5-plus-travis.json",
-   "records_request": null
-  }
- ],
+ "limitations": [],
  "groups": {},
  "manifest_cid": null,
  "atlas": null,
