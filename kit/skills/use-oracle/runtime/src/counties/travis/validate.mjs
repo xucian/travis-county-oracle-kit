@@ -58,6 +58,58 @@ export function assertGeometryInCounty(points) {
   }
 }
 
+/** The county every Travis seed row and record must name (seed.mjs COUNTY_NAME, COUNTY_FIPS). */
+export const TRAVIS_IDENTITY = Object.freeze({ county: "Travis", countyFips: "48453", stateCode: "TX" });
+
+/**
+ * Hosts an appraisal entity's `source_http_request` may name: the TCAD export and the TNR
+ * parcel layer. T4's permit entities will add `data.austintexas.gov` (the Austin permit export).
+ */
+export const TRAVIS_APPRAISAL_SOURCE_HOSTS = Object.freeze(["traviscad.org", "gis.traviscountytx.gov"]);
+
+/**
+ * Fail closed unless one parcel's output is a Travis record: the seed row names Travis and FIPS
+ * 48453, every entity's `request_identifier` is the row's `parcel_id`, every entity's
+ * `source_http_request.url` is on an appraisal source host, the address is in TX and names no
+ * other county, and every geometry point is inside the Travis bbox. The archive carries no county
+ * label (decisions.md section 22), so this check is what keeps a wrong-county record out.
+ *
+ * @param {{ row: Record<string, string>, files: Record<string, Record<string, unknown>>, roots: { countyCid: string, seedCid: string }, sourceHosts?: readonly string[] }} options - Seed row, `data/*.json` keyed by basename, root CIDs, and allowed hosts.
+ * @returns {void}
+ */
+export function assertTravisIdentity({ row, files, roots, sourceHosts = TRAVIS_APPRAISAL_SOURCE_HOSTS }) {
+  const fail = (detail) => {
+    throw new Error(`not a Travis record: ${detail}`);
+  };
+  const county = String(row?.county ?? "").trim();
+  const fips = String(row?.county_fips ?? "").trim();
+  if (county !== TRAVIS_IDENTITY.county || fips !== TRAVIS_IDENTITY.countyFips) {
+    fail(`seed row names county ${JSON.stringify(county)} (FIPS ${JSON.stringify(fips)}), expected ${TRAVIS_IDENTITY.county} (${TRAVIS_IDENTITY.countyFips})`);
+  }
+  const parcelId = String(row?.parcel_id ?? "").trim();
+  if (!parcelId) fail("seed row has no parcel_id");
+  const rootNames = new Set([`${roots.countyCid}.json`, `${roots.seedCid}.json`]);
+  for (const [name, body] of Object.entries(files)) {
+    if (rootNames.has(name) || name_is_relationship(name)) continue;
+    if (body?.request_identifier !== parcelId) fail(`${name} request_identifier ${JSON.stringify(body?.request_identifier)} is not the seed row's parcel_id ${parcelId}`);
+    const url = /** @type {{ url?: unknown } | undefined} */ (body?.source_http_request)?.url;
+    let host = null;
+    try {
+      host = typeof url === "string" ? new URL(url).hostname : null;
+    } catch {
+      host = null;
+    }
+    if (!host || !sourceHosts.includes(host)) fail(`${name} source_http_request host ${JSON.stringify(host)} is not an appraisal source (${sourceHosts.join(", ")})`);
+  }
+  const address = files["address.json"];
+  if (!address) fail("no address.json");
+  if (address.state_code !== TRAVIS_IDENTITY.stateCode) fail(`address.json state_code ${JSON.stringify(address.state_code)} is not ${TRAVIS_IDENTITY.stateCode}`);
+  if (Object.hasOwn(address, "county_name") && address.county_name !== TRAVIS_IDENTITY.county) {
+    fail(`address.json county_name ${JSON.stringify(address.county_name)} is not ${TRAVIS_IDENTITY.county}`);
+  }
+  if (files["geometry.json"]) assertGeometryInCounty(collectGeometryPoints(files["geometry.json"]));
+}
+
 /**
  * @param {unknown} link - `{"/": "./file.json"}`.
  * @returns {string | null} The relative file name, or null when not a link.

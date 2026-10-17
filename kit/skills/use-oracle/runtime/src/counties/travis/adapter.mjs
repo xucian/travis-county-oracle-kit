@@ -35,8 +35,8 @@ import { TRAVIS_QUERY_TABLE_SCHEMA_FIELDS } from "./enrichment-profile.mjs";
 import { buildSeed as buildTravisSeedFiles, toText, isValidPropId, polygonCentroid, TNR_PARCEL_LAYER_QUERY_URL, TRAVIS_SEED_BBOX } from "./seed.mjs";
 import {
   collectGeometryPoints,
-  assertGeometryInCounty,
   assertManifestReconciled,
+  assertTravisIdentity,
   assertUniqueParcelIds,
   assertOutputContract,
   REQUIRED_DATA_ARTIFACTS,
@@ -227,7 +227,7 @@ export async function resolveLexiconManifest({ htmlDir, allowNetwork = false, fe
 export function classifyTravisFailure(error) {
   const message = (error instanceof Error ? error.message : String(error)).toLowerCase();
   if (
-    /not a printed prop_id|not the printed prop_id|does not match requested|no situs address|outside the travis bbox|unsupported parcel input schema|is required|refusing to guess|egress country|county_jurisdiction|missing data-group root|must carry label|links to missing|is not linked|http 403|http 404|http 400/.test(
+    /not a printed prop_id|not the printed prop_id|does not match requested|no situs address|outside the travis bbox|unsupported parcel input schema|is required|refusing to guess|egress country|not a travis record|missing data-group root|must carry label|links to missing|is not linked|http 403|http 404|http 400/.test(
       message,
     )
   ) {
@@ -375,8 +375,10 @@ export async function captureAndTransform({
         await Promise.all(transform.files.map(async (name) => [name, JSON.parse(await readFile(path.join(transform.dataDir, name), "utf8"))])),
       );
       assertOutputContract(files, transform.roots);
+      // Fail closed on a wrong-county record (seed county and FIPS, request identifiers, source hosts,
+      // address state and county, geometry bbox): the archive itself carries no county label.
+      assertTravisIdentity({ row: { ...row, parcel_id: parcelId }, files, roots: transform.roots });
       const points = files["geometry.json"] ? collectGeometryPoints(files["geometry.json"]) : [];
-      assertGeometryInCounty(points);
       if (points.length > 0) geometryCount += 1;
       timing.checkMs = performance.now() - stageStarted;
       stageStarted = performance.now();

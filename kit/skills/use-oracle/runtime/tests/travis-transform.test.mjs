@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import { parseCsvRecords } from "../src/core/csv.mjs";
 import { materializeParcelInput } from "../src/counties/travis/adapter.mjs";
-import { assertOutputContract } from "../src/counties/travis/validate.mjs";
+import { assertOutputContract, assertTravisIdentity } from "../src/counties/travis/validate.mjs";
 import {
   TRANSFORM_VERSION,
   buildTravisOutput,
@@ -253,6 +253,25 @@ describe("buildTravisOutput (output contract)", () => {
     expect(files).not.toHaveProperty("mailing_address.json");
     expect(sourcePayload.owner.printed_name).toBe("SMITH");
     assertOutputContract(files, roots);
+  });
+});
+
+describe("assertTravisIdentity (wrong-county check, decisions.md section 22)", () => {
+  it("accepts the fixture parcel and fails closed on every wrong-county signal", async () => {
+    const { rows, manifest, roots } = await fixture();
+    const { files } = buildTravisOutput(materializeParcelInput(rows[0]), { manifest });
+    const row = rows[0];
+    expect(() => assertTravisIdentity({ row, files, roots })).not.toThrow();
+    expect(() => assertTravisIdentity({ row: { ...row, county: "Williamson", county_fips: "48491" }, files, roots })).toThrow(/not a Travis record: seed row names county "Williamson"/);
+    expect(() => assertTravisIdentity({ row: { ...row, county_fips: "48201" }, files, roots })).toThrow(/FIPS "48201"/);
+    expect(() => assertTravisIdentity({ row: { ...row, parcel_id: "900099" }, files, roots })).toThrow(/request_identifier "900001" is not the seed row's parcel_id 900099/);
+    const foreign = { ...files, "tax_2026.json": { ...files["tax_2026.json"], source_http_request: { method: "GET", url: "https://hcad.org/roll.zip" } } };
+    expect(() => assertTravisIdentity({ row, files: foreign, roots })).toThrow(/tax_2026.json source_http_request host "hcad.org" is not an appraisal source/);
+    expect(() => assertTravisIdentity({ row, files: { ...files, "address.json": { ...files["address.json"], state_code: "OK" } }, roots })).toThrow(/state_code "OK" is not TX/);
+    expect(() => assertTravisIdentity({ row, files: { ...files, "address.json": { ...files["address.json"], county_name: "Hays" } }, roots })).toThrow(/county_name "Hays" is not Travis/);
+    expect(() => assertTravisIdentity({ row, files: { ...files, "address.json": { ...files["address.json"], county_name: "Travis" } }, roots })).not.toThrow();
+    const outside = { ...files, "geometry.json": { ...files["geometry.json"], latitude: 29.7, longitude: -95.4 } };
+    expect(() => assertTravisIdentity({ row, files: outside, roots })).toThrow(/outside the Travis bbox/);
   });
 });
 
