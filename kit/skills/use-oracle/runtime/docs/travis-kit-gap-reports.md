@@ -30,3 +30,10 @@ kit file and line at the `travis` branch's base and a one-line fix. Reporting th
    reported with a reproduction, but not where or against what. Fix: file it on `elephant-xyz/elephant-cli` against
    the installed commit and main HEAD, with a reproduction from a kit replay fixture against the live manifest (as
    `docs/travis-elephant-cli-issue-property-seed-table-collision.md` does).
+8. **Licensing snapshot gate (Travis T3, assignment decisions.md section 23).** `skills/county-permit-adapter/SKILL.md`
+   9-13 and `skills/county-ingest-run/SKILL.md` 9-18 block permit harvest until an adequate licensing snapshot exists,
+   while `skills/use-oracle/reference/permit-evidence-preflight.md` 221-231, 284-287 and 313-317 block only historical
+   qualification of permits without a license number. Fix: state the preflight's rule in both skills (a county whose
+   permits print no license number, and a state with no license for the trade, may harvest once the official registry
+   and the available licensing snapshots are loaded). Travis follows the preflight, which county-permit-adapter 16-17
+   names as the identity procedure.

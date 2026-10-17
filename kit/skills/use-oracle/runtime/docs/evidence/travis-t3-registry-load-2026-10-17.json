@@ -1,0 +1,434 @@
+{
+ "kind": "travis-t3-registry-load",
+ "recorded_at": "2026-10-17T14:53:25.867Z",
+ "decision": "assignment docs/decisions.md section 23 (official registry equivalent; Travis load on the internal registry track)",
+ "source": "tx-comptroller-franchise-tax",
+ "dataset": "tx-comptroller-franchise-tax/9cir-efmm",
+ "track": "registry",
+ "scope": "Travis: taxpayer_county_code 227 (the taxpayer's mailing-address county), capture of 2026-10-16 under US egress",
+ "command": "node src/counties/travis/t3-snapshot.mjs load --source tx-comptroller-franchise-tax --capture data/travis/comptroller --output data/travis/registry --name tx-comptroller-franchise-tax-travis --scope '<scope>'",
+ "capture": {
+  "path": "data/travis/comptroller/",
+  "request": "GET https://data.texas.gov/resource/9cir-efmm.csv?$where=taxpayer_county_code='227'&$order=:id&$limit=50000&$offset=<0..300000> (7 pages, fetched 2026-10-16T18:16:14Z..18:17:09Z under US egress; receipts docs/evidence/travis-comptroller-cache-receipts-2026-10-16.jsonl)",
+  "files": 7,
+  "bytes": 70212189,
+  "verified_against_receipts": true,
+  "artifact_hash": "1e603d860e5be7ea9c764d9a1dbc9bbe9937617ff94517818ff31d20c9ad7f30",
+  "files_detail": [
+   {
+    "file": "page-000.csv",
+    "bytes": 10361766,
+    "sha256": "ed065ad436d8fc5cb146fc94055d0f487560a5f2e4d6415e036649f380e39bbd",
+    "rows": 50000,
+    "verified": true,
+    "rows_parsed": 50000
+   },
+   {
+    "file": "page-001.csv",
+    "bytes": 10236449,
+    "sha256": "a30c630515c6c92716034cffd3a41882ca68626f815348aebff2f27b83519459",
+    "rows": 50000,
+    "verified": true,
+    "rows_parsed": 50000
+   },
+   {
+    "file": "page-002.csv",
+    "bytes": 10209160,
+    "sha256": "e4a0d0f6c8207a2b141a833c59e7f7237b95c80d480d5957af898398f4f801a6",
+    "rows": 50000,
+    "verified": true,
+    "rows_parsed": 50000
+   },
+   {
+    "file": "page-003.csv",
+    "bytes": 10250538,
+    "sha256": "1e60504979e577495f1b8afbe108a3d7e6ede0502a1179e7a5eb2445cd0bfd67",
+    "rows": 50000,
+    "verified": true,
+    "rows_parsed": 50000
+   },
+   {
+    "file": "page-004.csv",
+    "bytes": 10250764,
+    "sha256": "ebb7d135bfde40b0a169ec6f94c44d3a5831fc7362e740e749643b5582011749",
+    "rows": 50000,
+    "verified": true,
+    "rows_parsed": 50000
+   },
+   {
+    "file": "page-005.csv",
+    "bytes": 10253701,
+    "sha256": "38ca16166d3b82ab42ed3d14d112a553d172d88167ed6741146208dffb4de0a0",
+    "rows": 50000,
+    "verified": true,
+    "rows_parsed": 50000
+   },
+   {
+    "file": "page-006.csv",
+    "bytes": 8649811,
+    "sha256": "12c6df7166fdf6c874926b647fa654c6878c3fd05914345db39bb7ada3ae9abe",
+    "rows": 42338,
+    "verified": true,
+    "rows_parsed": 42338
+   }
+  ]
+ },
+ "normalizer_version": "travis-t3-source-snapshot.v1",
+ "normalization": "every source column under its printed field name with the value as printed (the NAICS code under _621111 included) and <column>__trimmed beside it; an unquoted empty CSV cell is Socrata's null; per row _capture_file, _capture_url, _capture_fetched_at, _capture_sha256, _capture_row_index, _capture_offset, _row_sha256; capture order; SNAPPY Parquet with no timestamps",
+ "columns": {
+  "source": [
+   "taxpayer_number",
+   "taxpayer_name",
+   "taxpayer_address",
+   "taxpayer_city",
+   "taxpayer_state",
+   "taxpayer_zip",
+   "taxpayer_county_code",
+   "taxpayer_organizational_type",
+   "record_type_code",
+   "responsibility_beginning_date",
+   "secretary_of_state_sos_or_coa_file_number",
+   "sos_charter_date",
+   "sos_status_date",
+   "sos_status_code",
+   "right_to_transact_business_code",
+   "current_exempt_reason_code",
+   "exempt_begin_date",
+   "_621111"
+  ],
+  "count": 18,
+  "snapshot": 43
+ },
+ "counts": {
+  "rows": 342338,
+  "taxpayers": 342337,
+  "duplicate_taxpayers": 1,
+  "rows_under_duplicate_taxpayers": 2,
+  "reconciliation": "342,338 rows = 342,337 taxpayers + 1 duplicate row",
+  "sos_file_number_present": 335980,
+  "sos_file_number_present_pct": 98.14,
+  "present_non_blank": {
+   "taxpayer_number": 342338,
+   "taxpayer_name": 342338,
+   "taxpayer_address": 342338,
+   "taxpayer_city": 342338,
+   "taxpayer_state": 342338,
+   "taxpayer_zip": 342338,
+   "taxpayer_county_code": 342338,
+   "taxpayer_organizational_type": 342338,
+   "record_type_code": 342338,
+   "responsibility_beginning_date": 342338,
+   "secretary_of_state_sos_or_coa_file_number": 335980,
+   "sos_charter_date": 335980,
+   "sos_status_date": 335980,
+   "sos_status_code": 335980,
+   "right_to_transact_business_code": 342338,
+   "current_exempt_reason_code": 11834,
+   "exempt_begin_date": 11834,
+   "_621111": 53673
+  },
+  "by_scope": {
+   "travis": 342338
+  },
+  "distributions": {
+   "taxpayer_county_code": {
+    "227": 342338
+   },
+   "taxpayer_state": {
+    "TX": 340680,
+    "CA": 268,
+    "FL": 143,
+    "NY": 119,
+    "CO": 93,
+    "IL": 78,
+    "AZ": 68,
+    "NC": 68,
+    "GA": 54,
+    "WA": 54,
+    "NV": 47,
+    "VA": 46,
+    "MA": 44,
+    "TN": 41,
+    "PA": 40,
+    "NJ": 39,
+    "MT": 36,
+    "OR": 30,
+    "DE": 27,
+    "NM": 26,
+    "AR": 23,
+    "MI": 23,
+    "OH": 21,
+    "MO": 19,
+    "IN": 18,
+    "ID": 17,
+    "MD": 17,
+    "OK": 17,
+    "AL": 16,
+    "SC": 16,
+    "LA": 15,
+    "UT": 15,
+    "HI": 13,
+    "MN": 13,
+    "KS": 10,
+    "KY": 10,
+    "WY": 10,
+    "VT": 8,
+    "MS": 7,
+    "WI": 7,
+    "DC": 6,
+    "ND": 6,
+    "NE": 6,
+    "NH": 6,
+    "IA": 5,
+    "RI": 3,
+    "SD": 3,
+    "AK": 2,
+    "WV": 2,
+    "AP": 1,
+    "CT": 1,
+    "PR": 1
+   },
+   "taxpayer_organizational_type": {
+    "CL": 245158,
+    "CI": 28439,
+    "CT": 20438,
+    "CN": 17246,
+    "CF": 12516,
+    "PL": 10583,
+    "PF": 2442,
+    "CM": 1223,
+    "CP": 1069,
+    "AR": 829,
+    "AP": 661,
+    "PB": 551,
+    "AF": 385,
+    "CU": 382,
+    "TR": 186,
+    "PI": 108,
+    "TF": 52,
+    "PV": 38,
+    "TI": 14,
+    "AB": 10,
+    "PW": 8
+   },
+   "record_type_code": {
+    "U": 295141,
+    "V": 40839,
+    "X": 6358
+   },
+   "sos_status_code": {
+    "A": 302682,
+    "R": 24959,
+    "F": 7360,
+    "(null)": 6358,
+    "Y": 637,
+    "C": 326,
+    "W": 7,
+    "V": 4,
+    "D": 2,
+    "M": 1,
+    "T": 1,
+    "X": 1
+   },
+   "right_to_transact_business_code": {
+    "A": 288755,
+    "N": 49634,
+    "U": 2014,
+    "D": 1935
+   },
+   "current_exempt_reason_code": {
+    "10": 146,
+    "11": 2,
+    "12": 25,
+    "16": 1,
+    "17": 1,
+    "18": 19,
+    "19": 6150,
+    "20": 247,
+    "21": 31,
+    "22": 449,
+    "23": 81,
+    "24": 1312,
+    "27": 40,
+    "29": 9,
+    "30": 17,
+    "32": 1,
+    "34": 1,
+    "40": 6,
+    "41": 2,
+    "42": 11,
+    "43": 23,
+    "44": 10,
+    "49": 57,
+    "50": 4,
+    "51": 4,
+    "52": 14,
+    "53": 2,
+    "54": 4,
+    "55": 10,
+    "56": 6,
+    "57": 51,
+    "58": 1,
+    "60": 16,
+    "61": 4,
+    "62": 16,
+    "63": 4,
+    "64": 2,
+    "65": 4,
+    "66": 460,
+    "67": 31,
+    "68": 107,
+    "69": 7,
+    "70": 16,
+    "71": 4,
+    "73": 1,
+    "74": 517,
+    "75": 2,
+    "77": 1,
+    "78": 4,
+    "80": 3,
+    "88": 4,
+    "93": 3,
+    "99": 4,
+    "100": 19,
+    "101": 16,
+    "103": 894,
+    "104": 1,
+    "109": 9,
+    "(null)": 330504,
+    "04": 481,
+    "07": 254,
+    "03": 113,
+    "08": 42,
+    "01": 39,
+    "05": 17,
+    "06": 1,
+    "09": 1
+   }
+  }
+ },
+ "duplicate_explained": {
+  "detail": "one taxpayer printed twice with the same SOS file number; every column is equal except the SOS charter date, status date and status code: an active (A) status of 2001-03-30 and an R status of 2003 (charter 2003-08-22, status 2003-10-13). Both rows are kept as printed; the taxpayer is one key for the matcher and the diff.",
+  "rows": [
+   {
+    "rows": 2,
+    "locations": [
+     {
+      "file": "page-001.csv",
+      "row_index": 35324,
+      "offset": 85324
+     },
+     {
+      "file": "page-001.csv",
+      "row_index": 35810,
+      "offset": 85810
+     }
+    ],
+    "differing_columns": [
+     "sos_charter_date",
+     "sos_status_date",
+     "sos_status_code"
+    ],
+    "equal_columns": [
+     "taxpayer_number",
+     "taxpayer_name",
+     "taxpayer_address",
+     "taxpayer_city",
+     "taxpayer_state",
+     "taxpayer_zip",
+     "taxpayer_county_code",
+     "taxpayer_organizational_type",
+     "record_type_code",
+     "responsibility_beginning_date",
+     "secretary_of_state_sos_or_coa_file_number",
+     "right_to_transact_business_code",
+     "current_exempt_reason_code",
+     "exempt_begin_date",
+     "_621111"
+    ],
+    "differing_values": [
+     {
+      "sos_charter_date": "2001-03-30T00:00:00.000",
+      "sos_status_date": "2001-03-30T00:00:00.000",
+      "sos_status_code": "A"
+     },
+     {
+      "sos_charter_date": "2003-08-22T00:00:00.000",
+      "sos_status_date": "2003-10-13T00:00:00.000",
+      "sos_status_code": "R"
+     }
+    ]
+   }
+  ]
+ },
+ "names": {
+  "matcher_version": "travis-exact-unique-normalized-name.v1",
+  "source": "tx-comptroller-franchise-tax",
+  "normalized_names": 341677,
+  "entity_keys": 342334,
+  "unique_names": 341049,
+  "non_unique_names": 628,
+  "keys_under_non_unique_names": 1285,
+  "rows_indexed": 342335,
+  "rows_without_name": 3,
+  "by_scope": {
+   "travis": 342334
+  },
+  "name_columns": [
+   "taxpayer_name__trimmed"
+  ],
+  "match_name_version": null,
+  "rows_with_derived_name": 0
+ },
+ "names_note": "628 normalized names map to more than one taxpayer within Travis under matcher v1; 3 rows normalize to nothing (names made only of legal-form words or punctuation). The ruling's 629 (decisions.md section 23) counted those 3 empty names as one more shared name; 628 + 1 = 629.",
+ "snapshot": {
+  "path": "data/travis/registry/tx-comptroller-franchise-tax-travis.parquet",
+  "sha256": "cbf6aede89866854b30a62a184c84bd9cd0737a209b24c1b22d83da1b99b2553",
+  "bytes": 72351842,
+  "rows": 342338
+ },
+ "watermark": {
+  "track": "registry",
+  "source": "tx-comptroller-franchise-tax",
+  "dataset": "tx-comptroller-franchise-tax/9cir-efmm",
+  "scope": "Travis: taxpayer_county_code 227 (the taxpayer's mailing-address county), capture of 2026-10-16 under US egress",
+  "path": "data/travis/comptroller/",
+  "artifact_hash": "1e603d860e5be7ea9c764d9a1dbc9bbe9937617ff94517818ff31d20c9ad7f30",
+  "merged_count": 7,
+  "merged_rows": 342338,
+  "last_merged_at": "2026-10-17T14:53:25.867Z",
+  "hash_index_path": "data/travis/registry/tx-comptroller-franchise-tax-travis.hash-index.json",
+  "snapshot": {
+   "path": "data/travis/registry/tx-comptroller-franchise-tax-travis.parquet",
+   "sha256": "cbf6aede89866854b30a62a184c84bd9cd0737a209b24c1b22d83da1b99b2553",
+   "bytes": 72351842,
+   "rows": 342338
+  },
+  "normalizer_version": "travis-t3-source-snapshot.v1"
+ },
+ "watermark_sha256": "d183fa1959c9ed32dc2b0fb50517e0534cd609ad39e837e59a5cdbf79178f3cd",
+ "reload": {
+  "loaded_at": "2026-10-17T14:53:45.564Z",
+  "diff": {
+   "against": "snapshot on disk",
+   "new": 0,
+   "changed": 0,
+   "unchanged": 342337,
+   "removed": 0,
+   "tombstoned": 0
+  },
+  "merged": false,
+  "merge_reason": "the hash index covers every (path, artifact hash) and the content diff is empty",
+  "rebuilt_snapshot_sha256": "cbf6aede89866854b30a62a184c84bd9cd0737a209b24c1b22d83da1b99b2553",
+  "rebuild_matches_snapshot": true,
+  "watermark_sha256": "d183fa1959c9ed32dc2b0fb50517e0534cd609ad39e837e59a5cdbf79178f3cd",
+  "watermark_unchanged": true,
+  "duration_seconds": 20.2
+ },
+ "freshness": {
+  "capture_fetched_at": "2026-10-16T18:16:14Z..2026-10-16T18:17:09Z",
+  "dataset_data_updated_at_on_2026_10_17": "2026-10-17T10:35:29Z (Socrata catalog, api.us.socrata.com; the dataset is republished daily, so the T3 window's statewide capture is newer than this Travis cache)"
+ },
+ "private_boundary": "the Parquet, hash index, watermark and reports stay in the gitignored runtime data/; this file holds counts and digests only (no names, numbers or addresses)",
+ "duration_seconds": 19.5
+}

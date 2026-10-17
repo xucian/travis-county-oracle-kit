@@ -1,0 +1,288 @@
+{
+ "kind": "travis-t3-austin-row-capture",
+ "decision": "assignment docs/decisions.md section 23 (licensing: the City of Austin Active Right of Way Contractor License Holders, a dated, digested snapshot)",
+ "dataset": "austin-row-contractor-licenses/8d92-wsiw",
+ "authority": "City of Austin Transportation and Public Works",
+ "commands": [
+  "node src/counties/travis/t3-austin-row-fetch.mjs",
+  "node src/counties/travis/t3-snapshot.mjs load --source austin-row-contractor-licenses --capture data/travis/austin-row/v1792220735 --output data/travis/licensing --name austin-row-contractor-licenses --scope '<scope>'"
+ ],
+ "egress": {
+  "country": "RO",
+  "checked_at": "2026-10-17T14:40:35.237Z",
+  "gating": false
+ },
+ "egress_note": "data.austintexas.gov answers any country; no US gate applies to this host",
+ "capture": {
+  "path": "data/travis/austin-row/v1792220735/",
+  "rows": 469,
+  "expected_rows": 469,
+  "bytes": 59017,
+  "pages": 1,
+  "rows_updated_at": {
+   "start": "1792220735",
+   "end": "1792220735",
+   "start_iso": "2026-10-17T07:05:35.000Z",
+   "end_iso": "2026-10-17T07:05:35.000Z"
+  },
+  "view_last_modified_iso": "2026-06-08T16:38:03.000Z",
+  "columns": [
+   {
+    "fieldName": "contractor_name",
+    "name": "Contractor Name",
+    "dataTypeName": "text"
+   },
+   {
+    "fieldName": "license_number",
+    "name": "License Number",
+    "dataTypeName": "text"
+   },
+   {
+    "fieldName": "issue_date",
+    "name": "Issue Date",
+    "dataTypeName": "calendar_date"
+   },
+   {
+    "fieldName": "expiration_date",
+    "name": "Expiration Date",
+    "dataTypeName": "calendar_date"
+   },
+   {
+    "fieldName": "insurance_expiration",
+    "name": "Insurance Expiration",
+    "dataTypeName": "calendar_date"
+   }
+  ],
+  "consistent": true,
+  "started_at": "2026-10-17T14:40:35.238Z",
+  "finished_at": "2026-10-17T14:40:36.976Z"
+ },
+ "receipts": [
+  {
+   "kind": "metadata",
+   "file": "metadata-20261017T144035Z-start.json",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/api/views/8d92-wsiw.json",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/api/views/8d92-wsiw.json",
+    "multiValueQueryString": {}
+   },
+   "fetched_at": "2026-10-17T14:40:35.238Z",
+   "status": 200,
+   "bytes": 15857,
+   "sha256": "d044400afcfacdac19c26b673e52609d8f57ab68642638152faa781069e7af98",
+   "rows": null,
+   "content_type": "application/json; charset=utf-8",
+   "final_url": "https://data.austintexas.gov/api/views/8d92-wsiw.json",
+   "headers": {},
+   "egress": "not checked (host answers any country)",
+   "attempt": 1,
+   "duration_ms": 972,
+   "note": "copied from _metadata/metadata-20261017T144035Z-start.json"
+  },
+  {
+   "kind": "count",
+   "file": "count.json",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/resource/8d92-wsiw.json?%24select=count%28*%29+as+n",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/resource/8d92-wsiw.json",
+    "multiValueQueryString": {
+     "$select": [
+      "count(*) as n"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:40:36.214Z",
+   "status": 200,
+   "bytes": 14,
+   "sha256": "a79d4e0b8716ac3aa05e5c5c2552f4a3cf641d33a33385c4d121d125c058f917",
+   "rows": null,
+   "content_type": "application/json;charset=utf-8",
+   "final_url": "https://data.austintexas.gov/resource/8d92-wsiw.json?%24select=count%28*%29+as+n",
+   "headers": {
+    "last-modified": "Sat, 17 Oct 2026 07:05:35 GMT",
+    "etag": "\"anVsaWV0dC4xOTc4NTlfMl8xNThPUVBrZUhENGRtUUlyRUROOXNSY3NSWHF6LUk--gziGXgHM92M_9_tOuVizbE7Ady46mw---gzip\"",
+    "x-soda2-truth-last-modified": "Sat, 17 Oct 2026 07:05:35 GMT",
+    "x-soda2-data-out-of-date": "false",
+    "x-soda2-fields": "[\"n\"]",
+    "x-soda2-types": "[\"number\"]"
+   },
+   "egress": "not checked (host answers any country)",
+   "attempt": 1,
+   "duration_ms": 287
+  },
+  {
+   "kind": "page",
+   "file": "page-00000.csv",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/resource/8d92-wsiw.csv?%24order=%3Aid&%24limit=50000&%24offset=0",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/resource/8d92-wsiw.csv",
+    "multiValueQueryString": {
+     "$order": [
+      ":id"
+     ],
+     "$limit": [
+      "50000"
+     ],
+     "$offset": [
+      "0"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:40:36.502Z",
+   "status": 200,
+   "bytes": 59017,
+   "sha256": "bdafc9c5a6fc9aef4e91966ddb8fe028be7522d4218889c8c3d0e1507223f605",
+   "rows": 469,
+   "content_type": "text/csv; charset=UTF-8",
+   "final_url": "https://data.austintexas.gov/resource/8d92-wsiw.csv?%24order=%3Aid&%24limit=50000&%24offset=0",
+   "headers": {
+    "last-modified": "Sat, 17 Oct 2026 07:05:35 GMT",
+    "etag": "\"anVsaWV0dC4xOTc4NTlfMl8xNTg0R0ZBMFR3aHY2WnJabFNXbFdCS1BpTVV1Szg---gziraLSkfHSgfErm3bgRVizI9xX0q_A--gzip--gzip\"",
+    "x-soda2-truth-last-modified": "Sat, 17 Oct 2026 07:05:35 GMT",
+    "x-soda2-data-out-of-date": "false",
+    "x-soda2-fields": "[\"contractor_name\",\"license_number\",\"issue_date\",\"expiration_date\",\"insurance_expiration\"]",
+    "x-soda2-types": "[\"text\",\"text\",\"floating_timestamp\",\"floating_timestamp\",\"floating_timestamp\"]"
+   },
+   "egress": "not checked (host answers any country)",
+   "attempt": 1,
+   "duration_ms": 272
+  },
+  {
+   "kind": "metadata",
+   "file": "metadata-20261017T144036Z-end.json",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/api/views/8d92-wsiw.json",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/api/views/8d92-wsiw.json",
+    "multiValueQueryString": {}
+   },
+   "fetched_at": "2026-10-17T14:40:36.775Z",
+   "status": 200,
+   "bytes": 15857,
+   "sha256": "d044400afcfacdac19c26b673e52609d8f57ab68642638152faa781069e7af98",
+   "rows": null,
+   "content_type": "application/json; charset=utf-8",
+   "final_url": "https://data.austintexas.gov/api/views/8d92-wsiw.json",
+   "headers": {},
+   "egress": "not checked (host answers any country)",
+   "attempt": 1,
+   "duration_ms": 200
+  }
+ ],
+ "snapshot_load": {
+  "normalizer_version": "travis-t3-source-snapshot.v1",
+  "columns": {
+   "source": [
+    "contractor_name",
+    "license_number",
+    "issue_date",
+    "expiration_date",
+    "insurance_expiration"
+   ],
+   "count": 5,
+   "snapshot": 17
+  },
+  "counts": {
+   "rows": 469,
+   "distinct_keys": 469,
+   "rows_without_key": 0,
+   "duplicate_keys": 0,
+   "rows_under_duplicate_keys": 0,
+   "present_non_blank": {
+    "contractor_name": 469,
+    "license_number": 469,
+    "issue_date": 469,
+    "expiration_date": 469,
+    "insurance_expiration": 469
+   },
+   "by_scope": {
+    "travis": 469
+   },
+   "distributions": {}
+  },
+  "names": {
+   "matcher_version": "travis-exact-unique-normalized-name.v1",
+   "source": "austin-row-contractor-licenses",
+   "normalized_names": 533,
+   "entity_keys": 469,
+   "unique_names": 532,
+   "non_unique_names": 1,
+   "keys_under_non_unique_names": 2,
+   "rows_indexed": 469,
+   "rows_without_name": 0,
+   "by_scope": {
+    "travis": 469
+   },
+   "name_columns": [
+    "contractor_name__trimmed"
+   ],
+   "match_name_version": "austin-row-company-name.v1",
+   "rows_with_derived_name": 65
+  },
+  "snapshot": {
+   "path": "data/travis/licensing/austin-row-contractor-licenses.parquet",
+   "sha256": "9f0068f6d289a6c3aed51564c0626b15af87de76265308b33ed4289b45dcacd9",
+   "bytes": 89610,
+   "rows": 469
+  },
+  "watermark": {
+   "track": "licensing",
+   "source": "austin-row-contractor-licenses",
+   "dataset": "austin-row-contractor-licenses/8d92-wsiw",
+   "scope": "City of Austin right-of-way contractor licenses, active holders (all rows), capture of 2026-10-17",
+   "path": "data/travis/austin-row/v1792220735/",
+   "artifact_hash": "2b03f1959fad83b1dc06d2660be8b30aea9e6d74ead3a0d9160af8a131ad6a3a",
+   "merged_count": 1,
+   "merged_rows": 469,
+   "last_merged_at": "2026-10-17T14:55:19.400Z",
+   "hash_index_path": "data/travis/licensing/austin-row-contractor-licenses.hash-index.json",
+   "snapshot": {
+    "path": "data/travis/licensing/austin-row-contractor-licenses.parquet",
+    "sha256": "9f0068f6d289a6c3aed51564c0626b15af87de76265308b33ed4289b45dcacd9",
+    "bytes": 89610,
+    "rows": 469
+   },
+   "normalizer_version": "travis-t3-source-snapshot.v1"
+  },
+  "watermark_sha256": "d2bd1aa6ad81d27aa666befa0d4a5ed7aef951b5b733ec5c035d7f1acce9a8a9",
+  "diff": {
+   "against": "nothing (first load)",
+   "new": 469,
+   "changed": 0,
+   "unchanged": 0,
+   "removed": 0,
+   "tombstoned": 0
+  },
+  "merged": true
+ },
+ "reload": {
+  "loaded_at": "2026-10-17T14:55:19.558Z",
+  "diff": {
+   "against": "snapshot on disk",
+   "new": 0,
+   "changed": 0,
+   "unchanged": 469,
+   "removed": 0,
+   "tombstoned": 0
+  },
+  "merged": false,
+  "merge_reason": "the hash index covers every (path, artifact hash) and the content diff is empty",
+  "rebuilt_snapshot_sha256": "9f0068f6d289a6c3aed51564c0626b15af87de76265308b33ed4289b45dcacd9",
+  "rebuild_matches_snapshot": true,
+  "watermark_sha256": "d2bd1aa6ad81d27aa666befa0d4a5ed7aef951b5b733ec5c035d7f1acce9a8a9"
+ },
+ "findings": [
+  "5 columns: contractor_name, license_number, issue_date, expiration_date, insurance_expiration; every row has all five",
+  "license_number format NNNN-NNNNNNLC on all 469 rows (a City right-of-way license, not a state trade license)",
+  "contractor_name carries city staff annotations before 3 names (**date initials**) and an agent's name in parentheses after 64; the snapshot keeps them as printed, and the matcher also indexes the company part (austin-row-company-name.v1)",
+  "active holders only: no history, no qualifier, no link to a permit; a name match is a license_candidate, never identity"
+ ],
+ "private_boundary": "the capture, Parquet and watermark stay in the gitignored runtime data/; this file holds receipts, counts and digests only"
+}

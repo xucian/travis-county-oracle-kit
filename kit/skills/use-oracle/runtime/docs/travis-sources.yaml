@@ -486,6 +486,68 @@ permits:
         system_scope: Complete issued building-permit ledger with parcel identifiers
         route: records-first
 
+official_identity:
+  # Assignment decisions.md section 23 (approved by the operator on 2026-10-17). Loaded before any permit harvest
+  # (onboard-county stage 6). Rows are official records of their own subjects; a link from a permit contractor or a
+  # roll owner to a row is a review candidate (exact unique normalized name), never identity, and writes no company,
+  # person or license record and no identity edge.
+  corporate_registry:
+    profile_entry: official-registry-equivalent
+    approved_by: operator
+    approved_at: "2026-10-17"
+    approval_record: assignment repository docs/decisions.md section 23 (supersedes the corporate-registry approved exception of 2026-10-16, removed from approved_exceptions)
+    equivalent_source: Texas Comptroller of Public Accounts, Active Franchise Taxpayers (data.texas.gov 9cir-efmm), the official state record of each franchise-tax entity, carrying the Secretary of State registry key
+    equivalent_source_url: https://data.texas.gov/resource/9cir-efmm
+    authority_of_record: Texas Secretary of State; SOSDirect (paid subscriber access) stays an optional human payment decision, not required for v1
+    record_keys: taxpayer_number and secretary_of_state_sos_or_coa_file_number, both as printed (the trimmed values are the keys; the printed values are kept beside them)
+    registry_key_coverage_travis: SOS file number on 335,980 of 342,338 Travis rows (98.14%), with sos_status_code, sos_charter_date, sos_status_date and right_to_transact_business_code; the 6,358 rows without one are record_type_code X
+    columns: 18 (taxpayer number, name, mailing address, city, state, ZIP, mailing county code, organizational type, record type, responsibility beginning date, SOS or COA file number, SOS charter date, SOS status date, SOS status code, right-to-transact code, current exempt reason code, exempt begin date, NAICS code printed under the field name _621111)
+    limits:
+      - no registered agent, officers or other filing roles
+      - no assumed names
+      - no entity outside franchise tax (sole proprietors and general partnerships of natural persons are not franchise taxpayers; the Comptroller's sales-tax permit file is loaded for those, see further_business_sources)
+      - active taxpayers only, so no ended accounts and no history
+      - taxpayer_county_code is the mailing-address county, not a business location; one taxpayer prints two rows (SOS status A of 2001 and R of 2003)
+    scope: Travis load = taxpayer_county_code 227 (342,338 rows on 2026-10-16 = 342,337 taxpayers + 1 explained duplicate); the statewide file (3,486,216 rows on 2026-10-16) is the private matching universe, and out-of-county rows enter business_records only as matched candidates of a Travis permit or roll owner, flagged by scope
+    provenance: each row keeps its bulk capture (request as sent, fetched_at, page SHA-256, offset, row SHA-256); a per-taxpayer Comptroller detail URL is added only once its form is confirmed under US egress (the T3 window probe records it); the bulk dataset page is never written as a company's source_http_request
+    publication: not eligible for IPFS in v1 - the live manifest has no corporate-registry data group and company holds only name, request_identifier, source_http_request and the Florida sunbiz_document_number under additionalProperties false; rows stay on the internal registry track and reach the hosted API only as the deploy-time source-shaped business_records table, labelled unpublished_source per row
+    status: travis-loaded-offline-2026-10-17; statewide universe pending the T3 US-egress window
+    snapshot: runtime data/travis/registry/ (private Parquet, normalizer travis-t3-source-snapshot.v1) and its registry-track watermark; evidence docs/evidence/travis-t3-registry-load-2026-10-17.json
+  licensing:
+    approved_by: operator
+    approved_at: "2026-10-17"
+    approval_record: assignment repository docs/decisions.md section 23
+    roofing_license: none
+    roofing_license_note: Texas issues no state roofing license; RCAT's credential is voluntary and is enrichment at most
+    permit_license_numbers: none printed - the Austin export has 68 named columns (82 in the Socrata catalog with 4 location sub-fields and 10 computed regions), none license-related; license markers appear in free text on 14 of about 2.38 million rows and in no contractor field (docs/evidence/travis-t3-absence-proofs-2026-10-17.json)
+    historical_qualification: closed for v1 by the operator on 2026-10-17 - the README does not ask for it, Texas has no roofing license and no public file carries the dated license-holder-to-business relationship; no records requests are filed and the gap is listed under limitations
+    candidate_rule: a name match to a license row is a license_candidate (exact unique normalized name), never identity; no license record and no contractor_has_license edge (the live manifest has no license class and no company-to-license relationship; the gap is recorded and no other edge is substituted)
+    sources:
+      - key: tdlr-license-files
+        authority: Texas Department of Licensing and Regulation (electrical and air conditioning/refrigeration licenses)
+        source: TDLR daily license files (CSV), URLs resolved at run time from https://www.tdlr.texas.gov/LicenseSearch/licfile.asp
+        data_texas_gov_copy: 7358-krk7 (TDLR - All Licenses; data updated 2026-09-19 per the Socrata catalog on 2026-10-17)
+        status: pending the T3 US-egress window
+      - key: tsbpe-responsible-master-plumber
+        authority: Texas State Board of Plumbing Examiners
+        source: free licensee lists, the Responsible Master Plumber CSV with the last known company, URL resolved at run time from https://tsbpe.texas.gov/free-licensee-list/
+        status: pending the T3 US-egress window
+      - key: austin-row-contractor-licenses
+        authority: City of Austin Transportation and Public Works
+        source: Active Right of Way Contractor License Holders (data.austintexas.gov 8d92-wsiw; 5 columns; 469 rows captured 2026-10-17, data updated 2026-10-17T07:05:35Z)
+        status: captured and loaded 2026-10-17 (docs/evidence/travis-t3-austin-row-2026-10-17.json)
+  further_business_sources:
+    - key: tx-comptroller-sales-tax
+      source: Texas Comptroller Active Sales Tax Permit Holders (data.texas.gov jrea-zgmq; outlet addresses, outlet county, NAICS, permit and first-sale dates, entity types outside franchise tax)
+      scope: Travis outlets, outlet_county_code 227 (the column named in the Socrata catalog on 2026-10-17; the value is read from the dataset's grouped codes at fetch time)
+      privacy: individual-owner rows get a privacy classification before hosting; no SSN-derived taxpayer number is served
+      status: pending the T3 US-egress window
+    - key: tx-sos-veteran-owned-business
+      source: Texas Secretary of State Veteran Owned Business (data.texas.gov 2vfr-72e4)
+      scope: statewide file captured; the Travis subset is the rows whose filing_number equals a Travis franchise row's SOS file number (exact)
+      status: pending the T3 US-egress window
+  window_fetch: node src/counties/travis/t3-vpn-fetch.mjs (runtime directory; checks egress before every request, stops on non-US; assignment docs/runbook.md section 5)
+
 source_inventory:
   property_appraisal_bulk: https://traviscad.org/publicinformation
   property_geometry: https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions/TCAD_public/MapServer/0
@@ -499,10 +561,15 @@ source_inventory:
     cost: free direct downloads (no login, no account, no fee) on 2026-10-16
   permits_bulk: https://data.austintexas.gov/resource/3syk-w9eu
   permits_detail: https://abc.austintexas.gov/web/permit/public-search-other
-  corporate_registry_official: Texas Secretary of State (SOSDirect, paid)
-  corporate_registry_exception: https://data.texas.gov/resource/9cir-efmm (Comptroller Active Franchise Tax Permit Holders)
+  corporate_registry_official: Texas Secretary of State (SOSDirect, paid; authority of record)
+  corporate_registry_equivalent: https://data.texas.gov/resource/9cir-efmm (Comptroller Active Franchise Taxpayers; official_identity.corporate_registry)
+  business_sales_tax_permits: https://data.texas.gov/resource/jrea-zgmq (Comptroller Active Sales Tax Permit Holders)
+  business_veteran_owned: https://data.texas.gov/resource/2vfr-72e4 (SOS Veteran Owned Business)
   licensing_electrical_hvac: https://www.tdlr.texas.gov/LicenseSearch/ (HTTP 200 under US egress, "TDLR Active License Search")
+  licensing_electrical_hvac_files: https://www.tdlr.texas.gov/LicenseSearch/licfile.asp (daily CSV files; data.texas.gov copy 7358-krk7)
   licensing_plumbing: https://tsbpe.texas.gov/ (HTTP 200 under US egress)
+  licensing_plumbing_lists: https://tsbpe.texas.gov/free-licensee-list/ (free licensee lists, CSV)
+  licensing_austin_right_of_way: https://data.austintexas.gov/resource/8d92-wsiw (Active Right of Way Contractor License Holders)
   corporate_registry_official_access: https://direct.sos.state.tx.us/acct/acct-login.asp (HTTP 200 subscriber login page; paid SOSDirect account)
   comptroller_taxpayer_detail: https://comptroller.texas.gov/taxes/franchise/account-status/search (the former mycpa.cpa.state.tx.us/coa/ redirects here; HTTP 200 under US egress)
   bbb: https://www.bbb.org/ (not contacted from this machine)
@@ -538,19 +605,6 @@ enrichment:
     probe_policy: single bounded probe only from the approved AWS US-egress runtime (operator_machine false); nothing from this machine
     access_request: docs/travis-bbb-access-request.md
     observed_coverage: 0_percent
-  corporate_registry:
-    status: counted-not-loaded
-    comptroller_rows_statewide_2026_10_16: 3486216
-    comptroller_rows_travis_2026_10_16: 342338
-    comptroller_travis_filter: taxpayer_county_code = 227 (Travis; confirmed by the city distribution - AUSTIN 301,087, PFLUGERVILLE 8,373, LAKEWAY 3,815, W LAKE HILLS 3,699, MANOR 2,912 ...); the code is the taxpayer's mailing-address county, not a business-location claim
-    official_source: Texas Secretary of State (paid; human payment decision)
-    exception_source: Texas Comptroller Active Franchise Tax Permit Holders (data.texas.gov 9cir-efmm)
-    semantics: registry candidates only; never identity; the live lexicon has no corporate_registry group and company carries only sunbiz_document_number, so rows stay in the internal store
-  licensing:
-    status: reachable-not-loaded
-    authorities: [TDLR (electrical, HVAC), TSBPE (plumbing)]
-    roofing_license: none issued by Texas (recorded gap)
-    permit_license_numbers: the Austin export prints none, so no license lookup key exists
 
 lexicon_gaps:
   - id: lexicon-gap-county-enum
@@ -559,6 +613,10 @@ lexicon_gaps:
     detail: geo_id has no lexicon home; kept in source_payload on property and permit
   - id: lexicon-gap-permit-product-fields
     detail: description, printed status_current, expiresdate and contractor fields have no property_improvement home; kept in source_payload (decisions.md section 5 option ii, else iii)
+  - id: lexicon-gap-business-registration
+    detail: no corporate-registry data group among the live manifest's 16 groups; company holds only name, request_identifier, source_http_request and sunbiz_document_number (additionalProperties false); Business_Location is the places shape. Franchise, sales-tax and veteran-owned rows stay internal and reach the API as unpublished_source business_records (decisions.md section 23)
+  - id: lexicon-gap-license
+    detail: the live manifest (2026-10-17, 159 entries, sha256 7084b933...) has no license class and no company-to-license relationship (property_improvement_to_company and company_to_person exist); no license record or contractor_has_license edge is written and no other edge is substituted
 
 approved_exceptions:
   # Only an entry whose gate is exactly a validator gate name (parcel, permit, ...) is read by the
@@ -573,8 +631,6 @@ approved_exceptions:
     seed_decision: one seed row per real-property account from the TCAD export; the TNR layer supplies a polygon and centroid only where a polygon carries the account's PROP_ID; never seed from GIS
     excluded_population: none among real-property accounts; MH (11,744), P (39,536) and MN (5) accounts are outside the parcel population because they are not land parcels
     coverage_effect: accounts without their own polygon (at least the 57,567 condo units) carry no parcel coordinates; radius search reaches them only through a later condo-to-regime join or permit coordinates, reported as a coverage number and never geocoded
-  - gate: corporate-registry
-    reason: The official Texas corporate registry (Secretary of State) is paid; the Comptroller Active Franchise Tax Permit Holders file is used as the registry candidate source, loads candidates only (never identity), and the SOS purchase stays a human payment decision recorded in the run record.
   - gate: parcel-gis-only-contingency
     status: not-active
     activation: Move this entry to gate parcel only if the operator declines the TCAD export purchase; until then the parcel gate blocks on the pending counts.

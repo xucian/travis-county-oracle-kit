@@ -1,0 +1,242 @@
+{
+ "kind": "travis-t3-official-identity-baseline",
+ "increment": "T3",
+ "status": "prepared (offline part done; the US-egress window part is staged as one command)",
+ "recorded_at": "2026-10-17T15:10:00Z",
+ "decisions": "assignment docs/decisions.md section 23 (approved by the operator on 2026-10-17); historical license qualification closed for v1 by the operator; no records requests filed",
+ "kit_branch": "travis",
+ "readiness_report": {
+  "overall": "PASS",
+  "seed_allowed": true,
+  "gates": {
+   "catalog_metadata": "PASS",
+   "parcel": "PASS",
+   "permit": "PASS",
+   "destination": "NOT_APPLICABLE",
+   "enrichment": "PASS"
+  },
+  "evidence": "docs/evidence/travis-t3-readiness-2026-10-17.json"
+ },
+ "sources": [
+  {
+   "dataset": "tx-comptroller-franchise-tax/9cir-efmm",
+   "scope": "Travis (taxpayer_county_code 227)",
+   "url": "https://data.texas.gov/resource/9cir-efmm.csv",
+   "watermark": "capture of 2026-10-16 (the cache recorded no dataset update time; the catalog showed data_updated_at 2026-10-17T10:35:29Z on 2026-10-17)",
+   "fetched_at": "2026-10-16T18:16:14Z",
+   "sha256": "1e603d860e5be7ea9c764d9a1dbc9bbe9937617ff94517818ff31d20c9ad7f30",
+   "sha256_basis": "capture artifact hash over the 7 page digests (each verified against its receipt)",
+   "rows": 342338,
+   "availability": "supported_partial",
+   "source_access_status": "available (US egress)",
+   "partial_because": "Travis subset only until the statewide matching universe is fetched in the window"
+  },
+  {
+   "dataset": "austin-row-contractor-licenses/8d92-wsiw",
+   "scope": "all active holders",
+   "url": "https://data.austintexas.gov/resource/8d92-wsiw.csv",
+   "watermark": "2026-10-17T07:05:35.000Z",
+   "fetched_at": "2026-10-17T14:40:36.502Z",
+   "sha256": "2b03f1959fad83b1dc06d2660be8b30aea9e6d74ead3a0d9160af8a131ad6a3a",
+   "sha256_basis": "capture artifact hash over the page digest",
+   "rows": 469,
+   "availability": "supported_full",
+   "source_access_status": "available (any egress)"
+  },
+  {
+   "dataset": "tx-comptroller-franchise-tax/9cir-efmm",
+   "scope": "statewide (the private matching universe)",
+   "availability": "unsupported",
+   "source_access_status": "pending_us_egress_window",
+   "expected_rows": 3486216,
+   "expected_rows_basis": "count of 2026-10-16 under US egress"
+  },
+  {
+   "dataset": "tx-comptroller-sales-tax/jrea-zgmq",
+   "scope": "Travis outlets (outlet_county_code 227)",
+   "availability": "unsupported",
+   "source_access_status": "pending_us_egress_window"
+  },
+  {
+   "dataset": "tx-sos-veteran-owned-business/2vfr-72e4",
+   "scope": "statewide; Travis subset by exact SOS file number",
+   "availability": "unsupported",
+   "source_access_status": "pending_us_egress_window"
+  },
+  {
+   "dataset": "tdlr-license-files (data.texas.gov copy 7358-krk7)",
+   "scope": "electrical and air conditioning/refrigeration licenses, statewide",
+   "availability": "unsupported",
+   "source_access_status": "pending_us_egress_window"
+  },
+  {
+   "dataset": "tsbpe-responsible-master-plumber",
+   "scope": "statewide",
+   "availability": "unsupported",
+   "source_access_status": "pending_us_egress_window"
+  },
+  {
+   "dataset": "comptroller-taxpayer-detail-probe",
+   "scope": "one request: the per-taxpayer detail URL form",
+   "availability": "unsupported",
+   "source_access_status": "pending_us_egress_window"
+  }
+ ],
+ "loader_watermarks": [
+  {
+   "track": "registry",
+   "path": "data/travis/comptroller/",
+   "artifact_hash": "1e603d860e5be7ea9c764d9a1dbc9bbe9937617ff94517818ff31d20c9ad7f30",
+   "merged_count": 7,
+   "merged_rows": 342338,
+   "last_merged_at": "2026-10-17T14:53:25.867Z",
+   "snapshot_sha256": "cbf6aede89866854b30a62a184c84bd9cd0737a209b24c1b22d83da1b99b2553"
+  },
+  {
+   "track": "licensing",
+   "path": "data/travis/austin-row/v1792220735/",
+   "artifact_hash": "2b03f1959fad83b1dc06d2660be8b30aea9e6d74ead3a0d9160af8a131ad6a3a",
+   "merged_count": 1,
+   "merged_rows": 469,
+   "last_merged_at": "2026-10-17T14:55:19.400Z",
+   "snapshot_sha256": "9f0068f6d289a6c3aed51564c0626b15af87de76265308b33ed4289b45dcacd9"
+  }
+ ],
+ "counts": {
+  "registry_travis_rows": 342338,
+  "registry_travis_taxpayers": 342337,
+  "registry_duplicate_rows": 1,
+  "registry_sos_file_number_present": 335980,
+  "registry_sos_file_number_present_pct": 98.14,
+  "registry_sos_status_code": {
+   "A": 302682,
+   "R": 24959,
+   "F": 7360,
+   "(null)": 6358,
+   "Y": 637,
+   "C": 326,
+   "W": 7,
+   "V": 4,
+   "D": 2,
+   "M": 1,
+   "T": 1,
+   "X": 1
+  },
+  "registry_right_to_transact_business_code": {
+   "A": 288755,
+   "N": 49634,
+   "U": 2014,
+   "D": 1935
+  },
+  "registry_record_type_code": {
+   "U": 295141,
+   "V": 40839,
+   "X": 6358
+  },
+  "austin_row_licenses": 469
+ },
+ "reload": {
+  "registry": {
+   "loaded_at": "2026-10-17T14:53:45.564Z",
+   "diff": {
+    "against": "snapshot on disk",
+    "new": 0,
+    "changed": 0,
+    "unchanged": 342337,
+    "removed": 0,
+    "tombstoned": 0
+   },
+   "merged": false,
+   "merge_reason": "the hash index covers every (path, artifact hash) and the content diff is empty",
+   "rebuilt_snapshot_sha256": "cbf6aede89866854b30a62a184c84bd9cd0737a209b24c1b22d83da1b99b2553",
+   "rebuild_matches_snapshot": true,
+   "watermark_sha256": "d183fa1959c9ed32dc2b0fb50517e0534cd609ad39e837e59a5cdbf79178f3cd",
+   "watermark_unchanged": true,
+   "duration_seconds": 20.2
+  },
+  "licensing": {
+   "loaded_at": "2026-10-17T14:55:19.558Z",
+   "diff": {
+    "against": "snapshot on disk",
+    "new": 0,
+    "changed": 0,
+    "unchanged": 469,
+    "removed": 0,
+    "tombstoned": 0
+   },
+   "merged": false,
+   "merge_reason": "the hash index covers every (path, artifact hash) and the content diff is empty",
+   "rebuilt_snapshot_sha256": "9f0068f6d289a6c3aed51564c0626b15af87de76265308b33ed4289b45dcacd9",
+   "rebuild_matches_snapshot": true,
+   "watermark_sha256": "d2bd1aa6ad81d27aa666befa0d4a5ed7aef951b5b733ec5c035d7f1acce9a8a9"
+  }
+ },
+ "matcher": {
+  "version": "travis-exact-unique-normalized-name.v1",
+  "module": "src/counties/travis/name-matcher.mjs (no imports; packages/deploy-build imports it from this worktree)",
+  "fixtures": "fixtures/travis-t3/matcher/cases.json (14 statewide cases, 1 Travis-only case, the summary)",
+  "tests": "tests/travis-name-matcher.test.mjs",
+  "travis_universe_collisions": {
+   "normalized_names": 341677,
+   "entity_keys": 342334,
+   "non_unique_names": 628,
+   "keys_under_non_unique_names": 1285,
+   "rows_without_name": 3
+  },
+  "candidates_computed": "none yet: no permit has been read (T4); the matcher runs in internal reconciliation over the statewide universe after the window, and again at deploy"
+ },
+ "absence_proofs": {
+  "evidence": "docs/evidence/travis-t3-absence-proofs-2026-10-17.json",
+  "austin_columns": "68 named, 82 in the catalog; license columns 0",
+  "free_text_license_markers": "14 of 2380707 rows (description); contractor fields 0",
+  "roofing_licensed_trades": "18 of 33351",
+  "live_manifest": "sha256 7084b9334e66eb52..., 159 entries, 16 groups; corporate-registry group none; license entries none"
+ },
+ "limitations": [
+  {
+   "source": "permit license numbers",
+   "availability": "unsupported",
+   "detail": "no Austin permit prints a license number; a license record is never linked to a permit by number"
+  },
+  {
+   "source": "roofing license",
+   "availability": "unsupported",
+   "detail": "Texas issues no state roofing license"
+  },
+  {
+   "source": "historical license qualification",
+   "availability": "unsupported",
+   "detail": "closed for v1 by the operator on 2026-10-17; no public file carries the dated license-holder-to-business relationship; no records requests filed"
+  },
+  {
+   "source": "lexicon: business registration and license",
+   "availability": "unsupported",
+   "detail": "no corporate-registry group, no license class, no company-to-license relationship in the live manifest; business and license rows are served as unpublished_source records, never published"
+  },
+  {
+   "source": "tx-comptroller-franchise-tax/9cir-efmm",
+   "availability": "supported_partial",
+   "detail": "no registered agents or filing roles, no assumed names, no non-franchise entities, active taxpayers only (no history); the county code is the mailing county"
+  }
+ ],
+ "window": {
+  "command": "cd /Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime && node src/counties/travis/t3-vpn-fetch.mjs",
+  "egress_rule": "ipinfo.io/country before every request; a non-US country stops at once with nothing sent (exit 3); a non-answer is asked twice more, then stops",
+  "output": "data/travis/t3-window/ (gitignored): one directory per source, receipts.jsonl per capture, runs/<stamp>.json",
+  "estimate": {
+   "requests": "about 95 plus as many egress checks",
+   "statewide_9cir_efmm": {
+    "rows": 3486216,
+    "pages_of_50000": 70,
+    "bytes_estimate": "about 700 MB (202 bytes per row in the Travis cache)",
+    "page_seconds_measured": "6-18 s per 10 MB page on 2026-10-16 (Travis receipts), about 9 s average"
+   },
+   "other_sources": "jrea-zgmq Travis outlets a few pages (row count unknown until the window: data.texas.gov is not reachable from RO), 2vfr-72e4 one page, the TDLR electrical and A/C files tens of MB, the TSBPE list a few MB, one probe",
+   "wall_time": "about 4 minutes with 4 concurrent pages on data.texas.gov (70 pages x 9 s / 4, bounded by VPN bandwidth for about 0.8 GB); about 11 minutes if the portal serves pages one at a time"
+  }
+ },
+ "no_permit_feed": {
+  "detail": "no permit harvest, PermitFeed or permit pilot has started: runtime data/travis holds no permit capture or permit run (runs are the T2 smoke and pilot runs and the 2000-parcel appraisal sizing run); the only permit-export requests in T3 are the aggregate count queries of the absence proofs (no rows)",
+  "checked_at": "2026-10-17"
+ }
+}

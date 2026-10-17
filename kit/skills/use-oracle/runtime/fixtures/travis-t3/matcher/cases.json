@@ -1,0 +1,36 @@
+{
+  "description": "Synthetic matching universe and cases for travis-exact-unique-normalized-name.v1 (assignment decisions.md section 23). Names and numbers are invented. The universe has the shape of the Comptroller franchise-tax snapshot (printed taxpayer name, trimmed; taxpayer number; mailing county code, 227 = Travis); uniqueness is decided over the whole universe, so out-of-county rows count.",
+  "matcher_version": "travis-exact-unique-normalized-name.v1",
+  "universe": [
+    { "taxpayer_number": "10000000001", "taxpayer_name": "ACME ROOFING, L.L.C. ", "taxpayer_county_code": "227" },
+    { "taxpayer_number": "10000000002", "taxpayer_name": "LONE STAR ROOFING INC", "taxpayer_county_code": "227" },
+    { "taxpayer_number": "10000000003", "taxpayer_name": "LONE STAR ROOFING LLC", "taxpayer_county_code": "227" },
+    { "taxpayer_number": "10000000004", "taxpayer_name": "HILL COUNTRY EXTERIORS LLC", "taxpayer_county_code": "246" },
+    { "taxpayer_number": "10000000005", "taxpayer_name": "CAPITAL ROOF CO", "taxpayer_county_code": "227" },
+    { "taxpayer_number": "10000000006", "taxpayer_name": "CAPITAL ROOF, INC.", "taxpayer_county_code": "101" },
+    { "taxpayer_number": "10000000007", "taxpayer_name": "PEÑASCO ROOFING LLC", "taxpayer_county_code": "227" },
+    { "taxpayer_number": "10000000008", "taxpayer_name": "TWIN ROW HOLDINGS LP", "taxpayer_county_code": "227", "sos_status_code": "A" },
+    { "taxpayer_number": "10000000008", "taxpayer_name": "TWIN ROW HOLDINGS LP", "taxpayer_county_code": "227", "sos_status_code": "R" },
+    { "taxpayer_number": "10000000009", "taxpayer_name": "L.L.C.", "taxpayer_county_code": "227" }
+  ],
+  "cases": [
+    { "id": "exact-unique-travis", "printed": "Acme Roofing LLC", "expect": { "status": "candidate", "reason": null, "candidate_count": 1, "key": "10000000001", "scope": "travis" } },
+    { "id": "exact-unique-without-legal-form", "printed": "ACME ROOFING", "expect": { "status": "candidate", "reason": null, "candidate_count": 1, "key": "10000000001", "scope": "travis" } },
+    { "id": "legal-form-is-not-distinctive", "printed": "Acme Roofing Corp.", "expect": { "status": "candidate", "reason": null, "candidate_count": 1, "key": "10000000001", "scope": "travis" }, "note": "legal-form words are removed, so a different printed legal form still finds the one taxpayer: a review candidate, never identity" },
+    { "id": "non-unique-gives-no-candidate", "printed": "Lone Star Roofing", "expect": { "status": "no_candidate", "reason": "not_unique", "candidate_count": 2, "key": null, "scope": null } },
+    { "id": "out-of-county-unique", "printed": "Hill Country Exteriors", "expect": { "status": "candidate", "reason": null, "candidate_count": 1, "key": "10000000004", "scope": "out_of_county" } },
+    { "id": "travis-name-shared-out-of-county", "printed": "Capital Roof", "expect": { "status": "no_candidate", "reason": "not_unique", "candidate_count": 2, "key": null, "scope": null }, "note": "unique within Travis, not within the statewide universe: no candidate" },
+    { "id": "accents-removed", "printed": "Penasco Roofing", "expect": { "status": "candidate", "reason": null, "candidate_count": 1, "key": "10000000007", "scope": "travis" } },
+    { "id": "duplicate-rows-one-taxpayer", "printed": "Twin Row Holdings, L.P.", "expect": { "status": "candidate", "reason": null, "candidate_count": 1, "key": "10000000008", "scope": "travis", "rows": 2 } },
+    { "id": "no-fuzzy-match", "printed": "Acme Roofing & Sons", "expect": { "status": "no_candidate", "reason": "no_match", "candidate_count": 0, "key": null, "scope": null } },
+    { "id": "no-match", "printed": "Unknown Roofers", "expect": { "status": "no_candidate", "reason": "no_match", "candidate_count": 0, "key": null, "scope": null } },
+    { "id": "empty", "printed": "", "expect": { "status": "no_candidate", "reason": "empty_name", "candidate_count": 0, "key": null, "scope": null } },
+    { "id": "blank", "printed": "   ", "expect": { "status": "no_candidate", "reason": "empty_name", "candidate_count": 0, "key": null, "scope": null } },
+    { "id": "null", "printed": null, "expect": { "status": "no_candidate", "reason": "empty_name", "candidate_count": 0, "key": null, "scope": null } },
+    { "id": "legal-form-only", "printed": "LLC", "expect": { "status": "no_candidate", "reason": "empty_name", "candidate_count": 0, "key": null, "scope": null } }
+  ],
+  "travis_only_universe_cases": [
+    { "id": "capital-roof-unique-in-travis-alone", "printed": "Capital Roof", "expect": { "status": "candidate", "reason": null, "candidate_count": 1, "key": "10000000005", "scope": "travis" }, "note": "why the statewide file is the matching universe: the Travis subset alone would make this a candidate" }
+  ],
+  "summary": { "normalized_names": 6, "entity_keys": 8, "non_unique_names": 2, "keys_under_non_unique_names": 4, "rows_indexed": 9, "rows_without_name": 1, "by_scope": { "out_of_county": 2, "travis": 6 } }
+}

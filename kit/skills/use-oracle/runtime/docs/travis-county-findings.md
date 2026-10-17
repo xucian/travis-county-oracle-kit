@@ -406,3 +406,25 @@ run record.
 - **County label gap.** `address.county_name` is omitted until lexicon#194 is live; the wrong-county guard is
   `assertTravisIdentity` (seed county and FIPS, request identifiers, source hosts, address state and county,
   geometry bbox).
+
+## 12. T3 official identity baseline (2026-10-17): offline part done, one US window staged
+
+Assignment decisions.md section 23 (approved by the operator). Section 9's "No further VPN window is needed until run 2"
+no longer holds: T3 needs one short US window, staged as one command (`node src/counties/travis/t3-vpn-fetch.mjs`).
+
+- **Registry equivalent.** The Comptroller Active Franchise Taxpayers file (`9cir-efmm`) is the profile's official
+  corporate-registry equivalent (`travis-sources.yaml` `official_identity.corporate_registry`); the SOS is the authority
+  of record. The Travis cache (7 pages, verified against their receipts) is loaded into a private Parquet snapshot on the
+  registry track: 342,338 rows = 342,337 taxpayers + 1 duplicate (one taxpayer with two SOS status rows, A of 2001 and R
+  of 2003); SOS file number on 335,980 (98.14%). A re-load finds 0 new and 0 changed and rewrites nothing. Evidence
+  `docs/evidence/travis-t3-registry-load-2026-10-17.json`.
+- **Licensing.** No Austin permit prints a license number (68 named columns, 82 in the catalog; markers in free text on
+  14 of 2,380,707 rows, none in a contractor field); 18 of 33,351 roofing building permits name a licensed trade; Texas
+  issues no roofing license; historical qualification is closed for v1. The Austin right-of-way contractor licenses
+  (`8d92-wsiw`, 469 rows) are captured and snapshotted; the TDLR and TSBPE files wait for the window. Evidence
+  `docs/evidence/travis-t3-absence-proofs-2026-10-17.json`, `docs/evidence/travis-t3-austin-row-2026-10-17.json`.
+- **Matcher.** `travis-exact-unique-normalized-name.v1` (`src/counties/travis/name-matcher.mjs`): exact unique
+  normalized name gives a review candidate, never identity; 628 normalized names map to several taxpayers within Travis
+  alone, and the statewide file is the matching universe.
+- **Run record (prepared).** `docs/evidence/travis-t3-prepared-2026-10-17.json`: sources, watermarks, counts,
+  limitations, the window command and its estimate. No permit has been read.

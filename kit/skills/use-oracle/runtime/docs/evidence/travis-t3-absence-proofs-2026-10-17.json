@@ -1,0 +1,1357 @@
+{
+ "kind": "travis-t3-absence-proofs",
+ "recorded_at": "2026-10-17T14:58:57.061Z",
+ "decision": "assignment docs/decisions.md section 23 (licensing proven missing from the permits; business records proven missing from the lexicon)",
+ "egress": "RO",
+ "command": "node src/counties/travis/t3-absence-proofs.mjs --output docs/evidence/travis-t3-absence-proofs-2026-10-17.json --ruling-scratch <ruling scratch t3 dir>",
+ "austin_permit_columns": {
+  "dataset": "austin-issued-construction-permits/3syk-w9eu",
+  "data_updated_at": "2026-10-17T12:24:23.000Z",
+  "catalog_columns": 82,
+  "computed_region_columns": 10,
+  "location_sub_fields": [
+   "location_city",
+   "location_state",
+   "location_zip",
+   "location_address"
+  ],
+  "named_columns": 68,
+  "named": [
+   "certificate_of_occupancy",
+   "original_zip",
+   "total_job_valuation",
+   "completed_date",
+   "mechanical_valuation",
+   "permittype",
+   "contractor_trade",
+   "contractor_zip",
+   "building_valuation",
+   "applicant_city",
+   "applicant_address2",
+   "applicant_address1",
+   "applicant_full_name",
+   "contractor_city",
+   "contractor_company_name",
+   "jurisdiction",
+   "original_address1",
+   "electrical_valuation",
+   "building_valuation_remodel",
+   "total_new_add_sqft",
+   "status_current",
+   "issue_date",
+   "legal_description",
+   "tcad_id",
+   "permit_class",
+   "applicant_phone",
+   "original_city",
+   "plumbing_valuation_remodel",
+   "electrical_valuation_remodel",
+   "applieddate",
+   "contractor_address2",
+   "contractor_full_name",
+   "plumbing_valuation",
+   "mechanical_valuation_remodel",
+   "condominium",
+   "medgas_valuation",
+   "day_issued",
+   "issued_in_last_30_days",
+   "original_state",
+   "applicantzip",
+   "permit_type_desc",
+   "remodel_repair_sqft",
+   "expiresdate",
+   "description",
+   "applicant_org",
+   "calendar_year_issued",
+   "fiscal_year_issued",
+   "total_valuation_remodel",
+   "latitude",
+   "work_class",
+   "permit_number",
+   "housing_units",
+   "medgas_valuation_remodel",
+   "permit_location",
+   "issue_method",
+   "statusdate",
+   "longitude",
+   "total_lot_sq_ft",
+   "contractor_phone",
+   "project_id",
+   "council_district",
+   "total_existing_bldg_sqft",
+   "masterpermitnum",
+   "number_of_floors",
+   "link",
+   "contractor_address1",
+   "location",
+   "permit_class_mapped"
+  ],
+  "computed": [
+   {
+    "fieldName": ":@computed_region_6gig_z43c",
+    "name": "Council Districts Fill - TESTING DO NOT USE (Adrianne)"
+   },
+   {
+    "fieldName": ":@computed_region_xzeg_zdjk",
+    "name": "Neighborhood Planning Areas Dissolved"
+   },
+   {
+    "fieldName": ":@computed_region_i2aj_cj5t",
+    "name": "Zipcode Boundaries (Snapshot)"
+   },
+   {
+    "fieldName": ":@computed_region_qwte_z96m",
+    "name": "Zoning Review Cases_data"
+   },
+   {
+    "fieldName": ":@computed_region_a3it_2a2z",
+    "name": "Zip Codes"
+   },
+   {
+    "fieldName": ":@computed_region_rxpj_nzrk",
+    "name": "Zipcodes"
+   },
+   {
+    "fieldName": ":@computed_region_m2th_e4b7",
+    "name": "Community Registry"
+   },
+   {
+    "fieldName": ":@computed_region_e9j2_6w3z",
+    "name": "Neighborhood Planning Areas"
+   },
+   {
+    "fieldName": ":@computed_region_q9nd_rr82",
+    "name": "BOUNDARIES_single_member_districts"
+   },
+   {
+    "fieldName": ":@computed_region_8spj_utxs",
+    "name": "Single Member Council Districts"
+   }
+  ],
+  "export_header_columns": 68,
+  "export_header": [
+   "permittype",
+   "permit_type_desc",
+   "permit_number",
+   "permit_class_mapped",
+   "permit_class",
+   "work_class",
+   "condominium",
+   "permit_location",
+   "description",
+   "tcad_id",
+   "legal_description",
+   "applieddate",
+   "issue_date",
+   "day_issued",
+   "calendar_year_issued",
+   "fiscal_year_issued",
+   "issued_in_last_30_days",
+   "issue_method",
+   "status_current",
+   "statusdate",
+   "expiresdate",
+   "completed_date",
+   "total_existing_bldg_sqft",
+   "remodel_repair_sqft",
+   "total_new_add_sqft",
+   "total_valuation_remodel",
+   "total_job_valuation",
+   "number_of_floors",
+   "housing_units",
+   "building_valuation",
+   "building_valuation_remodel",
+   "electrical_valuation",
+   "electrical_valuation_remodel",
+   "mechanical_valuation",
+   "mechanical_valuation_remodel",
+   "plumbing_valuation",
+   "plumbing_valuation_remodel",
+   "medgas_valuation",
+   "medgas_valuation_remodel",
+   "original_address1",
+   "original_city",
+   "original_state",
+   "original_zip",
+   "council_district",
+   "jurisdiction",
+   "link",
+   "project_id",
+   "masterpermitnum",
+   "latitude",
+   "longitude",
+   "location",
+   "contractor_trade",
+   "contractor_company_name",
+   "contractor_full_name",
+   "contractor_phone",
+   "contractor_address1",
+   "contractor_address2",
+   "contractor_city",
+   "contractor_zip",
+   "applicant_full_name",
+   "applicant_org",
+   "applicant_phone",
+   "applicant_address1",
+   "applicant_address2",
+   "applicant_city",
+   "applicantzip",
+   "certificate_of_occupancy",
+   "total_lot_sq_ft"
+  ],
+  "license_like_pattern": "/licen|regist|qualif|tdlr|tsbpe|tacla|tecl|journey|master/i",
+  "license_like_columns": [
+   {
+    "fieldName": ":@computed_region_m2th_e4b7",
+    "name": "Community Registry",
+    "dataType": "Number",
+    "reading": "Community Registry: a computed region (the City's neighborhood-organization registry overlay), not a license"
+   },
+   {
+    "fieldName": "masterpermitnum",
+    "name": "Master Permit Num",
+    "dataType": "Number",
+    "reading": "Master Permit Num: the parent permit's number (a permit id), not a license"
+   }
+  ],
+  "license_columns": 0,
+  "conclusion": "no column of the Austin export prints a license number, license type or qualifier; the contractor fields are contractor_trade, contractor_company_name, contractor_full_name, contractor_phone, contractor_address1/2, contractor_city and contractor_zip"
+ },
+ "free_text_license_markers": {
+  "rows_in_export": 2380707,
+  "queries": [
+   {
+    "label": "description contains TACLA (TDLR A/C contractor license prefix)",
+    "where": "upper(description) like '%TACLA%'",
+    "rows": 1
+   },
+   {
+    "label": "description contains TECL (TDLR electrical contractor license prefix)",
+    "where": "upper(description) like '%TECL%'",
+    "rows": 9
+   },
+   {
+    "label": "description contains LICENSE #, LIC # or LIC#",
+    "where": "upper(description) like '%LICENSE #%' OR upper(description) like '%LIC #%' OR upper(description) like '%LIC#%'",
+    "rows": 4
+   },
+   {
+    "label": "contractor company or full name contains TACLA or TECL",
+    "where": "upper(contractor_company_name) like '%TACLA%' OR upper(contractor_company_name) like '%TECL%' OR upper(contractor_full_name) like '%TACLA%' OR upper(contractor_full_name) like '%TECL%'",
+    "rows": 0
+   },
+   {
+    "label": "contractor company or full name contains LIC...#",
+    "where": "upper(contractor_company_name) like '%LIC%#%' OR upper(contractor_full_name) like '%LIC%#%'",
+    "rows": 0
+   }
+  ],
+  "description_rows_any_marker": 14,
+  "contractor_field_rows": 0,
+  "conclusion": "license markers appear in the free-text description of 14 of 2,380,707 rows and in no contractor field: no lookup key exists for a license-detail search"
+ },
+ "roofing_trades": {
+  "where": "permittype='BP' AND upper(description) like '%ROOF%'",
+  "totals": {
+   "n": "33351",
+   "with_company": "14477",
+   "with_name": "12198"
+  },
+  "by_contractor_trade": [
+   {
+    "n": "16684"
+   },
+   {
+    "contractor_trade": "General Contractor",
+    "n": "16649"
+   },
+   {
+    "contractor_trade": "Electrical Contractor",
+    "n": "14"
+   },
+   {
+    "contractor_trade": "Mechanical Contractor",
+    "n": "3"
+   },
+   {
+    "contractor_trade": "Plumbing Contractor",
+    "n": "1"
+   }
+  ],
+  "licensed_trade_rows": 18,
+  "conclusion": "18 of 33,351 building permits mentioning roof name a licensed trade (electrical, mechanical, plumbing); Texas issues no roofing license"
+ },
+ "roofing_contractor_cities_top40": [
+  {
+   "city": "AUSTIN",
+   "n": "7521"
+  },
+  {
+   "city": "HOUSTON",
+   "n": "835"
+  },
+  {
+   "city": "ROUND ROCK",
+   "n": "519"
+  },
+  {
+   "city": "SAN ANTONIO",
+   "n": "486"
+  },
+  {
+   "city": "DALLAS",
+   "n": "470"
+  },
+  {
+   "n": "331"
+  },
+  {
+   "city": "PFLUGERVILLE",
+   "n": "261"
+  },
+  {
+   "city": "CEDAR PARK",
+   "n": "257"
+  },
+  {
+   "city": "MC KINNEY",
+   "n": "216"
+  },
+  {
+   "city": "HUTTO",
+   "n": "170"
+  },
+  {
+   "city": "GEORGETOWN",
+   "n": "161"
+  },
+  {
+   "city": "LEANDER",
+   "n": "154"
+  },
+  {
+   "city": "DEL VALLE",
+   "n": "123"
+  },
+  {
+   "city": "LAKEWAY",
+   "n": "112"
+  },
+  {
+   "city": "MANCHACA",
+   "n": "99"
+  },
+  {
+   "city": "PLANO",
+   "n": "94"
+  },
+  {
+   "city": "BUDA",
+   "n": "93"
+  },
+  {
+   "city": "NEW BRAUNFEL",
+   "n": "91"
+  },
+  {
+   "city": "FAIR OAK RAN",
+   "n": "82"
+  },
+  {
+   "city": "KENNEDALE",
+   "n": "82"
+  },
+  {
+   "city": "COMMERCE  CI",
+   "n": "78"
+  },
+  {
+   "city": "GARLAND",
+   "n": "70"
+  },
+  {
+   "city": "DRIPPING SPR",
+   "n": "69"
+  },
+  {
+   "city": "ATLANTA",
+   "n": "68"
+  },
+  {
+   "city": "KYLE",
+   "n": "63"
+  },
+  {
+   "city": "DRIFTWOOD",
+   "n": "55"
+  },
+  {
+   "city": "PHOENIX",
+   "n": "55"
+  },
+  {
+   "city": "LIBERTY HILL",
+   "n": "50"
+  },
+  {
+   "city": "OKLAHOMA CIT",
+   "n": "49"
+  },
+  {
+   "city": "MANOR",
+   "n": "49"
+  },
+  {
+   "city": "CLEVELAND",
+   "n": "48"
+  },
+  {
+   "city": "WACO",
+   "n": "37"
+  },
+  {
+   "city": "WEST LAKE HI",
+   "n": "31"
+  },
+  {
+   "city": "ELGIN",
+   "n": "29"
+  },
+  {
+   "city": "CLEBURNE",
+   "n": "28"
+  },
+  {
+   "city": "SPICEWOOD",
+   "n": "27"
+  },
+  {
+   "city": "BELTON",
+   "n": "27"
+  },
+  {
+   "city": "SOUTHLAKE",
+   "n": "26"
+  },
+  {
+   "city": "PEARLAND",
+   "n": "26"
+  },
+  {
+   "city": "LAGO VISTA",
+   "n": "26"
+  }
+ ],
+ "catalog_sources": {
+  "9cir-efmm": {
+   "name": "Active Franchise Taxpayers",
+   "domain": "data.texas.gov",
+   "attribution": "Texas Comptroller of Public Accounts",
+   "data_updated_at": "2026-10-17T10:35:29.000Z",
+   "columns": [
+    "right_to_transact_business_code",
+    "taxpayer_number",
+    "secretary_of_state_sos_or_coa_file_number",
+    "taxpayer_state",
+    "taxpayer_city",
+    "sos_status_code",
+    "sos_charter_date",
+    "responsibility_beginning_date",
+    "taxpayer_name",
+    "taxpayer_county_code",
+    "taxpayer_zip",
+    "_621111",
+    "current_exempt_reason_code",
+    "record_type_code",
+    "exempt_begin_date",
+    "sos_status_date",
+    "taxpayer_organizational_type",
+    "taxpayer_address"
+   ]
+  },
+  "jrea-zgmq": {
+   "name": "Active Sales Tax Permit Holders",
+   "domain": "data.texas.gov",
+   "attribution": "Texas Comptroller of Public Accounts",
+   "data_updated_at": "2026-10-17T10:31:10.000Z",
+   "columns": [
+    "taxpayer_name",
+    "taxpayer_state",
+    "outlet_city",
+    "outlet_county_code",
+    "taxpayer_number",
+    "outlet_inside_outside_city_limits_indicator",
+    "outlet_zip_code",
+    "taxpayer_organization_type",
+    "outlet_first_sales_date",
+    "outlet_number",
+    "taxpayer_address",
+    "outlet_state",
+    "outlet_permit_issue_date",
+    "outlet_naics_code",
+    "outlet_address",
+    "outlet_name",
+    "taxpayer_county_code",
+    "taxpayer_zip_code",
+    "taxpayer_city"
+   ]
+  },
+  "7358-krk7": {
+   "name": "TDLR - All Licenses",
+   "domain": "data.texas.gov",
+   "attribution": "Texas Department of Licensing and Regulation",
+   "data_updated_at": "2026-09-19T20:51:31.000Z",
+   "columns": [
+    "mailing_address_county",
+    ":@computed_region_346f_s9gh",
+    "business_mailing",
+    "license_subtype",
+    "owner_telephone",
+    "mailing_address_city_state_zip",
+    "mailing_address_line2",
+    "mailing_address_line1",
+    "owner_name",
+    "license_expiration_date_mmddccyy",
+    "business_telephone",
+    "business_city_state_zip",
+    "business_address_line2",
+    ":@computed_region_9y59_55ru",
+    ":@computed_region_ywmh_rrwq",
+    ":@computed_region_hy99_5a2i",
+    ":@computed_region_fd5q_j34z",
+    "business_address_line1",
+    "business_name",
+    "business_county",
+    "license_type",
+    "license_number",
+    "continuing_education_flag",
+    ":@computed_region_rk7b_wvzt",
+    ":@computed_region_ji3u_dqif",
+    ":@computed_region_59h5_km5p"
+   ]
+  },
+  "2vfr-72e4": {
+   "name": "Veteran Owned Business",
+   "domain": "data.texas.gov",
+   "attribution": "The Office of the Texas Secretary of State",
+   "data_updated_at": "2026-10-01T10:00:49.000Z",
+   "columns": [
+    "agent_country",
+    "entity_address2",
+    "corp_type",
+    "entity_state",
+    "entity_zip_code",
+    "entity_zip_extension",
+    "agent_city",
+    "agent_address2",
+    "agent_address1",
+    "agent_suffix",
+    "agent_last_name",
+    "agent_middle_name",
+    "agent_first_name",
+    "agent_business_name",
+    "entity_country",
+    "entity_address1",
+    "entity_city",
+    "name",
+    "status_description",
+    "creation_date",
+    "agent_state",
+    "agent_zip_extension",
+    "inactive_date",
+    "taxid",
+    "filing_number",
+    "agent_zip_code"
+   ]
+  },
+  "8d92-wsiw": {
+   "name": "Active Right of Way Contractor License Holders",
+   "domain": "datahub.austintexas.gov",
+   "attribution": "Austin Transportation and Public Works",
+   "data_updated_at": "2026-10-17T07:05:35.000Z",
+   "columns": [
+    "issue_date",
+    "contractor_name",
+    "insurance_expiration",
+    "license_number",
+    "expiration_date"
+   ]
+  }
+ },
+ "t3_window_facts": {
+  "sales_tax_outlet_county_column": "outlet_county_code",
+  "franchise_county_column": "taxpayer_county_code",
+  "veteran_owned_join_column": "filing_number (SOS file number, joined exactly to 9cir-efmm secretary_of_state_sos_or_coa_file_number)"
+ },
+ "live_manifest_gaps": {
+  "url": "https://lexicon.elephant.xyz/api/manifest",
+  "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+  "entries": 159,
+  "by_type": {
+   "class": 53,
+   "relationship": 90,
+   "dataGroup": 16
+  },
+  "data_groups": [
+   "Seed",
+   "County",
+   "Photo",
+   "Photo_Metadata",
+   "HOA_",
+   "Property_Management",
+   "Mortgage",
+   "Property_Ranking",
+   "Property_Improvement",
+   "Environment_Characteristics",
+   "Safety_and_Security",
+   "Transportation_and_Access",
+   "School",
+   "Tax",
+   "Sales_History",
+   "Business_Location"
+  ],
+  "corporate_registry_group": [],
+  "license_entries": [],
+  "company_related_relationships": [
+   "company_to_property",
+   "company_to_address",
+   "sales_history_to_company",
+   "company_to_fact_sheet",
+   "homeowners_association_to_company",
+   "property_to_company",
+   "property_improvement_to_company",
+   "company_to_communication",
+   "company_to_person",
+   "inspection_to_company",
+   "business_location_to_geometry",
+   "business_location_to_address",
+   "business_location_to_company",
+   "business_location_to_parcel"
+  ],
+  "company_schema": {
+   "cid": "bafkreifpgr7nbrcmdrjocuys34yjgdtttynt3pwrkpv47mlheklykmopjy",
+   "cid_matches_bytes": true,
+   "title": "company",
+   "required": [
+    "source_http_request",
+    "request_identifier",
+    "name",
+    "sunbiz_document_number"
+   ],
+   "additionalProperties": false,
+   "properties": [
+    "name",
+    "request_identifier",
+    "source_http_request",
+    "sunbiz_document_number"
+   ]
+  },
+  "business_location_schema": {
+   "cid": "bafkreidnmfbdzgupbh257g5z2tgouecbpgrxzic5oltjphqr3fjv6my7ni",
+   "cid_matches_bytes": true,
+   "title": "business_location",
+   "required": [
+    "source_system",
+    "source_record_identifier",
+    "source_release"
+   ],
+   "additionalProperties": false,
+   "properties": [
+    "basic_category",
+    "brand_name",
+    "brand_wikidata_identifier",
+    "hosted_service_rule",
+    "is_hosted_service",
+    "name",
+    "normalized_name",
+    "operating_status",
+    "source_confidence",
+    "source_provenance",
+    "source_record_identifier",
+    "source_record_version",
+    "source_release",
+    "source_system",
+    "taxonomy_alternate",
+    "taxonomy_hierarchy",
+    "taxonomy_primary"
+   ]
+  },
+  "conclusion": "no corporate-registry data group among the 16; no license class and no company-to-license relationship; company holds only name, request_identifier, source_http_request and the Florida sunbiz_document_number under additionalProperties false; Business_Location is the places shape"
+ },
+ "ruling_scratch": {
+  "note": "the ruling's outputs of 2026-10-17 (about 13:50Z, from RO egress; requests reconstructed from its transcript into LICENSE_MARKER_QUERIES and the roofing queries here), kept beside the fresh values; the export is republished daily, so counts can move by a few rows",
+  "license_markers": [
+   {
+    "query": "description contains TACLA (TDLR A/C contractor license prefix)",
+    "file": "dl-austin-soql/q1.json",
+    "sha256": "969c0d198c69cde51d5b16a3c73ead5d5ee51b83ab5f7903c393e295edbd7c75",
+    "value": [
+     {
+      "n": "1"
+     }
+    ]
+   },
+   {
+    "query": "description contains TECL (TDLR electrical contractor license prefix)",
+    "file": "dl-austin-soql/q2.json",
+    "sha256": "fc720445193e260c5f5b328b7f8845f176ea5e5526baf9e2d64e5122d540d890",
+    "value": [
+     {
+      "n": "9"
+     }
+    ]
+   },
+   {
+    "query": "description contains LICENSE #, LIC # or LIC#",
+    "file": "dl-austin-soql/q3.json",
+    "sha256": "5bf5a0a2ad9c35345e97c088b901aa7b81e0d7226302b79f6da2b79c4868ef80",
+    "value": [
+     {
+      "n": "4"
+     }
+    ]
+   },
+   {
+    "query": "contractor company or full name contains TACLA or TECL",
+    "file": "dl-austin-soql/q4.json",
+    "sha256": "3ab8834fb12e1fe27faa7685163dc93eb4e7a4da93d163848b19c1e372004fa7",
+    "value": [
+     {
+      "n": "0"
+     }
+    ]
+   },
+   {
+    "query": "contractor company or full name contains LIC...#",
+    "file": "dl-austin-soql/q5.json",
+    "sha256": "3ab8834fb12e1fe27faa7685163dc93eb4e7a4da93d163848b19c1e372004fa7",
+    "value": [
+     {
+      "n": "0"
+     }
+    ]
+   }
+  ],
+  "roof_total": {
+   "file": "dl-austin-soql/roof_total.json",
+   "sha256": "536f66f6c30272bb1b8225a97180704a72a6a6626871975ab30cb3854db0cda7",
+   "value": [
+    {
+     "n": "33351",
+     "with_company": "14477",
+     "with_name": "12198"
+    }
+   ]
+  },
+  "roof_trade": {
+   "file": "dl-austin-soql/roof_trade.json",
+   "sha256": "e3a263944bce433fd94b9fd5fe426f3fa3dd3697d0ef00b284d36a78ab2ee89f",
+   "value": [
+    {
+     "n": "16684"
+    },
+    {
+     "contractor_trade": "General Contractor",
+     "n": "16649"
+    },
+    {
+     "contractor_trade": "Electrical Contractor",
+     "n": "14"
+    },
+    {
+     "contractor_trade": "Mechanical Contractor",
+     "n": "3"
+    },
+    {
+     "contractor_trade": "Plumbing Contractor",
+     "n": "1"
+    }
+   ]
+  },
+  "roof_city": {
+   "file": "dl-austin-soql/roof_city.json",
+   "sha256": "7d4ddf76ff0e55e76ada4dfe8c35cbc11e64af4586e5dd99fc65dfdc1be6d6b7",
+   "value": [
+    {
+     "city": "AUSTIN",
+     "n": "7521"
+    },
+    {
+     "city": "HOUSTON",
+     "n": "835"
+    },
+    {
+     "city": "ROUND ROCK",
+     "n": "519"
+    },
+    {
+     "city": "SAN ANTONIO",
+     "n": "486"
+    },
+    {
+     "city": "DALLAS",
+     "n": "470"
+    },
+    {
+     "n": "331"
+    },
+    {
+     "city": "PFLUGERVILLE",
+     "n": "261"
+    },
+    {
+     "city": "CEDAR PARK",
+     "n": "257"
+    },
+    {
+     "city": "MC KINNEY",
+     "n": "216"
+    },
+    {
+     "city": "HUTTO",
+     "n": "170"
+    },
+    {
+     "city": "GEORGETOWN",
+     "n": "161"
+    },
+    {
+     "city": "LEANDER",
+     "n": "154"
+    },
+    {
+     "city": "DEL VALLE",
+     "n": "123"
+    },
+    {
+     "city": "LAKEWAY",
+     "n": "112"
+    },
+    {
+     "city": "MANCHACA",
+     "n": "99"
+    },
+    {
+     "city": "PLANO",
+     "n": "94"
+    },
+    {
+     "city": "BUDA",
+     "n": "93"
+    },
+    {
+     "city": "NEW BRAUNFEL",
+     "n": "91"
+    },
+    {
+     "city": "FAIR OAK RAN",
+     "n": "82"
+    },
+    {
+     "city": "KENNEDALE",
+     "n": "82"
+    },
+    {
+     "city": "COMMERCE  CI",
+     "n": "78"
+    },
+    {
+     "city": "GARLAND",
+     "n": "70"
+    },
+    {
+     "city": "DRIPPING SPR",
+     "n": "69"
+    },
+    {
+     "city": "ATLANTA",
+     "n": "68"
+    },
+    {
+     "city": "KYLE",
+     "n": "63"
+    },
+    {
+     "city": "DRIFTWOOD",
+     "n": "55"
+    },
+    {
+     "city": "PHOENIX",
+     "n": "55"
+    },
+    {
+     "city": "LIBERTY HILL",
+     "n": "50"
+    },
+    {
+     "city": "OKLAHOMA CIT",
+     "n": "49"
+    },
+    {
+     "city": "MANOR",
+     "n": "49"
+    },
+    {
+     "city": "CLEVELAND",
+     "n": "48"
+    },
+    {
+     "city": "WACO",
+     "n": "37"
+    },
+    {
+     "city": "WEST LAKE HI",
+     "n": "31"
+    },
+    {
+     "city": "ELGIN",
+     "n": "29"
+    },
+    {
+     "city": "CLEBURNE",
+     "n": "28"
+    },
+    {
+     "city": "SPICEWOOD",
+     "n": "27"
+    },
+    {
+     "city": "BELTON",
+     "n": "27"
+    },
+    {
+     "city": "SOUTHLAKE",
+     "n": "26"
+    },
+    {
+     "city": "PEARLAND",
+     "n": "26"
+    },
+    {
+     "city": "LAGO VISTA",
+     "n": "26"
+    }
+   ]
+  },
+  "manifest": {
+   "file": "dl-lexicon/manifest.json",
+   "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+   "entries": 159
+  }
+ },
+ "receipts": [
+  {
+   "purpose": "Socrata catalog entry of the Austin permit export",
+   "method": "GET",
+   "url": "https://api.us.socrata.com/api/catalog/v1?ids=3syk-w9eu",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://api.us.socrata.com/api/catalog/v1",
+    "multiValueQueryString": {
+     "ids": [
+      "3syk-w9eu"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:35.652Z",
+   "status": 200,
+   "bytes": 24849,
+   "sha256": "c36bd5bbfdcbfce1169d3492c8e39374ab3c60742773739bf86d5fa3bb17e67b",
+   "duration_ms": 614
+  },
+  {
+   "purpose": "the CSV header the Austin export prints",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/resource/3syk-w9eu.csv?%24limit=1",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/resource/3syk-w9eu.csv",
+    "multiValueQueryString": {
+     "$limit": [
+      "1"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:36.266Z",
+   "status": 200,
+   "bytes": 1841,
+   "sha256": "f163e9610634fb4faa4e2a45c0fa7c836ab4c07eb6c9442254712bc844ba9d66",
+   "duration_ms": 628
+  },
+  {
+   "purpose": "Austin export row count",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/resource/3syk-w9eu.json?%24select=count%28*%29+as+n",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/resource/3syk-w9eu.json",
+    "multiValueQueryString": {
+     "$select": [
+      "count(*) as n"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:36.895Z",
+   "status": 200,
+   "bytes": 18,
+   "sha256": "bfb1cc8b496845a569dd927be713926d03d5c3357a07934406ff2d5a0eb1aa78",
+   "duration_ms": 316
+  },
+  {
+   "purpose": "license marker: description contains TACLA (TDLR A/C contractor license prefix)",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/resource/3syk-w9eu.json?%24select=count%28*%29+as+n&%24where=upper%28description%29+like+%27%25TACLA%25%27",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/resource/3syk-w9eu.json",
+    "multiValueQueryString": {
+     "$select": [
+      "count(*) as n"
+     ],
+     "$where": [
+      "upper(description) like '%TACLA%'"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:38.212Z",
+   "status": 200,
+   "bytes": 12,
+   "sha256": "969c0d198c69cde51d5b16a3c73ead5d5ee51b83ab5f7903c393e295edbd7c75",
+   "duration_ms": 918
+  },
+  {
+   "purpose": "license marker: description contains TECL (TDLR electrical contractor license prefix)",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/resource/3syk-w9eu.json?%24select=count%28*%29+as+n&%24where=upper%28description%29+like+%27%25TECL%25%27",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/resource/3syk-w9eu.json",
+    "multiValueQueryString": {
+     "$select": [
+      "count(*) as n"
+     ],
+     "$where": [
+      "upper(description) like '%TECL%'"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:40.134Z",
+   "status": 200,
+   "bytes": 12,
+   "sha256": "fc720445193e260c5f5b328b7f8845f176ea5e5526baf9e2d64e5122d540d890",
+   "duration_ms": 784
+  },
+  {
+   "purpose": "license marker: description contains LICENSE #, LIC # or LIC#",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/resource/3syk-w9eu.json?%24select=count%28*%29+as+n&%24where=upper%28description%29+like+%27%25LICENSE+%23%25%27+OR+upper%28description%29+like+%27%25LIC+%23%25%27+OR+upper%28description%29+like+%27%25LIC%23%25%27",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/resource/3syk-w9eu.json",
+    "multiValueQueryString": {
+     "$select": [
+      "count(*) as n"
+     ],
+     "$where": [
+      "upper(description) like '%LICENSE #%' OR upper(description) like '%LIC #%' OR upper(description) like '%LIC#%'"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:41.921Z",
+   "status": 200,
+   "bytes": 12,
+   "sha256": "5bf5a0a2ad9c35345e97c088b901aa7b81e0d7226302b79f6da2b79c4868ef80",
+   "duration_ms": 1475
+  },
+  {
+   "purpose": "license marker: contractor company or full name contains TACLA or TECL",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/resource/3syk-w9eu.json?%24select=count%28*%29+as+n&%24where=upper%28contractor_company_name%29+like+%27%25TACLA%25%27+OR+upper%28contractor_company_name%29+like+%27%25TECL%25%27+OR+upper%28contractor_full_name%29+like+%27%25TACLA%25%27+OR+upper%28contractor_full_name%29+like+%27%25TECL%25%27",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/resource/3syk-w9eu.json",
+    "multiValueQueryString": {
+     "$select": [
+      "count(*) as n"
+     ],
+     "$where": [
+      "upper(contractor_company_name) like '%TACLA%' OR upper(contractor_company_name) like '%TECL%' OR upper(contractor_full_name) like '%TACLA%' OR upper(contractor_full_name) like '%TECL%'"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:44.398Z",
+   "status": 200,
+   "bytes": 12,
+   "sha256": "3ab8834fb12e1fe27faa7685163dc93eb4e7a4da93d163848b19c1e372004fa7",
+   "duration_ms": 687
+  },
+  {
+   "purpose": "license marker: contractor company or full name contains LIC...#",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/resource/3syk-w9eu.json?%24select=count%28*%29+as+n&%24where=upper%28contractor_company_name%29+like+%27%25LIC%25%23%25%27+OR+upper%28contractor_full_name%29+like+%27%25LIC%25%23%25%27",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/resource/3syk-w9eu.json",
+    "multiValueQueryString": {
+     "$select": [
+      "count(*) as n"
+     ],
+     "$where": [
+      "upper(contractor_company_name) like '%LIC%#%' OR upper(contractor_full_name) like '%LIC%#%'"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:46.085Z",
+   "status": 200,
+   "bytes": 12,
+   "sha256": "3ab8834fb12e1fe27faa7685163dc93eb4e7a4da93d163848b19c1e372004fa7",
+   "duration_ms": 587
+  },
+  {
+   "purpose": "license marker: distinct rows over the three description queries",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/resource/3syk-w9eu.json?%24select=count%28*%29+as+n&%24where=%28upper%28description%29+like+%27%25TACLA%25%27%29+OR+%28upper%28description%29+like+%27%25TECL%25%27%29+OR+%28upper%28description%29+like+%27%25LICENSE+%23%25%27+OR+upper%28description%29+like+%27%25LIC+%23%25%27+OR+upper%28description%29+like+%27%25LIC%23%25%27%29",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/resource/3syk-w9eu.json",
+    "multiValueQueryString": {
+     "$select": [
+      "count(*) as n"
+     ],
+     "$where": [
+      "(upper(description) like '%TACLA%') OR (upper(description) like '%TECL%') OR (upper(description) like '%LICENSE #%' OR upper(description) like '%LIC #%' OR upper(description) like '%LIC#%')"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:47.674Z",
+   "status": 200,
+   "bytes": 13,
+   "sha256": "92a0b3b9dcae5156c935fe1888694345650325aaf88b784cc958f462a8cb743b",
+   "duration_ms": 1908
+  },
+  {
+   "purpose": "roofing building permits: total, with a company, with a full name",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/resource/3syk-w9eu.json?%24select=count%28*%29+as+n%2C+count%28contractor_company_name%29+as+with_company%2C+count%28contractor_full_name%29+as+with_name&%24where=permittype%3D%27BP%27+AND+upper%28description%29+like+%27%25ROOF%25%27",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/resource/3syk-w9eu.json",
+    "multiValueQueryString": {
+     "$select": [
+      "count(*) as n, count(contractor_company_name) as with_company, count(contractor_full_name) as with_name"
+     ],
+     "$where": [
+      "permittype='BP' AND upper(description) like '%ROOF%'"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:50.583Z",
+   "status": 200,
+   "bytes": 59,
+   "sha256": "536f66f6c30272bb1b8225a97180704a72a6a6626871975ab30cb3854db0cda7",
+   "duration_ms": 586
+  },
+  {
+   "purpose": "roofing building permits by contractor_trade",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/resource/3syk-w9eu.json?%24select=contractor_trade%2C+count%28*%29+as+n&%24where=permittype%3D%27BP%27+AND+upper%28description%29+like+%27%25ROOF%25%27&%24group=contractor_trade&%24order=n+DESC&%24limit=15",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/resource/3syk-w9eu.json",
+    "multiValueQueryString": {
+     "$select": [
+      "contractor_trade, count(*) as n"
+     ],
+     "$where": [
+      "permittype='BP' AND upper(description) like '%ROOF%'"
+     ],
+     "$group": [
+      "contractor_trade"
+     ],
+     "$order": [
+      "n DESC"
+     ],
+     "$limit": [
+      "15"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:52.172Z",
+   "status": 200,
+   "bytes": 232,
+   "sha256": "e3a263944bce433fd94b9fd5fe426f3fa3dd3697d0ef00b284d36a78ab2ee89f",
+   "duration_ms": 517
+  },
+  {
+   "purpose": "roofing building permits that print a company, by contractor city (top 40)",
+   "method": "GET",
+   "url": "https://data.austintexas.gov/resource/3syk-w9eu.json?%24select=upper%28contractor_city%29+as+city%2C+count%28*%29+as+n&%24where=permittype%3D%27BP%27+AND+upper%28description%29+like+%27%25ROOF%25%27+AND+contractor_company_name+IS+NOT+NULL&%24group=upper%28contractor_city%29&%24order=n+DESC&%24limit=40",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://data.austintexas.gov/resource/3syk-w9eu.json",
+    "multiValueQueryString": {
+     "$select": [
+      "upper(contractor_city) as city, count(*) as n"
+     ],
+     "$where": [
+      "permittype='BP' AND upper(description) like '%ROOF%' AND contractor_company_name IS NOT NULL"
+     ],
+     "$group": [
+      "upper(contractor_city)"
+     ],
+     "$order": [
+      "n DESC"
+     ],
+     "$limit": [
+      "40"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:53.690Z",
+   "status": 200,
+   "bytes": 1212,
+   "sha256": "7d4ddf76ff0e55e76ada4dfe8c35cbc11e64af4586e5dd99fc65dfdc1be6d6b7",
+   "duration_ms": 653
+  },
+  {
+   "purpose": "Socrata catalog entry 9cir-efmm",
+   "method": "GET",
+   "url": "https://api.us.socrata.com/api/catalog/v1?ids=9cir-efmm",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://api.us.socrata.com/api/catalog/v1",
+    "multiValueQueryString": {
+     "ids": [
+      "9cir-efmm"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:54.345Z",
+   "status": 200,
+   "bytes": 7743,
+   "sha256": "4368373cf9e723227178db492f4cf4933a2ce67349be07a216abddc13b98365b",
+   "duration_ms": 626
+  },
+  {
+   "purpose": "Socrata catalog entry jrea-zgmq",
+   "method": "GET",
+   "url": "https://api.us.socrata.com/api/catalog/v1?ids=jrea-zgmq",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://api.us.socrata.com/api/catalog/v1",
+    "multiValueQueryString": {
+     "ids": [
+      "jrea-zgmq"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:54.971Z",
+   "status": 200,
+   "bytes": 8024,
+   "sha256": "8629ca7d84fb229012cf913b38cb9bc5df570b71e723ee6a03a00e2510537013",
+   "duration_ms": 174
+  },
+  {
+   "purpose": "Socrata catalog entry 7358-krk7",
+   "method": "GET",
+   "url": "https://api.us.socrata.com/api/catalog/v1?ids=7358-krk7",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://api.us.socrata.com/api/catalog/v1",
+    "multiValueQueryString": {
+     "ids": [
+      "7358-krk7"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:55.146Z",
+   "status": 200,
+   "bytes": 8766,
+   "sha256": "de8a02ce4177c67f79e0b295fb78c25a9e24f55a8531fc9492fb082aa405043c",
+   "duration_ms": 176
+  },
+  {
+   "purpose": "Socrata catalog entry 2vfr-72e4",
+   "method": "GET",
+   "url": "https://api.us.socrata.com/api/catalog/v1?ids=2vfr-72e4",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://api.us.socrata.com/api/catalog/v1",
+    "multiValueQueryString": {
+     "ids": [
+      "2vfr-72e4"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:55.323Z",
+   "status": 200,
+   "bytes": 7982,
+   "sha256": "a7cfed7248ba3cbfaa025beab5ef97de69755ad4102a195fcfe37d705861d5e7",
+   "duration_ms": 173
+  },
+  {
+   "purpose": "Socrata catalog entry 8d92-wsiw",
+   "method": "GET",
+   "url": "https://api.us.socrata.com/api/catalog/v1?ids=8d92-wsiw",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://api.us.socrata.com/api/catalog/v1",
+    "multiValueQueryString": {
+     "ids": [
+      "8d92-wsiw"
+     ]
+    }
+   },
+   "fetched_at": "2026-10-17T14:58:55.496Z",
+   "status": 200,
+   "bytes": 6035,
+   "sha256": "79adbb998a6c335d52c4f21ab25b7d846429af585f6959f6d43c3cb200424974",
+   "duration_ms": 178
+  },
+  {
+   "purpose": "live lexicon manifest",
+   "method": "GET",
+   "url": "https://lexicon.elephant.xyz/api/manifest",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://lexicon.elephant.xyz/api/manifest",
+    "multiValueQueryString": {}
+   },
+   "fetched_at": "2026-10-17T14:58:55.675Z",
+   "status": 200,
+   "bytes": 18499,
+   "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+   "duration_ms": 1385
+  },
+  {
+   "purpose": "lexicon schema company",
+   "method": "GET",
+   "url": "https://ipfs.filebase.io/ipfs/bafkreifpgr7nbrcmdrjocuys34yjgdtttynt3pwrkpv47mlheklykmopjy",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://ipfs.filebase.io/ipfs/bafkreifpgr7nbrcmdrjocuys34yjgdtttynt3pwrkpv47mlheklykmopjy",
+    "multiValueQueryString": {}
+   },
+   "fetched_at": "2026-10-17T14:58:57.075Z",
+   "status": 200,
+   "bytes": 2617,
+   "sha256": "af347ed0c44c1c52e15312df30930e739e1b3dbed153ebcfb16722978531cf4e",
+   "duration_ms": 130
+  },
+  {
+   "purpose": "lexicon schema business_location",
+   "method": "GET",
+   "url": "https://ipfs.filebase.io/ipfs/bafkreidnmfbdzgupbh257g5z2tgouecbpgrxzic5oltjphqr3fjv6my7ni",
+   "source_http_request": {
+    "method": "GET",
+    "url": "https://ipfs.filebase.io/ipfs/bafkreidnmfbdzgupbh257g5z2tgouecbpgrxzic5oltjphqr3fjv6my7ni",
+    "multiValueQueryString": {}
+   },
+   "fetched_at": "2026-10-17T14:58:57.206Z",
+   "status": 200,
+   "bytes": 4482,
+   "sha256": "6d61423c9a8f09f5df9bb9d4ccea104179a37ca05d72e6979e11d9535f331f6a",
+   "duration_ms": 124
+  }
+ ]
+}
