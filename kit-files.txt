@@ -15,6 +15,7 @@ skills/use-oracle/runtime/docs/evidence/travis-portal-probes-2026-10-16.txt
 skills/use-oracle/runtime/docs/evidence/travis-portal-reprobe-us-2026-10-16.txt
 skills/use-oracle/runtime/docs/evidence/travis-seed-manifest-2026-10-16.json
 skills/use-oracle/runtime/docs/evidence/travis-t2-field-coverage-20261016.json
+skills/use-oracle/runtime/docs/evidence/travis-t2-lexicon-amended-a0c05c5-plus-travis.json
 skills/use-oracle/runtime/docs/evidence/travis-t2-lexicon-reproduction-20261016.json
 skills/use-oracle/runtime/docs/evidence/travis-t2-pilot-attempt1-20261016T214212Z.json
 skills/use-oracle/runtime/docs/evidence/travis-t2-run-20261016T215528Z.json

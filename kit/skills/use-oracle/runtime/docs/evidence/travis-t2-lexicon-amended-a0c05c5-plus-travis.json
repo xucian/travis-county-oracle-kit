@@ -1,0 +1,166 @@
+{
+ "schemaVersion": "travis.t2-lexicon-amended.v1",
+ "built_at": "2026-10-17T05:26:30Z",
+ "name": "a0c05c5-plus-travis",
+ "construction": {
+  "base": {
+   "repository": "elephant-xyz/lexicon",
+   "commit": "a0c05c5",
+   "file": "src/data/lexicon.json",
+   "sha256": "f2efa4f21846d30e0d8c1e4df801a1638c38c85c3f04db16260c79512c6d2a67",
+   "why": "the live publication state: its build reproduces all 159 live manifest CIDs (docs/evidence/travis-t2-lexicon-reproduction-20261016.json)"
+  },
+  "patch": {
+   "source": "commit 04943fc on the fork branch add-travis-county (head 96224d6), the change of elephant-xyz/lexicon#194",
+   "command": "git diff 04943fc^ 04943fc -- src/data/lexicon.json",
+   "sha256": "8052c5428963fedaabb0177a42ae27196eaefc8629ba2fe127e56b0196cc3906",
+   "content": "adds \"Travis\" after \"Ellis\" to unnormalized_address.county_jurisdiction and to address.county_name (two enum lines)"
+  },
+  "amended_lexicon_json_sha256": "b73d67f92efe3587decc8b995f4a20cc57b020d3e6f7cf024e2e78eae1556099",
+  "not_used": "the fork branch as is: upstream main also carries #178 and #181, never published, which change the relationship class and 12 more data groups"
+ },
+ "method": "the repository's own json-schema-generator and json-canonicalize in its former publisher's order; CIDv1 raw sha2-256 computed locally (proof and tool: docs/evidence/travis-t2-lexicon-reproduction-20261016.json, src/counties/travis/lexicon-reproduce.ts); built in a scratch clone, /Users/luti/dev/lexicon untouched",
+ "live_manifest": {
+  "url": "https://lexicon.elephant.xyz/api/manifest",
+  "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+  "entries": 159
+ },
+ "amended_manifest": {
+  "path": "data/travis/lexicon-amended/a0c05c5-plus-travis/manifest.json (git-ignored)",
+  "sha256": "f0e2cdd2afcfe9be24447aa1d80f3af8a3c8a4daa8dcdc9634ea4e3b7d1392c2",
+  "bytes": 18499,
+  "entries": 159,
+  "format": "the live API shape {name: {ipfsCid, type}}, live key order, compact JSON",
+  "format_check": "re-serializing the live manifest the same way (live key order, compact) reproduces its sha256 7084b933..., so the amended manifest differs from the live one only in the 15 CIDs"
+ },
+ "amended_schemas": {
+  "path": "data/travis/lexicon-amended/a0c05c5-plus-travis/schemas/<cid>.json (git-ignored)",
+  "count": 15
+ },
+ "unchanged_verified_identical": 144,
+ "missing": 0,
+ "extra": 0,
+ "changed": [
+  {
+   "name": "unnormalized_address",
+   "type": "class",
+   "live": "bafkreibrfkgavsypoiw5mzvaysuzjd62qaccvvnkbbhgcrtp2othnryhbm",
+   "amended": "bafkreihge2trlc7xpplqlidrk6k45c77ok5sp7ioudo2yptgrpgynssxia",
+   "bytes": 6045,
+   "sha256": "e626a7158bf77bd705a0715795ce8bff72bb27fd0ea0ddac3e668bcd86ca5740"
+  },
+  {
+   "name": "address",
+   "type": "class",
+   "live": "bafkreiebzvyy6prnwf3dcippii7yysrjesnbxpvcpyqmbs2b67hm2taf2a",
+   "amended": "bafkreief6khxtvmcjt6fj6cjavwfwmalofy2dporb5u3nynfrbqxtl4jua",
+   "bytes": 17138,
+   "sha256": "85f28f79d5824cfc54f849056c5b300b7171a1bdd10f69b6e1a5886179af89a0"
+  },
+  {
+   "name": "property_seed_to_unnormalized_address",
+   "type": "relationship",
+   "live": "bafkreiaq3bf5s2v3yc2dojcxq2seu7au3rc5s67wqbmplod2saccpcuzbu",
+   "amended": "bafkreifbo3pq4vs7wbm2f63xvtbihby3a7lzzwo4y3y3j63gjqxi3t4h6a",
+   "bytes": 578,
+   "sha256": "a176df0e565fb059a2fb77acc283871b07d79cd9dcc6f1b4fb664c2e8dcf87f0"
+  },
+  {
+   "name": "address_to_parcel",
+   "type": "relationship",
+   "live": "bafkreieap27nt53dp332uf6fisvuhvnzbx4mvpddu2btii7p4wjclu5v4m",
+   "amended": "bafkreieiaxup7iruiilf2eop2tbpkuhhlj3zfxokblrdp7yftqox2jpke4",
+   "bytes": 518,
+   "sha256": "8805e8ffa23442165d11cfd4c2f550e75a7792ddca0ae237ff059c1d7d25ea27"
+  },
+  {
+   "name": "property_to_address",
+   "type": "relationship",
+   "live": "bafkreieb53fv3pv2bsifxyefuw3flkxxzg35dimaoubd35pe3n5bzdlosy",
+   "amended": "bafkreiemfq5o6vvihz7mguqpphmehjldmobmilasxbuhqlxmjvomvravla",
+   "bytes": 524,
+   "sha256": "8c2c3aef56a83e7ec3520f79d843a5636382c42c12b868782eec4d5ccac41558"
+  },
+  {
+   "name": "person_to_address",
+   "type": "relationship",
+   "live": "bafkreihbn54qb2zxjg2egbvcty6m65rk36luxz4r553v22h3wxl6am5wki",
+   "amended": "bafkreid5ll5qz56ctv67dhqtp2reld67jgfq4w4ocdz24ep4xzt4xdl2sm",
+   "bytes": 518,
+   "sha256": "7d5afb0cf7c29d7df19e137ea2458fdf498b0e5b8e10f3ae11fcbe67cb8d7a93"
+  },
+  {
+   "name": "company_to_address",
+   "type": "relationship",
+   "live": "bafkreia5hrpc4zgp5tv2vpvaj7l3qbrig57hzirkrl6bejfdcyiu43defe",
+   "amended": "bafkreifch7rv6zh2yrtu5asxhcpgzqzsilqsef6ufg4y373elsoq2xstvu",
+   "bytes": 521,
+   "sha256": "a23fe35f64fac4674e8257389e6cc33242e12217d429b98dff645c9d0d5e53ad"
+  },
+  {
+   "name": "address_to_fact_sheet",
+   "type": "relationship",
+   "live": "bafkreicdoqppf2no5ohfylgsvowab2q37djgyplj4egxe4az4tlbrjh4sa",
+   "amended": "bafkreiclmj36qvuhgymgbaw6kjsmc2v4buvoajzearnhfl6xr76p25gwne",
+   "bytes": 530,
+   "sha256": "4b6277e8568736186082de5264c16abc0d2ae02724045a72afd78ffcfd74d669"
+  },
+  {
+   "name": "address_to_geometry",
+   "type": "relationship",
+   "live": "bafkreigbrpoyl33mogccs4lpg2oj75sophfm56ag5ny5i4pf7nxys437ja",
+   "amended": "bafkreieagkpoink5zcp2uzj2nczbujrobxzxbylrfvnmchzvhuu3xvg5su",
+   "bytes": 524,
+   "sha256": "80329ee4355dc89faa653a68b21a262e0df370e1712d5ac11f353d29bbd4dd95"
+  },
+  {
+   "name": "property_improvement_to_address",
+   "type": "relationship",
+   "live": "bafkreieuk2qcgcx6k5twxdfz66qrag6zr6wv3yy5xbdsfpb47on37bsf5q",
+   "amended": "bafkreiblie5gvh6qs5aoadq6k6kwaz57qtxeyvbc5ovqgdaarb7bciewsm",
+   "bytes": 560,
+   "sha256": "2b413a6a9fd09740e00e1e57956067bf84ee4c5422ebab030c00887e11209693"
+  },
+  {
+   "name": "business_location_to_address",
+   "type": "relationship",
+   "live": "bafkreiekimw2hzd4zv6mloquspvyw57nmp4bd3kmhfv5jxktbavwmc4rry",
+   "amended": "bafkreicdss6bzfob7aumgmpjznlfi7slaqsohg5p74z5skeo6qatrquzn4",
+   "bytes": 551,
+   "sha256": "4394bc1c95c1f828c331e9cb56547e4b0424e39bafff33d9288ef40138c2996f"
+  },
+  {
+   "name": "Seed",
+   "type": "dataGroup",
+   "live": "bafkreibhurphpjdq33ysit57jtzmdldgngepsdbsw4vm7esawth2ezgaxu",
+   "amended": "bafkreial73icc2ozqfx2uxemlku6y64rqdwtzc55fexca5izb5brbgro6m",
+   "bytes": 1142,
+   "sha256": "0bfed02169d9816faa5c8c5aa9ec7b9180ed3c8bbd292e2075190f43109a2ef3"
+  },
+  {
+   "name": "County",
+   "type": "dataGroup",
+   "live": "bafkreia6tjziby3upxmidymud5iusd32urrztslgrudkwysc7ydmxoekuq",
+   "amended": "bafkreigyrx3yshn4zudxhpcsxd7ylza4ltga3unddqrqjftndl7dptr7ki",
+   "bytes": 14728,
+   "sha256": "d88df7891dbccd0773bc52b8ff85e41c5ccc0dd1a31c2304966d1afe37ce3f52"
+  },
+  {
+   "name": "Property_Improvement",
+   "type": "dataGroup",
+   "live": "bafkreicyzywzwhmguojpi2otgrwsyi37le3u4lnavljbxu76cnrudxaxfu",
+   "amended": "bafkreifdsy5en6c4ejxtqqjwf36k446icphycx3mwisdlujqsgornhy35m",
+   "bytes": 4911,
+   "sha256": "a3963a46f85c226f3841362efcae73c813cf815f6cb22435d130919d169f1beb"
+  },
+  {
+   "name": "Business_Location",
+   "type": "dataGroup",
+   "live": "bafkreihlh2y6vpxrzejjxjjj7ec76bdhpkcorfiw6trtj7juwsyzkxqgd4",
+   "amended": "bafkreihfbhynvc7zkfhks7ak7ptmrvkpenxi3acnbnctvdw3w3gze3dqsm",
+   "bytes": 1890,
+   "sha256": "e509f0da8bf9514ea97c0afbe6c8d54f236e8d804d0b453a8edbb6cd926c7093"
+  }
+ ],
+ "matches_candidate": "identical to the candidate computed in the reproduction evidence (144 identical, 15 changed)"
+}
