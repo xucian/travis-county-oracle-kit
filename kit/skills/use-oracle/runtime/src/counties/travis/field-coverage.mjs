@@ -6,9 +6,14 @@
  * archive), or seed building only. `tests/travis-field-coverage.test.mjs`
  * fails when a read field has no entry or an entry names a target the
  * transform does not write.
+ *
+ * v2 (transform v3, decisions.md section 22): the Seed root is `address_has_parcel` only, so
+ * `property_seed.parcel_id` and `unnormalized_address.full_address` are no longer targets. No
+ * source field loses coverage: `prop_id` still lands on `parcel.parcel_identifier` and
+ * `property.parcel_identifier`, and the situs fields on `address.unnormalized_address`.
  */
 
-export const TRAVIS_FIELD_COVERAGE_VERSION = "travis-field-coverage-v1";
+export const TRAVIS_FIELD_COVERAGE_VERSION = "travis-field-coverage-v2";
 
 const entry = (lexicon, sidecar, seed, note) => Object.freeze({ lexicon: Object.freeze(lexicon), sidecar: Object.freeze(sidecar), seed, note });
 

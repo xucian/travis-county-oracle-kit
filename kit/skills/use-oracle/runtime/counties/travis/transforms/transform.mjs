@@ -42,7 +42,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const TRANSFORM_VERSION = "travis-transform-v2";
+export const TRANSFORM_VERSION = "travis-transform-v3";
 export const PARCEL_INPUT_SCHEMA_VERSION = "travis.parcel-input.v1";
 export const STATE_CODE = "TX";
 export const OWNER_CLASSIFICATION_VERSION = "travis-owner-classification-v2";
