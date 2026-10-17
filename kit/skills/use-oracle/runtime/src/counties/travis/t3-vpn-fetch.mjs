@@ -53,6 +53,8 @@ export const COMPTROLLER_DETAIL_PREFIX = "https://comptroller.texas.gov/taxes/fr
 /** Trades whose TDLR licenses can back a permit contractor (Texas issues no roofing license). */
 export const TDLR_TRADES = /electric|air[\s-]*condition|\ba\/c\b|refrigerat/i;
 const RMP = /responsible\s+master\s+plumber/i;
+/** A download: a .csv path or TSBPE's /download-csv/<code>/ endpoint. The site menu also links each license type's description page under the same name. */
+const CSV_DOWNLOAD_PATH = /\/download-csv\/|\.csv$/i;
 
 const relative = (target) => {
   const rel = path.relative(RUNTIME_ROOT, target);
@@ -252,7 +254,7 @@ function dedupeByHref(links) {
 /** @param {{ href: string, text: string }[]} links @returns {{ href: string, text: string } | null} */
 function findRmpLink(links) {
   const matches = links.filter((link) => RMP.test(link.text) || RMP.test(decodeURIComponent(link.href).replace(/[-_+]/g, " ")));
-  return matches.find((link) => /\.csv$/i.test(new URL(link.href).pathname)) ?? matches[0] ?? null;
+  return matches.find((link) => CSV_DOWNLOAD_PATH.test(new URL(link.href).pathname)) ?? null;
 }
 
 /** @param {string} href @returns {string} A file name from the URL path. */

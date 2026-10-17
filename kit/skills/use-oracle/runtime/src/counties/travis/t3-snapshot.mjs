@@ -16,12 +16,25 @@
  *   - rows keep the capture order (pages by offset, rows as printed); the Parquet bytes are a function of the capture
  *     alone (SNAPPY, no timestamps), so the same capture gives the same snapshot digest.
  *
+ * Privacy (a source's `privacy` rule, `t3-sources.mjs`): in a classed row the withheld columns are null in both their
+ * printed and trimmed form, `_privacy_class` and `_withheld_columns` say so, and `_row_sha256` hashes the row as captured
+ * with the withheld cells emptied (`""`), so neither the value nor a hash that could be searched for it is stored. Such a
+ * row has no printed key and is keyed by that redacted row hash.
+ *
+ * Column sets: a source may map printed headers to snapshot field names (`columnSets` in `t3-sources.mjs`); every
+ * file's header is recorded with its digest and the column set version it resolved to, and a header no set knows stops
+ * the load before anything is written.
+ *
  * Loading verifies each captured file's size and SHA-256 against its receipt and stops on a mismatch. The track
  * watermark (`watermark.json`) holds, per snapshot, the capture path, the artifact hash over the hash index of
  * `(path, artifact hash)` pairs, `merged_count` (artifacts merged), `merged_rows` and `last_merged_at`. A re-load
  * compares every key's row hashes with the snapshot on disk: when the hash index already covers every captured
  * artifact and nothing is new, changed or removed, nothing is rewritten and the watermark stays byte-identical.
  * Keys absent from a later capture of the same source are tombstoned (`<name>.tombstones.jsonl`) in the same merge.
+ * A merge that replaces a snapshot moves the replaced Parquet and hash index to `history/` (named by their digest), so
+ * no earlier snapshot is lost. A load may take a row filter (for example the Travis rows of a statewide capture): the
+ * snapshot then holds only the rows that pass, the watermark names the filter, and the report counts the rest. For keys
+ * whose rows changed, the report counts which source columns differ (counts only, never values).
  *
  * The snapshot is internal reconciliation state: never uploaded, never an Atlas or MCP source.
  *
@@ -29,19 +42,23 @@
  */
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
-import { appendFile, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, open, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { ParquetReader, ParquetSchema, ParquetWriter } from "@dsnp/parquetjs";
 
 import { buildNameIndex, summarizeNameIndex } from "./name-matcher.mjs";
-import { getT3Source, matchNamesOf } from "./t3-sources.mjs";
+import { getT3Source, matchNamesOf, snapshotFieldName } from "./t3-sources.mjs";
 
 export const NORMALIZER_VERSION = "travis-t3-source-snapshot.v1";
 export const RUNTIME_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const TRIMMED_SUFFIX = "__trimmed";
 const KEY_SEPARATOR = "\u001f";
 const ROW_GROUP_SIZE = 50_000;
+const PRIVACY_COLUMNS = Object.freeze([
+  ["_privacy_class", "UTF8"],
+  ["_withheld_columns", "UTF8"],
+]);
 const PROVENANCE_COLUMNS = Object.freeze([
   ["_capture_file", "UTF8"],
   ["_capture_url", "UTF8"],
@@ -61,17 +78,31 @@ const relativeToRuntime = (target) => path.relative(RUNTIME_ROOT, path.resolve(t
  * @property {boolean} quoted - Whether the cell was quoted (Socrata quotes every non-null value).
  */
 
+/** @param {string | undefined} character @returns {boolean} Whether a quoted field may close before it. */
+const closesField = (character) => character === undefined || character === "," || character === "\n" || character === "\r";
+
 /**
  * RFC 4180 records with their character span, so each row's captured bytes can be hashed exactly.
  *
+ * Dialects: `rfc4180` (default, strict: a quote inside a quoted field must be doubled, anything else throws) and
+ * `unescaped-quotes` (for writers that wrap values in quotes without escaping the quotes inside them, such as TDLR's
+ * license files: a quote closes the field only before a comma, a line end or the end of the text, and is otherwise
+ * literal; a doubled quote is still one quote unless it stands right before a comma or line end, where it is a literal
+ * quote followed by the closing one). For RFC 4180 input both dialects give the same records; records that needed the
+ * lenient rule are marked `lenient: true`.
+ *
  * @param {string} text - Whole CSV document.
- * @returns {Generator<{ fields: CsvField[], start: number, end: number }>} Records, header first.
+ * @param {{ dialect?: "rfc4180" | "unescaped-quotes" }} [options] - Parser options.
+ * @returns {Generator<{ fields: CsvField[], start: number, end: number, lenient: boolean }>} Records, header first.
  */
-export function* parseCsvRecordSpans(text) {
+export function* parseCsvRecordSpans(text, { dialect = "rfc4180" } = {}) {
+  if (dialect !== "rfc4180" && dialect !== "unescaped-quotes") throw new Error(`unknown CSV dialect ${dialect}`);
+  const unescapedQuotes = dialect === "unescaped-quotes";
   const length = text.length;
   let index = text.charCodeAt(0) === 0xfeff ? 1 : 0;
   while (index < length) {
     const start = index;
+    let lenient = false;
     /** @type {CsvField[]} */
     const fields = [];
     for (;;) {
@@ -84,10 +115,26 @@ export function* parseCsvRecordSpans(text) {
         for (;;) {
           const quote = text.indexOf('"', index);
           if (quote < 0) throw new Error(`unterminated quoted field in the record starting at character ${start}`);
-          if (text[quote + 1] === '"') {
+          const next = text[quote + 1];
+          if (next === '"' && unescapedQuotes && closesField(text[quote + 2])) {
+            // A literal quote ending the value, then the closing quote.
+            value += text.slice(chunkStart, quote + 1);
+            index = quote + 2;
+            lenient = true;
+            break;
+          }
+          if (next === '"') {
             value += text.slice(chunkStart, quote + 1);
             index = quote + 2;
             chunkStart = index;
+            continue;
+          }
+          if (unescapedQuotes && !closesField(next)) {
+            // A literal quote inside the value (the writer does not escape quotes).
+            value += text.slice(chunkStart, quote + 1);
+            index = quote + 1;
+            chunkStart = index;
+            lenient = true;
             continue;
           }
           value += text.slice(chunkStart, quote);
@@ -102,7 +149,7 @@ export function* parseCsvRecordSpans(text) {
       }
       fields.push({ value, quoted });
       if (index >= length) {
-        if (!(fields.length === 1 && !quoted && value === "")) yield { fields, start, end: index };
+        if (!(fields.length === 1 && !quoted && value === "")) yield { fields, start, end: index, lenient };
         return;
       }
       const character = text[index];
@@ -113,7 +160,7 @@ export function* parseCsvRecordSpans(text) {
       if (character === "\r" || character === "\n") {
         const end = index;
         index += character === "\r" && text[index + 1] === "\n" ? 2 : 1;
-        if (!(fields.length === 1 && !quoted && value === "")) yield { fields, start, end };
+        if (!(fields.length === 1 && !quoted && value === "")) yield { fields, start, end, lenient };
         break;
       }
       throw new Error(`unexpected character ${JSON.stringify(character)} after a quoted field at character ${index}`);
@@ -122,10 +169,13 @@ export function* parseCsvRecordSpans(text) {
 }
 
 /**
+ * The data-file receipts of a capture: the latest receipt of each `.csv` page or file, in offset order. A receipt whose
+ * body was HTML (a download link that served a web page) is never a data file: it is set aside and reported.
+ *
  * @param {string} captureDir - Capture directory.
- * @returns {Promise<Record<string, any>[]>} Data-file receipts (one per captured CSV), in offset order.
+ * @returns {Promise<{ receipts: Record<string, any>[], excluded: { file: string, reason: string, sha256: string | null }[] }>} Selection.
  */
-export async function readCaptureReceipts(captureDir) {
+export async function selectCaptureReceipts(captureDir) {
   const text = await readFile(path.join(captureDir, "receipts.jsonl"), "utf8");
   const receipts = text
     .split("\n")
@@ -135,7 +185,22 @@ export async function readCaptureReceipts(captureDir) {
   /** @type {Map<string, Record<string, any>>} */
   const latest = new Map();
   for (const receipt of receipts) latest.set(receipt.file, receipt);
-  return [...latest.values()].sort((left, right) => requestOffset(left.url) - requestOffset(right.url) || left.file.localeCompare(right.file));
+  const excluded = [];
+  const kept = [];
+  for (const receipt of latest.values()) {
+    if (/text\/html/i.test(String(receipt.content_type ?? ""))) excluded.push({ file: receipt.file, reason: "html_not_csv", sha256: receipt.sha256 ?? null });
+    else kept.push(receipt);
+  }
+  kept.sort((left, right) => requestOffset(left.url) - requestOffset(right.url) || left.file.localeCompare(right.file));
+  return { receipts: kept, excluded: excluded.sort((left, right) => left.file.localeCompare(right.file)) };
+}
+
+/**
+ * @param {string} captureDir - Capture directory.
+ * @returns {Promise<Record<string, any>[]>} Data-file receipts (one per captured CSV), in offset order.
+ */
+export async function readCaptureReceipts(captureDir) {
+  return (await selectCaptureReceipts(captureDir)).receipts;
 }
 
 /**
@@ -170,19 +235,42 @@ export async function verifyCapture(captureDir, receipts) {
 
 /**
  * @param {string[]} columns - Source columns as printed in the header.
+ * @param {{ privacy?: boolean }} [options] - Whether the source has a privacy rule (adds the privacy columns).
  * @returns {Record<string, { type: string, optional: boolean, compression: string }>} Snapshot Parquet schema fields.
  */
-export function snapshotSchemaFields(columns) {
+export function snapshotSchemaFields(columns, { privacy = false } = {}) {
   /** @type {Record<string, { type: string, optional: boolean, compression: string }>} */
   const fields = {};
-  const reserved = new Set(PROVENANCE_COLUMNS.map(([name]) => name));
+  const reserved = new Set([...PROVENANCE_COLUMNS, ...PRIVACY_COLUMNS].map(([name]) => name));
   for (const column of columns) {
     if (reserved.has(column) || column.endsWith(TRIMMED_SUFFIX)) throw new Error(`source column ${column} collides with a snapshot column`);
     fields[column] = { type: "UTF8", optional: true, compression: "SNAPPY" };
     fields[`${column}${TRIMMED_SUFFIX}`] = { type: "UTF8", optional: true, compression: "SNAPPY" };
   }
   for (const [name, type] of PROVENANCE_COLUMNS) fields[name] = { type, optional: true, compression: "SNAPPY" };
+  if (privacy) for (const [name, type] of PRIVACY_COLUMNS) fields[name] = { type, optional: true, compression: "SNAPPY" };
   return fields;
+}
+
+/**
+ * One CSV field as a canonical writer prints it (quoted values with doubled quotes).
+ *
+ * @param {CsvField} field - Field.
+ * @returns {string} Its text.
+ */
+const printField = (field) => (field.quoted ? `"${field.value.replace(/"/g, '""')}"` : field.value);
+
+/**
+ * The captured row text with some cells emptied; refuses a row the canonical form would not reproduce byte for byte.
+ *
+ * @param {string} original - The row as captured.
+ * @param {CsvField[]} fields - Its fields.
+ * @param {Set<number>} emptied - Indexes of the cells to empty.
+ * @returns {string} Redacted row text.
+ */
+export function redactedRowText(original, fields, emptied) {
+  if (fields.map(printField).join(",") !== original) throw new Error("a withheld row is not in canonical CSV form; its redacted hash cannot be derived");
+  return fields.map((field, index) => (emptied.has(index) ? (field.quoted ? '""' : "") : printField(field))).join(",");
 }
 
 /**
@@ -218,17 +306,67 @@ export function entityKeyOf(source, row) {
 }
 
 /**
+ * The column set a printed header resolves to for a source.
+ *
+ * @param {import("./t3-sources.mjs").T3Source} source - Source definition.
+ * @param {string[]} printed - Header as printed.
+ * @returns {{ version: string, header_sha256: string, printed: string[], fields: string[] }} Column set.
+ */
+export function resolveColumnSet(source, printed) {
+  const headerSha256 = sha256Hex(JSON.stringify(printed));
+  if (!source.columnSets) return { version: "printed", header_sha256: headerSha256, printed: [...printed], fields: [...printed] };
+  let version;
+  if (source.columnSets === "derive") version = `derived:${headerSha256.slice(0, 12)}`;
+  else {
+    const set = source.columnSets.find((candidate) => JSON.stringify(candidate.printed) === JSON.stringify(printed));
+    if (!set) throw new Error(`header matches no column set of ${source.key} (header sha256 ${headerSha256}, ${printed.length} columns: ${JSON.stringify(printed)}); add a column set version to t3-sources.mjs`);
+    version = set.version;
+  }
+  const fields = printed.map(snapshotFieldName);
+  const duplicates = fields.filter((field, index) => fields.indexOf(field) !== index);
+  if (duplicates.length > 0) throw new Error(`${source.key}: printed headers collide as snapshot fields: ${[...new Set(duplicates)].join(", ")}`);
+  return { version, header_sha256: headerSha256, printed: [...printed], fields };
+}
+
+/**
+ * The header of a CSV file (read from its first 1 MB).
+ *
+ * @param {string} file - CSV path.
+ * @param {"rfc4180" | "unescaped-quotes"} dialect - Dialect.
+ * @returns {Promise<string[]>} Header names as printed.
+ */
+export async function readCsvHeader(file, dialect) {
+  const handle = await open(file, "r");
+  try {
+    const buffer = Buffer.alloc(1 << 20);
+    const { bytesRead } = await handle.read(buffer, 0, buffer.length, 0);
+    const text = buffer.subarray(0, bytesRead).toString("utf8");
+    const lineEnd = text.search(/\r?\n/);
+    const first = parseCsvRecordSpans(lineEnd >= 0 ? text.slice(0, lineEnd + 1) : text, { dialect }).next();
+    if (first.done) throw new Error(`${file}: no header`);
+    return first.value.fields.map((field) => field.value);
+  } finally {
+    await handle.close();
+  }
+}
+
+/**
  * Stream every captured file of a capture as normalized snapshot rows.
  *
  * @param {string} captureDir - Capture directory.
  * @param {Record<string, any>[]} receipts - Verified receipts.
  * @param {(row: Record<string, any>, header: string[]) => Promise<void> | void} onRow - Row callback, in capture order.
- * @returns {Promise<{ columns: string[], rows: number, rowsByFile: Record<string, number> }>} Header and counts.
+ * @param {{ dialect?: "rfc4180" | "unescaped-quotes", privacy?: import("./t3-sources.mjs").PrivacyRule, fieldsOf?: (printed: string[]) => string[] }} [options] - CSV
+ *   dialect, privacy rule and header-to-field mapping (column set) of the source.
+ * @returns {Promise<{ columns: string[], rows: number, rowsByFile: Record<string, number>, lenientRows: number, withheld: Record<string, number> }>} Header and counts.
  */
-export async function streamCaptureRows(captureDir, receipts, onRow) {
+export async function streamCaptureRows(captureDir, receipts, onRow, { dialect = "rfc4180", privacy, fieldsOf } = {}) {
+  /** @type {Record<string, number>} */
+  const withheld = {};
   /** @type {string[] | null} */
   let columns = null;
   let total = 0;
+  let lenientRows = 0;
   /** @type {Record<string, number>} */
   const rowsByFile = {};
   for (const receipt of receipts) {
@@ -236,9 +374,10 @@ export async function streamCaptureRows(captureDir, receipts, onRow) {
     const offset = requestOffset(receipt.url);
     let header = null;
     let rowIndex = 0;
-    for (const record of parseCsvRecordSpans(text)) {
+    for (const record of parseCsvRecordSpans(text, { dialect })) {
       if (header === null) {
-        header = record.fields.map((field) => field.value);
+        const printed = record.fields.map((field) => field.value);
+        header = fieldsOf ? fieldsOf(printed) : printed;
         if (columns === null) columns = header;
         else if (JSON.stringify(columns) !== JSON.stringify(header)) throw new Error(`${receipt.file}: header differs from the first file's`);
         continue;
@@ -251,7 +390,23 @@ export async function streamCaptureRows(captureDir, receipts, onRow) {
       row._capture_sha256 = receipt.sha256;
       row._capture_row_index = rowIndex;
       row._capture_offset = offset + rowIndex;
-      row._row_sha256 = sha256Hex(Buffer.from(text.slice(record.start, record.end), "utf8"));
+      const original = text.slice(record.start, record.end);
+      const privacyClass = privacy ? privacy.classOf(row) : null;
+      if (privacy) {
+        row._privacy_class = privacyClass;
+        row._withheld_columns = privacyClass ? privacy.withheldColumns.join(",") : null;
+      }
+      if (privacyClass) {
+        const emptied = new Set(privacy.withheldColumns.map((column) => header.indexOf(column)).filter((index) => index >= 0));
+        if (emptied.size !== privacy.withheldColumns.length) throw new Error(`${receipt.file}: a withheld column is missing from the header`);
+        for (const column of privacy.withheldColumns) {
+          row[column] = null;
+          row[`${column}${TRIMMED_SUFFIX}`] = null;
+        }
+        row._row_sha256 = sha256Hex(Buffer.from(redactedRowText(original, record.fields, emptied), "utf8"));
+        withheld[privacyClass] = (withheld[privacyClass] ?? 0) + 1;
+      } else row._row_sha256 = sha256Hex(Buffer.from(original, "utf8"));
+      if (record.lenient) lenientRows += 1;
       await onRow(row, header);
       rowIndex += 1;
     }
@@ -259,7 +414,7 @@ export async function streamCaptureRows(captureDir, receipts, onRow) {
     rowsByFile[receipt.file] = rowIndex;
     total += rowIndex;
   }
-  return { columns: columns ?? [], rows: total, rowsByFile };
+  return { columns: columns ?? [], rows: total, rowsByFile, lenientRows, withheld };
 }
 
 /**
@@ -322,6 +477,75 @@ export function hashIndexDigest(hashIndex) {
 }
 
 /**
+ * Read, from a snapshot, the source columns of the rows under some keys (the changed-column report).
+ *
+ * @param {import("./t3-sources.mjs").T3Source} source - Source definition.
+ * @param {string} parquetPath - Snapshot path.
+ * @param {Set<string>} keys - Entity keys wanted.
+ * @param {string[]} columns - Source columns to read (raw values).
+ * @returns {Promise<Map<string, Record<string, unknown>[]>>} Rows by key.
+ */
+export async function readSnapshotRows(source, parquetPath, keys, columns) {
+  /** @type {Map<string, Record<string, unknown>[]>} */
+  const rows = new Map();
+  if (keys.size === 0) return rows;
+  const reader = await ParquetReader.openFile(parquetPath);
+  try {
+    const projection = [...new Set([...columns, ...(source.keyColumns ?? []).map((column) => `${column}${TRIMMED_SUFFIX}`), "_row_sha256"])].map((column) => [column]);
+    const cursor = reader.getCursor(projection);
+    let record = await cursor.next();
+    while (record) {
+      const key = entityKeyOf(source, /** @type {Record<string, unknown>} */ (record));
+      if (keys.has(key)) rows.set(key, [...(rows.get(key) ?? []), /** @type {Record<string, unknown>} */ (record)]);
+      record = await cursor.next();
+    }
+  } finally {
+    await reader.close();
+  }
+  return rows;
+}
+
+/**
+ * Which source columns differ between the prior and the new rows of changed keys (counts only).
+ *
+ * @param {Map<string, Record<string, unknown>[]>} priorRows - Prior rows by key.
+ * @param {Map<string, Record<string, unknown>[]>} nextRows - New rows by key.
+ * @param {string[]} columns - Source columns.
+ * @returns {{ keys: number, single_row_keys: number, multi_row_keys: number, by_column: Record<string, number>, keys_without_value_change: number }} Counts
+ *   (`by_column`: how many compared keys differ in each column; a key can differ in several).
+ */
+export function changedColumnCounts(priorRows, nextRows, columns) {
+  /** @type {Record<string, number>} */
+  const byColumn = Object.fromEntries(columns.map((column) => [column, 0]));
+  let single = 0;
+  let multi = 0;
+  let withoutValueChange = 0;
+  for (const [key, next] of nextRows) {
+    const prior = priorRows.get(key) ?? [];
+    if (prior.length !== 1 || next.length !== 1) {
+      multi += 1;
+      continue;
+    }
+    single += 1;
+    let differs = false;
+    for (const column of columns) {
+      if ((prior[0][column] ?? null) !== (next[0][column] ?? null)) {
+        byColumn[column] += 1;
+        differs = true;
+      }
+    }
+    if (!differs) withoutValueChange += 1;
+  }
+  return { keys: nextRows.size, single_row_keys: single, multi_row_keys: multi, by_column: Object.fromEntries(Object.entries(byColumn).filter(([, count]) => count > 0).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))), keys_without_value_change: withoutValueChange };
+}
+
+/**
+ * @typedef {object} RowFilter
+ * @property {string} label - What the filter keeps (recorded in the watermark and the Parquet metadata).
+ * @property {(row: Record<string, any>) => boolean} test - Whether a normalized row is kept.
+ */
+
+/**
  * Load one capture into its snapshot, idempotently.
  *
  * @param {object} params - Load parameters.
@@ -330,23 +554,53 @@ export function hashIndexDigest(hashIndex) {
  * @param {string} params.outputDir - Track directory (snapshot, hash index, watermark, reports).
  * @param {string} params.name - Snapshot name (for example `tx-comptroller-franchise-tax-travis`).
  * @param {string} [params.scopeLabel] - Human description of the capture's scope.
+ * @param {RowFilter | null} [params.rowFilter] - Keep only the rows that pass (for example a county subset).
+ * @param {boolean} [params.names] - Build the matcher's collision summary in the report (default true).
+ * @param {number} [params.duplicateDetailLimit] - Describe duplicate keys only up to this many (default 50).
  * @param {string} [params.now] - Merge time (ISO); defaults to the current time.
  * @returns {Promise<Record<string, any>>} The load report (counts and digests only; no rows).
  */
-export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, scopeLabel = null, now = new Date().toISOString() }) {
-  const source = getT3Source(sourceKey);
+export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, scopeLabel = null, rowFilter = null, names = true, duplicateDetailLimit = 50, now = new Date().toISOString() }) {
+  const baseSource = getT3Source(sourceKey);
+  const dialect = baseSource.csvDialect ?? "rfc4180";
   const startedAt = Date.now();
   await mkdir(outputDir, { recursive: true });
-  const receipts = await readCaptureReceipts(captureDir);
-  if (receipts.length === 0) throw new Error(`${captureDir}: no captured CSV receipts`);
+  const selection = await selectCaptureReceipts(captureDir);
+  const receipts = selection.receipts;
+  if (receipts.length === 0) throw new Error(`${captureDir}: no captured CSV receipts${selection.excluded.length > 0 ? ` (set aside: ${selection.excluded.map((entry) => `${entry.file} ${entry.reason}`).join(", ")})` : ""}`);
   const verified = await verifyCapture(captureDir, receipts);
+
+  // Every file's header and the column set it resolves to; a header no set knows stops here, before any write.
+  const headers = [];
+  for (const receipt of receipts) headers.push({ file: receipt.file, ...resolveColumnSet(baseSource, await readCsvHeader(path.join(captureDir, receipt.file), dialect)) });
+  if (headers.some((header) => JSON.stringify(header.fields) !== JSON.stringify(headers[0].fields))) {
+    throw new Error(`${captureDir}: files resolve to different snapshot fields (${[...new Set(headers.map((header) => header.version))].join(", ")}); load them as separate snapshots`);
+  }
+  const fieldsByHeader = new Map(headers.map((header) => [JSON.stringify(header.printed), header.fields]));
+  const fieldsOf = (printed) => {
+    const fields = fieldsByHeader.get(JSON.stringify(printed));
+    if (!fields) throw new Error(`${sourceKey}: a header changed between the header check and the load`);
+    return fields;
+  };
+  const roles = baseSource.resolveColumns ? baseSource.resolveColumns(headers[0].fields, headers[0].printed) : null;
+  /** @type {import("./t3-sources.mjs").T3Source} */
+  const source = roles ? { ...baseSource, keyColumns: roles.keyColumns, nameColumns: roles.nameColumns, extraMatchNames: roles.extraMatchNames, matchNameVersion: roles.matchNameVersion, scopeOf: roles.scopeOf } : baseSource;
+  /** @type {{ version: string, header_sha256: string, printed: string[], fields: string[], files: string[] }[]} */
+  const columnSets = [];
+  for (const header of headers) {
+    const set = columnSets.find((candidate) => candidate.header_sha256 === header.header_sha256);
+    if (set) set.files.push(header.file);
+    else columnSets.push({ version: header.version, header_sha256: header.header_sha256, printed: header.printed, fields: header.fields, files: [header.file] });
+  }
 
   const parquetPath = path.join(outputDir, `${name}.parquet`);
   const hashIndexPath = path.join(outputDir, `${name}.hash-index.json`);
   const watermarkPath = path.join(outputDir, "watermark.json");
   const tombstonePath = path.join(outputDir, `${name}.tombstones.jsonl`);
+  const historyDir = path.join(outputDir, "history");
   const capturePath = `${relativeToRuntime(captureDir)}/`;
   const currentIndex = receipts.map((receipt) => ({ path: `${capturePath}${receipt.file}`, artifact_hash: receipt.sha256, bytes: receipt.bytes, rows: receipt.rows ?? null, fetched_at: receipt.fetched_at }));
+  const filterLabel = rowFilter?.label ?? null;
 
   /** @type {Record<string, any>} */
   const watermark = existsSync(watermarkPath) ? JSON.parse(await readFile(watermarkPath, "utf8")) : { track: source.track, county: "travis", entries: {} };
@@ -355,6 +609,7 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
   const priorIndex = existsSync(hashIndexPath) ? JSON.parse(await readFile(hashIndexPath, "utf8")) : [];
   const covered = new Set(priorIndex.map((entry) => `${entry.path}\u0000${entry.artifact_hash}`));
   const uncovered = currentIndex.filter((entry) => !covered.has(`${entry.path}\u0000${entry.artifact_hash}`));
+  const filterUnchanged = (prior?.row_filter ?? null) === filterLabel;
   const snapshotIntact = prior !== null && existsSync(parquetPath) && sha256Hex(await readFile(parquetPath)) === prior.snapshot.sha256;
   const previousKeys = snapshotIntact ? await readSnapshotKeys(source, parquetPath) : new Map();
 
@@ -368,57 +623,109 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
   const distributions = Object.fromEntries(source.distributionColumns.map((column) => [column, new Map()]));
   /** @type {Record<string, number>} */
   const scopes = {};
+  /** @type {Record<string, number>} */
+  const filteredOutByScope = {};
+  /** Source columns of the new rows of keys whose rows differ from the prior snapshot's. */
+  /** @type {Map<string, Record<string, unknown>[]>} */
+  const changedNextRows = new Map();
   const nameRows = [];
+  let rowsKept = 0;
   let columns = null;
   let writer = null;
   const openWriter = async (header) => {
     columns = header;
-    writer = await ParquetWriter.openFile(new ParquetSchema(snapshotSchemaFields(header)), temporaryPath, { rowGroupSize: ROW_GROUP_SIZE });
+    writer = await ParquetWriter.openFile(new ParquetSchema(snapshotSchemaFields(header, { privacy: Boolean(source.privacy) })), temporaryPath, { rowGroupSize: ROW_GROUP_SIZE });
     writer.setMetadata("t3.source", source.key);
     writer.setMetadata("t3.dataset", source.dataset);
     writer.setMetadata("t3.normalizer_version", NORMALIZER_VERSION);
     writer.setMetadata("t3.capture_artifact_hash", hashIndexDigest(currentIndex));
+    if (filterLabel !== null) writer.setMetadata("t3.row_filter", filterLabel);
+    if (source.privacy) writer.setMetadata("t3.privacy_version", source.privacy.version);
+    if (source.columnSets) writer.setMetadata("t3.column_sets", JSON.stringify(columnSets.map((set) => ({ version: set.version, header_sha256: set.header_sha256 }))));
   };
-  const streamed = await streamCaptureRows(captureDir, receipts, async (row, header) => {
-    if (writer === null) await openWriter(header);
-    /** @type {Record<string, unknown>} */
-    const record = {};
-    for (const [key, value] of Object.entries(row)) {
-      if (value === null || value === undefined) continue;
-      record[key] = key === "_capture_row_index" || key === "_capture_offset" ? BigInt(value) : value;
-      if (key.endsWith(TRIMMED_SUFFIX)) presence[key.slice(0, -TRIMMED_SUFFIX.length)] = (presence[key.slice(0, -TRIMMED_SUFFIX.length)] ?? 0) + 1;
-    }
-    await writer.appendRow(record);
-    const key = entityKeyOf(source, row);
-    const list = nextKeys.get(key) ?? [];
-    list.push(row._row_sha256);
-    nextKeys.set(key, list);
-    for (const column of source.distributionColumns) {
-      const value = row[`${column}${TRIMMED_SUFFIX}`] ?? "(null)";
-      distributions[column].set(value, (distributions[column].get(value) ?? 0) + 1);
-    }
-    const scope = source.scopeOf(row);
-    scopes[scope] = (scopes[scope] ?? 0) + 1;
-    if (source.nameColumns.length > 0) nameRows.push({ __key: key, __scope: scope, __names: matchNamesOf(source, row) });
-  });
+  const streamed = await streamCaptureRows(
+    captureDir,
+    receipts,
+    async (row, header) => {
+      if (writer === null) await openWriter(header);
+      const scope = source.scopeOf(row);
+      if (rowFilter && !rowFilter.test(row)) {
+        filteredOutByScope[scope] = (filteredOutByScope[scope] ?? 0) + 1;
+        return;
+      }
+      rowsKept += 1;
+      /** @type {Record<string, unknown>} */
+      const record = {};
+      for (const [key, value] of Object.entries(row)) {
+        if (value === null || value === undefined) continue;
+        record[key] = key === "_capture_row_index" || key === "_capture_offset" ? BigInt(value) : value;
+        if (key.endsWith(TRIMMED_SUFFIX)) presence[key.slice(0, -TRIMMED_SUFFIX.length)] = (presence[key.slice(0, -TRIMMED_SUFFIX.length)] ?? 0) + 1;
+      }
+      await writer.appendRow(record);
+      const key = entityKeyOf(source, row);
+      const list = nextKeys.get(key) ?? [];
+      list.push(row._row_sha256);
+      nextKeys.set(key, list);
+      const priorHashes = previousKeys.get(key);
+      if (priorHashes && !priorHashes.includes(row._row_sha256)) changedNextRows.set(key, [...(changedNextRows.get(key) ?? []), Object.fromEntries(header.map((column) => [column, row[column] ?? null]))]);
+      for (const column of source.distributionColumns) {
+        const value = row[`${column}${TRIMMED_SUFFIX}`] ?? "(null)";
+        distributions[column].set(value, (distributions[column].get(value) ?? 0) + 1);
+      }
+      scopes[scope] = (scopes[scope] ?? 0) + 1;
+      if (names && source.nameColumns.length > 0) nameRows.push({ __key: key, __scope: scope, __names: matchNamesOf(source, row) });
+    },
+    { dialect, privacy: source.privacy, fieldsOf },
+  );
   if (writer === null) await openWriter(streamed.columns);
   await writer.close();
   for (const list of nextKeys.values()) list.sort();
   const snapshotColumns = columns ?? streamed.columns;
 
   const diff = diffKeys(previousKeys, nextKeys);
-  const unchangedCapture = snapshotIntact && uncovered.length === 0 && diff.new === 0 && diff.changed === 0 && diff.removed === 0;
+  const unchangedCapture = snapshotIntact && filterUnchanged && uncovered.length === 0 && diff.new === 0 && diff.changed === 0 && diff.removed === 0;
   let merged = false;
   /** Digest of the snapshot this load rebuilt; on a no-op re-load it must equal the snapshot on disk (determinism). */
   const rebuiltSha256 = sha256Hex(await readFile(temporaryPath));
+  /** @type {{ path: string, sha256: string, hash_index_path: string | null } | null} */
+  let priorSnapshot = null;
+  // Changed keys: compare the prior rows column by column before the prior snapshot is moved away. Keys with one row on
+  // both sides are compared; keys with several rows on either side are counted only.
+  let multiRowChanged = 0;
+  for (const key of [...changedNextRows.keys()]) {
+    const priorHashes = previousKeys.get(key) ?? [];
+    const nextHashes = nextKeys.get(key) ?? [];
+    if (priorHashes.join(",") === nextHashes.join(",")) changedNextRows.delete(key);
+    else if (priorHashes.length !== 1 || nextHashes.length !== 1) {
+      multiRowChanged += 1;
+      changedNextRows.delete(key);
+    }
+  }
+  const changedColumns =
+    diff.changed > 0
+      ? { ...changedColumnCounts(await readSnapshotRows(source, parquetPath, new Set(changedNextRows.keys()), snapshotColumns), changedNextRows, snapshotColumns), multi_row_keys: multiRowChanged }
+      : null;
   if (unchangedCapture) {
     await rm(temporaryPath, { force: true });
   } else {
+    if (existsSync(parquetPath)) {
+      // Keep the replaced snapshot and its hash index (no snapshot is ever lost).
+      const replacedSha256 = sha256Hex(await readFile(parquetPath));
+      await mkdir(historyDir, { recursive: true });
+      const historyParquet = path.join(historyDir, `${name}.${replacedSha256.slice(0, 16)}.parquet`);
+      await rename(parquetPath, historyParquet);
+      let historyIndex = null;
+      if (existsSync(hashIndexPath)) {
+        historyIndex = path.join(historyDir, `${name}.${replacedSha256.slice(0, 16)}.hash-index.json`);
+        await writeFile(historyIndex, await readFile(hashIndexPath));
+      }
+      priorSnapshot = { path: relativeToRuntime(historyParquet), sha256: replacedSha256, hash_index_path: historyIndex ? relativeToRuntime(historyIndex) : null };
+    }
     await rename(temporaryPath, parquetPath);
     merged = true;
   }
   const snapshotBytes = await readFile(parquetPath);
-  const snapshot = { path: relativeToRuntime(parquetPath), sha256: sha256Hex(snapshotBytes), bytes: snapshotBytes.length, rows: streamed.rows };
+  const snapshot = { path: relativeToRuntime(parquetPath), sha256: sha256Hex(snapshotBytes), bytes: snapshotBytes.length, rows: rowsKept };
 
   if (merged) {
     for (const key of diff.removedKeys) {
@@ -431,10 +738,11 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
       source: source.key,
       dataset: source.dataset,
       scope: scopeLabel,
+      ...(filterLabel !== null ? { row_filter: filterLabel } : {}),
       path: capturePath,
       artifact_hash: hashIndexDigest(currentIndex),
       merged_count: currentIndex.length,
-      merged_rows: streamed.rows,
+      merged_rows: rowsKept,
       last_merged_at: now,
       hash_index_path: relativeToRuntime(hashIndexPath),
       snapshot,
@@ -446,14 +754,20 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
   // Duplicate keys: which columns differ between their rows (values only for code and date columns).
   const duplicateKeys = [...nextKeys.entries()].filter(([key, hashes]) => hashes.length > 1 && !key.startsWith("row:"));
   const duplicates = [];
-  if (duplicateKeys.length > 0 && duplicateKeys.length <= 50) {
+  if (duplicateKeys.length > 0 && duplicateKeys.length <= duplicateDetailLimit) {
     const wanted = new Set(duplicateKeys.map(([key]) => key));
     /** @type {Map<string, Record<string, any>[]>} */
     const rowsByKey = new Map();
-    await streamCaptureRows(captureDir, receipts, (row) => {
-      const key = entityKeyOf(source, row);
-      if (wanted.has(key)) rowsByKey.set(key, [...(rowsByKey.get(key) ?? []), row]);
-    });
+    await streamCaptureRows(
+      captureDir,
+      receipts,
+      (row) => {
+        if (rowFilter && !rowFilter.test(row)) return;
+        const key = entityKeyOf(source, row);
+        if (wanted.has(key)) rowsByKey.set(key, [...(rowsByKey.get(key) ?? []), row]);
+      },
+      { dialect, privacy: source.privacy, fieldsOf },
+    );
     const showable = new Set([...source.distributionColumns, ...snapshotColumns.filter((column) => /date/i.test(column))]);
     for (const rows of rowsByKey.values()) {
       const differing = snapshotColumns.filter((column) => new Set(rows.map((row) => row[column])).size > 1);
@@ -468,7 +782,7 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
   }
 
   const nameSummary =
-    source.nameColumns.length > 0
+    names && source.nameColumns.length > 0
       ? {
           ...summarizeNameIndex(
             buildNameIndex(
@@ -489,12 +803,29 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
     track: source.track,
     name,
     scope: scopeLabel,
+    row_filter: filterLabel,
     normalizer_version: NORMALIZER_VERSION,
+    csv_dialect: dialect,
     loaded_at: now,
-    capture: { path: capturePath, files: verified.length, bytes: verified.reduce((sum, file) => sum + file.bytes, 0), verified_against_receipts: true, artifact_hash: hashIndexDigest(currentIndex), files_detail: verified.map((file) => ({ ...file, rows_parsed: streamed.rowsByFile[file.file] })) },
-    columns: { source: snapshotColumns, count: snapshotColumns.length, snapshot: Object.keys(snapshotSchemaFields(snapshotColumns)).length },
-    counts: {
+    capture: {
+      path: capturePath,
+      files: verified.length,
+      bytes: verified.reduce((sum, file) => sum + file.bytes, 0),
+      verified_against_receipts: true,
+      artifact_hash: hashIndexDigest(currentIndex),
       rows: streamed.rows,
+      lenient_rows: streamed.lenientRows,
+      files_detail: verified.map((file) => ({ ...file, rows_parsed: streamed.rowsByFile[file.file] })),
+      set_aside: selection.excluded,
+    },
+    columns: { source: snapshotColumns, count: snapshotColumns.length, snapshot: Object.keys(snapshotSchemaFields(snapshotColumns, { privacy: Boolean(source.privacy) })).length },
+    column_sets: columnSets,
+    resolved_columns: roles ? { key_columns: roles.keyColumns, name_columns: roles.nameColumns, match_name_version: roles.matchNameVersion ?? null, roles: roles.roles } : null,
+    privacy: source.privacy ? { version: source.privacy.version, withheld_columns: source.privacy.withheldColumns, rows_by_class: streamed.withheld, row_sha256_basis: "classed rows: the captured row with the withheld cells emptied" } : null,
+    counts: {
+      rows: rowsKept,
+      rows_filtered_out: streamed.rows - rowsKept,
+      filtered_out_by_scope: Object.fromEntries(Object.entries(filteredOutByScope).sort(([a], [b]) => a.localeCompare(b))),
       distinct_keys: [...nextKeys.keys()].filter((key) => !key.startsWith("row:")).length,
       rows_without_key: [...nextKeys.keys()].filter((key) => key.startsWith("row:")).length,
       duplicate_keys: duplicateKeys.length,
@@ -504,11 +835,24 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
       distributions: Object.fromEntries(Object.entries(distributions).map(([column, values]) => [column, Object.fromEntries([...values.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])))])),
     },
     duplicates,
+    duplicates_described: duplicateKeys.length <= duplicateDetailLimit,
     names: nameSummary,
     diff: { against: snapshotIntact ? "snapshot on disk" : "nothing (first load)", new: diff.new, changed: diff.changed, unchanged: diff.unchanged, removed: diff.removed, tombstoned: merged ? diff.removed : 0 },
+    changed_columns: changedColumns,
     hash_index: { entries: currentIndex.length, uncovered_before_load: uncovered.length },
     merged,
-    merge_reason: merged ? (snapshotIntact ? "capture changed" : "first load") : "the hash index covers every (path, artifact hash) and the content diff is empty",
+    merge_reason: merged
+      ? !snapshotIntact
+        ? prior !== null
+          ? "snapshot on disk did not match the watermark"
+          : "first load"
+        : [
+            ...(uncovered.length > 0 ? [`${uncovered.length} capture artifacts not in the hash index`] : []),
+            ...(diff.new + diff.changed + diff.removed > 0 ? ["content diff"] : []),
+            ...(filterUnchanged ? [] : ["row filter changed"]),
+          ].join("; ")
+      : "the hash index covers every (path, artifact hash) and the content diff is empty",
+    prior_snapshot: priorSnapshot,
     snapshot,
     rebuilt_snapshot_sha256: rebuiltSha256,
     rebuild_matches_snapshot: rebuiltSha256 === snapshot.sha256,

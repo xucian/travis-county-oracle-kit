@@ -1,0 +1,38 @@
+{
+ "kind": "travis-t3-detail-url-decision",
+ "recorded_at": "2026-10-17T17:36:00Z",
+ "decision_basis": "assignment docs/decisions.md section 23 ('a per-taxpayer Comptroller detail URL is added only once its form is confirmed under US egress, and the bulk page is never written as a company's source_http_request') and api-contract.md BusinessRecord.detail_url ('the Comptroller's per-taxpayer detail URL, once its form is confirmed under US egress; never the bulk dataset page'); no field is added",
+ "probe": {
+  "capture": "data/travis/t3-window/comptroller-taxpayer-detail-probe/detail-20261017T160717Z.html (receipt-verified: docs/evidence/travis-t3-window-verify-20261017T160716Z.json)",
+  "request": "GET https://comptroller.texas.gov/taxes/franchise/account-status/search/<taxpayer_number>, egress US, 2026-10-17T16:07:17Z",
+  "probe_taxpayer": "the first Texas profit corporation (organizational type CT) with an SOS file number in the Travis cache; the number itself is not recorded here",
+  "status": 200,
+  "redirected": false,
+  "final_url_equals_request": true,
+  "content_type": "text/html; charset=UTF-8",
+  "bytes": 150053,
+  "sha256": "44013056777752f40468da3cbecccab7d53de701e34283a1eda51fa5d3a574f8",
+  "title": "FRANCHISE TAX ACCOUNT STATUS",
+  "taxpayer_number_occurrences": 4,
+  "where_it_occurs": {
+   "script_variable_apiUrl": 1,
+   "share_links": 3
+  },
+  "record_fields_in_html": "none: the page is a shell with a skeleton loader; its script calls fetch(apiUrl) and renders the account from the JSON",
+  "fetch_apiUrl_calls": 1,
+  "data_endpoint": "https://comptroller.texas.gov/data-search/franchise-tax/<taxpayer_number> (named by the page; not requested in the window)"
+ },
+ "decision": {
+  "detail_url": "https://comptroller.texas.gov/taxes/franchise/account-status/search/<taxpayer_number>, the trimmed printed 11-digit taxpayer number of a franchise-tax row",
+  "rule": "travis-comptroller-detail-url.v1 (src/counties/travis/t3-sources.mjs businessDetailUrl)",
+  "applies_to": "tx-comptroller-franchise-tax rows only (every row of 2026-10-17 prints an 11-digit number: 342,334 Travis rows, 3,487,662 statewide)",
+  "null_for": [
+   "tx-comptroller-sales-tax rows: the page is the franchise account status and was probed for a franchise taxpayer only; a withheld sole owner's number is never put in a URL",
+   "tx-sos-veteran-owned-business rows: keyed by SOS filing number, no taxpayer page was probed for them",
+   "any row whose number is withheld or not 11 digits"
+  ],
+  "form_confirmed_because": "under US egress the URL answers HTTP 200 without a redirect and returns a page generated for that taxpayer (its own data endpoint and its share links carry the same number)",
+  "not_provenance": "the HTML holds no record field, so the URL does not confirm the record and backs no field: no source_http_request, request_identifier or unpublished_source names it; a business record's provenance stays its bulk page request (unpublished_source.source_http_request). The probe's confirmation rule ('until then no company carries a per-taxpayer source_http_request') therefore still holds, and in v1 no company record is written at all",
+  "optional_confirmation": "one GET of the data-search endpoint for the probe taxpayer under US egress would show whether it serves the record; it is not needed for a link and is not part of the TSBPE re-run"
+ }
+}

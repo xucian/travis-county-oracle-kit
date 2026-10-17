@@ -132,7 +132,8 @@ async function internet({ country = () => "US", data = datasets(), tdlrPage, fai
       return respond(toCsv(["LICENSE NUMBER", "BUSINESS NAME"], [[`${path.basename(parsed.pathname)}-1`, "SPARK LLC"], ["X-2", "COOL\nLLC"]]), { headers: { "content-type": "text/csv", "last-modified": "Sat, 17 Oct 2026 05:00:00 GMT" } });
     }
     if (url === "https://tsbpe.texas.gov/free-licensee-list/") return respond(tsbpe, { headers: { "content-type": "text/html" } });
-    if (parsed.hostname === "tsbpe.texas.gov" && parsed.pathname.endsWith(".csv")) return respond(toCsv(["License Number", "Name", "Company"], [["RMP-1", "PAT PLUMBER", "PIPES LLC"]]), { headers: { "content-type": "text/csv" } });
+    if (parsed.hostname === "tsbpe.texas.gov" && parsed.pathname.startsWith("/license-types/")) return respond("<html><title>Responsible Master Plumber</title></html>", { headers: { "content-type": "text/html" } });
+    if (parsed.hostname === "tsbpe.texas.gov" && parsed.pathname.startsWith("/download-csv/")) return respond(toCsv(["License Number", "Name", "Company"], [["RMP-1", "PAT PLUMBER", "PIPES LLC"]]), { headers: { "content-type": "text/csv" } });
     if (parsed.hostname === "comptroller.texas.gov") return respond(comptroller, { headers: { "content-type": "text/html" } });
     return respond("not found", { status: 404 });
   };
@@ -217,7 +218,7 @@ describe("T3 VPN-only fetch", () => {
       const tdlr = results.find((result) => result.key === "tdlr-license-files");
       expect(tdlr.detail.files.map((file) => file.link_text).sort()).toEqual(["Airconditioning Contractors", "All A/C Technicians", "Electrical Contractors", "Master Electricians"]);
       expect(tdlr.rows).toBe(8);
-      expect(results.find((result) => result.key === "tsbpe-responsible-master-plumber")).toMatchObject({ rows: 1, detail: { link_text: "Responsible Master Plumber" } });
+      expect(results.find((result) => result.key === "tsbpe-responsible-master-plumber")).toMatchObject({ rows: 1, detail: { link_text: "Responsible Master Plumber List", file: "responsible-master-plumber-RMP.csv" } });
       const probe = results.find((result) => result.key === "comptroller-taxpayer-detail-probe");
       expect(probe.detail).toMatchObject({ status: 200, redirected: false, body_contains_taxpayer_number: false });
       const probeRecord = JSON.parse(await readFile(probe.detail.probe, "utf8"));

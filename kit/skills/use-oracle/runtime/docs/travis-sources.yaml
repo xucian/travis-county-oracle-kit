@@ -500,19 +500,21 @@ official_identity:
     equivalent_source_url: https://data.texas.gov/resource/9cir-efmm
     authority_of_record: Texas Secretary of State; SOSDirect (paid subscriber access) stays an optional human payment decision, not required for v1
     record_keys: taxpayer_number and secretary_of_state_sos_or_coa_file_number, both as printed (the trimmed values are the keys; the printed values are kept beside them)
-    registry_key_coverage_travis: SOS file number on 335,980 of 342,338 Travis rows (98.14%), with sos_status_code, sos_charter_date, sos_status_date and right_to_transact_business_code; the 6,358 rows without one are record_type_code X
+    registry_key_coverage_travis: SOS file number on 335,956 of 342,334 Travis rows of 2026-10-17 (98.14%), with sos_status_code, sos_charter_date, sos_status_date and right_to_transact_business_code; the 6,378 rows without one are record_type_code X
     columns: 18 (taxpayer number, name, mailing address, city, state, ZIP, mailing county code, organizational type, record type, responsibility beginning date, SOS or COA file number, SOS charter date, SOS status date, SOS status code, right-to-transact code, current exempt reason code, exempt begin date, NAICS code printed under the field name _621111)
     limits:
       - no registered agent, officers or other filing roles
       - no assumed names
       - no entity outside franchise tax (sole proprietors and general partnerships of natural persons are not franchise taxpayers; the Comptroller's sales-tax permit file is loaded for those, see further_business_sources)
       - active taxpayers only, so no ended accounts and no history
-      - taxpayer_county_code is the mailing-address county, not a business location; one taxpayer prints two rows (SOS status A of 2001 and R of 2003)
-    scope: Travis load = taxpayer_county_code 227 (342,338 rows on 2026-10-16 = 342,337 taxpayers + 1 explained duplicate); the statewide file (3,486,216 rows on 2026-10-16) is the private matching universe, and out-of-county rows enter business_records only as matched candidates of a Travis permit or roll owner, flagged by scope
-    provenance: each row keeps its bulk capture (request as sent, fetched_at, page SHA-256, offset, row SHA-256); a per-taxpayer Comptroller detail URL is added only once its form is confirmed under US egress (the T3 window probe records it); the bulk dataset page is never written as a company's source_http_request
+      - taxpayer_county_code is the mailing-address county, not a business location; 31 taxpayers statewide print two rows (one in Travis, SOS status A of 2001 and R of 2003)
+    scope: Travis load = taxpayer_county_code 227, derived from the statewide capture (342,334 rows on 2026-10-17 = 342,333 taxpayers + 1 explained duplicate); the statewide file (3,487,662 rows, 3,487,631 taxpayers, rowsUpdatedAt 2026-10-17T10:35:29Z) is the private matching universe, and out-of-county rows enter business_records only as matched candidates of a Travis permit or roll owner, flagged by scope
+    travis_delta_2026_10_16_to_2026_10_17: 290 new, 1,418 changed, 340,625 unchanged, 294 tombstoned (232 now under another mailing county in the statewide file, 62 gone from it)
+    provenance: each row keeps its bulk capture (request as sent, fetched_at, page SHA-256, offset, row SHA-256); the bulk dataset page is never written as a company's source_http_request
+    detail_url: travis-comptroller-detail-url.v1 - https://comptroller.texas.gov/taxes/franchise/account-status/search/<taxpayer_number> for franchise rows with an 11-digit number (HTTP 200, no redirect, a page generated for that taxpayer under US egress on 2026-10-17); null for sales-tax and veteran-owned rows and for withheld numbers; the page renders the record in the browser from https://comptroller.texas.gov/data-search/franchise-tax/<taxpayer_number> (not requested), so the URL is a link, never provenance (docs/evidence/travis-t3-detail-url-2026-10-17.json)
     publication: not eligible for IPFS in v1 - the live manifest has no corporate-registry data group and company holds only name, request_identifier, source_http_request and the Florida sunbiz_document_number under additionalProperties false; rows stay on the internal registry track and reach the hosted API only as the deploy-time source-shaped business_records table, labelled unpublished_source per row
-    status: travis-loaded-offline-2026-10-17; statewide universe pending the T3 US-egress window
-    snapshot: runtime data/travis/registry/ (private Parquet, normalizer travis-t3-source-snapshot.v1) and its registry-track watermark; evidence docs/evidence/travis-t3-registry-load-2026-10-17.json
+    status: travis-and-statewide-loaded-2026-10-17 (window run 20261017T160716Z, every receipt verified)
+    snapshot: runtime data/travis/registry/ (private Parquet tx-comptroller-franchise-tax-statewide and tx-comptroller-franchise-tax-travis, normalizer travis-t3-source-snapshot.v1, the 2026-10-16 snapshot kept under history/) and the registry-track watermark; evidence docs/evidence/travis-t3-franchise-load-2026-10-17.json
   licensing:
     approved_by: operator
     approved_at: "2026-10-17"
@@ -526,12 +528,17 @@ official_identity:
       - key: tdlr-license-files
         authority: Texas Department of Licensing and Regulation (electrical and air conditioning/refrigeration licenses)
         source: TDLR daily license files (CSV), URLs resolved at run time from https://www.tdlr.texas.gov/LicenseSearch/licfile.asp
-        data_texas_gov_copy: 7358-krk7 (TDLR - All Licenses; data updated 2026-09-19 per the Socrata catalog on 2026-10-17)
-        status: pending the T3 US-egress window
+        data_texas_gov_copy: 7358-krk7 (TDLR - All Licenses; data updated 2026-09-19; not used, the daily files are newer)
+        column_set: tdlr-licfile-columns.v1 (one 23-column header in all 16 files; any other header stops the load)
+        csv_dialect: unescaped-quotes (TDLR does not escape quotes inside quoted values; 4 rows in 3 files)
+        permit_roles: tdlr-permit-role.v1 - contractor licenses (Electrical Contractor, Electrical Sign Contractor, A/C Contractor, Appliance Installation Contractor; 35,981 statewide, 1,251 with a Travis business county) can back a permit's listed contractor; masters (20,487) qualify an electrical contractor; journeymen, apprentices, technicians, wiremen and installers (403,254) work under one; CE providers (271) hold no trade license
+        personal_contact_columns: mailing address lines and the licensee phone stay in the private snapshot and are never served
+        status: captured and loaded 2026-10-17 - 16 files, 887,715 rows, 459,993 licenses (docs/evidence/travis-t3-licensing-load-2026-10-17.json)
       - key: tsbpe-responsible-master-plumber
         authority: Texas State Board of Plumbing Examiners
-        source: free licensee lists, the Responsible Master Plumber CSV with the last known company, URL resolved at run time from https://tsbpe.texas.gov/free-licensee-list/
-        status: pending the T3 US-egress window
+        source: free licensee lists, the Responsible Master Plumber CSV with the last known company, https://tsbpe.texas.gov/download-csv/RMP/ (link "Responsible Master Plumber List" on https://tsbpe.texas.gov/free-licensee-list/)
+        status: awaiting one window re-run - the 2026-10-17 run saved the site menu's description page (HTML, kept as evidence, set aside by the loader); the resolver takes /download-csv/RMP/ since kit commit 8af4bc3; the loader resolves the license number, licensee and company columns from the header when the CSV lands
+        window_command: cd /Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime && node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber
       - key: austin-row-contractor-licenses
         authority: City of Austin Transportation and Public Works
         source: Active Right of Way Contractor License Holders (data.austintexas.gov 8d92-wsiw; 5 columns; 469 rows captured 2026-10-17, data updated 2026-10-17T07:05:35Z)
@@ -539,14 +546,19 @@ official_identity:
   further_business_sources:
     - key: tx-comptroller-sales-tax
       source: Texas Comptroller Active Sales Tax Permit Holders (data.texas.gov jrea-zgmq; outlet addresses, outlet county, NAICS, permit and first-sale dates, entity types outside franchise tax)
-      scope: Travis outlets, outlet_county_code 227 (the column named in the Socrata catalog on 2026-10-17; the value is read from the dataset's grouped codes at fetch time)
-      privacy: individual-owner rows get a privacy classification before hosting; no SSN-derived taxpayer number is served
-      status: pending the T3 US-egress window
+      scope: Travis outlets, outlet_county_code 227 (read from the dataset's grouped codes at fetch time)
+      privacy: travis-t3-privacy.v1 - taxpayer_organization_type IS (sole owner, the only natural-person type) is individual_owner; its taxpayer number is withheld from every derived store (null in the snapshot, row hash over the row with that cell emptied) and never served; 9,471 of 49,025 outlets; no number in the capture has the SSN-based leading 2, but the record layout was not captured, so every IS number is withheld
+      status: loaded 2026-10-17 - 49,025 outlets of 42,216 taxpayers, rowsUpdatedAt 2026-10-17T10:31:10Z (docs/evidence/travis-t3-sales-tax-load-2026-10-17.json)
     - key: tx-sos-veteran-owned-business
       source: Texas Secretary of State Veteran Owned Business (data.texas.gov 2vfr-72e4)
-      scope: statewide file captured; the Travis subset is the rows whose filing_number equals a Travis franchise row's SOS file number (exact)
-      status: pending the T3 US-egress window
-  window_fetch: node src/counties/travis/t3-vpn-fetch.mjs (runtime directory; checks egress before every request, stops on non-US; assignment docs/runbook.md section 5)
+      scope: statewide file captured (27,205 rows, dataset of 2026-10-01); the Travis subset is the 2,343 rows joined to a Travis franchise row
+      join_key: travis-sos-file-number-join.v1 - the franchise file prints the SOS file number zero-padded to 10 digits, the veteran file 9 digits, so printed equality joins none; the key restores the padding (25,466 joined; the veteran file's taxid agrees with the joined taxpayer number on 24,868); the operator confirms this reading of "exact"
+      status: loaded and joined 2026-10-17 (docs/evidence/travis-t3-veteran-owned-load-2026-10-17.json)
+  matcher:
+    version: travis-exact-unique-normalized-name.v1
+    indexes: runtime data/travis/matcher/ (travis-t3-name-index.v1); franchise universe statewide - 3,450,553 normalized names, 33,159 shared; Travis alone 628 shared; 336,439 Travis taxpayers hold a statewide-unique name, 5,891 a shared one (docs/evidence/travis-t3-name-index-2026-10-17.json)
+  window_fetch: node src/counties/travis/t3-vpn-fetch.mjs (runtime directory; checks egress before every request, stops on non-US; assignment docs/runbook.md section 5); run of record 20261017T160716Z (US at all 104 checks, 103 requests, 170 s)
+  offline_load: node src/counties/travis/t3-verify.mjs, then node --max-old-space-size=16384 src/counties/travis/t3-load.mjs (idempotent; a re-run reports every snapshot unchanged)
 
 source_inventory:
   property_appraisal_bulk: https://traviscad.org/publicinformation

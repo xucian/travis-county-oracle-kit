@@ -1,0 +1,53 @@
+{
+  "overall": "PASS",
+  "catalog": {
+    "county": "Travis",
+    "slug": "travis",
+    "state": "TX",
+    "fips": "48453"
+  },
+  "gates": [
+    {
+      "gate": "catalog_metadata",
+      "status": "PASS",
+      "evidence": "Travis TX slug=travis fips=48453",
+      "required_action": null
+    },
+    {
+      "gate": "parcel",
+      "status": "PASS",
+      "evidence": "canonical=tcad 2026 certified appraisal export (pacs legacy 8.0.33 fixed-width layout, supplement 0, run 2026-07-18) - real-property accounts assessed=441961.0 gis=386682.0 discrepancy=12.51%",
+      "required_action": null
+    },
+    {
+      "gate": "permit",
+      "status": "PASS",
+      "evidence": "23/23 jurisdictions classified",
+      "required_action": null
+    },
+    {
+      "gate": "destination",
+      "status": "NOT_APPLICABLE",
+      "evidence": "writes_in_scope is false",
+      "required_action": null
+    },
+    {
+      "gate": "enrichment",
+      "status": "PASS",
+      "evidence": "BBB advertised-count claim is bounded",
+      "required_action": null
+    }
+  ],
+  "preparation_allowed": true,
+  "execution_allowed": true,
+  "auto_advance_required": true,
+  "required_blocker_actions": [],
+  "next_automated_actions": [
+    "Start the next dependency-ready stage from the durable run manifest without operator confirmation"
+  ],
+  "next_automated_action": "Start the next dependency-ready stage from the durable run manifest without operator confirmation",
+  "next_permissible_automated_action": "Start the next dependency-ready stage from the durable run manifest without operator confirmation",
+  "seed_allowed": true,
+  "ingest_allowed": true,
+  "catalog_path": "skills/use-oracle/runtime/docs/travis-sources.yaml"
+}

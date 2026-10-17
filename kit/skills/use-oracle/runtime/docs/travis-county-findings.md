@@ -428,3 +428,31 @@ no longer holds: T3 needs one short US window, staged as one command (`node src/
   alone, and the statewide file is the matching universe.
 - **Run record (prepared).** `docs/evidence/travis-t3-prepared-2026-10-17.json`: sources, watermarks, counts,
   limitations, the window command and its estimate. No permit has been read.
+
+## 13. T3 window results (2026-10-17): every receipt verified, loads offline, TSBPE pending one re-run
+
+Window run `20261017T160716Z` (US egress at all 104 checks, 103 requests, 170 s). Everything below ran offline from that
+capture; the run record is `docs/evidence/travis-t3-run-2026-10-17.json`.
+
+- **Verification.** `t3-verify.mjs` rechecked 106 files against their 106 receipts (bytes, SHA-256, CSV rows by the
+  capture counter and a full parse, Socrata count = expected rows = pages, `rowsUpdatedAt` unchanged during the capture,
+  staging metadata copies, run-record sums): 0 mismatches, 4,451,607 CSV rows, 885.7 MB.
+- **TDLR quoting.** TDLR wraps values in quotes without escaping the quotes inside them (4 rows in 3 files, for example a
+  business name with a nickname in quotes). The parser's opt-in `unescaped-quotes` dialect reads them as printed; strict
+  RFC 4180 stays the default for every other source.
+- **Franchise universe.** 3,487,662 rows, 3,487,631 taxpayers statewide (rowsUpdatedAt 2026-10-17T10:35:29Z; the
+  2026-10-16 estimate was 3,486,216). The Travis subset derived from it: 342,334 rows, 342,333 taxpayers; against the
+  2026-10-16 Travis snapshot 290 new, 1,418 changed (all real value changes, 1,100 of them in the right-to-transact code),
+  294 tombstoned (232 moved to another mailing county, 62 left the file). Re-load: no-op, identical bytes.
+- **Sales tax.** 49,025 Travis outlets of 42,216 taxpayers. Sole owners (`IS`, 9,471 outlets) are `individual_owner`:
+  their taxpayer number is withheld from every derived store and its row hash covers the row with that cell emptied.
+- **Veteran-owned.** The franchise file prints SOS file numbers zero-padded to 10 digits, the SOS veteran file 9 digits;
+  printed equality joins nothing, the padded key joins 25,466 of 27,205 (taxid agrees on 24,868). Travis subset 2,343.
+- **Licensing.** TDLR: 16 files, 887,715 rows, 459,993 licenses, one 23-column header (`tdlr-licfile-columns.v1`);
+  35,981 contractor licenses can back a permit contractor, none for roofing. TSBPE: the run saved the menu's description
+  page; the loader waits for the `/download-csv/RMP/` capture (one window re-run).
+- **Matcher index.** Statewide 33,159 of 3,450,553 normalized names are shared; Travis alone 628; 336,439 Travis
+  taxpayers hold a statewide-unique name.
+- **Detail URL.** `…/taxes/franchise/account-status/search/<taxpayer_number>` answers 200 without a redirect for a
+  franchise taxpayer but renders the record in the browser from a JSON endpoint that was not requested: a link for
+  `BusinessRecord.detail_url` on franchise rows, never provenance.

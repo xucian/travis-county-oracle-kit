@@ -1,0 +1,627 @@
+{
+ "kind": "travis-t3-official-identity-baseline",
+ "increment": "T3",
+ "status": "observed: the US-window captures are verified and loaded offline; TSBPE awaits one window re-run; the operator runs the hand-off checklist (assignment docs/runbook.md section 5)",
+ "recorded_at": "2026-10-17T17:36:52.630Z",
+ "decisions": "assignment docs/decisions.md section 23 (approved 2026-10-17); open items for the operator in section 24",
+ "kit_branch": "travis",
+ "kit_commit_before_this_record": "1c8f8cd760f539d560302a1e29a981a97e5fceff",
+ "window_run": {
+  "record": "data/travis/t3-window/runs/20261017T160716Z.json",
+  "started_at": "2026-10-17T16:07:16.568Z",
+  "finished_at": "2026-10-17T16:10:06.911Z",
+  "seconds": 170.343,
+  "egress": "US at every check",
+  "egress_checks": 104,
+  "requests": 103,
+  "counts": {
+   "ok": 5,
+   "failed": 1,
+   "inconsistent": 0,
+   "stopped": 0
+  },
+  "exit_code": 1,
+  "exit_code_reason": "tsbpe-responsible-master-plumber failed (an HTML page under a .csv name); the other five sources ok",
+  "retries_from_ro": [
+   "data/travis/t3-window/runs/20261017T154849Z.json",
+   "data/travis/t3-window/runs/20261017T162511Z.json (both stopped before any request, exit 3)"
+  ]
+ },
+ "verification": {
+  "evidence": "docs/evidence/travis-t3-window-verify-20261017T160716Z.json",
+  "command": "node src/counties/travis/t3-verify.mjs --run 20261017T160716Z",
+  "ok": true,
+  "mismatches": 0,
+  "totals": {
+   "receipt_logs": 9,
+   "receipts": 106,
+   "files_verified": 106,
+   "bytes_verified": 885732310,
+   "csv_files": 88,
+   "csv_rows_parsed": 4451607,
+   "not_csv_files": 1,
+   "attempts_not_answered": 0
+  },
+  "per_source": [
+   {
+    "key": "tx-comptroller-franchise-tax",
+    "run_status": "ok",
+    "files_verified": 74,
+    "rows_parsed": 3487662,
+    "bytes": 703429216,
+    "not_csv_files": [],
+    "run_record_matches": true
+   },
+   {
+    "key": "tx-comptroller-sales-tax",
+    "run_status": "ok",
+    "files_verified": 6,
+    "rows_parsed": 49025,
+    "bytes": 11753383,
+    "not_csv_files": [],
+    "run_record_matches": true
+   },
+   {
+    "key": "tx-sos-veteran-owned-business",
+    "run_status": "ok",
+    "files_verified": 5,
+    "rows_parsed": 27205,
+    "bytes": 7258588,
+    "not_csv_files": [],
+    "run_record_matches": true
+   },
+   {
+    "key": "tdlr-license-files",
+    "run_status": "ok",
+    "files_verified": 18,
+    "rows_parsed": 887715,
+    "bytes": 162277107,
+    "not_csv_files": [],
+    "run_record_matches": true
+   },
+   {
+    "key": "tsbpe-responsible-master-plumber",
+    "run_status": "failed",
+    "files_verified": 2,
+    "rows_parsed": 0,
+    "bytes": 210552,
+    "not_csv_files": [
+     "responsible-master-plumber-responsible-master-plumber.csv"
+    ],
+    "run_record_matches": true
+   },
+   {
+    "key": "comptroller-taxpayer-detail-probe",
+    "run_status": "ok",
+    "files_verified": 1,
+    "rows_parsed": 0,
+    "bytes": 150053,
+    "not_csv_files": [],
+    "run_record_matches": true
+   }
+  ]
+ },
+ "readiness_report": {
+  "overall": "PASS",
+  "seed_allowed": true,
+  "ingest_allowed": true,
+  "gates": {
+   "catalog_metadata": "PASS",
+   "parcel": "PASS",
+   "permit": "PASS",
+   "destination": "NOT_APPLICABLE",
+   "enrichment": "PASS"
+  },
+  "evidence": "docs/evidence/travis-t3-readiness-window-2026-10-17.json",
+  "command": "python3 skills/use-oracle/scripts/validate-county-readiness.py skills/use-oracle/runtime/docs/travis-sources.yaml"
+ },
+ "sources": [
+  {
+   "dataset": "tx-comptroller-franchise-tax/9cir-efmm",
+   "scope": "statewide (the private matching universe)",
+   "url": "https://data.texas.gov/resource/9cir-efmm.csv",
+   "watermark": "2026-10-17T10:35:29.000Z",
+   "fetched_at": "2026-10-17T16:07:17Z..16:10:06Z",
+   "sha256": "2692a5132071dc80a505857a4f1e99a90bdaa1f90aeaee3e74d0fc6b8586fd33",
+   "sha256_basis": "capture artifact hash over the 70 page digests (each verified against its receipt)",
+   "rows": 3487662,
+   "taxpayers": 3487631,
+   "availability": "supported_partial",
+   "source_access_status": "available (US egress)",
+   "partial_because": "no registered agents or filing roles, no assumed names, no non-franchise entities, active taxpayers only"
+  },
+  {
+   "dataset": "tx-comptroller-franchise-tax/9cir-efmm",
+   "scope": "Travis (taxpayer_county_code 227), derived from the statewide capture",
+   "url": "https://data.texas.gov/resource/9cir-efmm.csv",
+   "watermark": "2026-10-17T10:35:29.000Z",
+   "sha256": "2692a5132071dc80a505857a4f1e99a90bdaa1f90aeaee3e74d0fc6b8586fd33",
+   "rows": 342334,
+   "taxpayers": 342333,
+   "availability": "supported_partial",
+   "source_access_status": "available (US egress)",
+   "partial_because": "as above"
+  },
+  {
+   "dataset": "tx-comptroller-sales-tax/jrea-zgmq",
+   "scope": "Travis outlets (outlet_county_code 227)",
+   "url": "https://data.texas.gov/resource/jrea-zgmq.csv",
+   "watermark": "2026-10-17T10:31:10.000Z",
+   "sha256": "d3da6f3d4a52824f2bd7bb18a71f6e1adce89abce03ba2454086170d31ea5994",
+   "rows": 49025,
+   "availability": "supported_full",
+   "source_access_status": "available (US egress)",
+   "note": "sole owners' taxpayer numbers withheld by design (travis-t3-privacy.v1)"
+  },
+  {
+   "dataset": "tx-sos-veteran-owned-business/2vfr-72e4",
+   "scope": "statewide; Travis subset by the SOS file number join",
+   "url": "https://data.texas.gov/resource/2vfr-72e4.csv",
+   "watermark": "2026-10-01T10:00:49.000Z",
+   "sha256": "5d16b8d3e906668e480bb597981accc4a558dba64a030927c00318615978bbeb",
+   "rows": 27205,
+   "travis_subset": 2343,
+   "availability": "supported_full",
+   "source_access_status": "available (US egress)"
+  },
+  {
+   "dataset": "tdlr-license-files (data.texas.gov copy 7358-krk7)",
+   "scope": "electrical and air conditioning/refrigeration licenses, statewide (16 files)",
+   "url": "https://www.tdlr.texas.gov/LicenseSearch/licfile.asp",
+   "watermark": "files Last-Modified Sat, 17 Oct 2026 11:18:43..11:21:04 GMT",
+   "sha256": "46c92dce2336475372f67ac81fc531a279f5dd6b2e66b340bd7faf9b7b257279",
+   "rows": 887715,
+   "licenses": 459993,
+   "availability": "supported_full",
+   "source_access_status": "available (US egress)",
+   "note": "the trades that can back an electrical or mechanical permit contractor; Texas issues no roofing license"
+  },
+  {
+   "dataset": "tsbpe-responsible-master-plumber",
+   "scope": "statewide",
+   "url": "https://tsbpe.texas.gov/download-csv/RMP/",
+   "availability": "unsupported",
+   "source_access_status": "pending_window_re_run",
+   "incomplete_reason": "the 2026-10-17 run saved the site menu description page (HTML) instead of the CSV; the resolver is fixed (kit 8af4bc3); one US-window re-run captures it"
+  },
+  {
+   "dataset": "austin-row-contractor-licenses/8d92-wsiw",
+   "scope": "all active holders",
+   "url": "https://data.austintexas.gov/resource/8d92-wsiw.csv",
+   "watermark": "2026-10-17T07:05:35.000Z",
+   "sha256": "2b03f1959fad83b1dc06d2660be8b30aea9e6d74ead3a0d9160af8a131ad6a3a",
+   "rows": 469,
+   "availability": "supported_full",
+   "source_access_status": "available (any egress)"
+  },
+  {
+   "dataset": "comptroller-taxpayer-detail-probe",
+   "scope": "one request: the per-taxpayer detail URL form",
+   "sha256": "44013056777752f40468da3cbecccab7d53de701e34283a1eda51fa5d3a574f8",
+   "availability": "supported_partial",
+   "source_access_status": "available (US egress)",
+   "note": "detail URL form decided (travis-comptroller-detail-url.v1); the page renders the record client-side from an endpoint not requested"
+  }
+ ],
+ "loader_watermarks": [
+  {
+   "track": "registry",
+   "name": "tx-comptroller-franchise-tax-statewide",
+   "path": "data/travis/t3-window/tx-comptroller-franchise-tax/v1792233329/",
+   "artifact_hash": "2692a5132071dc80a505857a4f1e99a90bdaa1f90aeaee3e74d0fc6b8586fd33",
+   "merged_count": 70,
+   "merged_rows": 3487662,
+   "last_merged_at": "2026-10-17T17:03:34.980Z",
+   "row_filter": null,
+   "snapshot_sha256": "2a102105f56edd3fd8afb157f72781ea3e573de98627fc025d49083f4d0ddda8"
+  },
+  {
+   "track": "registry",
+   "name": "tx-comptroller-franchise-tax-travis",
+   "path": "data/travis/t3-window/tx-comptroller-franchise-tax/v1792233329/",
+   "artifact_hash": "2692a5132071dc80a505857a4f1e99a90bdaa1f90aeaee3e74d0fc6b8586fd33",
+   "merged_count": 70,
+   "merged_rows": 342334,
+   "last_merged_at": "2026-10-17T17:03:34.980Z",
+   "row_filter": "taxpayer_county_code = 227 (Travis, the taxpayer's mailing county)",
+   "snapshot_sha256": "942e8645eec3d86f87347b82d554e58c44112c64e1c171b99c8f8e6e6c62a968"
+  },
+  {
+   "track": "registry",
+   "name": "tx-comptroller-sales-tax-travis",
+   "path": "data/travis/t3-window/tx-comptroller-sales-tax/v1792233070/",
+   "artifact_hash": "d3da6f3d4a52824f2bd7bb18a71f6e1adce89abce03ba2454086170d31ea5994",
+   "merged_count": 1,
+   "merged_rows": 49025,
+   "last_merged_at": "2026-10-17T17:19:05.460Z",
+   "row_filter": null,
+   "snapshot_sha256": "7c510df7ea0e94571bbd5ea032213c7dbcaaed652bdf26ee0025e21ca23e84fa"
+  },
+  {
+   "track": "registry",
+   "name": "tx-sos-veteran-owned-business",
+   "path": "data/travis/t3-window/tx-sos-veteran-owned-business/v1790848849/",
+   "artifact_hash": "5d16b8d3e906668e480bb597981accc4a558dba64a030927c00318615978bbeb",
+   "merged_count": 1,
+   "merged_rows": 27205,
+   "last_merged_at": "2026-10-17T17:21:31.895Z",
+   "row_filter": null,
+   "snapshot_sha256": "988727bb91ca5e23aa43d9aea26fc0c39826d819430025a0711ca39d5e401ef2"
+  },
+  {
+   "track": "licensing",
+   "name": "austin-row-contractor-licenses",
+   "path": "data/travis/austin-row/v1792220735/",
+   "artifact_hash": "2b03f1959fad83b1dc06d2660be8b30aea9e6d74ead3a0d9160af8a131ad6a3a",
+   "merged_count": 1,
+   "merged_rows": 469,
+   "last_merged_at": "2026-10-17T14:55:19.400Z",
+   "row_filter": null,
+   "snapshot_sha256": "9f0068f6d289a6c3aed51564c0626b15af87de76265308b33ed4289b45dcacd9"
+  },
+  {
+   "track": "licensing",
+   "name": "tdlr-license-files",
+   "path": "data/travis/t3-window/tdlr-license-files/d20261017/",
+   "artifact_hash": "46c92dce2336475372f67ac81fc531a279f5dd6b2e66b340bd7faf9b7b257279",
+   "merged_count": 16,
+   "merged_rows": 887715,
+   "last_merged_at": "2026-10-17T17:25:43.873Z",
+   "row_filter": null,
+   "snapshot_sha256": "2e3ab26003d6f366153373fa97c93797961b3e2049d4dfbb00b7cb57127ec6e8"
+  }
+ ],
+ "watermark_files": {
+  "registry": "acec0ed538dacb6c79d1857f56e6216ffaf2c307dedca6e14c9d6254d711c325",
+  "licensing": "6de1f4ba50b30e91bb0f2b4e63988190f05ae5cbb67157a0638550bbcb43928f"
+ },
+ "counts": {
+  "franchise_statewide_rows": 3487662,
+  "franchise_statewide_taxpayers": 3487631,
+  "franchise_statewide_duplicate_taxpayers": 31,
+  "franchise_statewide_estimate_2026_10_16": 3486216,
+  "franchise_travis_rows": 342334,
+  "franchise_travis_taxpayers": 342333,
+  "franchise_travis_sos_file_number_present": 335956,
+  "franchise_travis_sos_file_number_present_pct": 98.14,
+  "sales_tax_travis_outlets": 49025,
+  "sales_tax_printed_keys": 39554,
+  "sales_tax_individual_owner_rows": 9471,
+  "veteran_rows": 27205,
+  "veteran_joined": 25466,
+  "veteran_travis_subset": 2343,
+  "veteran_taxid_agrees": 24868,
+  "tdlr_rows": 887715,
+  "tdlr_licenses": 459993,
+  "tdlr_by_permit_role": {
+   "contractor": {
+    "licenses": 35981,
+    "travis_business_county": 1251
+   },
+   "not_a_trade_license": {
+    "licenses": 271,
+    "travis_business_county": 25
+   },
+   "qualifying_individual": {
+    "licenses": 20487,
+    "travis_business_county": 520
+   },
+   "works_under_a_contractor": {
+    "licenses": 403254,
+    "travis_business_county": 15993
+   }
+  },
+  "austin_row_licenses": 469,
+  "tsbpe_rows": null
+ },
+ "deltas": {
+  "franchise_travis_against_2026_10_16": {
+   "taxpayers_2026_10_16": 342337,
+   "taxpayers_2026_10_17": 342333,
+   "new": 290,
+   "changed": 1418,
+   "unchanged": 340625,
+   "tombstoned": 294,
+   "reconciliation": "342,337 = 340,625 unchanged + 1,418 changed + 294 tombstoned; 342,333 = 340,625 + 1,418 + 290 new",
+   "tombstoned_where": {
+    "tombstoned": 294,
+    "in_statewide_file_other_county": 232,
+    "in_statewide_file_travis": 0,
+    "not_in_statewide_file": 62
+   }
+  },
+  "changed_columns": {
+   "right_to_transact_business_code": 1100,
+   "taxpayer_address": 233,
+   "_621111": 150,
+   "taxpayer_zip": 146,
+   "taxpayer_city": 63,
+   "current_exempt_reason_code": 8,
+   "exempt_begin_date": 8,
+   "taxpayer_name": 8,
+   "taxpayer_state": 7,
+   "responsibility_beginning_date": 6,
+   "sos_status_date": 4,
+   "secretary_of_state_sos_or_coa_file_number": 3,
+   "sos_charter_date": 3,
+   "sos_status_code": 3,
+   "record_type_code": 1,
+   "taxpayer_organizational_type": 1
+  }
+ },
+ "tombstones_consumed": {
+  "registry": {
+   "tx-comptroller-franchise-tax-travis": 294,
+   "reason": "absent_from_capture"
+  }
+ },
+ "matcher": {
+  "version": "travis-exact-unique-normalized-name.v1",
+  "index_format": "travis-t3-name-index.v1",
+  "franchise_statewide": {
+   "statewide": {
+    "normalized_names": 3450553,
+    "entity_keys": 3487616,
+    "non_unique_names": 33159,
+    "keys_under_non_unique_names": 70222,
+    "rows_without_name": 15
+   },
+   "travis_alone": {
+    "normalized_names": 341673,
+    "non_unique_names": 628,
+    "keys_under_non_unique_names": 1285
+   },
+   "travis_in_statewide_universe": {
+    "travis_keys": 342330,
+    "normalized_names_held_by_travis_keys": 341673,
+    "names_unique_in_universe": 336439,
+    "names_shared_in_universe": 5234,
+    "names_shared_only_within_travis": 584,
+    "names_shared_with_an_out_of_county_key": 4650,
+    "travis_keys_with_a_unique_name": 336439,
+    "travis_keys_with_a_shared_name": 5891,
+    "travis_keys_with_a_unique_and_a_shared_name": 0
+   },
+   "index_sha256": "810a1fdc0d489455cbdbb7a72b8d2b95b672640347d4bde65e6fa79a32000b9b"
+  },
+  "other_indexes": {
+   "tx-comptroller-sales-tax-travis": {
+    "non_unique_names": 1143,
+    "normalized_names": 63006,
+    "index_sha256": "b2539d72c90d5958eccae37a3e4b11146493d2ee2f21b4843c296ad0871eb01f"
+   },
+   "tx-sos-veteran-owned-business": {
+    "non_unique_names": 42,
+    "normalized_names": 27163,
+    "index_sha256": "d1fb08e6f1eccbb9e0a9697606fbf7f699aa51b09385b76db564187840f44179"
+   },
+   "tdlr-license-files": {
+    "non_unique_names": 41722,
+    "normalized_names": 414175,
+    "index_sha256": "d6ef64ebcec6d7120b83184d5c9e03e63914e344f1d3fbc4ac486297dcd894d3"
+   },
+   "austin-row-contractor-licenses": {
+    "non_unique_names": 1,
+    "normalized_names": 533,
+    "index_sha256": "5eba0ce215b376a8f824edffa8665d29b2388f4642683a5999e6360ca7719e84"
+   }
+  },
+  "candidates_computed": "none: no permit has been read (T4)",
+  "evidence": "docs/evidence/travis-t3-name-index-2026-10-17.json"
+ },
+ "detail_url": {
+  "detail_url": "https://comptroller.texas.gov/taxes/franchise/account-status/search/<taxpayer_number>, the trimmed printed 11-digit taxpayer number of a franchise-tax row",
+  "rule": "travis-comptroller-detail-url.v1 (src/counties/travis/t3-sources.mjs businessDetailUrl)",
+  "applies_to": "tx-comptroller-franchise-tax rows only (every row of 2026-10-17 prints an 11-digit number: 342,334 Travis rows, 3,487,662 statewide)",
+  "not_provenance": "the HTML holds no record field, so the URL does not confirm the record and backs no field: no source_http_request, request_identifier or unpublished_source names it; a business record's provenance stays its bulk page request (unpublished_source.source_http_request). The probe's confirmation rule ('until then no company carries a per-taxpayer source_http_request') therefore still holds, and in v1 no company record is written at all",
+  "evidence": "docs/evidence/travis-t3-detail-url-2026-10-17.json"
+ },
+ "privacy": {
+  "rule": "travis-t3-privacy.v1",
+  "class": "individual_owner = sales-tax taxpayer_organization_type IS",
+  "rows": {
+   "individual_owner": 9471
+  },
+  "check": {
+   "source": "tx-comptroller-sales-tax",
+   "privacy_version": "travis-t3-privacy.v1",
+   "classed_rows_in_capture": 9471,
+   "withheld_values_in_capture": 9088,
+   "snapshot_rows": 49025,
+   "snapshot_rows_classed": 9471,
+   "snapshot_classed_rows_with_a_value": 0,
+   "withheld_values_in_snapshot": 0,
+   "captured_row_hashes_in_snapshot": 0,
+   "withheld_values_in_index": 0,
+   "withheld_values_in_track_files": 0,
+   "track_files_checked": 4,
+   "ok": true
+  },
+  "check_command": "node src/counties/travis/t3-privacy-check.mjs"
+ },
+ "veteran_join": {
+  "rule": "travis-sos-file-number-join.v1",
+  "printed_values_equal": 0,
+  "joined": 25466,
+  "travis_subset": 2343,
+  "taxid_agrees": 24868,
+  "taxid_differs": 16,
+  "taxid_blank": 582,
+  "unmatched": 1739,
+  "join_sha256": "7979c67c3d1dbfff7e1705fcb3caee0f18e1e9167c1c97debb0602b17eb9cc75"
+ },
+ "limitations": [
+  {
+   "source": "tsbpe-responsible-master-plumber",
+   "availability": "unsupported",
+   "source_access_status": "pending_window_re_run",
+   "detail": "one US-window re-run: cd /Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime && node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber; then t3-verify.mjs and t3-load.mjs --only tsbpe,name-index offline",
+   "evidence": "docs/evidence/travis-t3-licensing-load-2026-10-17.json"
+  },
+  {
+   "source": "permit license numbers",
+   "availability": "unsupported",
+   "detail": "no Austin permit prints a license number; a license record is never linked to a permit by number",
+   "evidence": "docs/evidence/travis-t3-absence-proofs-2026-10-17.json"
+  },
+  {
+   "source": "roofing license",
+   "availability": "unsupported",
+   "detail": "Texas issues no state roofing license; no TDLR or TSBPE row can back a roofing permit contractor"
+  },
+  {
+   "source": "historical license qualification",
+   "availability": "unsupported",
+   "detail": "closed for v1 by the operator on 2026-10-17; no public file carries the dated license-holder-to-business relationship; no records requests filed"
+  },
+  {
+   "source": "lexicon: business registration and license",
+   "availability": "unsupported",
+   "detail": "no corporate-registry group, no license class, no company-to-license relationship in the live manifest; business and license rows are unpublished_source records, never published"
+  },
+  {
+   "source": "tx-comptroller-franchise-tax/9cir-efmm",
+   "availability": "supported_partial",
+   "detail": "no registered agents or filing roles, no assumed names, no non-franchise entities, active taxpayers only (no history); the county code is the mailing county"
+  },
+  {
+   "source": "tx-comptroller-sales-tax/jrea-zgmq",
+   "availability": "supported_full",
+   "detail": "sole owners' taxpayer numbers are withheld from every derived store; the dataset record layout (organization codes, number forms) was not captured"
+  },
+  {
+   "source": "tx-sos-veteran-owned-business/2vfr-72e4",
+   "availability": "supported_full",
+   "detail": "dataset of 2026-10-01; joined by the padded SOS file number (operator confirmation open, decisions.md section 24); 1,739 rows, mostly inactive entities, join no active franchise taxpayer"
+  },
+  {
+   "source": "comptroller detail URL",
+   "availability": "supported_partial",
+   "detail": "a link only: the page renders the record in the browser from https://comptroller.texas.gov/data-search/franchise-tax/<n>, which was not requested"
+  }
+ ],
+ "operator_decisions_open": "assignment docs/decisions.md section 24: (1) the padded SOS file number as the exact join key; (2) business_record_id and row_sha256 of withheld rows; (3) the TDLR license_record_id needs the subtype; (4) IS as the only individual-owner type",
+ "reload": {
+  "record": "data/travis/t3-loads/20261017T173652Z.json",
+  "loaded_at": "2026-10-17T17:36:52.630Z",
+  "all_no_op": true,
+  "awaiting_capture": [
+   "tsbpe"
+  ],
+  "seconds": 506.989,
+  "steps": {
+   "franchise-statewide": {
+    "merged": false,
+    "diff": {
+     "against": "snapshot on disk",
+     "new": 0,
+     "changed": 0,
+     "unchanged": 3487631,
+     "removed": 0,
+     "tombstoned": 0
+    },
+    "rebuild_matches_snapshot": true,
+    "snapshot_sha256": "2a102105f56edd3fd8afb157f72781ea3e573de98627fc025d49083f4d0ddda8",
+    "watermark_sha256": "acec0ed538dacb6c79d1857f56e6216ffaf2c307dedca6e14c9d6254d711c325",
+    "seconds": 298.9
+   },
+   "franchise-travis": {
+    "merged": false,
+    "diff": {
+     "against": "snapshot on disk",
+     "new": 0,
+     "changed": 0,
+     "unchanged": 342333,
+     "removed": 0,
+     "tombstoned": 0
+    },
+    "rebuild_matches_snapshot": true,
+    "snapshot_sha256": "942e8645eec3d86f87347b82d554e58c44112c64e1c171b99c8f8e6e6c62a968",
+    "watermark_sha256": "acec0ed538dacb6c79d1857f56e6216ffaf2c307dedca6e14c9d6254d711c325",
+    "seconds": 49.9
+   },
+   "sales-tax": {
+    "merged": false,
+    "diff": {
+     "against": "snapshot on disk",
+     "new": 0,
+     "changed": 0,
+     "unchanged": 49025,
+     "removed": 0,
+     "tombstoned": 0
+    },
+    "rebuild_matches_snapshot": true,
+    "snapshot_sha256": "7c510df7ea0e94571bbd5ea032213c7dbcaaed652bdf26ee0025e21ca23e84fa",
+    "watermark_sha256": "acec0ed538dacb6c79d1857f56e6216ffaf2c307dedca6e14c9d6254d711c325",
+    "seconds": 3.4
+   },
+   "veteran": {
+    "merged": false,
+    "diff": {
+     "against": "snapshot on disk",
+     "new": 0,
+     "changed": 0,
+     "unchanged": 27205,
+     "removed": 0,
+     "tombstoned": 0
+    },
+    "rebuild_matches_snapshot": true,
+    "snapshot_sha256": "988727bb91ca5e23aa43d9aea26fc0c39826d819430025a0711ca39d5e401ef2",
+    "watermark_sha256": "acec0ed538dacb6c79d1857f56e6216ffaf2c307dedca6e14c9d6254d711c325",
+    "seconds": 1.9
+   },
+   "veteran-join": {
+    "status": "unchanged",
+    "detail": "25466 of 27205 veteran rows joined (Travis 2343); exact printed values equal 0; taxid agrees 24868, differs 16, blank 582"
+   },
+   "tdlr": {
+    "merged": false,
+    "diff": {
+     "against": "snapshot on disk",
+     "new": 0,
+     "changed": 0,
+     "unchanged": 459993,
+     "removed": 0,
+     "tombstoned": 0
+    },
+    "rebuild_matches_snapshot": true,
+    "snapshot_sha256": "2e3ab26003d6f366153373fa97c93797961b3e2049d4dfbb00b7cb57127ec6e8",
+    "watermark_sha256": "6de1f4ba50b30e91bb0f2b4e63988190f05ae5cbb67157a0638550bbcb43928f",
+    "seconds": 60.3
+   },
+   "tsbpe": {
+    "status": "awaiting_capture",
+    "detail": "no CSV capture yet (set aside: data/travis/t3-window/tsbpe-responsible-master-plumber/d20261017/responsible-master-plumber-responsible-master-plumber.csv html_not_csv); run the window command node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber under US egress, then this step again"
+   },
+   "name-index": {
+    "status": "unchanged",
+    "detail": "5 indexes, not yet built (no snapshot): tsbpe-responsible-master-plumber; tx-comptroller-franchise-tax-statewide 33159 non-unique of 3450553; tx-comptroller-sales-tax-travis 1143 non-unique of 63006; tx-sos-veteran-owned-business 42 non-unique of 27163; tdlr-license-files 41722 non-unique of 414175; austin-row-contractor-licenses 1 non-unique of 533"
+   }
+  }
+ },
+ "evidence": [
+  "docs/evidence/travis-t3-window-verify-20261017T160716Z.json",
+  "docs/evidence/travis-t3-franchise-load-2026-10-17.json",
+  "docs/evidence/travis-t3-sales-tax-load-2026-10-17.json",
+  "docs/evidence/travis-t3-veteran-owned-load-2026-10-17.json",
+  "docs/evidence/travis-t3-licensing-load-2026-10-17.json",
+  "docs/evidence/travis-t3-name-index-2026-10-17.json",
+  "docs/evidence/travis-t3-detail-url-2026-10-17.json",
+  "docs/evidence/travis-t3-readiness-window-2026-10-17.json",
+  "docs/evidence/travis-t3-prepared-2026-10-17.json (the offline part)"
+ ],
+ "no_permit_feed": {
+  "detail": "no permit harvest, PermitFeed or permit pilot has started; nothing from T4-T10 ran; no openapi.json",
+  "checked_at": "2026-10-17"
+ },
+ "private_boundary": "snapshots, indexes, joins, watermarks, tombstones and load records stay in the gitignored runtime data/; this file holds counts and digests only (no names, numbers or addresses)",
+ "tests": {
+  "command": "npx vitest run tests/travis-*",
+  "test_files": 16,
+  "tests": 146,
+  "passed": 146,
+  "failed": 0,
+  "matcher_tests": "tests/travis-name-matcher.test.mjs unchanged and passing"
+ },
+ "window_fetch_tsbpe_rerun": "cd /Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime && node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber"
+}

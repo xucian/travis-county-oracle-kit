@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { ParquetReader } from "@dsnp/parquetjs";
 
-import { NORMALIZER_VERSION, loadSnapshot, normalizeRecord, parseCsvRecordSpans, readCaptureReceipts, verifyCapture } from "../src/counties/travis/t3-snapshot.mjs";
+import { NORMALIZER_VERSION, changedColumnCounts, loadSnapshot, normalizeRecord, parseCsvRecordSpans, readCaptureReceipts, redactedRowText, selectCaptureReceipts, verifyCapture } from "../src/counties/travis/t3-snapshot.mjs";
 
 const sha256 = (text) => createHash("sha256").update(text).digest("hex");
 const HEADER = '"taxpayer_number","taxpayer_name","taxpayer_county_code","sos_status_code","sos_status_date","exempt_begin_date","_621111"';
@@ -150,6 +150,11 @@ describe("T3 snapshot normalizer", () => {
       const tombstones = (await readFile(path.join(output, "franchise-travis.tombstones.jsonl"), "utf8")).trim().split("\n").map((line) => JSON.parse(line));
       expect(tombstones).toEqual([expect.objectContaining({ key: "10000000003", reason: "absent_from_capture", removed_at: "2026-10-19T00:00:00.000Z" })]);
       expect(existsSync(path.join(output, "franchise-travis.loads.jsonl"))).toBe(true);
+      // The replaced snapshot is kept under history/, named by its digest.
+      expect(third.prior_snapshot).toMatchObject({ sha256: first.snapshot.sha256 });
+      expect(existsSync(path.join(output, "history", `franchise-travis.${first.snapshot.sha256.slice(0, 16)}.parquet`))).toBe(true);
+      expect(third.changed_columns).toMatchObject({ keys: 1, single_row_keys: 1, multi_row_keys: 0, by_column: { sos_status_code: 1 }, keys_without_value_change: 0 });
+      expect(third.merge_reason).toBe("2 capture artifacts not in the hash index; content diff");
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
@@ -169,5 +174,106 @@ describe("T3 snapshot normalizer", () => {
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
+  });
+
+  it("derives a subset with a row filter, diffs it against the snapshot of another capture, and keeps the old one", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "t3-filter-"));
+    try {
+      // First the Travis-only capture, then a statewide capture whose Travis rows changed by one, lost one, gained one.
+      const travis = path.join(dir, "travis-cache");
+      await writeCapture(travis, [ROWS.slice(0, 3)]);
+      const output = path.join(dir, "registry");
+      const base = { sourceKey: "tx-comptroller-franchise-tax", outputDir: output, name: "franchise-travis" };
+      const first = await loadSnapshot({ ...base, captureDir: travis, now: "2026-10-16T00:00:00.000Z" });
+      expect(first.counts.rows).toBe(3);
+
+      const statewide = path.join(dir, "statewide");
+      const elsewhere = '"20000000009 ","AUSTIN ELSEWHERE LLC ","101","A ","2001-12-07T00:00:00.000",,"  "';
+      const moved = ROWS[2].replace('"227"', '"101"');
+      await writeCapture(statewide, [[ROWS[0].replace('"A "', '"F "'), ROWS[1], elsewhere], [moved, '"10000000007 ","NEW TRAVIS CO ","227","A ","2026-10-01T00:00:00.000",,"  "']]);
+      const filter = { label: "taxpayer_county_code = 227", test: (row) => row.taxpayer_county_code__trimmed === "227" };
+      const derived = await loadSnapshot({ ...base, captureDir: statewide, rowFilter: filter, now: "2026-10-17T00:00:00.000Z" });
+      expect(derived.counts).toMatchObject({ rows: 3, rows_filtered_out: 2, filtered_out_by_scope: { out_of_county: 2 } });
+      expect(derived.diff).toMatchObject({ new: 1, changed: 1, unchanged: 1, removed: 1, tombstoned: 1 });
+      expect(derived.merge_reason).toBe("2 capture artifacts not in the hash index; content diff; row filter changed");
+      expect(derived.watermark).toMatchObject({ row_filter: "taxpayer_county_code = 227", merged_rows: 3 });
+      expect(derived.prior_snapshot.sha256).toBe(first.snapshot.sha256);
+      expect(existsSync(path.join(output, "history", `franchise-travis.${first.snapshot.sha256.slice(0, 16)}.hash-index.json`))).toBe(true);
+
+      const again = await loadSnapshot({ ...base, captureDir: statewide, rowFilter: filter, now: "2026-10-18T00:00:00.000Z" });
+      expect(again).toMatchObject({ merged: false, diff: { new: 0, changed: 0, removed: 0 }, rebuild_matches_snapshot: true });
+      expect(again.snapshot.sha256).toBe(derived.snapshot.sha256);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("sets aside an HTML body saved under a .csv name", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "t3-html-"));
+    try {
+      await writeCapture(dir, [ROWS.slice(0, 1)]);
+      const html = "<html>not a csv</html>";
+      const receipts = (await readFile(path.join(dir, "receipts.jsonl"), "utf8")).trim();
+      await writeFile(path.join(dir, "page-html.csv"), html);
+      await writeFile(path.join(dir, "receipts.jsonl"), `${receipts}\n${JSON.stringify({ kind: "file", file: "page-html.csv", url: "https://tsbpe.texas.gov/license-types/x/", status: 200, bytes: html.length, sha256: sha256(html), rows: 0, content_type: "text/html; charset=UTF-8" })}\n`);
+      const selection = await selectCaptureReceipts(dir);
+      expect(selection.receipts.map((receipt) => receipt.file)).toEqual(["page-000.csv"]);
+      expect(selection.excluded).toEqual([{ file: "page-html.csv", reason: "html_not_csv", sha256: sha256(html) }]);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("counts changed columns per key without values", () => {
+    const prior = new Map([["k1", [{ a: "1", b: "x" }]], ["k2", [{ a: "2", b: "y" }]]]);
+    const next = new Map([["k1", [{ a: "1", b: "z" }]], ["k2", [{ a: "3", b: "w" }]]]);
+    expect(changedColumnCounts(prior, next, ["a", "b"])).toEqual({ keys: 2, single_row_keys: 2, multi_row_keys: 0, by_column: { b: 2, a: 1 }, keys_without_value_change: 0 });
+  });
+
+  it("withholds a sole owner's taxpayer number from the snapshot, its key and its row hash", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "t3-privacy-"));
+    try {
+      const header = '"taxpayer_number","taxpayer_name","taxpayer_organization_type","outlet_number","outlet_name","outlet_county_code"';
+      const owner = '"32055555555","PAT SMITH","IS","00001","PAT SMITH LAWN","227"';
+      const company = '"32011111111","ACME ROOFING LLC","CL","00001","ACME ROOFING","227"';
+      const text = `${header}\n${owner}\n${company}\n`;
+      await writeFile(path.join(dir, "page-00000.csv"), text);
+      await writeFile(path.join(dir, "receipts.jsonl"), `${JSON.stringify({ kind: "page", file: "page-00000.csv", url: "https://data.texas.gov/resource/jrea-zgmq.csv?%24offset=0", fetched_at: "2026-10-17T16:07:22.000Z", status: 200, bytes: Buffer.byteLength(text), sha256: sha256(text), rows: 2, content_type: "text/csv" })}\n`);
+      const output = path.join(dir, "registry");
+      const report = await loadSnapshot({ sourceKey: "tx-comptroller-sales-tax", captureDir: dir, outputDir: output, name: "sales-travis", now: "2026-10-17T00:00:00.000Z" });
+      expect(report.privacy).toMatchObject({ version: "travis-t3-privacy.v1", withheld_columns: ["taxpayer_number"], rows_by_class: { individual_owner: 1 } });
+      expect(report.counts).toMatchObject({ rows: 2, distinct_keys: 1, rows_without_key: 1 });
+      expect(report.counts.present_non_blank.taxpayer_number).toBe(1);
+      const parquet = await readFile(path.join(output, "sales-travis.parquet"));
+      expect(parquet.includes(Buffer.from("32055555555"))).toBe(false);
+      expect(parquet.includes(Buffer.from(sha256(owner)))).toBe(false);
+      expect(parquet.includes(Buffer.from(sha256('"","PAT SMITH","IS","00001","PAT SMITH LAWN","227"')))).toBe(true);
+      expect(parquet.includes(Buffer.from("32011111111"))).toBe(true);
+      const reader = await ParquetReader.openFile(path.join(output, "sales-travis.parquet"));
+      try {
+        const cursor = reader.getCursor();
+        const first = await cursor.next();
+        expect(first).toMatchObject({ _privacy_class: "individual_owner", _withheld_columns: "taxpayer_number", taxpayer_name: "PAT SMITH" });
+        expect(first.taxpayer_number ?? null).toBeNull();
+        const second = await cursor.next();
+        expect(second._privacy_class ?? null).toBeNull();
+        expect(second.taxpayer_number).toBe("32011111111");
+      } finally {
+        await reader.close();
+      }
+      for (const file of ["sales-travis.load-report.json", "sales-travis.hash-index.json", "watermark.json"]) {
+        expect((await readFile(path.join(output, file), "utf8")).includes("32055555555")).toBe(false);
+      }
+      const again = await loadSnapshot({ sourceKey: "tx-comptroller-sales-tax", captureDir: dir, outputDir: output, name: "sales-travis", now: "2026-10-18T00:00:00.000Z" });
+      expect(again).toMatchObject({ merged: false, diff: { new: 0, changed: 0, removed: 0 }, rebuild_matches_snapshot: true });
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("refuses to derive a redacted hash from a row that is not in canonical form", () => {
+    const fields = [{ value: "1", quoted: true }, { value: "A", quoted: true }];
+    expect(redactedRowText('"1","A"', fields, new Set([0]))).toBe('"","A"');
+    expect(() => redactedRowText('"1", "A"', fields, new Set([0]))).toThrow(/canonical/);
   });
 });

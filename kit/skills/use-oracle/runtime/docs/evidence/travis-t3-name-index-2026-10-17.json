@@ -1,0 +1,268 @@
+{
+ "kind": "travis-t3-name-index",
+ "recorded_at": "2026-10-17T17:30:48.604Z",
+ "decision": "assignment docs/decisions.md section 23: the versioned exact-unique-normalized-name matcher runs in internal reconciliation over the statewide franchise universe (and again at deploy; the counts reconcile)",
+ "matcher_version": "travis-exact-unique-normalized-name.v1 (src/counties/travis/name-matcher.mjs, unchanged; its 21 tests pass)",
+ "index_format": "travis-t3-name-index.v1 (src/counties/travis/t3-name-index.mjs): one Parquet row per (normalized name, entity key), sorted, with scope, printed names, rows and keys_under_name; readNameIndex returns an index matchName accepts; built from the private snapshot with the matcher's own buildNameIndex",
+ "command": "node --max-old-space-size=16384 src/counties/travis/t3-load.mjs --only name-index",
+ "franchise_statewide": {
+  "statewide": {
+   "matcher_version": "travis-exact-unique-normalized-name.v1",
+   "source": "tx-comptroller-franchise-tax",
+   "normalized_names": 3450553,
+   "entity_keys": 3487616,
+   "unique_names": 3417394,
+   "non_unique_names": 33159,
+   "keys_under_non_unique_names": 70222,
+   "rows_indexed": 3487647,
+   "rows_without_name": 15,
+   "by_scope": {
+    "out_of_county": 3145286,
+    "travis": 342330
+   }
+  },
+  "travis_alone": {
+   "normalized_names": 341673,
+   "non_unique_names": 628,
+   "keys_under_non_unique_names": 1285
+  },
+  "travis_in_statewide_universe": {
+   "travis_keys": 342330,
+   "normalized_names_held_by_travis_keys": 341673,
+   "names_unique_in_universe": 336439,
+   "names_shared_in_universe": 5234,
+   "names_shared_only_within_travis": 584,
+   "names_shared_with_an_out_of_county_key": 4650,
+   "travis_keys_with_a_unique_name": 336439,
+   "travis_keys_with_a_shared_name": 5891,
+   "travis_keys_with_a_unique_and_a_shared_name": 0
+  },
+  "out_of_county_unique_names": 3080955,
+  "reading": "statewide, 33,159 normalized names map to more than one taxpayer (70,222 taxpayers), 15 rows have no comparable name. Within Travis alone 628 names are shared (1,285 taxpayers), as on 2026-10-16. Over the statewide universe, which decides a Travis candidate: 336,439 Travis taxpayers hold a name no other Texas franchise taxpayer holds (a permit printing that name gets a review candidate); 5,891 hold one of 5,234 shared names (584 shared only within Travis, 4,650 with a taxpayer elsewhere) and get none. No candidate is computed yet: no permit has been read (T4)",
+  "snapshot": {
+   "path": "data/travis/registry/tx-comptroller-franchise-tax-statewide.parquet",
+   "sha256": "2a102105f56edd3fd8afb157f72781ea3e573de98627fc025d49083f4d0ddda8"
+  },
+  "output": {
+   "path": "data/travis/matcher/tx-comptroller-franchise-tax-statewide.names.parquet",
+   "sha256": "810a1fdc0d489455cbdbb7a72b8d2b95b672640347d4bde65e6fa79a32000b9b",
+   "rows": 3487616,
+   "written": true,
+   "unchanged": false
+  },
+  "duration_seconds": 66.9
+ },
+ "other_indexes": {
+  "tx-comptroller-sales-tax-travis": {
+   "source": "tx-comptroller-sales-tax",
+   "universe": {
+    "matcher_version": "travis-exact-unique-normalized-name.v1",
+    "source": "tx-comptroller-sales-tax",
+    "normalized_names": 63006,
+    "entity_keys": 42599,
+    "unique_names": 61863,
+    "non_unique_names": 1143,
+    "keys_under_non_unique_names": 2543,
+    "rows_indexed": 49025,
+    "rows_without_name": 0,
+    "by_scope": {
+     "travis": 42599
+    }
+   },
+   "key_on": "taxpayer",
+   "travis_alone": {
+    "normalized_names": 63006,
+    "non_unique_names": 1143,
+    "keys_under_non_unique_names": 2543
+   },
+   "travis_in_universe": {
+    "travis_keys": 42599,
+    "normalized_names_held_by_travis_keys": 63006,
+    "names_unique_in_universe": 61863,
+    "names_shared_in_universe": 1143,
+    "names_shared_only_within_travis": 1143,
+    "names_shared_with_an_out_of_county_key": 0,
+    "travis_keys_with_a_unique_name": 42162,
+    "travis_keys_with_a_shared_name": 1955,
+    "travis_keys_with_a_unique_and_a_shared_name": 1518
+   },
+   "out_of_county_unique_names": 0,
+   "snapshot": {
+    "path": "data/travis/registry/tx-comptroller-sales-tax-travis.parquet",
+    "sha256": "7c510df7ea0e94571bbd5ea032213c7dbcaaed652bdf26ee0025e21ca23e84fa"
+   },
+   "output": {
+    "path": "data/travis/matcher/tx-comptroller-sales-tax-travis.names.parquet",
+    "sha256": "b2539d72c90d5958eccae37a3e4b11146493d2ee2f21b4843c296ad0871eb01f",
+    "rows": 64406,
+    "written": true,
+    "unchanged": false
+   }
+  },
+  "tx-sos-veteran-owned-business": {
+   "source": "tx-sos-veteran-owned-business",
+   "universe": {
+    "matcher_version": "travis-exact-unique-normalized-name.v1",
+    "source": "tx-sos-veteran-owned-business",
+    "normalized_names": 27163,
+    "entity_keys": 27205,
+    "unique_names": 27121,
+    "non_unique_names": 42,
+    "keys_under_non_unique_names": 84,
+    "rows_indexed": 27205,
+    "rows_without_name": 0,
+    "by_scope": {
+     "statewide": 27205
+    }
+   },
+   "key_on": "record key",
+   "travis_alone": {
+    "normalized_names": 0,
+    "non_unique_names": 0,
+    "keys_under_non_unique_names": 0
+   },
+   "travis_in_universe": {
+    "travis_keys": 0,
+    "normalized_names_held_by_travis_keys": 0,
+    "names_unique_in_universe": 0,
+    "names_shared_in_universe": 0,
+    "names_shared_only_within_travis": 0,
+    "names_shared_with_an_out_of_county_key": 0,
+    "travis_keys_with_a_unique_name": 0,
+    "travis_keys_with_a_shared_name": 0,
+    "travis_keys_with_a_unique_and_a_shared_name": 0
+   },
+   "out_of_county_unique_names": 27121,
+   "snapshot": {
+    "path": "data/travis/registry/tx-sos-veteran-owned-business.parquet",
+    "sha256": "988727bb91ca5e23aa43d9aea26fc0c39826d819430025a0711ca39d5e401ef2"
+   },
+   "output": {
+    "path": "data/travis/matcher/tx-sos-veteran-owned-business.names.parquet",
+    "sha256": "d1fb08e6f1eccbb9e0a9697606fbf7f699aa51b09385b76db564187840f44179",
+    "rows": 27205,
+    "written": true,
+    "unchanged": false
+   }
+  },
+  "tdlr-license-files": {
+   "source": "tdlr-license-files",
+   "universe": {
+    "matcher_version": "travis-exact-unique-normalized-name.v1",
+    "source": "tdlr-license-files",
+    "normalized_names": 414175,
+    "entity_keys": 459993,
+    "unique_names": 372453,
+    "non_unique_names": 41722,
+    "keys_under_non_unique_names": 107420,
+    "rows_indexed": 887715,
+    "rows_without_name": 0,
+    "by_scope": {
+     "out_of_county": 442204,
+     "travis": 17789
+    }
+   },
+   "key_on": "record key",
+   "travis_alone": {
+    "normalized_names": 17419,
+    "non_unique_names": 962,
+    "keys_under_non_unique_names": 2023
+   },
+   "travis_in_universe": {
+    "travis_keys": 17789,
+    "normalized_names_held_by_travis_keys": 17419,
+    "names_unique_in_universe": 14723,
+    "names_shared_in_universe": 2696,
+    "names_shared_only_within_travis": 773,
+    "names_shared_with_an_out_of_county_key": 1923,
+    "travis_keys_with_a_unique_name": 14259,
+    "travis_keys_with_a_shared_name": 3734,
+    "travis_keys_with_a_unique_and_a_shared_name": 204
+   },
+   "out_of_county_unique_names": 357730,
+   "snapshot": {
+    "path": "data/travis/licensing/tdlr-license-files.parquet",
+    "sha256": "2e3ab26003d6f366153373fa97c93797961b3e2049d4dfbb00b7cb57127ec6e8"
+   },
+   "output": {
+    "path": "data/travis/matcher/tdlr-license-files.names.parquet",
+    "sha256": "d6ef64ebcec6d7120b83184d5c9e03e63914e344f1d3fbc4ac486297dcd894d3",
+    "rows": 479873,
+    "written": true,
+    "unchanged": false
+   }
+  },
+  "austin-row-contractor-licenses": {
+   "source": "austin-row-contractor-licenses",
+   "universe": {
+    "matcher_version": "travis-exact-unique-normalized-name.v1",
+    "source": "austin-row-contractor-licenses",
+    "normalized_names": 533,
+    "entity_keys": 469,
+    "unique_names": 532,
+    "non_unique_names": 1,
+    "keys_under_non_unique_names": 2,
+    "rows_indexed": 469,
+    "rows_without_name": 0,
+    "by_scope": {
+     "travis": 469
+    }
+   },
+   "key_on": "record key",
+   "travis_alone": {
+    "normalized_names": 533,
+    "non_unique_names": 1,
+    "keys_under_non_unique_names": 2
+   },
+   "travis_in_universe": {
+    "travis_keys": 469,
+    "normalized_names_held_by_travis_keys": 533,
+    "names_unique_in_universe": 532,
+    "names_shared_in_universe": 1,
+    "names_shared_only_within_travis": 1,
+    "names_shared_with_an_out_of_county_key": 0,
+    "travis_keys_with_a_unique_name": 469,
+    "travis_keys_with_a_shared_name": 2,
+    "travis_keys_with_a_unique_and_a_shared_name": 2
+   },
+   "out_of_county_unique_names": 0,
+   "snapshot": {
+    "path": "data/travis/licensing/austin-row-contractor-licenses.parquet",
+    "sha256": "9f0068f6d289a6c3aed51564c0626b15af87de76265308b33ed4289b45dcacd9"
+   },
+   "output": {
+    "path": "data/travis/matcher/austin-row-contractor-licenses.names.parquet",
+    "sha256": "5eba0ce215b376a8f824edffa8665d29b2388f4642683a5999e6360ca7719e84",
+    "rows": 534,
+    "written": true,
+    "unchanged": false
+   }
+  }
+ },
+ "notes": {
+  "tx-comptroller-sales-tax-travis": "keyed on the taxpayer (42,216 taxpayers) so a taxpayer's own outlets do not count as a collision; the 9,471 sole-owner outlets have no stored taxpayer number and are keyed per outlet (9,088 owners, 383 extra keys), so a sole owner with several outlets under one name counts as shared",
+  "tx-sos-veteran-owned-business": "statewide entities; its Travis view is the franchise join (2,343 rows), not a scope of its own",
+  "tdlr-license-files": "licenses keyed by (type, subtype, number), names from NAME and BUSINESS NAME; scope travis = business county TRAVIS",
+  "austin-row-contractor-licenses": "printed contractor_name plus the derived company name (austin-row-company-name.v1)",
+  "tsbpe-responsible-master-plumber": "not built: awaiting the capture (one window re-run); built by the same step once the snapshot exists"
+ },
+ "missing": [
+  "tsbpe-responsible-master-plumber"
+ ],
+ "reload": {
+  "loaded_at": "2026-10-17T17:32:09.922Z",
+  "all_no_op": true,
+  "outputs_unchanged": {
+   "tx-comptroller-franchise-tax-statewide": true,
+   "tx-comptroller-sales-tax-travis": true,
+   "tx-sos-veteran-owned-business": true,
+   "tdlr-license-files": true,
+   "austin-row-contractor-licenses": true
+  }
+ },
+ "load_records": [
+  "data/travis/t3-loads/20261017T173048Z.json",
+  "data/travis/t3-loads/20261017T173209Z.json"
+ ],
+ "private_boundary": "the index Parquet files stay in the gitignored runtime data/travis/matcher/; this file holds counts and digests only"
+}
