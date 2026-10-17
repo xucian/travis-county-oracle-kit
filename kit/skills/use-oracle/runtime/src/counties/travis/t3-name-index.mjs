@@ -43,7 +43,7 @@ const SUFFIX = "__trimmed";
 /** @type {readonly IndexSpec[]} */
 export const NAME_INDEXES = Object.freeze([
   { name: "tx-comptroller-franchise-tax-statewide", sourceKey: "tx-comptroller-franchise-tax", track: "registry", snapshot: "tx-comptroller-franchise-tax-statewide", universe: "statewide active franchise taxpayers (the private matching universe)" },
-  { name: "tx-comptroller-sales-tax-travis", sourceKey: "tx-comptroller-sales-tax", track: "registry", snapshot: "tx-comptroller-sales-tax-travis", keyOn: "taxpayer", universe: "Travis sales-tax outlets, keyed on the taxpayer (a sole owner, whose number is withheld, is keyed per outlet)" },
+  { name: "tx-comptroller-sales-tax-travis", sourceKey: "tx-comptroller-sales-tax", track: "registry", snapshot: "tx-comptroller-sales-tax-travis", keyOn: "taxpayer", universe: "Travis sales-tax outlets, keyed on the taxpayer (a sole owner, whose number is withheld, is keyed per outlet by its keyed record id)" },
   { name: "tx-sos-veteran-owned-business", sourceKey: "tx-sos-veteran-owned-business", track: "registry", snapshot: "tx-sos-veteran-owned-business", universe: "statewide SOS veteran-owned entities" },
   { name: "tdlr-license-files", sourceKey: "tdlr-license-files", track: "licensing", snapshot: "tdlr-license-files", universe: "statewide TDLR electrical and A/C licenses" },
   { name: "tsbpe-responsible-master-plumber", sourceKey: "tsbpe-responsible-master-plumber", track: "licensing", snapshot: "tsbpe-responsible-master-plumber", universe: "statewide TSBPE Responsible Master Plumbers" },
@@ -68,12 +68,12 @@ export async function buildIndexFromSnapshot(spec, parquetPath) {
       const roles = source.resolveColumns(fields, fields);
       source = { ...source, keyColumns: roles.keyColumns, nameColumns: roles.nameColumns, extraMatchNames: roles.extraMatchNames, matchNameVersion: roles.matchNameVersion, scopeOf: roles.scopeOf };
     }
-    const cursor = reader.getCursor(schemaFields.filter((field) => field.endsWith(SUFFIX) || field === "_row_sha256").map((field) => [field]));
+    const cursor = reader.getCursor(schemaFields.filter((field) => field.endsWith(SUFFIX) || field === "_row_sha256" || field === "_withheld_record_id").map((field) => [field]));
     const rows = [];
     let record = await cursor.next();
     while (record) {
       const row = /** @type {Record<string, unknown>} */ (record);
-      const key = spec.keyOn === "taxpayer" ? (row.taxpayer_number__trimmed ? String(row.taxpayer_number__trimmed) : `row:${row._row_sha256}`) : entityKeyOf(source, row);
+      const key = spec.keyOn === "taxpayer" ? (row.taxpayer_number__trimmed ? String(row.taxpayer_number__trimmed) : entityKeyOf(source, row)) : entityKeyOf(source, row);
       const names = matchNamesOf(source, row);
       rows.push({ __key: key, __scope: source.scopeOf(row), ...Object.fromEntries(names.map((text, index) => [`__name_${index}`, text])) });
       record = await cursor.next();

@@ -1,0 +1,210 @@
+{
+ "kind": "travis-t3-withheld-record-ids",
+ "recorded_at": "2026-10-17T18:45:06.767Z",
+ "ruling": "assignment docs/decisions.md section 24.2 (oracle agent, delegated by the operator on 2026-10-17); api-contract.md change control 2026-10-17",
+ "rows": {
+  "individual_owner_rows": 9471,
+  "distinct_taxpayer_outlet_pairs": 9471,
+  "distinct_owners": 9088
+ },
+ "collision_counts": {
+  "plain_recipe_with_the_number_emptied (source key, outlet number)": {
+   "distinct_ids": 22,
+   "ids_shared": 15,
+   "rows_under_shared_ids": 9464,
+   "note": "outlet number 1 alone covers 5,615 rows"
+  },
+  "redacted_full_row": {
+   "distinct_ids": 9471,
+   "ids_shared": 0,
+   "rows_under_shared_ids": 0,
+   "note": "not guaranteed; changes whenever any printed value of the row changes"
+  },
+  "outlet_fields (number, name, address, city, ZIP, permit and first-sale dates)": {
+   "distinct_ids": 9471,
+   "ids_shared": 0,
+   "rows_under_shared_ids": 0,
+   "note": "not guaranteed; changes with any of those values"
+  },
+  "taxpayer_name_and_outlet_number": {
+   "distinct_ids": 9467,
+   "ids_shared": 4,
+   "rows_under_shared_ids": 8
+  },
+  "hmac_sha256_with_a_secret (source key, taxpayer number, outlet number)": {
+   "distinct_ids": 9471,
+   "ids_shared": 0,
+   "rows_under_shared_ids": 0,
+   "note": "guaranteed: the message is the dataset's own unique key"
+  },
+  "omit": "ruled out: business_record_id is a path key and a candidate reference; row_sha256 is the row's provenance"
+ },
+ "chosen": {
+  "business_record_id": "travis-record-id.v1 keyed: first 32 hex of HMAC-SHA256(record-id key, source key U+001F taxpayer number U+001F outlet number)",
+  "row_sha256": "SHA-256 of the captured row with the withheld cells emptied",
+  "records_with_a_printed_key": "unchanged plain SHA-256 recipe"
+ },
+ "key": {
+  "file": "runtime data/travis/keys/record-id.key (gitignored, mode 0600; TRAVIS_RECORD_ID_KEY_FILE overrides)",
+  "created": "2026-10-17 with node src/counties/travis/t3-record-id-key.mjs init",
+  "fingerprint": "a85dc5bf94154a97",
+  "rule": "a missing key or another key than the watermark's stops the load; --allow-rekey re-keys on purpose and records rekeyed tombstones",
+  "backup": "the operator keeps one copy off the machine"
+ },
+ "applied": {
+  "rekey_load": {
+   "record": "data/travis/t3-loads/20261017T184506Z.json",
+   "diff": {
+    "against": "snapshot on disk",
+    "new": 9471,
+    "changed": 0,
+    "unchanged": 39554,
+    "removed": 9471,
+    "rekeyed": 9471,
+    "tombstoned": 9471
+   },
+   "note": "the one intended change: the 9,471 sole-owner rows move from their redacted-row-hash key to their keyed id; every old key's rows are still present, so all 9,471 tombstones carry reason rekeyed and none absent_from_capture",
+   "prior_snapshot": {
+    "path": "data/travis/registry/history/tx-comptroller-sales-tax-travis.7c510df7ea0e9457.parquet",
+    "sha256": "7c510df7ea0e94571bbd5ea032213c7dbcaaed652bdf26ee0025e21ca23e84fa",
+    "hash_index_path": "data/travis/registry/history/tx-comptroller-sales-tax-travis.7c510df7ea0e9457.hash-index.json"
+   },
+   "snapshot": {
+    "path": "data/travis/registry/tx-comptroller-sales-tax-travis.parquet",
+    "sha256": "e98bb767e1813384a1effbeba8c2c32e61284e4c3768d4bc21a3344403941325",
+    "bytes": 13698689,
+    "rows": 49025
+   },
+   "privacy": {
+    "version": "travis-t3-privacy.v1",
+    "withheld_columns": [
+     "taxpayer_number"
+    ],
+    "rows_by_class": {
+     "individual_owner": 9471
+    },
+    "row_sha256_basis": "classed rows: the captured row with the withheld cells emptied",
+    "record_id": "travis-record-id.v1: classed rows carry _withheld_record_id = HMAC-SHA256 under the record-id key over the printed key (taxpayer_number, outlet_number), first 32 hex characters",
+    "record_id_key_fingerprint": "a85dc5bf94154a97",
+    "withheld_record_ids": {
+     "rows": 9471,
+     "distinct": 9471,
+     "shared_by_several_rows": 0
+    }
+   }
+  },
+  "reload": {
+   "record": "data/travis/t3-loads/20261017T184511Z.json",
+   "diff": {
+    "against": "snapshot on disk",
+    "new": 0,
+    "changed": 0,
+    "unchanged": 49025,
+    "removed": 0,
+    "rekeyed": 0,
+    "tombstoned": 0
+   },
+   "merged": false,
+   "rebuild_matches_snapshot": true,
+   "watermark_sha256": "90b7f2087f141e27436b61a9bcb574fc93cc925cd5fce8d9ed7f6409458c4eac"
+  },
+  "privacy_check": {
+   "source": "tx-comptroller-sales-tax",
+   "privacy_version": "travis-t3-privacy.v1",
+   "classed_rows_in_capture": 9471,
+   "withheld_values_in_capture": 9088,
+   "snapshot_rows": 49025,
+   "snapshot_rows_classed": 9471,
+   "snapshot_classed_rows_with_a_value": 0,
+   "withheld_values_in_snapshot": 0,
+   "captured_row_hashes_in_snapshot": 0,
+   "keyed_record_ids_in_snapshot": 9471,
+   "keyed_record_ids_distinct": 9471,
+   "keyed_record_ids_not_matching_the_key": 0,
+   "plain_record_ids_found": 0,
+   "withheld_values_in_index": 0,
+   "withheld_values_in_track_files": 0,
+   "key_material_in_track_files": 0,
+   "track_files_checked": 5,
+   "ok": true
+  },
+  "record_ids_check": {
+   "record": "data/travis/t3-loads/20261017T184528Z.json",
+   "checks": {
+    "tx-comptroller-franchise-tax-statewide": {
+     "recipe": "travis-record-id.v1",
+     "rows": 3487662,
+     "distinct_records": 3487631,
+     "distinct_ids": 3487631,
+     "keyed_ids_of_withheld_rows": 0,
+     "rows_without_id": 0,
+     "ids_shared_by_different_records": 0,
+     "records_under_shared_ids": 0,
+     "records_printed_on_several_rows": 31,
+     "rows_of_records_printed_on_several_rows": 62
+    },
+    "tx-comptroller-franchise-tax-travis": {
+     "recipe": "travis-record-id.v1",
+     "rows": 342334,
+     "distinct_records": 342333,
+     "distinct_ids": 342333,
+     "keyed_ids_of_withheld_rows": 0,
+     "rows_without_id": 0,
+     "ids_shared_by_different_records": 0,
+     "records_under_shared_ids": 0,
+     "records_printed_on_several_rows": 1,
+     "rows_of_records_printed_on_several_rows": 2
+    },
+    "tx-comptroller-sales-tax-travis": {
+     "recipe": "travis-record-id.v1",
+     "rows": 49025,
+     "distinct_records": 49025,
+     "distinct_ids": 49025,
+     "keyed_ids_of_withheld_rows": 9471,
+     "rows_without_id": 0,
+     "ids_shared_by_different_records": 0,
+     "records_under_shared_ids": 0,
+     "records_printed_on_several_rows": 0,
+     "rows_of_records_printed_on_several_rows": 0
+    },
+    "tx-sos-veteran-owned-business": {
+     "recipe": "travis-record-id.v1",
+     "rows": 27205,
+     "distinct_records": 27205,
+     "distinct_ids": 27205,
+     "keyed_ids_of_withheld_rows": 0,
+     "rows_without_id": 0,
+     "ids_shared_by_different_records": 0,
+     "records_under_shared_ids": 0,
+     "records_printed_on_several_rows": 0,
+     "rows_of_records_printed_on_several_rows": 0
+    },
+    "tdlr-license-files": {
+     "recipe": "travis-record-id.v1",
+     "rows": 887715,
+     "distinct_records": 459992,
+     "distinct_ids": 459992,
+     "keyed_ids_of_withheld_rows": 0,
+     "rows_without_id": 1,
+     "ids_shared_by_different_records": 0,
+     "records_under_shared_ids": 0,
+     "records_printed_on_several_rows": 427722,
+     "rows_of_records_printed_on_several_rows": 855444
+    },
+    "austin-row-contractor-licenses": {
+     "recipe": "travis-record-id.v1",
+     "rows": 469,
+     "distinct_records": 469,
+     "distinct_ids": 469,
+     "keyed_ids_of_withheld_rows": 0,
+     "rows_without_id": 0,
+     "ids_shared_by_different_records": 0,
+     "records_under_shared_ids": 0,
+     "records_printed_on_several_rows": 0,
+     "rows_of_records_printed_on_several_rows": 0
+    }
+   }
+  }
+ },
+ "private_boundary": "counts, digests and the key fingerprint only; no number, no id of a withheld row, no key material"
+}

@@ -538,7 +538,7 @@ official_identity:
         authority: Texas State Board of Plumbing Examiners
         source: free licensee lists, the Responsible Master Plumber CSV with the last known company, https://tsbpe.texas.gov/download-csv/RMP/ (link "Responsible Master Plumber List" on https://tsbpe.texas.gov/free-licensee-list/)
         status: awaiting one window re-run - the 2026-10-17 run saved the site menu's description page (HTML, kept as evidence, set aside by the loader); the resolver takes /download-csv/RMP/ since kit commit 8af4bc3; the loader resolves the license number, licensee and company columns from the header when the CSV lands
-        window_command: cd /Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime && node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber
+        window_command: cd /Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime && node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber,comptroller-record-layouts
       - key: austin-row-contractor-licenses
         authority: City of Austin Transportation and Public Works
         source: Active Right of Way Contractor License Holders (data.austintexas.gov 8d92-wsiw; 5 columns; 469 rows captured 2026-10-17, data updated 2026-10-17T07:05:35Z)
@@ -547,13 +547,22 @@ official_identity:
     - key: tx-comptroller-sales-tax
       source: Texas Comptroller Active Sales Tax Permit Holders (data.texas.gov jrea-zgmq; outlet addresses, outlet county, NAICS, permit and first-sale dates, entity types outside franchise tax)
       scope: Travis outlets, outlet_county_code 227 (read from the dataset's grouped codes at fetch time)
-      privacy: travis-t3-privacy.v1 - taxpayer_organization_type IS (sole owner, the only natural-person type) is individual_owner; its taxpayer number is withheld from every derived store (null in the snapshot, row hash over the row with that cell emptied) and never served; 9,471 of 49,025 outlets; no number in the capture has the SSN-based leading 2, but the record layout was not captured, so every IS number is withheld
+      privacy: travis-t3-privacy.v1 - taxpayer_organization_type IS (sole owner, the only natural-person type) is individual_owner; its taxpayer number is withheld from every derived store (null in the snapshot, row hash over the row with that cell emptied) and never served; 9,471 of 49,025 outlets; no number in the capture has the SSN-based leading 2, but the record layout was not captured, so every IS number is withheld; record ids (assignment decisions.md section 24.2) - business_record_id of a withheld row is the keyed travis-record-id.v1 digest (HMAC-SHA256 under the record-id key, fingerprint a85dc5bf94154a97, over taxpayer and outlet number), row_sha256 the hash of the row with the number emptied
       status: loaded 2026-10-17 - 49,025 outlets of 42,216 taxpayers, rowsUpdatedAt 2026-10-17T10:31:10Z (docs/evidence/travis-t3-sales-tax-load-2026-10-17.json)
     - key: tx-sos-veteran-owned-business
       source: Texas Secretary of State Veteran Owned Business (data.texas.gov 2vfr-72e4)
       scope: statewide file captured (27,205 rows, dataset of 2026-10-01); the Travis subset is the 2,343 rows joined to a Travis franchise row
-      join_key: travis-sos-file-number-join.v1 - the franchise file prints the SOS file number zero-padded to 10 digits, the veteran file 9 digits, so printed equality joins none; the key restores the padding (25,466 joined; the veteran file's taxid agrees with the joined taxpayer number on 24,868); the operator confirms this reading of "exact"
+      join_key: travis-sos-file-number-join.v1 - the franchise file prints the SOS file number zero-padded to 10 digits, the veteran file 9 digits, so printed equality joins none; the key restores the padding (25,466 joined; the veteran file's taxid agrees with the joined taxpayer number on 24,868); ruled by the operator on 2026-10-17 as the exact SOS file number (assignment decisions.md section 24.1)
       status: loaded and joined 2026-10-17 (docs/evidence/travis-t3-veteran-owned-load-2026-10-17.json)
+  record_layouts:
+    approved_by: operator
+    approved_at: "2026-10-17"
+    approval_record: assignment repository docs/decisions.md section 24.4
+    source: the record layouts attached to jrea-zgmq ("Active Sales Tax Permit Record Layout.pdf", asset c1cf06f3-4a69-4489-b1c7-84de30a269d8 in the metadata of 2026-10-17) and 9cir-efmm ("Franchise Layout.docx", asset 297f2282-33fe-4e7b-86de-10f6ae5f07e3), resolved at fetch time from each dataset's metadata (the captured metadata when that request fails), from https://data.texas.gov/api/views/<id>/files/<assetId>, the asset endpoint as fallback
+    purpose: confirm the organization codes and taxpayer number forms the privacy rule travis-t3-privacy.v1 relies on (IS the only individual-owner type)
+    offline_check: node --max-old-space-size=16384 src/counties/travis/t3-load.mjs --only layouts (travis-t3-layout-check.v1; consistent, differs, partial, unreadable or awaiting_capture)
+    status: awaiting the next US window, fetched together with the TSBPE re-run
+    window_command: cd /Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime && node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber,comptroller-record-layouts
   matcher:
     version: travis-exact-unique-normalized-name.v1
     indexes: runtime data/travis/matcher/ (travis-t3-name-index.v1); franchise universe statewide - 3,450,553 normalized names, 33,159 shared; Travis alone 628 shared; 336,439 Travis taxpayers hold a statewide-unique name, 5,891 a shared one (docs/evidence/travis-t3-name-index-2026-10-17.json)

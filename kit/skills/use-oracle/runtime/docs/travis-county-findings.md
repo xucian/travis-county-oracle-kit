@@ -456,3 +456,9 @@ capture; the run record is `docs/evidence/travis-t3-run-2026-10-17.json`.
 - **Detail URL.** `…/taxes/franchise/account-status/search/<taxpayer_number>` answers 200 without a redirect for a
   franchise taxpayer but renders the record in the browser from a JSON endpoint that was not requested: a link for
   `BusinessRecord.detail_url` on franchise rows, never provenance.
+- **Rulings (assignment decisions.md section 24, 2026-10-17).** The padded SOS file number is the exact veteran join
+  key. A sole owner's `business_record_id` is a keyed digest (HMAC-SHA256 under the record-id key over taxpayer and
+  outlet number) and its `row_sha256` hashes the row with the number emptied: the plain recipe with the number emptied
+  would have given 9,471 outlets 22 ids. TDLR licenses are keyed by type, subtype and number. The two Comptroller record
+  layouts come in the next window with TSBPE (`--only tsbpe-responsible-master-plumber,comptroller-record-layouts`) and
+  are checked offline against the privacy rule.

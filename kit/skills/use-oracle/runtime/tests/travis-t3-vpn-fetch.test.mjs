@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -19,6 +19,7 @@ function datasets() {
   return {
     "9cir-efmm": {
       rowsUpdatedAt: 1792230000,
+      attachments: [{ filename: "Franchise Layout.docx", assetId: "297f2282-33fe-4e7b-86de-10f6ae5f07e3", name: "Franchise Layout.docx" }],
       header: ["taxpayer_number", "taxpayer_name", "taxpayer_county_code"],
       rows: [
         ["10000000001", "ACME ROOFING LLC", "227"],
@@ -30,6 +31,7 @@ function datasets() {
     },
     "jrea-zgmq": {
       rowsUpdatedAt: 1792230100,
+      attachments: [{ filename: "Active Sales Tax Permit Record Layout.pdf", assetId: "c1cf06f3-4a69-4489-b1c7-84de30a269d8", name: "Active Sales Tax Permit Record Layout.pdf" }],
       header: ["taxpayer_number", "outlet_number", "outlet_name", "outlet_county_code"],
       rows: [
         ["10000000001", "00001", "ACME ROOFING", "227"],
@@ -57,6 +59,8 @@ function datasets() {
 }
 
 const csvCell = (value) => `"${String(value).replaceAll('"', '""')}"`;
+/** A stand-in layout document: a PDF or a DOCX (zip) signature, then text. */
+const LAYOUT_BODY = (filename) => (/\.pdf$/i.test(filename) ? "%PDF-1.4\nIS Individual - Sole Owner\n" : Buffer.concat([Buffer.from([0x50, 0x4b, 0x03, 0x04]), Buffer.from(" CL Limited Liability Company")]));
 const toCsv = (header, rows) => `${[header, ...rows].map((row) => row.map(csvCell).join(",")).join("\n")}\n`;
 
 /**
@@ -69,8 +73,9 @@ const toCsv = (header, rows) => `${[header, ...rows].map((row) => row.map(csvCel
  * @param {string} [options.tdlrPage] - TDLR page HTML.
  * @param {Set<string>} [options.failOnce] - URL substrings answered 429 once.
  * @param {(id: string, call: number) => number} [options.versionOf] - rowsUpdatedAt per metadata call.
+ * @param {(url: URL) => Response | null} [options.override] - Answer some URLs differently (tests of fallbacks).
  */
-async function internet({ country = () => "US", data = datasets(), tdlrPage, failOnce = new Set(), versionOf } = {}) {
+async function internet({ country = () => "US", data = datasets(), tdlrPage, failOnce = new Set(), versionOf, override } = {}) {
   const tdlr = tdlrPage ?? (await readFile(path.join(PAGES, "tdlr-licfile.html"), "utf8"));
   const tsbpe = await readFile(path.join(PAGES, "tsbpe-free-licensee-list.html"), "utf8");
   const comptroller = await readFile(path.join(PAGES, "comptroller-detail.html"), "utf8");
@@ -96,13 +101,21 @@ async function internet({ country = () => "US", data = datasets(), tdlrPage, fai
         return respond("slow down", { status: 429, headers: { "retry-after": "1" } });
       }
     }
+    const overridden = override ? override(parsed) : null;
+    if (overridden) return overridden;
+    const file = /^\/api\/views\/([a-z0-9]{4}-[a-z0-9]{4})\/files\/([0-9a-f-]+)$/.exec(parsed.pathname);
+    if (file) {
+      const attachment = (data[file[1]]?.attachments ?? []).find((entry) => entry.assetId === file[2]);
+      if (!attachment) return respond("not found", { status: 404 });
+      return respond(LAYOUT_BODY(attachment.filename), { headers: { "content-type": "application/octet-stream" } });
+    }
     const view = /^\/api\/views\/([a-z0-9]{4}-[a-z0-9]{4})\.json$/.exec(parsed.pathname);
     if (view) {
       const id = view[1];
       metadataCalls[id] = (metadataCalls[id] ?? 0) + 1;
       const dataset = data[id];
       const rowsUpdatedAt = versionOf ? versionOf(id, metadataCalls[id]) : dataset.rowsUpdatedAt;
-      return respond(JSON.stringify({ id, rowsUpdatedAt, viewLastModified: rowsUpdatedAt, columns: dataset.header.map((fieldName) => ({ fieldName, name: fieldName, dataTypeName: "text" })) }), { headers: { "content-type": "application/json" } });
+      return respond(JSON.stringify({ id, rowsUpdatedAt, viewLastModified: rowsUpdatedAt, columns: dataset.header.map((fieldName) => ({ fieldName, name: fieldName, dataTypeName: "text" })), metadata: { attachments: dataset.attachments ?? [] } }), { headers: { "content-type": "application/json" } });
     }
     const resource = /^\/resource\/([a-z0-9]{4}-[a-z0-9]{4})\.(json|csv)$/.exec(parsed.pathname);
     if (resource) {
@@ -242,7 +255,12 @@ describe("T3 VPN-only fetch", () => {
       expect(retried.map((receipt) => receipt.status)).toEqual([429, 200]);
 
       expect(lines.filter((line) => line.startsWith("["))).toHaveLength(VPN_SOURCES.length);
-      expect(lines.at(-1)).toMatch(/^t3-vpn-fetch: 6\/6 ok; .* rows, .* MB, \d+ requests \(0 resumed\), \d+ egress checks, /);
+      expect(lines.at(-1)).toMatch(/^t3-vpn-fetch: 7\/7 ok; .* rows, .* MB, \d+ requests \(0 resumed\), \d+ egress checks, /);
+      const layouts = results.find((result) => result.key === "comptroller-record-layouts");
+      expect(layouts.detail.files.map((file) => [file.dataset_id, file.document])).toEqual([
+        ["jrea-zgmq", "pdf"],
+        ["9cir-efmm", "docx"],
+      ]);
 
       // The capture loads offline with the T3 snapshot loader.
       const loaded = await loadSnapshot({ sourceKey: "tx-comptroller-franchise-tax", captureDir: path.join(out, "tx-comptroller-franchise-tax", "v1792230000"), outputDir: path.join(out, "registry"), name: "statewide", now: "2026-10-17T00:00:00.000Z" });
@@ -313,5 +331,71 @@ describe("T3 VPN-only fetch", () => {
 
   it("refuses unknown sources", async () => {
     await expect(runVpnFetch({ only: ["bbb"] })).rejects.toThrow(/unknown source bbb/);
+  });
+
+  it("fetches the two record layouts in the same run as the TSBPE re-run, from one command", async () => {
+    await withOut(async (out) => {
+      const net = await internet();
+      const lines = [];
+      const { exitCode, results, summary } = await runVpnFetch({ ...options(out, net, { only: ["tsbpe-responsible-master-plumber", "comptroller-record-layouts"] }), context: { fetchImpl: net.fetchImpl, sleep: noSleep, log: (line) => lines.push(line) } });
+      expect(exitCode).toBe(0);
+      expect(results.map((result) => [result.key, result.status])).toEqual([
+        ["tsbpe-responsible-master-plumber", "ok"],
+        ["comptroller-record-layouts", "ok"],
+      ]);
+      const data = net.log.filter((entry) => entry.kind === "data");
+      expect(data.every((entry) => entry.country === "US")).toBe(true);
+      expect(net.checks()).toBe(data.length + 1);
+      expect(data.map((entry) => new URL(entry.url).pathname).filter((pathname) => pathname.startsWith("/api/"))).toEqual([
+        "/api/views/jrea-zgmq.json",
+        "/api/views/jrea-zgmq/files/c1cf06f3-4a69-4489-b1c7-84de30a269d8",
+        "/api/views/9cir-efmm.json",
+        "/api/views/9cir-efmm/files/297f2282-33fe-4e7b-86de-10f6ae5f07e3",
+      ]);
+      expect(summary.requests).toBe(6);
+      expect(lines.at(-1)).toMatch(/^t3-vpn-fetch: 2\/2 ok; /);
+      const layouts = results.find((result) => result.key === "comptroller-record-layouts");
+      const resolution = JSON.parse(await readFile(layouts.detail.resolution, "utf8"));
+      expect(resolution.datasets.map((entry) => [entry.dataset_id, entry.status, entry.resolved_from.startsWith("metadata fetched in this run")])).toEqual([
+        ["jrea-zgmq", "ok", true],
+        ["9cir-efmm", "ok", true],
+      ]);
+    });
+  });
+
+  it("falls back to the asset endpoint, and to metadata captured earlier, and refuses an HTML body", async () => {
+    await withOut(async (out) => {
+      // Metadata captured by an earlier window run, under the source's version directory.
+      const earlier = path.join(out, "tx-comptroller-franchise-tax", "v1792230000");
+      await mkdir(earlier, { recursive: true });
+      await writeFile(path.join(earlier, "metadata-20261017T161006Z-end.json"), JSON.stringify({ id: "9cir-efmm", metadata: { attachments: datasets()["9cir-efmm"].attachments } }));
+      const net = await internet({
+        override: (url) => {
+          if (url.pathname === "/api/views/9cir-efmm.json") return new Response("server error", { status: 500 });
+          if (url.pathname.startsWith("/api/views/jrea-zgmq/files/")) return new Response("<html>gone</html>", { status: 200, headers: { "content-type": "text/html" } });
+          if (url.pathname.startsWith("/api/assets/c1cf06f3")) return new Response("%PDF-1.4\nlayout\n", { status: 200, headers: { "content-type": "application/pdf" } });
+          if (url.pathname.startsWith("/api/assets/")) return new Response("<html>no</html>", { status: 200, headers: { "content-type": "text/html" } });
+          return null;
+        },
+      });
+      const { results } = await runVpnFetch(options(out, net, { only: ["comptroller-record-layouts"] }));
+      const layouts = results[0];
+      expect(layouts.status).toBe("ok");
+      const resolution = JSON.parse(await readFile(layouts.detail.resolution, "utf8"));
+      const sales = resolution.datasets.find((entry) => entry.dataset_id === "jrea-zgmq");
+      expect(sales.files[0].tried.map((attempt) => [attempt.status, attempt.document])).toEqual([
+        [200, null],
+        [200, "pdf"],
+      ]);
+      const franchise = resolution.datasets.find((entry) => entry.dataset_id === "9cir-efmm");
+      expect(franchise).toMatchObject({ metadata_status: 500, status: "ok" });
+      expect(franchise.resolved_from).toMatch(/^metadata captured earlier/);
+      expect(layouts.detail.files.map((file) => file.file)).toEqual(["jrea-zgmq-asset-Active_Sales_Tax_Permit_Record_Layout.pdf", "9cir-efmm-Franchise_Layout.docx"]);
+
+      // Nothing usable for a dataset: the source fails and says which.
+      const bad = await internet({ override: (url) => (url.pathname.includes("/files/") || url.pathname.startsWith("/api/assets/") ? new Response("<html>x</html>", { status: 200, headers: { "content-type": "text/html" } }) : null) });
+      const failed = await runVpnFetch(options(path.join(out, "second"), bad, { only: ["comptroller-record-layouts"] }));
+      expect(failed.results[0]).toMatchObject({ status: "failed", detail: { error: "no record layout captured for jrea-zgmq, 9cir-efmm" } });
+    });
   });
 });

@@ -287,10 +287,11 @@ export async function verifyWindow({ windowDir, runStamp }) {
     }
     if (Array.isArray(source.detail?.files)) {
       summary.files = source.detail.files.map((entry) => {
-        const file = csvFiles.find((candidate) => candidate.file === entry.file);
-        const match = file !== undefined && file.parsed_rows === entry.rows && file.bytes === entry.bytes;
-        if (!match) mismatches.push(`${source.key}/${entry.file}: run record ${entry.rows} rows ${entry.bytes} bytes, receipts ${file?.parsed_rows} rows ${file?.bytes} bytes`);
-        return { file: entry.file, link_text: entry.link_text, rows: file?.parsed_rows ?? null, bytes: file?.bytes ?? null, sha256: file?.sha256 ?? null, last_modified: entry.last_modified, matches_run_record: match };
+        const file = dataFiles.find((candidate) => candidate.file === entry.file);
+        const rowsMatch = typeof entry.rows === "number" ? file?.parsed_rows === entry.rows : true;
+        const match = file !== undefined && rowsMatch && file.bytes === entry.bytes && (entry.sha256 === undefined || file.sha256 === entry.sha256);
+        if (!match) mismatches.push(`${source.key}/${entry.file}: run record ${entry.rows ?? "-"} rows ${entry.bytes} bytes, receipts ${file?.parsed_rows ?? "-"} rows ${file?.bytes} bytes`);
+        return { file: entry.file, link_text: entry.link_text ?? entry.attachment_name ?? null, rows: file?.parsed_rows ?? null, bytes: file?.bytes ?? null, sha256: file?.sha256 ?? null, last_modified: entry.last_modified ?? null, matches_run_record: match };
       });
     }
     sources.push(summary);

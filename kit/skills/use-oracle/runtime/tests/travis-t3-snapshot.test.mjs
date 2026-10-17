@@ -6,6 +6,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { ParquetReader } from "@dsnp/parquetjs";
 
+import { recordIdKeyFingerprint, recordIdOf, withheldRecordIdOf } from "../src/counties/travis/record-ids.mjs";
+
 import { NORMALIZER_VERSION, changedColumnCounts, loadSnapshot, normalizeRecord, parseCsvRecordSpans, readCaptureReceipts, redactedRowText, selectCaptureReceipts, verifyCapture } from "../src/counties/travis/t3-snapshot.mjs";
 
 const sha256 = (text) => createHash("sha256").update(text).digest("hex");
@@ -240,20 +242,26 @@ describe("T3 snapshot normalizer", () => {
       await writeFile(path.join(dir, "page-00000.csv"), text);
       await writeFile(path.join(dir, "receipts.jsonl"), `${JSON.stringify({ kind: "page", file: "page-00000.csv", url: "https://data.texas.gov/resource/jrea-zgmq.csv?%24offset=0", fetched_at: "2026-10-17T16:07:22.000Z", status: 200, bytes: Buffer.byteLength(text), sha256: sha256(text), rows: 2, content_type: "text/csv" })}\n`);
       const output = path.join(dir, "registry");
-      const report = await loadSnapshot({ sourceKey: "tx-comptroller-sales-tax", captureDir: dir, outputDir: output, name: "sales-travis", now: "2026-10-17T00:00:00.000Z" });
-      expect(report.privacy).toMatchObject({ version: "travis-t3-privacy.v1", withheld_columns: ["taxpayer_number"], rows_by_class: { individual_owner: 1 } });
-      expect(report.counts).toMatchObject({ rows: 2, distinct_keys: 1, rows_without_key: 1 });
+      const recordIdKey = Buffer.alloc(32, 7);
+      const report = await loadSnapshot({ sourceKey: "tx-comptroller-sales-tax", captureDir: dir, outputDir: output, name: "sales-travis", recordIdKey, now: "2026-10-17T00:00:00.000Z" });
+      expect(report.privacy).toMatchObject({ version: "travis-t3-privacy.v1", withheld_columns: ["taxpayer_number"], rows_by_class: { individual_owner: 1 }, record_id_key_fingerprint: recordIdKeyFingerprint(recordIdKey), withheld_record_ids: { rows: 1, distinct: 1, shared_by_several_rows: 0 } });
+      expect(report.counts).toMatchObject({ rows: 2, distinct_keys: 2, rows_without_key: 0 });
+      expect(report.watermark).toMatchObject({ record_id_version: "travis-record-id.v1", record_id_key_fingerprint: recordIdKeyFingerprint(recordIdKey) });
+      const keyedId = withheldRecordIdOf(recordIdKey, "tx-comptroller-sales-tax", ["32055555555", "00001"]);
+      const plainId = recordIdOf("tx-comptroller-sales-tax", ["32055555555", "00001"]);
       expect(report.counts.present_non_blank.taxpayer_number).toBe(1);
       const parquet = await readFile(path.join(output, "sales-travis.parquet"));
       expect(parquet.includes(Buffer.from("32055555555"))).toBe(false);
       expect(parquet.includes(Buffer.from(sha256(owner)))).toBe(false);
       expect(parquet.includes(Buffer.from(sha256('"","PAT SMITH","IS","00001","PAT SMITH LAWN","227"')))).toBe(true);
       expect(parquet.includes(Buffer.from("32011111111"))).toBe(true);
+      expect(parquet.includes(Buffer.from(keyedId))).toBe(true);
+      expect(parquet.includes(Buffer.from(plainId))).toBe(false);
       const reader = await ParquetReader.openFile(path.join(output, "sales-travis.parquet"));
       try {
         const cursor = reader.getCursor();
         const first = await cursor.next();
-        expect(first).toMatchObject({ _privacy_class: "individual_owner", _withheld_columns: "taxpayer_number", taxpayer_name: "PAT SMITH" });
+        expect(first).toMatchObject({ _privacy_class: "individual_owner", _withheld_columns: "taxpayer_number", _withheld_record_id: keyedId, taxpayer_name: "PAT SMITH" });
         expect(first.taxpayer_number ?? null).toBeNull();
         const second = await cursor.next();
         expect(second._privacy_class ?? null).toBeNull();
@@ -264,8 +272,16 @@ describe("T3 snapshot normalizer", () => {
       for (const file of ["sales-travis.load-report.json", "sales-travis.hash-index.json", "watermark.json"]) {
         expect((await readFile(path.join(output, file), "utf8")).includes("32055555555")).toBe(false);
       }
-      const again = await loadSnapshot({ sourceKey: "tx-comptroller-sales-tax", captureDir: dir, outputDir: output, name: "sales-travis", now: "2026-10-18T00:00:00.000Z" });
+      const again = await loadSnapshot({ sourceKey: "tx-comptroller-sales-tax", captureDir: dir, outputDir: output, name: "sales-travis", recordIdKey, now: "2026-10-18T00:00:00.000Z" });
       expect(again).toMatchObject({ merged: false, diff: { new: 0, changed: 0, removed: 0 }, rebuild_matches_snapshot: true });
+      // Another key stops the load; a deliberate re-key moves the withheld row to its new id and records it as rekeyed.
+      const otherKey = Buffer.alloc(32, 8);
+      await expect(loadSnapshot({ sourceKey: "tx-comptroller-sales-tax", captureDir: dir, outputDir: output, name: "sales-travis", recordIdKey: otherKey, now: "2026-10-19T00:00:00.000Z" })).rejects.toThrow(/record-id key changed/);
+      await expect(loadSnapshot({ sourceKey: "tx-comptroller-sales-tax", captureDir: dir, outputDir: output, name: "sales-travis", now: "2026-10-19T00:00:00.000Z" })).rejects.toThrow(/needs the record-id key/);
+      const rekeyed = await loadSnapshot({ sourceKey: "tx-comptroller-sales-tax", captureDir: dir, outputDir: output, name: "sales-travis", recordIdKey: otherKey, allowRekey: true, now: "2026-10-19T00:00:00.000Z" });
+      expect(rekeyed).toMatchObject({ merged: true, diff: { new: 1, changed: 0, unchanged: 1, removed: 1, rekeyed: 1, tombstoned: 1 } });
+      const tombstones = (await readFile(path.join(output, "sales-travis.tombstones.jsonl"), "utf8")).trim().split("\n").map((line) => JSON.parse(line));
+      expect(tombstones).toEqual([expect.objectContaining({ key: `withheld:${keyedId}`, reason: "rekeyed" })]);
     } finally {
       await rm(dir, { recursive: true, force: true });
     }

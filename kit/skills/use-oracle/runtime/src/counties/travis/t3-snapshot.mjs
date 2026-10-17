@@ -18,8 +18,11 @@
  *
  * Privacy (a source's `privacy` rule, `t3-sources.mjs`): in a classed row the withheld columns are null in both their
  * printed and trimmed form, `_privacy_class` and `_withheld_columns` say so, and `_row_sha256` hashes the row as captured
- * with the withheld cells emptied (`""`), so neither the value nor a hash that could be searched for it is stored. Such a
- * row has no printed key and is keyed by that redacted row hash.
+ * with the withheld cells emptied (`""`), so neither the value nor a hash that could be searched for it is stored. Its
+ * key is `_withheld_record_id`, the keyed record id of decisions.md section 24.2 (HMAC-SHA256 under the record-id key
+ * over the printed key, computed before the value is dropped): unique per outlet and stable across captures. The
+ * watermark records the key's fingerprint; a load under another key stops. A key that disappears while all of its rows
+ * are still in the capture under another key is recorded as `rekeyed`, not as gone.
  *
  * Column sets: a source may map printed headers to snapshot field names (`columnSets` in `t3-sources.mjs`); every
  * file's header is recorded with its digest and the column set version it resolved to, and a header no set knows stops
@@ -48,6 +51,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { ParquetReader, ParquetSchema, ParquetWriter } from "@dsnp/parquetjs";
 
 import { buildNameIndex, summarizeNameIndex } from "./name-matcher.mjs";
+import { RECORD_ID_VERSION, recordIdKeyFingerprint, withheldRecordIdOf } from "./record-ids.mjs";
 import { getT3Source, matchNamesOf, snapshotFieldName } from "./t3-sources.mjs";
 
 export const NORMALIZER_VERSION = "travis-t3-source-snapshot.v1";
@@ -58,6 +62,7 @@ const ROW_GROUP_SIZE = 50_000;
 const PRIVACY_COLUMNS = Object.freeze([
   ["_privacy_class", "UTF8"],
   ["_withheld_columns", "UTF8"],
+  ["_withheld_record_id", "UTF8"],
 ]);
 const PROVENANCE_COLUMNS = Object.freeze([
   ["_capture_file", "UTF8"],
@@ -299,8 +304,10 @@ export function normalizeRecord(columns, fields) {
  * @returns {string} Entity key (trimmed key columns), or the row hash when the source has none or a key part is null.
  */
 export function entityKeyOf(source, row) {
+  if (row._withheld_record_id) return `withheld:${row._withheld_record_id}`;
   if (!source.keyColumns) return `row:${row._row_sha256}`;
-  const parts = source.keyColumns.map((column) => row[`${column}${TRIMMED_SUFFIX}`]);
+  const nullable = new Set(source.nullableKeyColumns ?? []);
+  const parts = source.keyColumns.map((column) => row[`${column}${TRIMMED_SUFFIX}`] ?? (nullable.has(column) ? "" : null));
   if (parts.some((part) => part === null || part === undefined)) return `row:${row._row_sha256}`;
   return parts.join(KEY_SEPARATOR);
 }
@@ -356,11 +363,11 @@ export async function readCsvHeader(file, dialect) {
  * @param {string} captureDir - Capture directory.
  * @param {Record<string, any>[]} receipts - Verified receipts.
  * @param {(row: Record<string, any>, header: string[]) => Promise<void> | void} onRow - Row callback, in capture order.
- * @param {{ dialect?: "rfc4180" | "unescaped-quotes", privacy?: import("./t3-sources.mjs").PrivacyRule, fieldsOf?: (printed: string[]) => string[] }} [options] - CSV
- *   dialect, privacy rule and header-to-field mapping (column set) of the source.
+ * @param {{ dialect?: "rfc4180" | "unescaped-quotes", privacy?: import("./t3-sources.mjs").PrivacyRule, fieldsOf?: (printed: string[]) => string[], withheldIdOf?: (row: Record<string, any>) => string }} [options] - CSV
+ *   dialect, privacy rule, header-to-field mapping (column set) and the keyed record id of a classed row.
  * @returns {Promise<{ columns: string[], rows: number, rowsByFile: Record<string, number>, lenientRows: number, withheld: Record<string, number> }>} Header and counts.
  */
-export async function streamCaptureRows(captureDir, receipts, onRow, { dialect = "rfc4180", privacy, fieldsOf } = {}) {
+export async function streamCaptureRows(captureDir, receipts, onRow, { dialect = "rfc4180", privacy, fieldsOf, withheldIdOf } = {}) {
   /** @type {Record<string, number>} */
   const withheld = {};
   /** @type {string[] | null} */
@@ -395,8 +402,12 @@ export async function streamCaptureRows(captureDir, receipts, onRow, { dialect =
       if (privacy) {
         row._privacy_class = privacyClass;
         row._withheld_columns = privacyClass ? privacy.withheldColumns.join(",") : null;
+        row._withheld_record_id = null;
       }
       if (privacyClass) {
+        if (!withheldIdOf) throw new Error(`${receipt.file}: a withheld row needs the record-id key (decisions.md section 24.2)`);
+        // The keyed id is computed from the printed key before the withheld value is dropped.
+        row._withheld_record_id = withheldIdOf(row);
         const emptied = new Set(privacy.withheldColumns.map((column) => header.indexOf(column)).filter((index) => index >= 0));
         if (emptied.size !== privacy.withheldColumns.length) throw new Error(`${receipt.file}: a withheld column is missing from the header`);
         for (const column of privacy.withheldColumns) {
@@ -429,7 +440,8 @@ export async function readSnapshotKeys(source, parquetPath) {
   const keys = new Map();
   const reader = await ParquetReader.openFile(parquetPath);
   try {
-    const projection = [...(source.keyColumns ?? []).map((column) => [`${column}${TRIMMED_SUFFIX}`]), ["_row_sha256"]];
+    const present = new Set(Object.keys(reader.getSchema().fields));
+    const projection = [...(source.keyColumns ?? []).map((column) => `${column}${TRIMMED_SUFFIX}`), "_row_sha256", "_withheld_record_id"].filter((column) => present.has(column)).map((column) => [column]);
     const cursor = reader.getCursor(projection);
     let record = await cursor.next();
     while (record) {
@@ -491,7 +503,8 @@ export async function readSnapshotRows(source, parquetPath, keys, columns) {
   if (keys.size === 0) return rows;
   const reader = await ParquetReader.openFile(parquetPath);
   try {
-    const projection = [...new Set([...columns, ...(source.keyColumns ?? []).map((column) => `${column}${TRIMMED_SUFFIX}`), "_row_sha256"])].map((column) => [column]);
+    const present = new Set(Object.keys(reader.getSchema().fields));
+    const projection = [...new Set([...columns, ...(source.keyColumns ?? []).map((column) => `${column}${TRIMMED_SUFFIX}`), "_row_sha256", "_withheld_record_id"])].filter((column) => present.has(column)).map((column) => [column]);
     const cursor = reader.getCursor(projection);
     let record = await cursor.next();
     while (record) {
@@ -557,10 +570,12 @@ export function changedColumnCounts(priorRows, nextRows, columns) {
  * @param {RowFilter | null} [params.rowFilter] - Keep only the rows that pass (for example a county subset).
  * @param {boolean} [params.names] - Build the matcher's collision summary in the report (default true).
  * @param {number} [params.duplicateDetailLimit] - Describe duplicate keys only up to this many (default 50).
+ * @param {Buffer | null} [params.recordIdKey] - Record-id key (required by a source with a privacy rule).
+ * @param {boolean} [params.allowRekey] - Accept a record-id key other than the one the watermark names (a re-key).
  * @param {string} [params.now] - Merge time (ISO); defaults to the current time.
  * @returns {Promise<Record<string, any>>} The load report (counts and digests only; no rows).
  */
-export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, scopeLabel = null, rowFilter = null, names = true, duplicateDetailLimit = 50, now = new Date().toISOString() }) {
+export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, scopeLabel = null, rowFilter = null, names = true, duplicateDetailLimit = 50, recordIdKey = null, allowRekey = false, now = new Date().toISOString() }) {
   const baseSource = getT3Source(sourceKey);
   const dialect = baseSource.csvDialect ?? "rfc4180";
   const startedAt = Date.now();
@@ -585,6 +600,10 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
   const roles = baseSource.resolveColumns ? baseSource.resolveColumns(headers[0].fields, headers[0].printed) : null;
   /** @type {import("./t3-sources.mjs").T3Source} */
   const source = roles ? { ...baseSource, keyColumns: roles.keyColumns, nameColumns: roles.nameColumns, extraMatchNames: roles.extraMatchNames, matchNameVersion: roles.matchNameVersion, scopeOf: roles.scopeOf } : baseSource;
+  /** @type {Set<string>} */
+  const withheldIds = new Set();
+  let withheldRows = 0;
+  const withheldIdOf = source.privacy && recordIdKey ? (row) => withheldRecordIdOf(recordIdKey, source.key, source.privacy.recordKeyColumns.map((column) => row[`${column}${TRIMMED_SUFFIX}`])) : undefined;
   /** @type {{ version: string, header_sha256: string, printed: string[], fields: string[], files: string[] }[]} */
   const columnSets = [];
   for (const header of headers) {
@@ -606,6 +625,12 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
   const watermark = existsSync(watermarkPath) ? JSON.parse(await readFile(watermarkPath, "utf8")) : { track: source.track, county: "travis", entries: {} };
   if (watermark.track !== source.track) throw new Error(`${watermarkPath} is the ${watermark.track} track, source ${sourceKey} is ${source.track}`);
   const prior = watermark.entries[name] ?? null;
+  // Withheld rows are keyed by the record-id key: a missing key stops, and so does another key than the watermark's.
+  const keyFingerprint = baseSource.privacy ? (recordIdKey ? recordIdKeyFingerprint(recordIdKey) : null) : null;
+  if (baseSource.privacy && !recordIdKey) throw new Error(`${sourceKey} withholds values and needs the record-id key (node src/counties/travis/t3-record-id-key.mjs init; decisions.md section 24.2)`);
+  if (keyFingerprint && prior?.record_id_key_fingerprint && prior.record_id_key_fingerprint !== keyFingerprint && !allowRekey) {
+    throw new Error(`${name}: the record-id key changed (watermark ${prior.record_id_key_fingerprint}, now ${keyFingerprint}); restore the key, or re-key on purpose with allowRekey`);
+  }
   const priorIndex = existsSync(hashIndexPath) ? JSON.parse(await readFile(hashIndexPath, "utf8")) : [];
   const covered = new Set(priorIndex.map((entry) => `${entry.path}\u0000${entry.artifact_hash}`));
   const uncovered = currentIndex.filter((entry) => !covered.has(`${entry.path}\u0000${entry.artifact_hash}`));
@@ -654,6 +679,10 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
         return;
       }
       rowsKept += 1;
+      if (row._withheld_record_id) {
+        withheldRows += 1;
+        withheldIds.add(row._withheld_record_id);
+      }
       /** @type {Record<string, unknown>} */
       const record = {};
       for (const [key, value] of Object.entries(row)) {
@@ -675,7 +704,7 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
       scopes[scope] = (scopes[scope] ?? 0) + 1;
       if (names && source.nameColumns.length > 0) nameRows.push({ __key: key, __scope: scope, __names: matchNamesOf(source, row) });
     },
-    { dialect, privacy: source.privacy, fieldsOf },
+    { dialect, privacy: source.privacy, fieldsOf, withheldIdOf },
   );
   if (writer === null) await openWriter(streamed.columns);
   await writer.close();
@@ -683,6 +712,9 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
   const snapshotColumns = columns ?? streamed.columns;
 
   const diff = diffKeys(previousKeys, nextKeys);
+  // A removed key whose every row is still in the capture under another key was re-keyed, not removed from the source.
+  const nextHashes = new Set([...nextKeys.values()].flat());
+  const rekeyedKeys = new Set(diff.removedKeys.filter((key) => (previousKeys.get(key) ?? []).every((hash) => nextHashes.has(hash))));
   const unchangedCapture = snapshotIntact && filterUnchanged && uncovered.length === 0 && diff.new === 0 && diff.changed === 0 && diff.removed === 0;
   let merged = false;
   /** Digest of the snapshot this load rebuilt; on a no-op re-load it must equal the snapshot on disk (determinism). */
@@ -729,7 +761,7 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
 
   if (merged) {
     for (const key of diff.removedKeys) {
-      await appendFile(tombstonePath, `${JSON.stringify({ key, reason: "absent_from_capture", row_sha256: previousKeys.get(key), removed_at: now, capture_artifact_hash: hashIndexDigest(currentIndex) })}\n`);
+      await appendFile(tombstonePath, `${JSON.stringify({ key, reason: rekeyedKeys.has(key) ? "rekeyed" : "absent_from_capture", row_sha256: previousKeys.get(key), removed_at: now, capture_artifact_hash: hashIndexDigest(currentIndex) })}\n`);
     }
     const hashIndex = currentIndex.map((entry) => ({ ...entry, merged_at: now }));
     await writeFile(hashIndexPath, `${JSON.stringify(hashIndex, null, 1)}\n`);
@@ -747,6 +779,7 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
       hash_index_path: relativeToRuntime(hashIndexPath),
       snapshot,
       normalizer_version: NORMALIZER_VERSION,
+      ...(keyFingerprint ? { record_id_version: RECORD_ID_VERSION, record_id_key_fingerprint: keyFingerprint } : {}),
     };
     await writeFile(watermarkPath, `${JSON.stringify(watermark, null, 1)}\n`);
   }
@@ -766,7 +799,7 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
         const key = entityKeyOf(source, row);
         if (wanted.has(key)) rowsByKey.set(key, [...(rowsByKey.get(key) ?? []), row]);
       },
-      { dialect, privacy: source.privacy, fieldsOf },
+      { dialect, privacy: source.privacy, fieldsOf, withheldIdOf },
     );
     const showable = new Set([...source.distributionColumns, ...snapshotColumns.filter((column) => /date/i.test(column))]);
     for (const rows of rowsByKey.values()) {
@@ -821,7 +854,17 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
     columns: { source: snapshotColumns, count: snapshotColumns.length, snapshot: Object.keys(snapshotSchemaFields(snapshotColumns, { privacy: Boolean(source.privacy) })).length },
     column_sets: columnSets,
     resolved_columns: roles ? { key_columns: roles.keyColumns, name_columns: roles.nameColumns, match_name_version: roles.matchNameVersion ?? null, roles: roles.roles } : null,
-    privacy: source.privacy ? { version: source.privacy.version, withheld_columns: source.privacy.withheldColumns, rows_by_class: streamed.withheld, row_sha256_basis: "classed rows: the captured row with the withheld cells emptied" } : null,
+    privacy: source.privacy
+      ? {
+          version: source.privacy.version,
+          withheld_columns: source.privacy.withheldColumns,
+          rows_by_class: streamed.withheld,
+          row_sha256_basis: "classed rows: the captured row with the withheld cells emptied",
+          record_id: `${RECORD_ID_VERSION}: classed rows carry _withheld_record_id = HMAC-SHA256 under the record-id key over the printed key (${source.privacy.recordKeyColumns.join(", ")}), first 32 hex characters`,
+          record_id_key_fingerprint: keyFingerprint,
+          withheld_record_ids: { rows: withheldRows, distinct: withheldIds.size, shared_by_several_rows: withheldRows - withheldIds.size },
+        }
+      : null,
     counts: {
       rows: rowsKept,
       rows_filtered_out: streamed.rows - rowsKept,
@@ -837,7 +880,7 @@ export async function loadSnapshot({ sourceKey, captureDir, outputDir, name, sco
     duplicates,
     duplicates_described: duplicateKeys.length <= duplicateDetailLimit,
     names: nameSummary,
-    diff: { against: snapshotIntact ? "snapshot on disk" : "nothing (first load)", new: diff.new, changed: diff.changed, unchanged: diff.unchanged, removed: diff.removed, tombstoned: merged ? diff.removed : 0 },
+    diff: { against: snapshotIntact ? "snapshot on disk" : "nothing (first load)", new: diff.new, changed: diff.changed, unchanged: diff.unchanged, removed: diff.removed, rekeyed: rekeyedKeys.size, tombstoned: merged ? diff.removed : 0 },
     changed_columns: changedColumns,
     hash_index: { entries: currentIndex.length, uncovered_before_load: uncovered.length },
     merged,

@@ -298,7 +298,7 @@
   "why": "the franchise file prints the SOS file number zero-padded to 10 digits (all 3,245,622 printed values), the veteran file prints 9 digits (all 27,205): equality of the printed values joins 0 rows; the padded key restores the print width and changes nothing else (all franchise values are 10 digits and all veteran values 9, so the padding is one-to-one on both sides)",
   "independent_check": "the veteran file's own taxid equals the joined franchise taxpayer number on 24,868 of the 25,466 joined rows (97.65%); 16 differ, 582 have no taxid",
   "unmatched": "1,739 rows: 1,736 are inactive entities (forfeited 918, voluntarily dissolved 716, involuntarily dissolved 59, merged 32, conversion 9, cancelled 1, deleted 1), which the active-taxpayer franchise file does not hold, and 3 are 'In existence'",
-  "operator_decision": "section 23 says 'joined ... by exact SOS file number'; exact equality of the printed values joins nothing, so the loader compares the same number at the franchise file's print width. Confirm this reading of 'exact', or rule otherwise"
+  "operator_decision": "ruled by the operator on 2026-10-17: the SOS file number left-padded to 10 digits counts as the exact SOS file number (travis-sos-file-number-join.v1; assignment decisions.md section 24.1)"
  },
  "travis_subset": {
   "rows": 2343,

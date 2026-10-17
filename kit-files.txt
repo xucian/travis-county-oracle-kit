@@ -38,6 +38,7 @@ skills/use-oracle/runtime/docs/evidence/travis-t3-run-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-t3-sales-tax-load-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-t3-veteran-owned-load-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-t3-window-verify-20261017T160716Z.json
+skills/use-oracle/runtime/docs/evidence/travis-t3-withheld-record-ids-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-tcad-downloads-2026-10-16.jsonl
 skills/use-oracle/runtime/docs/evidence/travis-tcad-prop-counts-2026-10-16.json
 skills/use-oracle/runtime/docs/evidence/travis-tcad-state-code-counts-2026-10-16.json
@@ -84,14 +85,17 @@ skills/use-oracle/runtime/src/counties/travis/name-matcher.mjs
 skills/use-oracle/runtime/src/counties/travis/permit-profile.mjs
 skills/use-oracle/runtime/src/counties/travis/publish.mjs
 skills/use-oracle/runtime/src/counties/travis/query-table.mjs
+skills/use-oracle/runtime/src/counties/travis/record-ids.mjs
 skills/use-oracle/runtime/src/counties/travis/seed.mjs
 skills/use-oracle/runtime/src/counties/travis/t3-absence-proofs.mjs
 skills/use-oracle/runtime/src/counties/travis/t3-austin-row-fetch.mjs
 skills/use-oracle/runtime/src/counties/travis/t3-fetch.mjs
 skills/use-oracle/runtime/src/counties/travis/t3-join.mjs
+skills/use-oracle/runtime/src/counties/travis/t3-layouts.mjs
 skills/use-oracle/runtime/src/counties/travis/t3-load.mjs
 skills/use-oracle/runtime/src/counties/travis/t3-name-index.mjs
 skills/use-oracle/runtime/src/counties/travis/t3-privacy-check.mjs
+skills/use-oracle/runtime/src/counties/travis/t3-record-id-key.mjs
 skills/use-oracle/runtime/src/counties/travis/t3-snapshot.mjs
 skills/use-oracle/runtime/src/counties/travis/t3-sources.mjs
 skills/use-oracle/runtime/src/counties/travis/t3-verify.mjs
@@ -105,7 +109,9 @@ skills/use-oracle/runtime/tests/travis-name-matcher.test.mjs
 skills/use-oracle/runtime/tests/travis-permit-profile.test.mjs
 skills/use-oracle/runtime/tests/travis-publish.test.mjs
 skills/use-oracle/runtime/tests/travis-query-table.test.mjs
+skills/use-oracle/runtime/tests/travis-record-ids.test.mjs
 skills/use-oracle/runtime/tests/travis-seed.test.mjs
+skills/use-oracle/runtime/tests/travis-t3-layouts.test.mjs
 skills/use-oracle/runtime/tests/travis-t3-load.test.mjs
 skills/use-oracle/runtime/tests/travis-t3-name-index.test.mjs
 skills/use-oracle/runtime/tests/travis-t3-snapshot.test.mjs

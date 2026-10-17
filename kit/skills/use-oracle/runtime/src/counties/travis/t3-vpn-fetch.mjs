@@ -4,6 +4,7 @@
  * It only downloads and records; every transform, load and match runs offline afterwards.
  *
  *   node src/counties/travis/t3-vpn-fetch.mjs [--out data/travis/t3-window] [--only a,b] [--page-size 50000]
+ *   (the TSBPE re-run and the layouts in one go: --only tsbpe-responsible-master-plumber,comptroller-record-layouts)
  *                                             [--tdlr-all] [--probe-taxpayer <number>]
  *
  * Before every request it checks https://ipinfo.io/country and stops on anything but US: the request is not sent and
@@ -24,13 +25,18 @@
  *                                     page at run time
  *   comptroller-taxpayer-detail-probe one GET of comptroller.texas.gov/taxes/franchise/account-status/search/<number>
  *                                     for one franchise-tax corporation, recording what the per-taxpayer URL returns
+ *   comptroller-record-layouts        the record layouts attached to jrea-zgmq and 9cir-efmm (organization codes and
+ *                                     taxpayer number forms; decisions.md section 24.4), resolved at run time from each
+ *                                     dataset's metadata (fetched now; the metadata already captured under the window
+ *                                     directory when that request fails), downloaded from Socrata's file endpoint, with
+ *                                     the asset endpoint as fallback; a body that is not a PDF or a DOCX is a failure
  *
  * Prints one progress line per source and a one-line summary; writes `<out>/runs/<stamp>.json` (counts only).
  *
  * @module counties/travis/t3-vpn-fetch
  */
 import { existsSync } from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -45,6 +51,12 @@ export const VPN_SOURCES = Object.freeze([
   "tdlr-license-files",
   "tsbpe-responsible-master-plumber",
   "comptroller-taxpayer-detail-probe",
+  "comptroller-record-layouts",
+]);
+/** Datasets whose record layout defines the organization codes and taxpayer number forms the privacy rule relies on. */
+export const LAYOUT_DATASETS = Object.freeze([
+  { id: "jrea-zgmq", sourceKey: "tx-comptroller-sales-tax" },
+  { id: "9cir-efmm", sourceKey: "tx-comptroller-franchise-tax" },
 ]);
 export const TDLR_LICENSE_FILE_PAGE = "https://www.tdlr.texas.gov/LicenseSearch/licfile.asp";
 export const TSBPE_FREE_LIST_PAGE = "https://tsbpe.texas.gov/free-licensee-list/";
@@ -221,6 +233,62 @@ const RUNNERS = {
     await writeFile(path.join(dir, `probe-${stamp}.json`), `${JSON.stringify(analysis, null, 1)}\n`);
     return { status: receipt.status >= 200 && receipt.status < 300 ? "ok" : "failed", rows: null, bytes: receipt.bytes, detail: { capture: relative(dir), probe: relative(path.join(dir, `probe-${stamp}.json`)), status: receipt.status, redirected: analysis.redirected, body_contains_taxpayer_number: analysis.body_contains_taxpayer_number } };
   },
+
+  async "comptroller-record-layouts"(ctx, options) {
+    const source = "comptroller-record-layouts";
+    const dir = path.join(options.out, source, `d${utcDate(ctx.now())}`);
+    const stamp = compactTimestamp(ctx.now());
+    const datasets = [];
+    const files = [];
+    for (const { id, sourceKey } of LAYOUT_DATASETS) {
+      const captured = await capturedMetadata(options.out, sourceKey);
+      const meta = await captureToFile(ctx, { source, kind: "metadata", dir, file: `metadata-${id}-${stamp}.json`, url: `https://data.texas.gov/api/views/${id}.json`, resume: false, allowHttpError: true });
+      let attachments = [];
+      let resolvedFrom = null;
+      if (meta.status === 200) {
+        try {
+          attachments = attachmentsOf(JSON.parse(await readFile(path.join(dir, meta.file), "utf8")));
+          resolvedFrom = `metadata fetched in this run (${meta.file})`;
+        } catch {
+          attachments = [];
+        }
+      }
+      if (attachments.length === 0 && captured) {
+        attachments = captured.attachments;
+        resolvedFrom = `metadata captured earlier (${captured.file})`;
+      }
+      const entry = { dataset_id: id, resolved_from: resolvedFrom, metadata_status: meta.status, captured_metadata: captured ? { file: captured.file, attachments: captured.attachments } : null, attachments, files: [] };
+      for (const attachment of attachments) {
+        const base = `${id}-${String(attachment.filename ?? attachment.name ?? attachment.assetId).replace(/[^A-Za-z0-9._-]+/g, "_")}`;
+        const tries = attachmentUrls(id, attachment).map((url, index) => ({ url, file: index === 0 ? base : `${id}-asset-${base.slice(id.length + 1)}` }));
+        const tried = [];
+        let kept = null;
+        for (const attempt of tries) {
+          const receipt = await captureToFile(ctx, { source, kind: "file", dir, file: attempt.file, url: attempt.url, allowHttpError: true, extra: { dataset_id: id, asset_id: attachment.assetId, attachment_name: attachment.filename ?? attachment.name ?? null } });
+          const kind = receipt.status === 200 ? await documentKind(path.join(dir, attempt.file), receipt) : null;
+          tried.push({ url: attempt.url, file: attempt.file, status: receipt.status, content_type: receipt.content_type ?? null, document: kind });
+          if (kind) {
+            kept = { file: attempt.file, dataset_id: id, asset_id: attachment.assetId, attachment_name: attachment.filename ?? attachment.name ?? null, document: kind, bytes: receipt.bytes, sha256: receipt.sha256, content_type: receipt.content_type ?? null, last_modified: receipt.headers?.["last-modified"] ?? null };
+            break;
+          }
+        }
+        entry.files.push({ attachment: attachment.filename ?? attachment.name ?? attachment.assetId, tried, kept: kept?.file ?? null });
+        if (kept) files.push(kept);
+      }
+      entry.status = entry.files.some((file) => file.kept) ? "ok" : "failed";
+      datasets.push(entry);
+    }
+    const resolution = path.join(dir, `resolution-${stamp}.json`);
+    await mkdir(dir, { recursive: true });
+    await writeFile(resolution, `${JSON.stringify({ datasets }, null, 1)}\n`);
+    const failed = datasets.filter((entry) => entry.status !== "ok").map((entry) => entry.dataset_id);
+    return {
+      status: failed.length === 0 ? "ok" : "failed",
+      rows: null,
+      bytes: files.reduce((sum, file) => sum + file.bytes, 0),
+      detail: { capture: relative(dir), resolution: relative(resolution), files, ...(failed.length > 0 ? { error: `no record layout captured for ${failed.join(", ")}` } : {}) },
+    };
+  },
 };
 
 /**
@@ -243,6 +311,74 @@ function socrataResult(summary) {
       ...(summary.inconsistency ? { inconsistency: summary.inconsistency } : {}),
     },
   };
+}
+
+/**
+ * Attachments named by a Socrata dataset's metadata.
+ *
+ * @param {Record<string, any>} metadata - `/api/views/<id>.json`.
+ * @returns {{ assetId: string, filename: string | null, name: string | null }[]} Attachments with an asset id.
+ */
+export function attachmentsOf(metadata) {
+  const list = metadata?.metadata?.attachments ?? [];
+  return list
+    .map((attachment) => ({ assetId: attachment.assetId ?? attachment.blobId ?? null, filename: attachment.filename ?? null, name: attachment.name ?? null }))
+    .filter((attachment) => typeof attachment.assetId === "string" && attachment.assetId !== "");
+}
+
+/**
+ * Download URLs of a Socrata attachment: the file endpoint, then the asset endpoint.
+ *
+ * @param {string} id - Dataset id.
+ * @param {{ assetId: string, filename: string | null, name: string | null }} attachment - Attachment.
+ * @returns {string[]} URLs in the order tried.
+ */
+export function attachmentUrls(id, attachment) {
+  const filename = attachment.filename ?? attachment.name ?? "";
+  return [
+    `https://data.texas.gov/api/views/${id}/files/${encodeURIComponent(attachment.assetId)}?download=true&filename=${encodeURIComponent(filename)}`,
+    `https://data.texas.gov/api/assets/${encodeURIComponent(attachment.assetId)}?download=true`,
+  ];
+}
+
+/**
+ * @param {string} file - Downloaded body.
+ * @param {Record<string, any>} receipt - Its receipt.
+ * @returns {Promise<"pdf" | "docx" | null>} The document kind, or null for anything else (an HTML error page above all).
+ */
+async function documentKind(file, receipt) {
+  if (/text\/html/i.test(String(receipt.content_type ?? ""))) return null;
+  const head = (await readFile(file)).subarray(0, 5);
+  if (head.toString("latin1").startsWith("%PDF-")) return "pdf";
+  if (head[0] === 0x50 && head[1] === 0x4b && head[2] === 0x03 && head[3] === 0x04) return "docx";
+  return null;
+}
+
+/**
+ * The newest metadata of a Socrata source already captured under the window directory (no request).
+ *
+ * @param {string} out - Window directory.
+ * @param {string} sourceKey - Source key of the dataset's capture.
+ * @returns {Promise<{ file: string, attachments: ReturnType<typeof attachmentsOf> } | null>} Metadata, or null.
+ */
+export async function capturedMetadata(out, sourceKey) {
+  const base = path.join(out, sourceKey);
+  if (!existsSync(base)) return null;
+  const candidates = [];
+  for (const entry of await readdir(base, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    for (const name of await readdir(path.join(base, entry.name))) if (/^metadata-.*\.json$/.test(name)) candidates.push(path.join(base, entry.name, name));
+  }
+  candidates.sort((left, right) => path.basename(right).localeCompare(path.basename(left)));
+  for (const file of candidates) {
+    try {
+      const attachments = attachmentsOf(JSON.parse(await readFile(file, "utf8")));
+      if (attachments.length > 0) return { file: relative(file), attachments };
+    } catch {
+      // A file that does not parse is skipped.
+    }
+  }
+  return null;
 }
 
 /** @param {{ href: string, text: string }[]} links @returns {{ href: string, text: string }[]} */

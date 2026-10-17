@@ -269,10 +269,7 @@
    "owner_numbers_in_reports_or_watermark": 0
   },
   "raw_capture": "the window capture itself (gitignored runtime data/, receipt-verified) holds the numbers as fetched; it is the evidence of record and is never loaded into a derived store without this rule",
-  "contract_items_for_the_operator": [
-   "api-contract.md business_record_id is the SHA-256 of the source key and the printed key; for a withheld row that digest can be reversed by enumerating 11-digit numbers, which contradicts 'they never expose a withheld number'; the internal snapshot keys withheld rows by the redacted row hash instead",
-   "api-contract.md unpublished_source.row_sha256 'hashes the row as captured'; for a withheld row the captured-row hash can be searched for the number in the same way; the snapshot stores the redacted-row hash instead"
-  ]
+  "contract_items_for_the_operator": "ruled in assignment decisions.md section 24.2: keyed business_record_id and redacted row_sha256 for withheld rows"
  },
  "reload": {
   "loaded_at": "2026-10-17T17:19:08.761Z",
@@ -297,5 +294,6 @@
   "data/travis/t3-loads/20261017T171908Z.json"
  ],
  "private_boundary": "counts and digests only (no names, numbers or addresses)",
- "names_note": "the load's collision summary keys on (taxpayer, outlet), so the outlets of one taxpayer count as a shared name (42,216 taxpayers hold the 49,025 outlets); the matcher index of step 6 keys this source on the taxpayer"
+ "names_note": "the load's collision summary keys on (taxpayer, outlet), so the outlets of one taxpayer count as a shared name (42,216 taxpayers hold the 49,025 outlets); the matcher index of step 6 keys this source on the taxpayer",
+ "superseded_in_part": "after ruling 24.2 (2026-10-17) the snapshot keys sole-owner rows by their keyed record id: one re-load re-keyed the 9,471 rows (none removed) and moved this load's snapshot (7c510df7ea0e...) to history/; the current snapshot, watermark and checks are in docs/evidence/travis-t3-withheld-record-ids-2026-10-17.json"
 }

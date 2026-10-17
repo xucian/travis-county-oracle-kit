@@ -31,6 +31,8 @@ export function requiresUsEgress(url) {
  * @property {string} dataset - Dataset label used in run records and `unpublished_source.dataset`.
  * @property {string} authority - Publishing authority.
  * @property {string[] | null} keyColumns - Entity key columns (trimmed values joined); null diffs by row hash only.
+ * @property {string[] | undefined} [nullableKeyColumns] - Key columns whose blank value is part of the key (the empty
+ *   string) instead of leaving the row without a key.
  * @property {string[]} nameColumns - Columns the matcher indexes (printed values, trimmed).
  * @property {((row: Record<string, unknown>) => (string | null)[]) | undefined} [extraMatchNames] - Further texts
  *   derived from the printed name for indexing (versioned with `matchNameVersion`); the printed name is always indexed.
@@ -196,6 +198,8 @@ export function resolveTsbpeColumns(fields, printed) {
  * @property {string} version - Rule version (recorded in the snapshot metadata and the load report).
  * @property {(row: Record<string, unknown>) => string | null} classOf - Privacy class of a row (null: nothing withheld).
  * @property {string[]} withheldColumns - Source columns emptied for a classed row (printed and trimmed values).
+ * @property {string[]} recordKeyColumns - The printed key of a classed row (withheld parts included): the message of
+ *   its keyed `business_record_id` (record-ids.mjs, decisions.md section 24.2).
  */
 
 /** Version of the privacy rules below. */
@@ -255,7 +259,7 @@ export const T3_SOURCES = Object.freeze({
     distributionColumns: ["outlet_county_code", "taxpayer_organization_type", "outlet_inside_outside_city_limits_indicator", "outlet_state"],
     scopeOf: (row) => (row.outlet_county_code__trimmed === TRAVIS_COMPTROLLER_COUNTY_CODE ? "travis" : "out_of_county"),
     // assignment decisions.md section 23: no SSN-derived taxpayer number is stored in a derived store or served.
-    privacy: { version: PRIVACY_VERSION, classOf: salesTaxPrivacyClass, withheldColumns: ["taxpayer_number"] },
+    privacy: { version: PRIVACY_VERSION, classOf: salesTaxPrivacyClass, withheldColumns: ["taxpayer_number"], recordKeyColumns: ["taxpayer_number", "outlet_number"] },
   },
   "tx-sos-veteran-owned-business": {
     key: "tx-sos-veteran-owned-business",
@@ -287,8 +291,10 @@ export const T3_SOURCES = Object.freeze({
     track: "licensing",
     dataset: "tdlr-license-files (daily CSV files from tdlr.texas.gov/LicenseSearch/licfile.asp; data.texas.gov copy 7358-krk7)",
     authority: "Texas Department of Licensing and Regulation (electrical and air conditioning/refrigeration licenses)",
-    // (type, subtype, number): 121 A/C technician numbers are printed twice, once registered (REG), once certified (CER).
+    // (type, subtype, number), ruled by the operator on 2026-10-17 (assignment decisions.md section 24.3): 121 A/C
+    // technician numbers are printed twice, once registered (REG), once certified (CER); a blank subtype is part of the key.
     keyColumns: ["license_type", "license_subtype", "license_number"],
+    nullableKeyColumns: ["license_subtype"],
     nameColumns: ["name__trimmed", "business_name__trimmed"],
     distributionColumns: ["license_type", "license_subtype", "business_county", "continuing_education_flag"],
     scopeOf: (row) => (String(row.business_county__trimmed ?? "").toUpperCase() === "TRAVIS" ? "travis" : "out_of_county"),
@@ -347,7 +353,8 @@ export const SOS_JOIN_VERSION = "travis-sos-file-number-join.v1";
  * franchise file prints it zero-padded to 10 digits (all 3,245,622 printed values of 2026-10-17), the veteran file
  * without the padding, as 9 digits (all 27,205); the printed values never compare equal. The key is the printed digits
  * left-padded with zeros to 10: the same number, the padding restored, nothing else changed. Anything but 1 to 10 digits
- * has no key.
+ * has no key. Ruled by the operator on 2026-10-17 to be the exact SOS file number of section 23 (assignment
+ * decisions.md section 24.1).
  *
  * @param {unknown} printed - SOS file number or filing number as printed (trimmed).
  * @returns {string | null} The 10-digit key, or null.

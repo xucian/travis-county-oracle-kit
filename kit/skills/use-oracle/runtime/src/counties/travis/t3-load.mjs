@@ -5,6 +5,7 @@
  * snapshot reports 0 new, 0 changed, 0 removed, rewrites nothing and leaves its watermark byte-identical.
  *
  *   node --max-old-space-size=16384 src/counties/travis/t3-load.mjs [--only step,step] [--now <iso>] [--window <dir>]
+ *                                                                [--allow-rekey]
  *
  * Steps, in order (the single writer of each track):
  *   franchise-statewide  9cir-efmm statewide capture -> registry `tx-comptroller-franchise-tax-statewide` (the private
@@ -23,9 +24,15 @@
  *   tsbpe                the TSBPE Responsible Master Plumber CSV -> licensing `tsbpe-responsible-master-plumber`,
  *                        columns resolved from its header; until a CSV capture exists the step reports
  *                        `awaiting_capture` (the HTML page saved by the 2026-10-17 run is set aside, never loaded)
+ *   layouts              the Comptroller record layouts (jrea-zgmq, 9cir-efmm) checked against the privacy rule
+ *                        `travis-t3-privacy.v1` and the organization codes the data prints; `awaiting_capture` until the
+ *                        window fetches them (decisions.md section 24.4)
  *   name-index           the matcher's normalized-name index of every loaded snapshot -> `data/travis/matcher/`
  *                        (`travis-exact-unique-normalized-name.v1`; the franchise index is statewide), with collision
  *                        counts statewide and for Travis
+ *   record-ids           the contract's business_record_id / license_record_id (`travis-record-id.v1`) of every row of
+ *                        every snapshot: how many ids, and whether any id is shared by two different records (a
+ *                        collapse); writes nothing
  *
  * Prints one line per step and writes `data/travis/t3-loads/<stamp>.json` (counts and digests only).
  *
@@ -38,7 +45,9 @@ import { pathToFileURL } from "node:url";
 import { ParquetReader } from "@dsnp/parquetjs";
 
 import { joinVeteranToFranchise } from "./t3-join.mjs";
+import { checkRecordLayouts } from "./t3-layouts.mjs";
 import { NAME_INDEXES, buildAndWriteIndex } from "./t3-name-index.mjs";
+import { RECORD_ID_VERSION, readRecordIdKey, recordIdOf } from "./record-ids.mjs";
 import { RUNTIME_ROOT, entityKeyOf, loadSnapshot, selectCaptureReceipts } from "./t3-snapshot.mjs";
 import { TDLR_PERMIT_ROLE_VERSION, TRAVIS_COMPTROLLER_COUNTY_CODE, getT3Source, tdlrPermitRole } from "./t3-sources.mjs";
 
@@ -214,7 +223,74 @@ export async function summarizeTdlrSnapshot(parquetPath, sourceKey) {
   };
 }
 
-/** @typedef {{ windowDir: string, registryDir: string, licensingDir: string, matcherDir: string, now: string, log: (line: string) => void, results: Record<string, any> }} LoadContext */
+/**
+ * The contract's record ids of every row of a snapshot (`travis-record-id.v1`) and whether any two different records
+ * share one. A key printed twice (the same record on two rows) is one record with one id; it is counted apart.
+ *
+ * @param {string} sourceKey - Source key.
+ * @param {string} parquetPath - Snapshot.
+ * @returns {Promise<Record<string, any>>} Counts only.
+ */
+export async function checkRecordIds(sourceKey, parquetPath) {
+  let source = getT3Source(sourceKey);
+  const reader = await ParquetReader.openFile(parquetPath);
+  /** @type {Map<string, Set<string>>} */
+  const keysById = new Map();
+  /** @type {Map<string, number>} */
+  const rowsByKey = new Map();
+  let rows = 0;
+  let rowsWithoutId = 0;
+  let keyedRows = 0;
+  try {
+    const schemaFields = Object.keys(reader.getSchema().fields);
+    if (source.resolveColumns) {
+      const fields = schemaFields.filter((field) => !field.startsWith("_") && !field.endsWith("__trimmed"));
+      const roles = source.resolveColumns(fields, fields);
+      source = { ...source, keyColumns: roles.keyColumns, scopeOf: roles.scopeOf };
+    }
+    const wanted = new Set([...(source.keyColumns ?? []).map((column) => `${column}__trimmed`), "_row_sha256", "_withheld_record_id"]);
+    const cursor = reader.getCursor(schemaFields.filter((field) => wanted.has(field)).map((field) => [field]));
+    let record = await cursor.next();
+    while (record) {
+      rows += 1;
+      const row = /** @type {Record<string, any>} */ (record);
+      const key = entityKeyOf(source, row);
+      rowsByKey.set(key, (rowsByKey.get(key) ?? 0) + 1);
+      let id = null;
+      if (row._withheld_record_id) {
+        id = String(row._withheld_record_id);
+        keyedRows += 1;
+      } else if (source.keyColumns && !key.startsWith("row:")) {
+        id = recordIdOf(source.key, source.keyColumns.map((column) => row[`${column}__trimmed`] ?? ""));
+      }
+      if (id === null) rowsWithoutId += 1;
+      else {
+        const keys = keysById.get(id) ?? new Set();
+        keys.add(key);
+        keysById.set(id, keys);
+      }
+      record = await cursor.next();
+    }
+  } finally {
+    await reader.close();
+  }
+  const shared = [...keysById.values()].filter((keys) => keys.size > 1);
+  const printedTwice = [...rowsByKey.entries()].filter(([key, count]) => count > 1 && !key.startsWith("row:"));
+  return {
+    recipe: RECORD_ID_VERSION,
+    rows,
+    distinct_records: [...rowsByKey.keys()].filter((key) => !key.startsWith("row:")).length,
+    distinct_ids: keysById.size,
+    keyed_ids_of_withheld_rows: keyedRows,
+    rows_without_id: rowsWithoutId,
+    ids_shared_by_different_records: shared.length,
+    records_under_shared_ids: shared.reduce((sum, keys) => sum + keys.size, 0),
+    records_printed_on_several_rows: printedTwice.length,
+    rows_of_records_printed_on_several_rows: printedTwice.reduce((sum, [, count]) => sum + count, 0),
+  };
+}
+
+/** @typedef {{ windowDir: string, registryDir: string, licensingDir: string, matcherDir: string, now: string, log: (line: string) => void, results: Record<string, any>, recordIdKey?: Buffer | null, allowRekey?: boolean }} LoadContext */
 
 /** @type {Record<string, (ctx: LoadContext) => Promise<Record<string, any>>>} */
 export const STEPS = {
@@ -271,6 +347,8 @@ export const STEPS = {
       outputDir: ctx.registryDir,
       name: "tx-comptroller-sales-tax-travis",
       scopeLabel: `Travis outlets: ${capture.where ?? "outlet_county_code 227"} (the outlet's county), capture of ${capture.rows_updated_at?.end_iso ?? "unknown"} under US egress`,
+      recordIdKey: ctx.recordIdKey ?? readRecordIdKey(),
+      allowRekey: ctx.allowRekey,
       now: ctx.now,
     });
     return { report, freshness: { rows_updated_at: capture.rows_updated_at?.end_iso ?? null, expected_rows: capture.expected_rows, where: capture.where ?? null } };
@@ -320,7 +398,7 @@ export const STEPS = {
       return {
         status: "awaiting_capture",
         set_aside: setAside,
-        detail: `no CSV capture yet${setAside.length > 0 ? ` (set aside: ${setAside.map((entry) => `${entry.dir}/${entry.file} ${entry.reason}`).join(", ")})` : ""}; run the window command node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber under US egress, then this step again`,
+        detail: `no CSV capture yet${setAside.length > 0 ? ` (set aside: ${setAside.map((entry) => `${entry.dir}/${entry.file} ${entry.reason}`).join(", ")})` : ""}; run the window command node src/counties/travis/t3-vpn-fetch.mjs --only tsbpe-responsible-master-plumber,comptroller-record-layouts under US egress, then this step again`,
       };
     }
     const report = await loadSnapshot({
@@ -333,6 +411,22 @@ export const STEPS = {
       now: ctx.now,
     });
     return { report, set_aside: setAside };
+  },
+
+  async layouts(ctx) {
+    const observedOf = async (name, column) => {
+      const file = path.join(ctx.registryDir, `${name}.load-report.json`);
+      if (!existsSync(file)) return {};
+      return JSON.parse(await readFile(file, "utf8")).counts?.distributions?.[column] ?? {};
+    };
+    const check = await checkRecordLayouts({
+      windowDir: ctx.windowDir,
+      observedByDataset: { "jrea-zgmq": await observedOf("tx-comptroller-sales-tax-travis", "taxpayer_organization_type"), "9cir-efmm": await observedOf("tx-comptroller-franchise-tax-statewide", "taxpayer_organizational_type") },
+    });
+    const result = { ...check, ...(check.capture ? { capture: relative(check.capture) } : {}) };
+    await mkdir(ctx.registryDir, { recursive: true });
+    await writeFile(path.join(ctx.registryDir, "comptroller-record-layouts.check.json"), `${JSON.stringify(result, null, 1)}\n`);
+    return { layouts: result, status: check.status, detail: check.status === "awaiting_capture" ? check.detail : check.changes.length > 0 ? check.changes.join("; ") : `${check.layouts.length} layouts read; the privacy rule holds` };
   },
 
   async "name-index"(ctx) {
@@ -350,6 +444,29 @@ export const STEPS = {
       index: { output: { unchanged: all.every((built) => built.output.unchanged) } },
       status: all.every((built) => built.output.unchanged) ? "unchanged" : "written",
       detail: `${all.length} indexes${missing.length ? `, not yet built (no snapshot): ${missing.join(", ")}` : ""}; ${all.map((built) => `${built.index} ${built.universe.non_unique_names} non-unique of ${built.universe.normalized_names}`).join("; ")}`,
+    };
+  },
+
+  async "record-ids"(ctx) {
+    const targets = [
+      ["registry", "tx-comptroller-franchise-tax", "tx-comptroller-franchise-tax-statewide"],
+      ["registry", "tx-comptroller-franchise-tax", "tx-comptroller-franchise-tax-travis"],
+      ["registry", "tx-comptroller-sales-tax", "tx-comptroller-sales-tax-travis"],
+      ["registry", "tx-sos-veteran-owned-business", "tx-sos-veteran-owned-business"],
+      ["licensing", "tdlr-license-files", "tdlr-license-files"],
+      ["licensing", "austin-row-contractor-licenses", "austin-row-contractor-licenses"],
+      ["licensing", "tsbpe-responsible-master-plumber", "tsbpe-responsible-master-plumber"],
+    ];
+    const checks = {};
+    for (const [track, sourceKey, name] of targets) {
+      const file = path.join(track === "registry" ? ctx.registryDir : ctx.licensingDir, `${name}.parquet`);
+      if (existsSync(file)) checks[name] = await checkRecordIds(sourceKey, file);
+    }
+    const collapsed = Object.values(checks).reduce((sum, check) => sum + check.ids_shared_by_different_records, 0);
+    return {
+      checks,
+      status: collapsed === 0 ? "no collapsed records" : `${collapsed} ids shared by different records`,
+      detail: Object.entries(checks).map(([name, check]) => `${name} ${check.distinct_ids} ids for ${check.distinct_records} records${check.rows_without_id ? `, ${check.rows_without_id} rows without id` : ""}`).join("; "),
     };
   },
 };
@@ -381,13 +498,15 @@ export function stepLine(step, result) {
  * @param {string} [options.licensingDir] - Licensing track directory.
  * @param {string} [options.matcherDir] - Name index directory.
  * @param {string | null} [options.loadsDir] - Where the run summary goes (null: not written).
+ * @param {Buffer | null} [options.recordIdKey] - Record-id key (default: read from the key file when a step needs it).
+ * @param {boolean} [options.allowRekey] - Accept a record-id key other than the watermark's (a deliberate re-key).
  * @param {(line: string) => void} [options.log] - Progress output.
  * @returns {Promise<Record<string, any>>} Summary.
  */
-export async function runLoad({ only = [...STEP_ORDER], now = new Date().toISOString(), windowDir = DEFAULT_WINDOW, registryDir = REGISTRY_DIR, licensingDir = LICENSING_DIR, matcherDir = path.join(path.dirname(registryDir), "matcher"), loadsDir = LOADS_DIR, log = (line) => console.log(line) } = {}) {
+export async function runLoad({ only = [...STEP_ORDER], now = new Date().toISOString(), windowDir = DEFAULT_WINDOW, registryDir = REGISTRY_DIR, licensingDir = LICENSING_DIR, matcherDir = path.join(path.dirname(registryDir), "matcher"), loadsDir = LOADS_DIR, recordIdKey = null, allowRekey = false, log = (line) => console.log(line) } = {}) {
   const unknown = only.filter((step) => !STEPS[step]);
   if (unknown.length > 0) throw new Error(`unknown step ${unknown.join(", ")}; known: ${STEP_ORDER.join(", ")}`);
-  const ctx = { windowDir, registryDir, licensingDir, matcherDir, now, log, results: {} };
+  const ctx = { windowDir, registryDir, licensingDir, matcherDir, now, log, results: {}, recordIdKey, allowRekey };
   const started = Date.now();
   for (const step of STEP_ORDER.filter((name) => only.includes(name))) {
     const result = await STEPS[step](ctx);
@@ -424,6 +543,7 @@ export function parseArgs(argv) {
     if (flag === "--only") options.only = argv[(index += 1)].split(",").map((step) => step.trim()).filter(Boolean);
     else if (flag === "--now") options.now = argv[(index += 1)];
     else if (flag === "--window") options.windowDir = path.resolve(argv[(index += 1)]);
+    else if (flag === "--allow-rekey") options.allowRekey = true;
     else throw new Error(`unknown argument ${flag}`);
   }
   return options;

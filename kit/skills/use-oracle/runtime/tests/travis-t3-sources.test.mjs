@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { DETAIL_URL_VERSION, businessDetailUrl, INDIVIDUAL_OWNER_TYPES, PRIVACY_VERSION, T3_SOURCES, TDLR_LICFILE_COLUMNS_V1, resolveTsbpeColumns, salesTaxPrivacyClass, snapshotFieldName, sosFileNumberJoinKey, tdlrPermitRole } from "../src/counties/travis/t3-sources.mjs";
-import { resolveColumnSet } from "../src/counties/travis/t3-snapshot.mjs";
+import { entityKeyOf, resolveColumnSet } from "../src/counties/travis/t3-snapshot.mjs";
 
 describe("T3 source rules", () => {
   it("classes sole owners of the sales-tax file as individual_owner and nothing else", () => {
@@ -68,5 +68,15 @@ describe("T3 source rules", () => {
     expect(businessDetailUrl("tx-comptroller-sales-tax", { taxpayer_number__trimmed: "32000000001" })).toBeNull();
     expect(businessDetailUrl("tx-comptroller-sales-tax", { taxpayer_number__trimmed: null, _privacy_class: "individual_owner" })).toBeNull();
     expect(businessDetailUrl("tx-sos-veteran-owned-business", { filing_number__trimmed: "801000001" })).toBeNull();
+  });
+
+  it("keys TDLR licenses by type, subtype and number, a blank subtype included (decisions.md 24.3)", () => {
+    const source = T3_SOURCES["tdlr-license-files"];
+    const reg = { license_type__trimmed: "A/C Technician", license_subtype__trimmed: "REG", license_number__trimmed: "123", _row_sha256: "a" };
+    const cer = { ...reg, license_subtype__trimmed: "CER", _row_sha256: "b" };
+    const blank = { ...reg, license_subtype__trimmed: null, _row_sha256: "c" };
+    expect(new Set([entityKeyOf(source, reg), entityKeyOf(source, cer), entityKeyOf(source, blank)]).size).toBe(3);
+    expect(entityKeyOf(source, blank)).toBe("A/C Technician\u001f\u001f123");
+    expect(entityKeyOf(source, { ...reg, license_number__trimmed: null })).toBe("row:a");
   });
 });

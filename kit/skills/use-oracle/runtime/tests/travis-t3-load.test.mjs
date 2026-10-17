@@ -161,9 +161,14 @@ describe("T3 offline load", () => {
       const header = '"taxpayer_number","taxpayer_name","taxpayer_organization_type","outlet_number","outlet_name","outlet_county_code"';
       await writeCsvCapture(path.join(windowDir, "tx-comptroller-sales-tax", "v1792233070"), header, [['"32055555555","PAT SMITH","IS","00001","PAT SMITH LAWN","227"', '"32055555555","PAT SMITH","IS","00002","PAT SMITH LAWN 2","227"', '"32011111111","ACME ROOFING LLC","CL","00001","ACME ROOFING","227"']], { url: "https://data.texas.gov/resource/jrea-zgmq.csv" });
       const registryDir = path.join(root, "registry");
-      await runLoad({ windowDir, registryDir, licensingDir: path.join(root, "licensing"), loadsDir: null, only: ["sales-tax", "name-index"], now: "2026-10-17T17:00:00.000Z", log: () => {} });
-      const result = await runPrivacyCheck({ windowDir, registryDir });
-      expect(result).toMatchObject({ classed_rows_in_capture: 2, withheld_values_in_capture: 1, snapshot_rows: 3, snapshot_rows_classed: 2, snapshot_classed_rows_with_a_value: 0, withheld_values_in_snapshot: 0, captured_row_hashes_in_snapshot: 0, withheld_values_in_index: 0, withheld_values_in_track_files: 0, ok: true });
+      await runLoad({ windowDir, registryDir, licensingDir: path.join(root, "licensing"), loadsDir: null, only: ["sales-tax", "name-index"], recordIdKey: Buffer.alloc(32, 9), now: "2026-10-17T17:00:00.000Z", log: () => {} });
+      const result = await runPrivacyCheck({ windowDir, registryDir, recordIdKey: Buffer.alloc(32, 9) });
+      expect(result).toMatchObject({ classed_rows_in_capture: 2, withheld_values_in_capture: 1, snapshot_rows: 3, snapshot_rows_classed: 2, snapshot_classed_rows_with_a_value: 0, withheld_values_in_snapshot: 0, captured_row_hashes_in_snapshot: 0, keyed_record_ids_in_snapshot: 2, keyed_record_ids_distinct: 2, keyed_record_ids_not_matching_the_key: 0, plain_record_ids_found: 0, withheld_values_in_index: 0, withheld_values_in_track_files: 0, key_material_in_track_files: 0, ok: true });
+      // Under another key the stored ids do not match: the check fails.
+      expect((await runPrivacyCheck({ windowDir, registryDir, recordIdKey: Buffer.alloc(32, 3) })).ok).toBe(false);
+      // Two outlets of one sole owner: two records, two ids, no collapse.
+      const ids = await runLoad({ windowDir, registryDir, licensingDir: path.join(root, "licensing"), loadsDir: null, only: ["record-ids"], log: () => {} });
+      expect(ids.steps["record-ids"].checks["tx-comptroller-sales-tax-travis"]).toMatchObject({ rows: 3, distinct_records: 3, distinct_ids: 3, keyed_ids_of_withheld_rows: 2, ids_shared_by_different_records: 0, rows_without_id: 0 });
       expect(result.track_files_checked).toBeGreaterThan(0);
     } finally {
       await rm(root, { recursive: true, force: true });
