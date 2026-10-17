@@ -12,9 +12,10 @@
  * evidence states, and the `tcad_id` (TCAD Geographic ID) evidence states
  * with the digits-only normalization proof the parcel link may rely on.
  *
- * Nothing here harvests. The Socrata harvester and the kit routing profile
+ * Nothing here harvests. The Socrata harvester is `t4-permit-fetch.mjs` and
+ * the link pass `t4-permit-links.mjs` (T4); the kit routing profile
  * (`validatePermitProfile`, whose adapter enum has no Socrata family at
- * `99c7bff`) are v2 work; the jurisdiction catalog lives in
+ * `99c7bff`) is not used; the jurisdiction catalog lives in
  * `docs/travis-sources.yaml`.
  *
  * Every mapping is exact after one normalization: NFKC, trim, whitespace
@@ -33,9 +34,11 @@ export const TRAVIS_PERMIT_DATASET_URL = "https://data.austintexas.gov/resource/
 
 export const STATUS_GROUP_VERSION = "travis-status-group-v1";
 export const LIFECYCLE_MAPPING_VERSION = "travis-lifecycle-v1";
-export const WORK_CLASSIFIER_VERSION = "travis-work-classifier-v1";
+export const WORK_CLASSIFIER_VERSION = "travis-work-classifier-v2";
 export const DATE_EVIDENCE_VERSION = "travis-date-evidence-v1";
 export const TCAD_ID_NORMALIZATION_VERSION = "travis-tcad-id-digits-v1";
+/** Reasons a printed `tcad_id` is not a usable Geographic ID (v2 adds the neighbouring-district forms, T4 capture). */
+export const TCAD_ID_EVIDENCE_VERSION = "travis-tcad-id-evidence-v2";
 export const TRAVIS_ROOF_AGE_PROFILE_VERSION = "travis-roof-age-profile-v1";
 
 /** Dates before this are migration artifacts in the export (the earliest applied date is 1921-09-20). */
@@ -470,13 +473,19 @@ function remainingRoofTokens(text) {
  * Classify a permit's roofing work from exact terms in `description`,
  * `work_class` and `permit_class`.
  *
- * Precedence (fixture-tested): non-building permit types are `other`;
+ * Precedence (fixture-tested, v2): non-building permit types are `other`;
  * exclusion terms are removed first; replacement without accessory terms is
- * `primary_roof_replacement`; replacement with accessory terms is
+ * `primary_roof_replacement` (legacy rows coded `New` whose text says re-roof
+ * stay re-roofs); a `New` permit in a new-building class is
+ * `primary_roof_new_construction` unless its text names only repair work (a
+ * repair of an existing building coded `New`): the permit builds the whole
+ * structure, so an attached carport, a covered porch or a negation such as
+ * "no carport" in its text does not make it accessory work (v1 put accessory
+ * terms first and read 42,287 new buildings of the T4 capture as
+ * `accessory_roof`); otherwise replacement with accessory terms is
  * `needs_review`; accessory terms are `accessory_roof`; repair terms are
- * `repair_or_coating`; a `New` permit in a new-building class with no roof
- * class terms is `primary_roof_new_construction`; a bare roof mention that
- * no term explains is `needs_review`; everything else is `other`.
+ * `repair_or_coating`; a bare roof mention that no term explains is
+ * `needs_review`; everything else is `other`.
  *
  * @param {object} row - Printed permit fields.
  * @param {unknown} row.permitType - `permittype`.
@@ -525,16 +534,14 @@ export function classifyRoofWork({ permitType, description, workClass, permitCla
   const hasReplacement = matchedTerms.replacement.length > 0;
   const hasAccessory = matchedTerms.accessory.length > 0;
   const hasRepair = matchedTerms.repair.length > 0;
+  const newBuilding =
+    normalizeSourceValue(workClass) === normalizeSourceValue(NEW_CONSTRUCTION_WORK_CLASS) && NEW_BUILDING_SET.has(normalizeSourceValue(permitClass));
   if (hasReplacement && !hasAccessory) return result("primary_roof_replacement", "replacement_terms");
+  if (newBuilding && hasRepair && !hasAccessory && !hasReplacement) return result("repair_or_coating", "repair_or_coating_terms");
+  if (newBuilding) return result("primary_roof_new_construction", hasAccessory || hasReplacement ? "new_building_permit_class_over_terms" : "new_building_permit_class");
   if (hasReplacement && hasAccessory) return result("needs_review", "replacement_and_accessory_terms");
   if (hasAccessory) return result("accessory_roof", "accessory_terms");
   if (hasRepair) return result("repair_or_coating", "repair_or_coating_terms");
-  if (
-    normalizeSourceValue(workClass) === normalizeSourceValue(NEW_CONSTRUCTION_WORK_CLASS) &&
-    NEW_BUILDING_SET.has(normalizeSourceValue(permitClass))
-  ) {
-    return result("primary_roof_new_construction", "new_building_permit_class");
-  }
   if (matchedTerms.generic.length > 0) return result("needs_review", "unqualified_roof_mention");
   return result("other", "no_roof_terms");
 }
@@ -552,6 +559,14 @@ export const ROOFING_WORK_CLASSES = Object.freeze([
 // ---------------------------------------------------------------------------
 
 const GEO_ID_PATTERN = /^\d{10}$/;
+/**
+ * The account form of the Williamson Central Appraisal District (`R` and six digits) and its marker `WCAD`. The T4
+ * capture (v1792239863) prints it on 103,848 + 21 permits, 99.98% of those with coordinates north of latitude 30.40 in
+ * the Austin limits that lie in Williamson County: another county's parcel id, never a TCAD Geographic ID, so these
+ * permits are outside the Travis parcel population (the 2026-10-16 count of "7-character" values was this form).
+ */
+const WILLIAMSON_CAD_ACCOUNT = /^R\d{6}$/;
+const WILLIAMSON_CAD_MARKER = "WCAD";
 
 /**
  * @typedef {object} TcadIdEvidence
@@ -562,9 +577,12 @@ const GEO_ID_PATTERN = /^\d{10}$/;
  */
 
 /**
- * Classify a printed `tcad_id`. Only an exact 10-digit value is a usable
- * Geographic ID; 7-digit and other lengths (103,843 and 199 rows on
- * 2026-10-16) are quarantined with the raw value kept; blanks are unknown.
+ * Classify a printed `tcad_id` ({@link TCAD_ID_EVIDENCE_VERSION}). Only an
+ * exact 10-digit value is a usable Geographic ID. The Williamson CAD account
+ * form (`R` and six digits; 103,848 rows in the T4 capture) and its `WCAD`
+ * marker (21) name another county's parcel; other lengths (176) and other
+ * text (2) are malformed. All of them are quarantined with the raw value kept;
+ * blanks are unknown.
  *
  * @param {unknown} raw - `tcad_id` as printed.
  * @returns {TcadIdEvidence} Evidence record.
@@ -573,6 +591,8 @@ export function tcadIdEvidence(raw) {
   const text = raw === null || raw === undefined ? "" : String(raw).trim();
   if (text === "") return { value: null, evidenceState: "unknown", raw: null, reason: "blank" };
   if (GEO_ID_PATTERN.test(text)) return { value: text, evidenceState: "confirmed_present", raw: text, reason: "ten_digit_geo_id" };
+  if (WILLIAMSON_CAD_ACCOUNT.test(text)) return { value: text, evidenceState: "invalid_quarantined", raw: text, reason: "williamson_cad_account_form" };
+  if (text.toUpperCase() === WILLIAMSON_CAD_MARKER) return { value: text, evidenceState: "invalid_quarantined", raw: text, reason: "williamson_cad_marker" };
   return { value: text, evidenceState: "invalid_quarantined", raw: text, reason: /^\d+$/.test(text) ? `digits_length_${text.length}` : "non_numeric" };
 }
 
@@ -818,6 +838,7 @@ export function summarizePermitRow(row, { asOfDate }) {
       workClassifier: WORK_CLASSIFIER_VERSION,
       dateEvidence: DATE_EVIDENCE_VERSION,
       tcadIdNormalization: TCAD_ID_NORMALIZATION_VERSION,
+      tcadIdEvidence: TCAD_ID_EVIDENCE_VERSION,
       roofAgeProfile: compiledTravisRoofAgeProfile.version,
       roofAgeProfileSha256: compiledTravisRoofAgeProfile.sha256,
     },

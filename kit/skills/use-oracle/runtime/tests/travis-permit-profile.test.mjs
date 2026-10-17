@@ -20,6 +20,7 @@ import {
   REPLACEMENT_TERMS,
   ROOFING_WORK_CLASSES,
   STATUS_GROUP_VERSION,
+  TCAD_ID_EVIDENCE_VERSION,
   TCAD_ID_NORMALIZATION_VERSION,
   TRAVIS_PERMIT_SOURCE_SYSTEM,
   TRAVIS_ROOF_AGE_PROFILE_VERSION,
@@ -204,11 +205,12 @@ describe("Travis tcad_id evidence, normalization proof and parcel link", () => {
   it("classifies every evidence fixture case", async () => {
     const fixture = await loadJson(PROFILE_FIXTURES, "tcad-id.json");
     expect(fixture.version).toBe(TCAD_ID_NORMALIZATION_VERSION);
+    expect(fixture.evidence_version).toBe(TCAD_ID_EVIDENCE_VERSION);
     for (const testCase of fixture.evidence_cases) {
       const result = tcadIdEvidence(testCase.raw);
       expect(result.evidenceState, JSON.stringify(testCase.raw)).toBe(testCase.expected_state);
       expect(result.value, JSON.stringify(testCase.raw)).toBe(testCase.expected_value);
-      if (testCase.reason) expect(result.reason).toBe(testCase.reason);
+      if (testCase.reason) expect(result.reason, JSON.stringify(testCase.raw)).toBe(testCase.reason);
     }
   });
 

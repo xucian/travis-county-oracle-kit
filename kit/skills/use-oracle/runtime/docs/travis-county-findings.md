@@ -284,14 +284,16 @@ the `__NONE__` sentinel (appraisal only).
 
 | Source | Volume | Mode | Estimate |
 | --- | --- | --- | --- |
-| Socrata permits | 2,380,507 rows | one bulk GET per run (CSV export endpoint, or SODA pages of 50,000 with `$offset`), recorded as the `source_http_request` actually made | minutes; no per-parcel harvest |
+| Socrata permits | 2,380,707 rows (2026-10-17) | one GET per (`permittype`, `calendar_year_issued`) partition, 270 requests, recorded as the `source_http_request` actually made | **measured (T4):** 318.6 s for the whole export at 2 requests in flight, no throttling; no per-parcel harvest |
 | TCAD export | a handful of files, hundreds of MB | bulk download under US egress | minutes to download; seed build is a local join |
 | TNR parcel layer | 386,682 polygons at 1,000 per request | paged REST queries (MapServer layer 0, geoJSON), concurrency 1, recorded per page | about 387 requests, well under an hour |
 | Comptroller file | about 3M rows statewide, filter Travis | bulk download | minutes |
-| Transform | per parcel, custom code, no browser | warm single process | thousands of parcels per minute class |
+| Transform | per parcel, custom code, no browser | warm single process | **measured (T4):** 10,069 parcels per minute (appraisal), 74,593 permits per minute (permit transform) |
+| elephant-cli validate, hash, CAR validate, export-tables | per group, local | one process per group, or K concurrent shards | **measured (T4):** sequential 0.39 s per parcel for the County chain (validate 0.36 s) and 0.14 s per permit-group parcel; on 8 shards 0.085 and 0.041 s |
 
-Nothing in v1 or v2 projects past the kit's 48-hour gate; the measured pilot timings go into the
-run record.
+The only source acquisition T4 adds, the Austin export, takes 5.3 minutes; the kit's 48-hour gate per
+source holds. The full local pipeline projects to 59.97 hours sequentially and 15.47 hours with the CLI
+chain on 8 concurrent shards per group (section 14).
 
 ## 8. Risks and findings that gate later steps
 
@@ -466,3 +468,57 @@ capture; the run record is `docs/evidence/travis-t3-run-2026-10-17.json`.
   (`PLUMB_COMPANY` is the company; `INSURANCE_COMPANY` the insurer). Both record layouts print the same 79 organization
   codes, one-letter codes included, with two sole-owner types (`IS`, `S`) and no SSN statement; the privacy rule became
   `travis-t3-privacy.v2` (`IS`, `S`; 0 rows changed). Partnerships (`PI`, `PZ`), estates and trusts stay visible.
+
+## 14. T4 permit profile, pilot and feasibility (2026-10-17)
+
+Everything ran from one Socrata capture and the T1 seed; the only other requests were the public lexicon manifest and
+the Socrata cross-checks. Run record `docs/evidence/travis-t4-run-2026-10-17.json`; harvest
+`travis-t4-harvest-v1792239863.json`; link proof `travis-t4-link-proof-v1792239863.json`.
+
+- **Harvest.** `t4-permit-fetch.mjs` captured the whole Austin export from RO egress (the host answers any country):
+  2,380,707 rows = `count(*)` = plan total, 270 partitions, 1,813,784,373 bytes, 274 requests, no 429 and no retry,
+  318.6 s, `rowsUpdatedAt` 2026-10-17T12:24:23Z at start and end. `t4-permit-verify.mjs` rechecks every byte count, digest,
+  recount and header offline. The capture's artifact hash (sorted partition digests) is `05a9be10…`.
+- **Stable provenance.** One request per (`permittype`, `calendar_year_issued`) partition (the largest holds 21,926 rows,
+  under the 50,000 limit; a larger one would be split by issue month). A permit never moves between partitions, so the
+  request that captured it is the same request in every run and is its `source_http_request`; page offsets, which shift as
+  rows are added, are never part of it.
+- **Columns.** 60 collected (`travis-austin-permit-columns.v1`); the 7 applicant fields are never requested (privacy
+  classification) and neither is `issued_in_last_30_days`, a flag the publisher recomputes daily. A changed column set
+  stops the harvest before any data request.
+- **Link proof (`geo_id` exact).** 1,978,992 of 2,380,707 permits (83.13%) link exactly to 232,640 of 441,961 accounts;
+  `normalized_digits` 0 (the digits-only proof holds over the roll, but every roll `geo_id` and every usable `tcad_id` is
+  already 10 digits). Unlinked: `no_candidate` 259,419 (63,019 blank; 196,400 on 6,260 ten-digit ids no 2026 account
+  prints), `multiple_candidates` 38,249 (1,164 `geo_id`s shared by 11,589 accounts, mostly condominium regimes),
+  `invalid_quarantined` 104,047. No permit number is printed twice.
+- **Williamson County rows.** The "seven-character" `tcad_id` values of 2026-10-16 are the Williamson Central Appraisal
+  District account form, `R` and six digits (103,848 rows, plus 21 printed `WCAD`); 89,550 of the 89,564 with coordinates
+  lie north of latitude 30.40, in the Austin limits that are in Williamson County. They are another county's parcels:
+  `travis-tcad-id-evidence-v2` names the reason; they stay unlinked.
+- **Retired `geo_id`s.** The 196,400 ten-digit ids absent from the 2026 roll sit inside Travis (latitude p1-p99
+  30.126-30.441) and grow in recent decades (3.6% of the 1980s permits, 14.6% of the 2020s), consistent with tracts
+  subdivided after the permit. They stay `no_candidate`; nothing in the 2026 export maps an old `geo_id` to its successors.
+- **Profile.** 25 status values, none new (447 rows `needs_review`: 433 unmapped, 14 blank); `completed_date` 2,180,217
+  confirmed, 198,488 unknown, 2,002 quarantined (before the applied date). Work classifier v2: a new building's own permit
+  is new construction even when its text mentions an attached carport or covered porch (v1 read 42,287 of them as
+  accessory roofs); `primary_roof_new_construction` 155,327, `primary_roof_replacement` 23,290, `accessory_roof` 26,193,
+  `repair_or_coating` 1,321, `needs_review` 5,735 (4,929 distinct descriptions, the top 40 in the link proof).
+- **Pilot (`__ALL__`, run `20261017T213138Z`).** 25 = 25 + 0 + 0 appraisal; permit path 5 parcels, 145 permits;
+  permit-less path 20 parcels, 4 of them on shared `geo_id`s (83 permits unlinked as `multiple_candidates`). County CAR
+  and tables roots equal T2's run of record; Property Improvement validate 5/5, CAR 322 blocks, six checks 0, 7 tables;
+  the same property CIDs in both archives; Socrata cross-check 25/25 equal through 2026-10-16. `__NONE__`
+  (`20261017T213346Z`): 25 `not_eligible`, no roll index, no link pass, no permit artifact. Fault drill
+  (`20261017T213411Z`): an injected permanent failure stays `failed_permanent` on `--resume`; an injected timeout is
+  `failed_retryable` and completes on `--resume`.
+- **Feasibility (1,000 parcels, `20261017T213812Z`).** A uniform sample (`travis-t4-feasibility-v1`): 1,000 = 1,000 +
+  0 + 0; 530 parcels with 4,151 permits, 470 permit-less; both groups validate with 0 errors and pass the six CAR checks;
+  the same property CIDs in both archives; Socrata cross-check 998/998 `geo_id`s equal (p50 295 ms per lookup). The
+  sample tracks the roll: 4.15 permits per parcel against 4.48, 53% of parcels with permits against 52.6%.
+- **Projection.** Source acquisition 0.09 hours (the kit's 48-hour gate per source holds). Full run sequential 59.97
+  hours, past the gate: `elephant-cli validate` of the County group alone is 44.2 hours. With the CLI chain on 8
+  concurrent shards per group (measured: County 85.2 s per 1,000 parcels, Property Improvement 21.9 s per 530) the full
+  run projects to 15.47 hours; on 4 County shards 19.41 hours.
+- **Bulk versus runtime retrieval.** The bulk harvest costs 270 requests and 5.3 minutes per run; a per-parcel lookup costs
+  about 0.3 s, so the roll would take 441,961 requests and about 18 hours at 2 in flight. The bulk path stays; nothing
+  needs runtime retrieval.
+

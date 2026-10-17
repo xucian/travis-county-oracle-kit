@@ -57,9 +57,19 @@ permits:
     row_count_2026_10_16: 2380507
     updated_at_semantics: ":updated_at equals the daily publish time on every row; not a per-row change signal; watermark on row content plus statusdate/applieddate windows"
     tcad_id_lengths: {ten: 2213446, seven: 103843, blank: 63019, other: 199}
+    tcad_id_lengths_note: the seven-character values are not numbers but the Williamson CAD account form R + 6 digits (T4 capture, tcad_id_forms_2026_10_17)
     license_number_column: none
     roof_mentions_bp: 33343
     roof_mentions_distinct_tcad_id: 22405
+    row_count_2026_10_17: 2380707
+    harvest_module: src/counties/travis/t4-permit-fetch.mjs (travis-t4-socrata-harvest.v1); offline check src/counties/travis/t4-permit-verify.mjs
+    harvest_method: one GET per (permittype, calendar_year_issued) partition planned from the dataset's own group-by counts (270 partitions on 2026-10-17, the largest 21,926 rows; page limit 50,000, a month split above it); no offset, so the request that captured a permit is the same in every run and is its source_http_request
+    harvest_columns: travis-austin-permit-columns.v1, 60 collected; never requested - the 7 applicant fields (personal contact fields, see permit_contact_privacy_classification) and issued_in_last_30_days (a flag the publisher recomputes every day, which would change a row hash with no change to the permit); a different column set stops the harvest before any data request
+    harvest_throttle: 2 requests in flight, Retry-After honoured, no app token; the host answers any country, so the egress country is recorded and does not gate
+    harvest_of_record: v1792239863 (rowsUpdatedAt 2026-10-17T12:24:23Z, unchanged at the end), 2026-10-17 20:56-21:01Z from RO egress; 2,380,707 rows = count(*) = plan total, 270 partitions, 1,813,784,373 bytes, 274 requests, no 429, no retry, 318.6 s (448,354 rows per minute); t4-permit-verify OK (docs/evidence/travis-t4-harvest-v1792239863.json)
+    tcad_id_forms_2026_10_17: {ten_digit: 2213641, blank: 63019, williamson_cad_account_r_6_digits: 103848, wcad_marker: 21, other_lengths: 176, other_text: 2}
+    williamson_cad_rows: 103,869 permits print a Williamson Central Appraisal District account (R + 6 digits) or WCAD instead of a TCAD Geographic ID; 89,550 of the 89,564 with coordinates lie north of latitude 30.40 (the Austin limits in Williamson County); another county's parcels, invalid_quarantined with reason williamson_cad_account_form (travis-tcad-id-evidence-v2) and outside the Travis parcel population
+    link_proof_2026_10_17: geo_id exact 1,978,992 of 2,380,707 (83.13%) on 232,640 parcels; normalized_digits 0 (the digits-only proof holds - 431,536 distinct geo_ids, no collision - but every roll geo_id and every usable tcad_id is already 10 digits); unlinked no_candidate 259,419 (63,019 blank, 196,400 on 6,260 10-digit geo_ids that no 2026 account prints), multiple_candidates 38,249 (1,164 geo_ids shared by 11,589 accounts), invalid_quarantined 104,047 (103,869 Williamson CAD); no permit number repeats; docs/evidence/travis-t4-link-proof-v1792239863.json
   jurisdictions:
     - jurisdiction: City of Austin (full purpose, limited purpose, ETJ rows)
       key: austin
@@ -71,13 +81,14 @@ permits:
       historical_records: true
       anonymous_access: true
       adapter: socrata-bulk-export
-      implementation_status: adapter-pending-t4 (profile fixtures built in v1; harvester built in v2 T4)
+      implementation_status: harvester-built-t4 (t4-permit-fetch, t4-permit-verify, the t4-permit-links link pass and the permit transform; pilot and 1,000-parcel feasibility run in T4)
       enumeration_status: certified-bulk-reported-count
-      reported_count: 2380507
+      reported_count: 2380707
+      reported_count_date: "2026-10-17"
       history_start_date: "1921-09-20"
       parcel_search: not needed; bulk rows carry tcad_id (geo_id)
       probe_2026_10_16: export reachable from non-US egress (HTTP 200); AB+C public search page HTTP 200 with Incapsula markers; citizen portal home shows reCAPTCHA
-      known_exclusions: no license-number column; applicant fields not collected; live detail status not refreshed in v1
+      known_exclusions: no license-number column; applicant fields and the rolling issued_in_last_30_days flag not collected; live detail status not refreshed in v1; 103,869 rows on Williamson CAD parcels are outside Travis
       publication_rights: public domain City of Austin open data; publish privacy-limited normalized facts only
       records_request:
         recipient_office: City of Austin Development Services Department, public information requests
@@ -188,7 +199,7 @@ permits:
       historical_records: true
       anonymous_access: false
       adapter: none
-      implementation_status: tyler-civic-access-candidate-not-routed (the kit's tyler-civic-access adapter family; routing, tenant verification and a bounded pilot are T4 work)
+      implementation_status: tyler-civic-access-candidate-not-routed (the kit's tyler-civic-access adapter family; not routed in T4 - the operator's T4 scope of 2026-10-17 keeps every jurisdiction other than Austin as classified)
       austin_feed_rows: 8384
       probe_2026_10_16: HTTP 403 with cf-mitigated challenge ("Just a moment"), a bot challenge; guessed tylerhost hostname did not resolve
       reprobe_us_egress_2026_10_16: city page HTTP 200 under US egress (no challenge) and links the portal https://lakewaytx-energovweb.tylerhost.net/apps/selfservice, which answers HTTP 200 "SelfService Public Site"; vendor verified Tyler EnerGov; stays blocked only until the kit adapter is routed and certified

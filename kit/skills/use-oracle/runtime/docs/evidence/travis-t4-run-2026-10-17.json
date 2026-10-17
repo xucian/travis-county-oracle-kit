@@ -1,0 +1,1166 @@
+{
+ "schemaVersion": "travis.t4-run-record.v1",
+ "status": "T4 run of record (permit profile, permit pilot and feasibility); offline except the lexicon manifest and the Socrata cross-checks; nothing uploaded, pinned or registered",
+ "increment": "T4 (assignment decisions.md section 2 item 4)",
+ "check": "fixtures pass; link-method counts and the projection in the run record",
+ "kit_commit": "44bed5b",
+ "cli_commit": "44bb182 (@elephant-xyz/cli 1.58.1, project-local in the assignment repository)",
+ "lexicon_manifest_url": "https://lexicon.elephant.xyz/api/manifest",
+ "source": {
+  "dataset": "austin-issued-construction-permits/3syk-w9eu",
+  "url": "https://data.austintexas.gov/resource/3syk-w9eu.csv",
+  "watermark": "2026-10-17T12:24:23.000Z",
+  "fetched": {
+   "started_at": "2026-10-17T20:56:06.633Z",
+   "finished_at": "2026-10-17T21:01:25.227Z"
+  },
+  "artifact_hash": "05a9be10f3e0c7e2e28105f35c0151518e60bdcba679ebb1d14979ba12090a7a",
+  "artifact_hash_recipe": "SHA-256 over the sorted lines <partition file>:<sha256>, one per partition",
+  "partitions": 270,
+  "rows": 2380707,
+  "bytes": 1813784373,
+  "requests": 274,
+  "throttling_seen": "none (0 HTTP 429, 0 retries)",
+  "verification": "t4-permit-verify: OK; 270 partitions, 274 receipts, 2,380,707 CSV rows, 1813.8 MB; v1792239863 (rowsUpdatedAt 2026-10-17T12:24:23.000Z)",
+  "availability": "supported_partial",
+  "availability_note": "Austin's export only (the other 22 jurisdictions are blocked or custodian-only as classified); 17% of its rows do not link to a 2026 Travis account",
+  "evidence": "docs/evidence/travis-t4-harvest-v1792239863.json"
+ },
+ "link_proof": {
+  "evidence": "docs/evidence/travis-t4-link-proof-v1792239863.json",
+  "rows": 2380707,
+  "link_method": {
+   "exact": 1978992,
+   "normalized_digits": 0
+  },
+  "linked": 1978992,
+  "linked_share": 0.8313,
+  "linked_parcels": 232640,
+  "unlinked_reasons": {
+   "no_candidate": 259419,
+   "multiple_candidates": 38249,
+   "invalid_quarantined": 104047
+  },
+  "no_candidate_detail": {
+   "blank_tcad_id": 63019,
+   "ten_digit_not_in_roll": 196400
+  },
+  "by_permittype_link": {
+   "BP": {
+    "exact": 435019,
+    "normalized_digits": 0,
+    "no_candidate": 56959,
+    "multiple_candidates": 9060,
+    "invalid_quarantined": 20313
+   },
+   "DS": {
+    "exact": 100101,
+    "normalized_digits": 0,
+    "no_candidate": 9987,
+    "multiple_candidates": 649,
+    "invalid_quarantined": 5912
+   },
+   "EP": {
+    "exact": 570769,
+    "normalized_digits": 0,
+    "no_candidate": 78415,
+    "multiple_candidates": 10869,
+    "invalid_quarantined": 29099
+   },
+   "MP": {
+    "exact": 420694,
+    "normalized_digits": 0,
+    "no_candidate": 54405,
+    "multiple_candidates": 9639,
+    "invalid_quarantined": 21792
+   },
+   "PP": {
+    "exact": 452409,
+    "normalized_digits": 0,
+    "no_candidate": 59653,
+    "multiple_candidates": 8032,
+    "invalid_quarantined": 26931
+   }
+  },
+  "roll": {
+   "seed_rows": 441961,
+   "blank_geo_ids": 0,
+   "non_ten_digit_geo_ids": 0,
+   "distinct_geo_ids": 431536,
+   "shared_geo_ids": 1164,
+   "accounts_on_shared_geo_ids": 11589,
+   "seed_sha256": "8b79ca01f6bad5332b0fc82122d6d3783a582815e86fd7c9dd10e400620e17f8",
+   "digits_only_proof": {
+    "normalizationVersion": "travis-tcad-id-digits-v1",
+    "checkedCount": 441961,
+    "distinctGeoIds": 431536,
+    "distinctDigits": 431536,
+    "oneToOne": true,
+    "collisions": 0
+   },
+   "digits_fallback_enabled": true
+  },
+  "williamson_cad_tcad_id": {
+   "account_form_rows": 103848,
+   "marker_rows": 21,
+   "with_coordinates": 89564,
+   "north_of_30_40": 89550
+  },
+  "ten_digit_not_in_roll": {
+   "rows": 196400,
+   "distinct_geo_ids": 6260
+  },
+  "permit_number": {
+   "distinct": 2380707,
+   "blank_rows": 0,
+   "printed_more_than_once": 0,
+   "rows_under_repeated_numbers": 0,
+   "repeated_rows_identical_to_first": 0,
+   "printed_on_differing_rows": 0
+  }
+ },
+ "evidence_states": {
+  "completed_date": {
+   "confirmed_present": 2180217,
+   "unknown": 198488,
+   "invalid_quarantined": 2002
+  },
+  "status_current": {
+   "confirmed_present": 2380693,
+   "unknown": 14
+  },
+  "tcad_id": {
+   "confirmed_present": 2213641,
+   "unknown": 63019,
+   "invalid_quarantined": 104047
+  }
+ },
+ "unlinked_reasons": {
+  "no_candidate": 259419,
+  "multiple_candidates": 38249,
+  "invalid_quarantined": 104047
+ },
+ "profile": {
+  "versions": {
+   "status_group": "travis-status-group-v1",
+   "lifecycle": "travis-lifecycle-v1",
+   "work_classifier": "travis-work-classifier-v2",
+   "date_evidence": "travis-date-evidence-v1",
+   "tcad_id_normalization": "travis-tcad-id-digits-v1"
+  },
+  "status_group": {
+   "closed": 2237835,
+   "open": 28208,
+   "stalled": 114217,
+   "needs_review": 447
+  },
+  "lifecycle": {
+   "completed": 2010298,
+   "other": 341754,
+   "open": 28208,
+   "needs_review": 447
+  },
+  "status_vocabulary": {
+   "distinct": 25,
+   "new_unmapped_values": [],
+   "needs_review_rows": 447
+  },
+  "roof_work_class": {
+   "primary_roof_new_construction": 155327,
+   "other": 2168841,
+   "accessory_roof": 26193,
+   "primary_roof_replacement": 23290,
+   "repair_or_coating": 1321,
+   "needs_review": 5735
+  },
+  "roofing": {
+   "permits": 206131,
+   "linked": 166650,
+   "by_status_group": {
+    "closed": 195109,
+    "stalled": 6609,
+    "open": 4399,
+    "needs_review": 14
+   },
+   "by_class_linked": {
+    "primary_roof_new_construction": 121637,
+    "accessory_roof": 23203,
+    "primary_roof_replacement": 20660,
+    "repair_or_coating": 1150
+   },
+   "bp_rows": 521351
+  },
+  "date_reasons": {
+   "applieddate": {
+    "valid": 2380678,
+    "blank": 29
+   },
+   "issue_date": {
+    "valid": 2380707
+   },
+   "completed_date": {
+    "valid": 2180217,
+    "blank": 198488,
+    "before_applied_date": 2002
+   },
+   "expiresdate": {
+    "valid": 2379917,
+    "blank": 790
+   },
+   "statusdate_final": {
+    "valid": 2010296,
+    "before_applied_date": 2
+   }
+  },
+  "needs_review_distinct_descriptions": 4925
+ },
+ "pilot": {
+  "all": {
+   "run_dir": "data/travis/runs/20261017T213138Z-t4-pilot",
+   "attempts": [
+    {
+     "attempt": 1,
+     "started_at": "2026-10-17T21:31:38.114Z",
+     "finished_at": "2026-10-17T21:33:45.934Z",
+     "resumed": false,
+     "fault_drill": {
+      "permanent": [],
+      "retryable": []
+     }
+    }
+   ],
+   "seed": {
+    "path": "data/seeds/travis-pilot.csv",
+    "sha256": "0a75f9e99f029c6ca4dba57a4a6bba6d7333c8b88b459c20312d880385ce7f3d",
+    "rows": 25
+   },
+   "lexicon_manifest": {
+    "source": "live",
+    "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+    "property_improvement_cid": "bafkreicyzywzwhmguojpi2otgrwsyi37le3u4lnavljbxu76cnrudxaxfu",
+    "seed_cid": "bafkreibhurphpjdq33ysit57jtzmdldgngepsdbsw4vm7esawth2ezgaxu"
+   },
+   "eligibility_policy": {
+    "variable": "PROPERTY_FIRST_PERMIT_ELIGIBLE_USAGE_TYPES_TRAVIS",
+    "value": "__ALL__",
+    "mode": "all",
+    "fingerprint": "315d4a131b0aa620dc4ab3535402ca2135f6e6050a8527cda4f68dec6c7dff62"
+   },
+   "appraisal": {
+    "reconciled": {
+     "seedRows": 25,
+     "success": 25,
+     "permanentFailure": 0,
+     "retryableFailure": 0
+    },
+    "geometry": 13,
+    "reconcile_export": {
+     "rows": 25,
+     "expected": 25
+    }
+   },
+   "eligibility": {
+    "eligible": 25,
+    "not_eligible": 0
+   },
+   "permit_states": {
+    "done_zero_permits": 20,
+    "done": 5
+   },
+   "permits": {
+    "linked": 145,
+    "published": 145,
+    "parcels_written": 5,
+    "conflicting": 0,
+    "identical_repeats": 0
+   },
+   "groups": {
+    "county": 25,
+    "property_improvement": 5
+   },
+   "county_group": {
+    "parcels": 25,
+    "validate": {
+     "processed": {
+      "processed": 25,
+      "succeeded": 25,
+      "failed": 0
+     },
+     "error_rows": 0,
+     "exit": 0
+    },
+    "car": {
+     "root": "baguqeerahe3ecgiyigcgdg6gmxqsmc5ylzlucf4kb3n5xcqi5tvtiebpv2ta",
+     "blocks": 471,
+     "bytes": 176848,
+     "sha256": "62456f387fd6b25466c63ba6f8b4bbf2020c2b1fa963f71a82b3541bf8a1ebc6"
+    },
+    "car_validation": {
+     "blocks": 471,
+     "properties": 25,
+     "data_groups_validated": 50,
+     "integrity_errors": 0,
+     "root_errors": 0,
+     "index_errors": 0,
+     "graph_errors": 0,
+     "lexicon_errors": 0,
+     "orphans_errors": 0,
+     "passed": true
+    },
+    "tables": {
+     "tables": 23,
+     "parts": 23,
+     "root": "baguqeeram5hefoyihxelublnx3hzdmbdxg5gavyukspzevkwnii7b5zexipq"
+    }
+   },
+   "property_improvement_group": {
+    "parcels": 5,
+    "validate": {
+     "processed": {
+      "processed": 5,
+      "succeeded": 5,
+      "failed": 0
+     },
+     "error_rows": 0,
+     "exit": 0
+    },
+    "car": {
+     "root": "baguqeeram7n2d2uqpotfmu3bgmjrplguzny22ldvlwjnv4sk5hpjwohr4njq",
+     "blocks": 322,
+     "bytes": 282633,
+     "sha256": "2c48a80f74f6a7379392c847d6ca48578466d5edaa49c02beeb72f68a7abed6e"
+    },
+    "car_validation": {
+     "blocks": 322,
+     "properties": 5,
+     "data_groups_validated": 10,
+     "integrity_errors": 0,
+     "root_errors": 0,
+     "index_errors": 0,
+     "graph_errors": 0,
+     "lexicon_errors": 0,
+     "orphans_errors": 0,
+     "passed": true
+    },
+    "tables": {
+     "tables": 7,
+     "parts": 7,
+     "root": "baguqeera7qlc2qavbgfy75sbznosxmkxsknmab35prsr6q7tqf2qejmw6i3a"
+    }
+   },
+   "property_cid_check": {
+    "county_properties": 25,
+    "permit_properties": 5,
+    "permit_properties_in_county_archive": 5,
+    "missing": [],
+    "same_property_cid": true
+   },
+   "socrata_cross_check": {
+    "requests": 27,
+    "dataset_version_now": "1792239863",
+    "capture_version": "1792239863",
+    "same_version": true,
+    "issued_through": "2026-10-16",
+    "rows_issued_after_now": 0,
+    "geo_ids": 25,
+    "equal": 25,
+    "differs": [],
+    "per_request_ms": {
+     "p50": 316,
+     "p95": 431,
+     "max": 841
+    },
+    "elapsed_ms": 4301
+   },
+   "timings_ms": {
+    "lexicon_manifest": 637.1,
+    "verify_capture": 9469.1,
+    "appraisal_transform": 145.7,
+    "appraisal_reconcile_export": 82.6,
+    "eligibility": 4.9,
+    "roll_index": 6532,
+    "permit_link_pass": 85396.5,
+    "permit_transform": 89.6,
+    "assemble_groups": 140.7,
+    "cli_county_validate": 10916,
+    "cli_county_hash": 1945.1,
+    "cli_county_car_validate": 1792.3,
+    "cli_county_export_tables": 597.4,
+    "cli_property_improvement_validate": 1719.1,
+    "cli_property_improvement_hash": 1023.8,
+    "cli_property_improvement_car_validate": 1232.3,
+    "cli_property_improvement_export_tables": 572.8,
+    "socrata_cross_check": 4301
+   },
+   "total_ms": 127819.7
+  },
+  "appraisal_only": {
+   "run_dir": "data/travis/runs/20261017T213346Z-t4-pilot-none",
+   "attempts": [
+    {
+     "attempt": 1,
+     "started_at": "2026-10-17T21:33:46.359Z",
+     "finished_at": "2026-10-17T21:34:10.981Z",
+     "resumed": false,
+     "fault_drill": {
+      "permanent": [],
+      "retryable": []
+     }
+    }
+   ],
+   "seed": {
+    "path": "data/seeds/travis-pilot.csv",
+    "sha256": "0a75f9e99f029c6ca4dba57a4a6bba6d7333c8b88b459c20312d880385ce7f3d",
+    "rows": 25
+   },
+   "lexicon_manifest": {
+    "source": "live",
+    "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+    "property_improvement_cid": "bafkreicyzywzwhmguojpi2otgrwsyi37le3u4lnavljbxu76cnrudxaxfu",
+    "seed_cid": "bafkreibhurphpjdq33ysit57jtzmdldgngepsdbsw4vm7esawth2ezgaxu"
+   },
+   "eligibility_policy": {
+    "variable": "PROPERTY_FIRST_PERMIT_ELIGIBLE_USAGE_TYPES_TRAVIS",
+    "value": "__NONE__",
+    "mode": "none",
+    "fingerprint": "05b20f8a3f5b95de63e9c49c267a2ff42c430a95951faeeb176378fb7d5640ed"
+   },
+   "appraisal": {
+    "reconciled": {
+     "seedRows": 25,
+     "success": 25,
+     "permanentFailure": 0,
+     "retryableFailure": 0
+    },
+    "geometry": 13,
+    "reconcile_export": {
+     "rows": 25,
+     "expected": 25
+    }
+   },
+   "eligibility": {
+    "eligible": 0,
+    "not_eligible": 25
+   },
+   "permit_states": {
+    "not_eligible": 25
+   },
+   "permits": {
+    "linked": 0,
+    "published": 0,
+    "parcels_written": 0,
+    "conflicting": 0,
+    "identical_repeats": 0
+   },
+   "groups": {
+    "county": 25,
+    "property_improvement": 0
+   },
+   "county_group": {
+    "parcels": 25,
+    "validate": {
+     "processed": {
+      "processed": 25,
+      "succeeded": 25,
+      "failed": 0
+     },
+     "error_rows": 0,
+     "exit": 0
+    },
+    "car": {
+     "root": "baguqeerahe3ecgiyigcgdg6gmxqsmc5ylzlucf4kb3n5xcqi5tvtiebpv2ta",
+     "blocks": 471,
+     "bytes": 176848,
+     "sha256": "62456f387fd6b25466c63ba6f8b4bbf2020c2b1fa963f71a82b3541bf8a1ebc6"
+    },
+    "car_validation": {
+     "blocks": 471,
+     "properties": 25,
+     "data_groups_validated": 50,
+     "integrity_errors": 0,
+     "root_errors": 0,
+     "index_errors": 0,
+     "graph_errors": 0,
+     "lexicon_errors": 0,
+     "orphans_errors": 0,
+     "passed": true
+    },
+    "tables": {
+     "tables": 23,
+     "parts": 23,
+     "root": "baguqeeram5hefoyihxelublnx3hzdmbdxg5gavyukspzevkwnii7b5zexipq"
+    }
+   },
+   "property_improvement_group": {
+    "skipped": "no parcel in this group"
+   },
+   "property_cid_check": null,
+   "socrata_cross_check": null,
+   "timings_ms": {
+    "lexicon_manifest": 614.1,
+    "verify_capture": 9526.3,
+    "appraisal_transform": 151.6,
+    "appraisal_reconcile_export": 81.7,
+    "eligibility": 4.8,
+    "roll_index": {
+     "skipped": "no eligible parcel"
+    },
+    "permit_link_pass": {
+     "skipped": "no eligible parcel"
+    },
+    "permit_transform": 3,
+    "assemble_groups": 77.1,
+    "cli_county_validate": 10272.4,
+    "cli_county_hash": 1539.7,
+    "cli_county_car_validate": 1765.7,
+    "cli_county_export_tables": 578.9
+   },
+   "total_ms": 24623
+  },
+  "fault_drill": {
+   "run_dir": "data/travis/runs/20261017T213411Z-t4-pilot-drill",
+   "attempts": [
+    {
+     "attempt": 1,
+     "started_at": "2026-10-17T21:34:11.189Z",
+     "finished_at": "2026-10-17T21:36:11.594Z",
+     "resumed": false,
+     "fault_drill": {
+      "permanent": [
+       "547839"
+      ],
+      "retryable": [
+       "830704"
+      ]
+     }
+    },
+    {
+     "attempt": 2,
+     "started_at": "2026-10-17T21:36:12.053Z",
+     "finished_at": "2026-10-17T21:38:11.947Z",
+     "resumed": true,
+     "fault_drill": {
+      "permanent": [],
+      "retryable": []
+     }
+    }
+   ],
+   "seed": {
+    "path": "data/travis/runs/20261017T213411Z-t4-pilot-drill/seed.csv",
+    "sha256": "0a75f9e99f029c6ca4dba57a4a6bba6d7333c8b88b459c20312d880385ce7f3d",
+    "rows": 25
+   },
+   "lexicon_manifest": {
+    "source": "resumed",
+    "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+    "property_improvement_cid": "bafkreicyzywzwhmguojpi2otgrwsyi37le3u4lnavljbxu76cnrudxaxfu",
+    "seed_cid": "bafkreibhurphpjdq33ysit57jtzmdldgngepsdbsw4vm7esawth2ezgaxu"
+   },
+   "eligibility_policy": {
+    "variable": "PROPERTY_FIRST_PERMIT_ELIGIBLE_USAGE_TYPES_TRAVIS",
+    "value": "__ALL__",
+    "mode": "all",
+    "fingerprint": "315d4a131b0aa620dc4ab3535402ca2135f6e6050a8527cda4f68dec6c7dff62"
+   },
+   "appraisal": {
+    "reconciled": {
+     "seedRows": 25,
+     "success": 25,
+     "permanentFailure": 0,
+     "retryableFailure": 0
+    },
+    "geometry": 13,
+    "reconcile_export": {
+     "rows": 25,
+     "expected": 25
+    }
+   },
+   "eligibility": {
+    "eligible": 25,
+    "not_eligible": 0
+   },
+   "permit_states": {
+    "done_zero_permits": 20,
+    "failed_permanent": 1,
+    "done": 4
+   },
+   "permits": {
+    "linked": 18,
+    "published": 18,
+    "parcels_written": 4,
+    "conflicting": 0,
+    "identical_repeats": 0
+   },
+   "groups": {
+    "county": 25,
+    "property_improvement": 4
+   },
+   "county_group": {
+    "parcels": 25,
+    "validate": {
+     "processed": {
+      "processed": 25,
+      "succeeded": 25,
+      "failed": 0
+     },
+     "error_rows": 0,
+     "exit": 0
+    },
+    "car": {
+     "root": "baguqeerahe3ecgiyigcgdg6gmxqsmc5ylzlucf4kb3n5xcqi5tvtiebpv2ta",
+     "blocks": 471,
+     "bytes": 176848,
+     "sha256": "62456f387fd6b25466c63ba6f8b4bbf2020c2b1fa963f71a82b3541bf8a1ebc6"
+    },
+    "car_validation": {
+     "blocks": 471,
+     "properties": 25,
+     "data_groups_validated": 50,
+     "integrity_errors": 0,
+     "root_errors": 0,
+     "index_errors": 0,
+     "graph_errors": 0,
+     "lexicon_errors": 0,
+     "orphans_errors": 0,
+     "passed": true
+    },
+    "tables": {
+     "tables": 23,
+     "parts": 23,
+     "root": "baguqeeram5hefoyihxelublnx3hzdmbdxg5gavyukspzevkwnii7b5zexipq"
+    }
+   },
+   "property_improvement_group": {
+    "parcels": 4,
+    "validate": {
+     "processed": {
+      "processed": 4,
+      "succeeded": 4,
+      "failed": 0
+     },
+     "error_rows": 0,
+     "exit": 0
+    },
+    "car": {
+     "root": "baguqeera2p34jqbamughnis4kbnswq654yg22rtxzu7x3iewilinuo7hlzea",
+     "blocks": 62,
+     "bytes": 43135,
+     "sha256": "452878248050c841aad7ff90118d7fa0c9ece6f6f0825a93af855c757ff9ed4c"
+    },
+    "car_validation": {
+     "blocks": 62,
+     "properties": 4,
+     "data_groups_validated": 8,
+     "integrity_errors": 0,
+     "root_errors": 0,
+     "index_errors": 0,
+     "graph_errors": 0,
+     "lexicon_errors": 0,
+     "orphans_errors": 0,
+     "passed": true
+    },
+    "tables": {
+     "tables": 7,
+     "parts": 7,
+     "root": "baguqeerare47y2wzuexphqc3so6u2uuyevuftdjrkrtxe7n55xm7msfmqsnq"
+    }
+   },
+   "property_cid_check": {
+    "county_properties": 25,
+    "permit_properties": 4,
+    "permit_properties_in_county_archive": 4,
+    "missing": [],
+    "same_property_cid": true
+   },
+   "socrata_cross_check": null,
+   "timings_ms": {
+    "lexicon_manifest": 0,
+    "verify_capture": 9554.9,
+    "appraisal_transform": 141.3,
+    "appraisal_reconcile_export": 82.3,
+    "eligibility": 5.2,
+    "roll_index": 6478.7,
+    "permit_link_pass": 84222.9,
+    "permit_transform": 13.6,
+    "assemble_groups": 100.7,
+    "cli_county_validate": 10966,
+    "cli_county_hash": 1823,
+    "cli_county_car_validate": 1781.3,
+    "cli_county_export_tables": 588.9,
+    "cli_property_improvement_validate": 1526.9,
+    "cli_property_improvement_hash": 979,
+    "cli_property_improvement_car_validate": 1063.2,
+    "cli_property_improvement_export_tables": 557
+   },
+   "total_ms": 119893.2
+  }
+ },
+ "feasibility": {
+  "run_dir": "data/travis/runs/20261017T213812Z-t4-feasibility-1000",
+  "attempts": [
+   {
+    "attempt": 1,
+    "started_at": "2026-10-17T21:38:12.373Z",
+    "finished_at": "2026-10-17T21:50:36.802Z",
+    "resumed": false,
+    "fault_drill": {
+     "permanent": [],
+     "retryable": []
+    }
+   }
+  ],
+  "seed": {
+   "path": "data/seeds/travis-feasibility-1000.csv",
+   "sha256": "5fccc9c2deaca758c1f585a90621a56105f093ca445d72c1304748161ed9990c",
+   "rows": 1000
+  },
+  "lexicon_manifest": {
+   "source": "live",
+   "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+   "property_improvement_cid": "bafkreicyzywzwhmguojpi2otgrwsyi37le3u4lnavljbxu76cnrudxaxfu",
+   "seed_cid": "bafkreibhurphpjdq33ysit57jtzmdldgngepsdbsw4vm7esawth2ezgaxu"
+  },
+  "eligibility_policy": {
+   "variable": "PROPERTY_FIRST_PERMIT_ELIGIBLE_USAGE_TYPES_TRAVIS",
+   "value": "__ALL__",
+   "mode": "all",
+   "fingerprint": "315d4a131b0aa620dc4ab3535402ca2135f6e6050a8527cda4f68dec6c7dff62"
+  },
+  "appraisal": {
+   "reconciled": {
+    "seedRows": 1000,
+    "success": 1000,
+    "permanentFailure": 0,
+    "retryableFailure": 0
+   },
+   "geometry": 842,
+   "reconcile_export": {
+    "rows": 1000,
+    "expected": 1000
+   }
+  },
+  "eligibility": {
+   "eligible": 1000,
+   "not_eligible": 0
+  },
+  "permit_states": {
+   "done": 530,
+   "done_zero_permits": 470
+  },
+  "permits": {
+   "linked": 4151,
+   "published": 4151,
+   "parcels_written": 530,
+   "conflicting": 0,
+   "identical_repeats": 0
+  },
+  "groups": {
+   "county": 1000,
+   "property_improvement": 530
+  },
+  "county_group": {
+   "parcels": 1000,
+   "validate": {
+    "processed": {
+     "processed": 1000,
+     "succeeded": 1000,
+     "failed": 0
+    },
+    "error_rows": 0,
+    "exit": 0
+   },
+   "car": {
+    "root": "baguqeerajznciv64kds7dilxfyy5mg33klp4ap2wxfe2frrag7cwhb6gau4a",
+    "blocks": 20138,
+    "bytes": 8078795,
+    "sha256": "343b1cc7f4a5f9ebe8fa6a50fe129deee3cdbbfddd23bae624f3f2b47e502bd6"
+   },
+   "car_validation": {
+    "blocks": 20138,
+    "properties": 1000,
+    "data_groups_validated": 2000,
+    "integrity_errors": 0,
+    "root_errors": 0,
+    "index_errors": 0,
+    "graph_errors": 0,
+    "lexicon_errors": 0,
+    "orphans_errors": 0,
+    "passed": true
+   },
+   "tables": {
+    "tables": 24,
+    "parts": 24,
+    "root": "baguqeerag4dmbm2gzcqhvlzetfng4je6v6oklp2ny45azubq4ewv45sizrba"
+   }
+  },
+  "property_improvement_group": {
+   "parcels": 530,
+   "validate": {
+    "processed": {
+     "processed": 530,
+     "succeeded": 530,
+     "failed": 0
+    },
+    "error_rows": 0,
+    "exit": 0
+   },
+   "car": {
+    "root": "baguqeeraajeuzganwzd64fxgwhcga4lsig35omoofvggisxkkmzbw4grp6xq",
+    "blocks": 11484,
+    "bytes": 8987913,
+    "sha256": "089fbac3099891f06bd7497de21397b8d4e39a099c8cbcdb83e68613677630a1"
+   },
+   "car_validation": {
+    "blocks": 11484,
+    "properties": 530,
+    "data_groups_validated": 1060,
+    "integrity_errors": 0,
+    "root_errors": 0,
+    "index_errors": 0,
+    "graph_errors": 0,
+    "lexicon_errors": 0,
+    "orphans_errors": 0,
+    "passed": true
+   },
+   "tables": {
+    "tables": 7,
+    "parts": 7,
+    "root": "baguqeera4fgbfvmjr7azmjfshzcumwdwgylfqy5gczqeb3a3i6seo5zoe3dq"
+   }
+  },
+  "property_cid_check": {
+   "county_properties": 1000,
+   "permit_properties": 530,
+   "permit_properties_in_county_archive": 530,
+   "missing": [],
+   "same_property_cid": true
+  },
+  "socrata_cross_check": {
+   "requests": 1000,
+   "dataset_version_now": "1792239863",
+   "capture_version": "1792239863",
+   "same_version": true,
+   "issued_through": "2026-10-16",
+   "rows_issued_after_now": 0,
+   "geo_ids": 998,
+   "equal": 998,
+   "differs": [],
+   "per_request_ms": {
+    "p50": 295,
+    "p95": 444,
+    "max": 3396
+   },
+   "elapsed_ms": 159078
+  },
+  "timings_ms": {
+   "lexicon_manifest": 336.5,
+   "verify_capture": 9900.2,
+   "appraisal_transform": 5958.6,
+   "appraisal_reconcile_export": 693,
+   "eligibility": 222.4,
+   "roll_index": 6589.2,
+   "permit_link_pass": 85993.2,
+   "permit_transform": 3338.9,
+   "assemble_groups": 5768.4,
+   "cli_county_validate": 359941.6,
+   "cli_county_hash": 17229.7,
+   "cli_county_car_validate": 10214.2,
+   "cli_county_export_tables": 1287.5,
+   "cli_property_improvement_validate": 63640.9,
+   "cli_property_improvement_hash": 8603,
+   "cli_property_improvement_car_validate": 3280.7,
+   "cli_property_improvement_export_tables": 1032.9,
+   "socrata_cross_check": 159078
+  },
+  "total_ms": 744424.1
+ },
+ "projection": {
+  "projection_version": "travis-t4-projection.v1",
+  "gate_s": 172800,
+  "sample": {
+   "run_dir": "data/travis/runs/20261017T213812Z-t4-feasibility-1000",
+   "parcels": 1000,
+   "parcels_with_permits": 530,
+   "permits_published": 4151
+  },
+  "full_scale": {
+   "rows": 2380707,
+   "linked": 1978992,
+   "linked_parcels": 232640,
+   "seed_rows": 441961
+  },
+  "scales": {
+   "per_parcel": 441.961,
+   "permits": 476.751,
+   "parcels_with_permits": 438.943,
+   "permit_group_used": 476.751
+  },
+  "stages": [
+   {
+    "stage": "socrata_harvest",
+    "basis": "measured at full scale (the whole export)",
+    "measured_s": 318.6,
+    "scale": 1,
+    "projected_s": 318.6,
+    "rate": "448354 rows/min, 274 requests"
+   },
+   {
+    "stage": "verify_capture",
+    "basis": "measured at full scale (once per run)",
+    "measured_s": 9.9,
+    "scale": 1,
+    "projected_s": 9.9,
+    "rate": null
+   },
+   {
+    "stage": "roll_index",
+    "basis": "measured at full scale (once per run)",
+    "measured_s": 6.6,
+    "scale": 1,
+    "projected_s": 6.6,
+    "rate": "4024413 rows/min"
+   },
+   {
+    "stage": "permit_link_pass",
+    "basis": "measured at full scale (once per run)",
+    "measured_s": 86,
+    "scale": 1,
+    "projected_s": 86,
+    "rate": "1661090 rows/min"
+   },
+   {
+    "stage": "appraisal_transform",
+    "basis": "measured on 1000 parcels, scaled by 441961 seed rows",
+    "measured_s": 5.96,
+    "scale": 441.961,
+    "projected_s": 2633.5,
+    "rate": "10069 parcels/min"
+   },
+   {
+    "stage": "appraisal_reconcile_export",
+    "basis": "measured on 1000 parcels, scaled by 441961 seed rows",
+    "measured_s": 0.69,
+    "scale": 441.961,
+    "projected_s": 306.3,
+    "rate": "86580 parcels/min"
+   },
+   {
+    "stage": "eligibility",
+    "basis": "measured on 1000 parcels, scaled by 441961 seed rows",
+    "measured_s": 0.22,
+    "scale": 441.961,
+    "projected_s": 98.3,
+    "rate": "269784 parcels/min"
+   },
+   {
+    "stage": "assemble_groups",
+    "basis": "measured on 1000 parcels, scaled by 441961 seed rows",
+    "measured_s": 5.77,
+    "scale": 441.961,
+    "projected_s": 2549.4,
+    "rate": "10401 parcels/min"
+   },
+   {
+    "stage": "cli_county_validate",
+    "basis": "measured on 1000 parcels, scaled by 441961 seed rows",
+    "measured_s": 359.94,
+    "scale": 441.961,
+    "projected_s": 159080.1,
+    "rate": "167 parcels/min"
+   },
+   {
+    "stage": "cli_county_hash",
+    "basis": "measured on 1000 parcels, scaled by 441961 seed rows",
+    "measured_s": 17.23,
+    "scale": 441.961,
+    "projected_s": 7614.9,
+    "rate": "3482 parcels/min"
+   },
+   {
+    "stage": "cli_county_car_validate",
+    "basis": "measured on 1000 parcels, scaled by 441961 seed rows",
+    "measured_s": 10.21,
+    "scale": 441.961,
+    "projected_s": 4514.3,
+    "rate": "5874 parcels/min"
+   },
+   {
+    "stage": "cli_county_export_tables",
+    "basis": "measured on 1000 parcels, scaled by 441961 seed rows",
+    "measured_s": 1.29,
+    "scale": 441.961,
+    "projected_s": 569,
+    "rate": "46602 parcels/min"
+   },
+   {
+    "stage": "permit_transform",
+    "basis": "measured on 4151 permits of 530 parcels, scaled by the larger of 1978992 linked permits and 232640 parcels with permits",
+    "measured_s": 3.34,
+    "scale": 476.751,
+    "projected_s": 1591.8,
+    "rate": "74593 permits/min"
+   },
+   {
+    "stage": "cli_property_improvement_validate",
+    "basis": "measured on 4151 permits of 530 parcels, scaled by the larger of 1978992 linked permits and 232640 parcels with permits",
+    "measured_s": 63.64,
+    "scale": 476.751,
+    "projected_s": 30340.8,
+    "rate": "3914 permits/min"
+   },
+   {
+    "stage": "cli_property_improvement_hash",
+    "basis": "measured on 4151 permits of 530 parcels, scaled by the larger of 1978992 linked permits and 232640 parcels with permits",
+    "measured_s": 8.6,
+    "scale": 476.751,
+    "projected_s": 4101.5,
+    "rate": "28950 permits/min"
+   },
+   {
+    "stage": "cli_property_improvement_car_validate",
+    "basis": "measured on 4151 permits of 530 parcels, scaled by the larger of 1978992 linked permits and 232640 parcels with permits",
+    "measured_s": 3.28,
+    "scale": 476.751,
+    "projected_s": 1564.1,
+    "rate": "75917 permits/min"
+   },
+   {
+    "stage": "cli_property_improvement_export_tables",
+    "basis": "measured on 4151 permits of 530 parcels, scaled by the larger of 1978992 linked permits and 232640 parcels with permits",
+    "measured_s": 1.03,
+    "scale": 476.751,
+    "projected_s": 492.4,
+    "rate": "241127 permits/min"
+   }
+  ],
+  "source_acquisition": {
+   "projected_s": 318.6,
+   "projected_h": 0.089,
+   "within_gate": true,
+   "note": "the kit's 48-hour gate is per scraped source; the Austin export is the only acquisition T4 adds (TCAD and TNR were captured in T1)"
+  },
+  "full_run": {
+   "projected_s": 215877.5,
+   "projected_h": 59.97,
+   "within_gate": false,
+   "margin_h": -11.97,
+   "mode": "every stage sequential, elephant-cli as one process per group"
+  },
+  "full_run_sharded": {
+   "groups": {
+    "county": {
+     "shards": 8,
+     "sample_parcels": 1000,
+     "measured_wall_s": 85.16,
+     "scale": 441.961,
+     "projected_s": 37636.1,
+     "projected_h": 10.45
+    },
+    "property_improvement": {
+     "shards": 8,
+     "sample_parcels": 530,
+     "measured_wall_s": 21.9,
+     "scale": 476.751,
+     "projected_s": 10439.9,
+     "projected_h": 2.9
+    }
+   },
+   "projected_s": 55676.4,
+   "projected_h": 15.47,
+   "within_gate": true,
+   "margin_h": 32.53,
+   "note": "the elephant-cli stages of each benchmarked group replaced by its measured K-shard wall time, scaled like the sequential stage; every other stage as above"
+  },
+  "slowest_stages": [
+   {
+    "stage": "cli_county_validate",
+    "projected_h": 44.19
+   },
+   {
+    "stage": "cli_property_improvement_validate",
+    "projected_h": 8.43
+   },
+   {
+    "stage": "cli_county_hash",
+    "projected_h": 2.12
+   }
+  ],
+  "assumptions": [
+   "sequential stages on the operator's machine at the measured concurrency (one Socrata request pair in flight; elephant-cli at its own default concurrency)",
+   "per-parcel and per-permit costs scale linearly; CARs are cut into the kit's 5,000-property shards, so hash, CAR validate and export-tables run per shard at the sampled per-property rate",
+   "the full run's link pass streams its rows to per-parcel files instead of holding them in memory (the write cost is in the permit transform stage, which writes the sidecar per parcel)",
+   "no upload, pin or gateway time (T6), no Query DB load (T5's Loader)"
+  ]
+ },
+ "shard_bench": [
+  {
+   "group": "county",
+   "parcels": 1000,
+   "shards": 8,
+   "wall_ms": 85157,
+   "wall_ms_per_parcel": 85.157,
+   "all_passed": true,
+   "shard_ms": [
+    84463,
+    84377,
+    84397,
+    84460,
+    84206,
+    85154,
+    84301,
+    84386
+   ]
+  },
+  {
+   "group": "property_improvement",
+   "parcels": 530,
+   "shards": 8,
+   "wall_ms": 21898,
+   "wall_ms_per_parcel": 41.317,
+   "all_passed": true,
+   "shard_ms": [
+    21898,
+    20646,
+    20852,
+    20686,
+    20683,
+    20519,
+    20852,
+    20665
+   ]
+  },
+  {
+   "group": "county",
+   "parcels": 1000,
+   "shards": 4,
+   "wall_ms": 117264,
+   "wall_ms_per_parcel": 117.264,
+   "all_passed": true,
+   "shard_ms": [
+    116964,
+    117262,
+    116975,
+    116973
+   ]
+  }
+ ],
+ "readiness_report": {
+  "overall": "PASS",
+  "seed_allowed": true,
+  "gates": {
+   "catalog_metadata": "PASS",
+   "parcel": "PASS",
+   "permit": "PASS",
+   "destination": "NOT_APPLICABLE",
+   "enrichment": "PASS"
+  }
+ },
+ "tests": "npx vitest run tests/travis-* : 26 files, 191 tests passed (kit 44bed5b)",
+ "loader_watermarks": [],
+ "loader_watermarks_note": "no Query DB load in T4 (the permits track's Loader is T5); the capture's artifact hash above is the watermark T5 starts from",
+ "tombstones_consumed": {
+  "dead": 0,
+  "invalid": 0
+ },
+ "publication": "none: the County and Property Improvement CARs and tables are local files under the run directories (T6 publishes)"
+}

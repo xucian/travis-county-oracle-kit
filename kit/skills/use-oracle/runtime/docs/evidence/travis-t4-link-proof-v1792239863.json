@@ -1,0 +1,540 @@
+{
+ "schemaVersion": "travis.t4-link-proof.v1",
+ "kind": "T4 geo_id link proof and permit profile over the whole capture v1792239863 and the whole seed (441,961 accounts); work classifier v2, tcad_id evidence v2",
+ "command": "node --max-old-space-size=12288 src/counties/travis/t4-permit-links.mjs",
+ "kit_commit": "90f8c34",
+ "resources": {
+  "wall_s": 94.04,
+  "max_rss_bytes": 2981019648
+ },
+ "link_pass_version": "travis-t4-link-pass.v1",
+ "versions": {
+  "status_group": "travis-status-group-v1",
+  "lifecycle": "travis-lifecycle-v1",
+  "work_classifier": "travis-work-classifier-v2",
+  "date_evidence": "travis-date-evidence-v1",
+  "tcad_id_normalization": "travis-tcad-id-digits-v1"
+ },
+ "as_of_date": "2026-10-17",
+ "roll": {
+  "seed_rows": 441961,
+  "blank_geo_ids": 0,
+  "non_ten_digit_geo_ids": 0,
+  "distinct_geo_ids": 431536,
+  "shared_geo_ids": 1164,
+  "accounts_on_shared_geo_ids": 11589,
+  "seed_sha256": "8b79ca01f6bad5332b0fc82122d6d3783a582815e86fd7c9dd10e400620e17f8",
+  "digits_only_proof": {
+   "normalizationVersion": "travis-tcad-id-digits-v1",
+   "checkedCount": 441961,
+   "distinctGeoIds": 431536,
+   "distinctDigits": 431536,
+   "oneToOne": true,
+   "collisions": 0
+  },
+  "digits_fallback_enabled": true
+ },
+ "rows": 2380707,
+ "by_permittype": {
+  "BP": 521351,
+  "DS": 116649,
+  "EP": 689152,
+  "MP": 506530,
+  "PP": 547025
+ },
+ "link_method": {
+  "exact": 1978992,
+  "normalized_digits": 0
+ },
+ "unlinked_reasons": {
+  "no_candidate": 259419,
+  "multiple_candidates": 38249,
+  "invalid_quarantined": 104047
+ },
+ "no_candidate_detail": {
+  "blank_tcad_id": 63019,
+  "ten_digit_not_in_roll": 196400
+ },
+ "by_permittype_link": {
+  "BP": {
+   "exact": 435019,
+   "normalized_digits": 0,
+   "no_candidate": 56959,
+   "multiple_candidates": 9060,
+   "invalid_quarantined": 20313
+  },
+  "DS": {
+   "exact": 100101,
+   "normalized_digits": 0,
+   "no_candidate": 9987,
+   "multiple_candidates": 649,
+   "invalid_quarantined": 5912
+  },
+  "EP": {
+   "exact": 570769,
+   "normalized_digits": 0,
+   "no_candidate": 78415,
+   "multiple_candidates": 10869,
+   "invalid_quarantined": 29099
+  },
+  "MP": {
+   "exact": 420694,
+   "normalized_digits": 0,
+   "no_candidate": 54405,
+   "multiple_candidates": 9639,
+   "invalid_quarantined": 21792
+  },
+  "PP": {
+   "exact": 452409,
+   "normalized_digits": 0,
+   "no_candidate": 59653,
+   "multiple_candidates": 8032,
+   "invalid_quarantined": 26931
+  }
+ },
+ "tcad_id": {
+  "confirmed_present": 2213641,
+  "unknown": 63019,
+  "invalid_quarantined": 104047
+ },
+ "tcad_id_quarantine_reasons": {
+  "williamson_cad_account_form": 103848,
+  "williamson_cad_marker": 21,
+  "digits_length_6": 153,
+  "digits_length_9": 19,
+  "digits_length_1": 1,
+  "digits_length_8": 3,
+  "non_numeric": 2
+ },
+ "evidence_states": {
+  "completed_date": {
+   "confirmed_present": 2180217,
+   "unknown": 198488,
+   "invalid_quarantined": 2002
+  },
+  "status_current": {
+   "confirmed_present": 2380693,
+   "unknown": 14
+  },
+  "tcad_id": {
+   "confirmed_present": 2213641,
+   "unknown": 63019,
+   "invalid_quarantined": 104047
+  }
+ },
+ "date_reasons": {
+  "applieddate": {
+   "valid": 2380678,
+   "blank": 29
+  },
+  "issue_date": {
+   "valid": 2380707
+  },
+  "completed_date": {
+   "valid": 2180217,
+   "blank": 198488,
+   "before_applied_date": 2002
+  },
+  "expiresdate": {
+   "valid": 2379917,
+   "blank": 790
+  },
+  "statusdate_final": {
+   "valid": 2010296,
+   "before_applied_date": 2
+  }
+ },
+ "status_current": {
+  "Final": 2010298,
+  "VOID": 153349,
+  "Expired": 169679,
+  "Withdrawn": 17795,
+  "Active": 27902,
+  "Cancelled": 675,
+  "Closed": 129,
+  "": 14,
+  "Pending": 236,
+  "Suspended": 26,
+  "Rejected": 1,
+  "Revoked": 2,
+  "Aborted": 121,
+  "Pending Permit": 61,
+  "On Hold": 70,
+  "Re Review": 55,
+  "Cancelled - Contractor Required": 126,
+  "Cancelled - New Permit Required": 9,
+  "New Permit Required": 3,
+  "Inactive Pending Revision": 94,
+  "Denied but Closed": 43,
+  "Expired - License": 13,
+  "Inactive Contractor": 3,
+  "Awaiting Upload": 1,
+  "Application Incomplete": 2
+ },
+ "status_group": {
+  "closed": 2237835,
+  "open": 28208,
+  "stalled": 114217,
+  "needs_review": 447
+ },
+ "status_group_basis": {
+  "exact_closed_status": 2182373,
+  "expired_with_confirmed_completion": 55462,
+  "exact_open_status": 28208,
+  "expired_without_confirmed_completion": 114217,
+  "unmapped_status": 433,
+  "blank_status": 14
+ },
+ "lifecycle": {
+  "completed": 2010298,
+  "other": 341754,
+  "open": 28208,
+  "needs_review": 447
+ },
+ "roof_work_class": {
+  "primary_roof_new_construction": 155327,
+  "other": 2168841,
+  "accessory_roof": 26193,
+  "primary_roof_replacement": 23290,
+  "repair_or_coating": 1321,
+  "needs_review": 5735
+ },
+ "roof_work_basis": {
+  "primary_roof_new_construction:new_building_permit_class": 113036,
+  "other:no_roof_terms": 309485,
+  "accessory_roof:accessory_terms": 26193,
+  "primary_roof_replacement:replacement_terms": 23290,
+  "repair_or_coating:repair_or_coating_terms": 1321,
+  "primary_roof_new_construction:new_building_permit_class_over_terms": 42291,
+  "needs_review:unqualified_roof_mention": 5234,
+  "needs_review:replacement_and_accessory_terms": 501,
+  "other:non_building_permit_type": 1859356
+ },
+ "roofing": {
+  "permits": 206131,
+  "linked": 166650,
+  "by_status_group": {
+   "closed": 195109,
+   "stalled": 6609,
+   "open": 4399,
+   "needs_review": 14
+  },
+  "by_class_linked": {
+   "primary_roof_new_construction": 121637,
+   "accessory_roof": 23203,
+   "primary_roof_replacement": 20660,
+   "repair_or_coating": 1150
+  },
+  "bp_rows": 521351
+ },
+ "jurisdiction_of_unlinked": {
+  "no_candidate:AUSTIN FULL PURPOSE": 211866,
+  "no_candidate:(blank)": 24897,
+  "multiple_candidates:AUSTIN FULL PURPOSE": 36441,
+  "invalid_quarantined:AUSTIN FULL PURPOSE": 88498,
+  "no_candidate:AUSTIN 2 MILE ETJ": 6038,
+  "invalid_quarantined:AUSTIN 2 MILE ETJ": 12572,
+  "no_candidate:OTHER": 1268,
+  "no_candidate:AUSTIN LTD": 10957,
+  "multiple_candidates:WEST LAKE HILLS FULL PURPOSE": 353,
+  "invalid_quarantined:AUSTIN LTD": 276,
+  "multiple_candidates:SB 2038 ETJ RELEASE": 60,
+  "multiple_candidates:AUSTIN 2 MILE ETJ": 817,
+  "no_candidate:WEST LAKE HILLS FULL PURPOSE": 519,
+  "no_candidate:LAKEWAY FULL PURPOSE": 1402,
+  "no_candidate:SB 2038 ETJ RELEASE": 221,
+  "no_candidate:LAGO VISTA ETJ": 17,
+  "no_candidate:WEST LAKE HILLS ETJ": 172,
+  "no_candidate:SUNSET VALLEY FULL PURPOSE": 29,
+  "no_candidate:BASTROP ETJ": 46,
+  "invalid_quarantined:ROUND ROCK ETJ": 2644,
+  "no_candidate:AUSTIN 5 MILE ETJ": 929,
+  "invalid_quarantined:SB 2038 ETJ RELEASE": 42,
+  "no_candidate:ROUND ROCK ETJ": 17,
+  "multiple_candidates:AUSTIN LTD": 199,
+  "multiple_candidates:THE HILLS FULL PURPOSE": 61,
+  "no_candidate:BEE CAVE FULL PURPOSE": 731,
+  "no_candidate:BEE CAVE ETJ": 128,
+  "invalid_quarantined:CEDAR PARK FULL PURPOSE": 10,
+  "multiple_candidates:LAKEWAY FULL PURPOSE": 51,
+  "no_candidate:CEDAR PARK FULL PURPOSE": 1,
+  "no_candidate:PFLUGERVILLE FULL PURPOSE": 42,
+  "no_candidate:ROLLINGWOOD FULL PURPOSE": 40,
+  "no_candidate:POINT VENTURE FULL PURPOSE": 2,
+  "multiple_candidates:(blank)": 200,
+  "no_candidate:LAKEWAY ETJ": 79,
+  "multiple_candidates:AUSTIN 5 MILE ETJ": 39,
+  "multiple_candidates:BEE CAVE FULL PURPOSE": 9,
+  "no_candidate:THE HILLS FULL PURPOSE": 11,
+  "multiple_candidates:LAKEWAY ETJ": 4,
+  "no_candidate:CREEDMOOR FULL PURPOSE": 2,
+  "multiple_candidates:BEE CAVE ETJ": 15,
+  "no_candidate:BEAR CREEK FULL PURPOSE": 1,
+  "invalid_quarantined:(blank)": 5,
+  "no_candidate:PFLUGERVILLE ETJ": 1,
+  "no_candidate:MUSTANG RIDGE ETJ": 3
+ },
+ "linked": 1978992,
+ "unlinked": 401715,
+ "linked_share": 0.8313,
+ "linked_parcels": 232640,
+ "issue_date_max": "2026-10-16",
+ "permits_per_linked_parcel": {
+  "p50": 6,
+  "p90": 13,
+  "p99": 58,
+  "max": 13418,
+  "mean": 8.51
+ },
+ "status_vocabulary": {
+  "distinct": 25,
+  "new_unmapped_values": [],
+  "needs_review_rows": 447
+ },
+ "permit_number": {
+  "distinct": 2380707,
+  "blank_rows": 0,
+  "printed_more_than_once": 0,
+  "rows_under_repeated_numbers": 0,
+  "repeated_rows_identical_to_first": 0,
+  "printed_on_differing_rows": 0
+ },
+ "williamson_cad_tcad_id": {
+  "account_form_rows": 103848,
+  "marker_rows": 21,
+  "with_coordinates": 89564,
+  "north_of_30_40": 89550,
+  "jurisdictions": {
+   "AUSTIN FULL PURPOSE": 88325,
+   "AUSTIN 2 MILE ETJ": 12572,
+   "AUSTIN LTD": 271,
+   "ROUND ROCK ETJ": 2644,
+   "SB 2038 ETJ RELEASE": 42,
+   "CEDAR PARK FULL PURPOSE": 10,
+   "(blank)": 5
+  },
+  "note": "tcad_id printed in the Williamson CAD account form (R + 6 digits) or as WCAD: another county's parcel id, invalid_quarantined, outside the Travis parcel population; north_of_30_40 counts the rows with coordinates north of latitude 30.40"
+ },
+ "ten_digit_not_in_roll": {
+  "rows": 196400,
+  "distinct_geo_ids": 6260,
+  "by_issue_decade": {
+   "1920s": {
+    "not_in_roll": 0,
+    "in_roll": 5
+   },
+   "1960s": {
+    "not_in_roll": 0,
+    "in_roll": 3
+   },
+   "1970s": {
+    "not_in_roll": 106,
+    "in_roll": 1885
+   },
+   "1980s": {
+    "not_in_roll": 15174,
+    "in_roll": 411507
+   },
+   "1990s": {
+    "not_in_roll": 13527,
+    "in_roll": 340411
+   },
+   "2000s": {
+    "not_in_roll": 32511,
+    "in_roll": 398951
+   },
+   "2010s": {
+    "not_in_roll": 74771,
+    "in_roll": 512259
+   },
+   "2020s": {
+    "not_in_roll": 60311,
+    "in_roll": 352220
+   }
+  },
+  "note": "a 10-digit tcad_id that no 2026 roll account prints (no_candidate): a geo_id retired since the permit, for example a tract later subdivided; it stays unlinked (decisions.md section 5 links on geo_id only)"
+ },
+ "needs_review_descriptions_top": [
+  {
+   "normalized_description": "REPLACE ROOFING ON EXISTING SINGLE FAMILY RESIDENCE NO OTHER CHANGES AUTHORIZED UNDER THIS PERMIT",
+   "rows": 93
+  },
+  {
+   "normalized_description": "ROOF SIDING REPAIR TO EXISTING APARTMENTS",
+   "rows": 56
+  },
+  {
+   "normalized_description": "EXPRESS INSTALLATION OF METAL ROOF",
+   "rows": 34
+  },
+  {
+   "normalized_description": "REPLACE ROOFING WITH METAL ROOF",
+   "rows": 23
+  },
+  {
+   "normalized_description": "REROOF TO EXISTING CARPORTS AT MULTI FAMILY RES",
+   "rows": 23
+  },
+  {
+   "normalized_description": "EXPRESS INSTALL METAL ROOF",
+   "rows": 21
+  },
+  {
+   "normalized_description": "EXTERIOR REPAIRS SIDING ENTRY ROOF",
+   "rows": 20
+  },
+  {
+   "normalized_description": "NON STRUCTURAL ROOF MODIFICATIONS",
+   "rows": 20
+  },
+  {
+   "normalized_description": "CONSTRUCT 8 X 16 DECK TO MANUGACTURED HOME W FLAT ROOF",
+   "rows": 17
+  },
+  {
+   "normalized_description": "CONSTRUCT 8 X 16 DECK TO MANUFACTURED HOME W FLAT ROOF",
+   "rows": 16
+  },
+  {
+   "normalized_description": "REMODEL EXIST APTS FLAT ROOF TO PITCH",
+   "rows": 15
+  },
+  {
+   "normalized_description": "CHANGE FLAT ROOF TO PITCHED",
+   "rows": 14
+  },
+  {
+   "normalized_description": "EXTERIOR SIDING TRIM REPAIRS AND ROOFING REPLACEMENT",
+   "rows": 12
+  },
+  {
+   "normalized_description": "REPLACEMENT OF ROOF",
+   "rows": 12
+  },
+  {
+   "normalized_description": "CONSTRUCT 8 X 16 DECK W FLAT ROOF TO FRONT AND 4 X 4 DECK TO BACK OF MANUFACTURED HOME ONLY",
+   "rows": 11
+  },
+  {
+   "normalized_description": "INSTALLATION OF METAL ROOF",
+   "rows": 10
+  },
+  {
+   "normalized_description": "CHANGE FROM FLAT TO PITCH ROOF",
+   "rows": 9
+  },
+  {
+   "normalized_description": "NON STRUCTURAL REROOF FOR EXISTING CARPORTS FOR EXISTING MULTI FAMILY RES APTS",
+   "rows": 9
+  },
+  {
+   "normalized_description": "REPAIR TO THE EXISTING ROOF",
+   "rows": 9
+  },
+  {
+   "normalized_description": "REPLACE ROOFING",
+   "rows": 9
+  },
+  {
+   "normalized_description": "DEMOLITION PARTIAL AT A CA 1962 BURGER STAND 2 CAR CANOPIES 1 EACH ON THE N S SIDES OF THE STRUCTURE 3 EXISTING CONCRETE",
+   "rows": 8
+  },
+  {
+   "normalized_description": "EXPRESS REMOVE EXISTING ROOFING AND INSTALL NEW TESLA SOLAR GLASS SOLAR ROOFING",
+   "rows": 8
+  },
+  {
+   "normalized_description": "REPLACEMENT OF ROOF EXISTING MULTIFAMILY",
+   "rows": 8
+  },
+  {
+   "normalized_description": "RETRO FIT NEW TPO ROOF SYSTEM OVER EXISTING ROOF SEE SYSTEM LETTER",
+   "rows": 8
+  },
+  {
+   "normalized_description": "TPO ROOF OVERLAY",
+   "rows": 8
+  },
+  {
+   "normalized_description": "ADD DECKING TO THE EXISTING ROOF",
+   "rows": 7
+  },
+  {
+   "normalized_description": "EXPRESS INSTALL METAL ROOF NOT GOING PAST DECKING",
+   "rows": 7
+  },
+  {
+   "normalized_description": "INSTALL PV SOLAR PANES ON THE ROOF TOP OF EXISTING MULTI FAMILY APARTMENTS",
+   "rows": 7
+  },
+  {
+   "normalized_description": "REPAIR EXISTING APARTMENT ROOF",
+   "rows": 7
+  },
+  {
+   "normalized_description": "REPLACE WINDOWS SIDING EXTERIOR DOORS REPAIR ROOFING REPAIR STABILIZE FOUNDATION ON EXISTING SINGLE FAMILY RESIDENCE NO ",
+   "rows": 7
+  },
+  {
+   "normalized_description": "APARTMENT RENOVATION 2 GABLES ADDED TO ROOF LINE",
+   "rows": 6
+  },
+  {
+   "normalized_description": "CONSTRUCT 8 X 16 DECK W FLAT ROOF TO FRONT AND 4 X4 DECK TO THE BACK OF MANUFACTURED HOME ONLY",
+   "rows": 6
+  },
+  {
+   "normalized_description": "EXPRESS INSTALL TESLA SOLARGLASS SOLAR ROOFING",
+   "rows": 6
+  },
+  {
+   "normalized_description": "EXTERIOR REMODEL REROOF STUCCO CROWN MOULDINGS ON CHIMINEY MODIFY STAIR AWNING REPLACE HANDRAILS SIDING",
+   "rows": 6
+  },
+  {
+   "normalized_description": "REPLACE FIXTURES REMODEL ROOF SIDING",
+   "rows": 6
+  },
+  {
+   "normalized_description": "REPLACE ROOFING AT EXISTING SFR",
+   "rows": 6
+  },
+  {
+   "normalized_description": "CHANGE FLAT ROOF TO PITCH",
+   "rows": 5
+  },
+  {
+   "normalized_description": "CHANGE OUT FLAT ROOF TO PITCH ROOF",
+   "rows": 5
+  },
+  {
+   "normalized_description": "CONTRUCT 8 X 16 DECK TO MANUFACTURED HOME W FLAT ROOF",
+   "rows": 5
+  },
+  {
+   "normalized_description": "EXPRESS INSTALL NEW TESLA SOLARGLASS SOLAR ROOFING AND ENERGY STORAGE SYSTEM TO EXISTING RESIDENCE",
+   "rows": 5
+  }
+ ],
+ "needs_review_distinct_descriptions": 4925,
+ "elapsed_ms": 87329,
+ "rows_per_minute": 1635673,
+ "capture": {
+  "dir": "data/travis/permits/v1792239863",
+  "dataset": "austin-issued-construction-permits/3syk-w9eu",
+  "rows_updated_at": {
+   "start": "1792239863",
+   "end": "1792239863",
+   "start_iso": "2026-10-17T12:24:23.000Z",
+   "end_iso": "2026-10-17T12:24:23.000Z"
+  },
+  "rows": 2380707,
+  "bytes": 1813784373
+ },
+ "seed": {
+  "path": "data/seeds/travis.csv",
+  "sha256": "8b79ca01f6bad5332b0fc82122d6d3783a582815e86fd7c9dd10e400620e17f8",
+  "rows": 441961,
+  "read_ms": 6410
+ }
+}

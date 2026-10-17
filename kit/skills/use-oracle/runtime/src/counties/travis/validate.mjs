@@ -63,9 +63,15 @@ export const TRAVIS_IDENTITY = Object.freeze({ county: "Travis", countyFips: "48
 
 /**
  * Hosts an appraisal entity's `source_http_request` may name: the TCAD export and the TNR
- * parcel layer. T4's permit entities will add `data.austintexas.gov` (the Austin permit export).
+ * parcel layer.
  */
 export const TRAVIS_APPRAISAL_SOURCE_HOSTS = Object.freeze(["traviscad.org", "gis.traviscountytx.gov"]);
+
+/**
+ * Hosts a Property Improvement group's entities may name: the appraisal hosts (the shared property, address and parcel
+ * files) plus the Austin permit export (`data.austintexas.gov`, T4).
+ */
+export const TRAVIS_PERMIT_SOURCE_HOSTS = Object.freeze([...TRAVIS_APPRAISAL_SOURCE_HOSTS, "data.austintexas.gov"]);
 
 /**
  * Fail closed unless one parcel's output is a Travis record: the seed row names Travis and FIPS

@@ -1,39 +1,365 @@
 {
-  "version": "travis-work-classifier-v1",
-  "note": "Exact-term cases seeded from the first API draft's regex tiers (commit 44c7fce) and the sampled export rows. Every case names the rule expected to fire.",
+  "version": "travis-work-classifier-v2",
+  "note": "Exact-term cases seeded from the first API draft's regex tiers (commit 44c7fce) and the sampled export rows. Every case names the rule expected to fire. v2 (T4, 2026-10-17): a New permit in a new-building class is new construction unless its text names only replacement or only repair work; the cases marked v2 are real rows of the T4 capture v1792239863.",
   "cases": [
-    {"name": "re-roof in description, filed as Repair", "permittype": "BP", "description": "RE-ROOF RESIDENCE, TEAR OFF AND REPLACE SHINGLES", "work_class": "Repair", "permit_class": "R- 435 Renovations/Remodel", "expected": "primary_roof_replacement", "basis": "replacement_terms"},
-    {"name": "reroof one word", "permittype": "BP", "description": "reroof", "work_class": "Remodel", "permit_class": "R- 435 Renovations/Remodel", "expected": "primary_roof_replacement", "basis": "replacement_terms"},
-    {"name": "re roof with slash", "permittype": "BP", "description": "re/roof existing house", "work_class": "Repair", "permit_class": "R- 435 Renovations/Remodel", "expected": "primary_roof_replacement", "basis": "replacement_terms"},
-    {"name": "roof replacement phrase", "permittype": "BP", "description": "Complete roof replacement, decking repair as needed", "work_class": "Repair", "permit_class": "R- 435 Renovations/Remodel", "expected": "primary_roof_replacement", "basis": "replacement_terms"},
-    {"name": "replace the roof", "permittype": "BP", "description": "Replace the roof on existing SFR", "work_class": "Repair", "permit_class": "R- 435 Renovations/Remodel", "expected": "primary_roof_replacement", "basis": "replacement_terms"},
-    {"name": "new roof", "permittype": "BP", "description": "New roof, metal standing seam", "work_class": "Remodel", "permit_class": "R- 435 Renovations/Remodel", "expected": "primary_roof_replacement", "basis": "replacement_terms"},
-    {"name": "sampled row 2021-015319 BP", "permittype": "BP", "description": "express: replace roof repair drywall damage replace siding and stucco as needed for roof replacement minor cosmetic framing no structural walls affected. Reroute one roof drain", "work_class": "Repair", "permit_class": "R- 435 Renovations/Remodel", "expected": "primary_roof_replacement", "basis": "replacement_terms", "note": "roof drain is an exclusion term removed first"},
-    {"name": "re-roof that also mentions solar", "permittype": "BP", "description": "Re-roof and install solar panels", "work_class": "Remodel", "permit_class": "R- 435 Renovations/Remodel", "expected": "primary_roof_replacement", "basis": "replacement_terms", "note": "first draft: a re-roof that also mentions solar still is"},
-    {"name": "new roof top unit is not a new roof", "permittype": "BP", "description": "Install new roof top unit (RTU) for HVAC", "work_class": "Remodel", "permit_class": "C-1000 Commercial Remodel", "expected": "other", "basis": "no_roof_terms"},
-    {"name": "roof repair", "permittype": "BP", "description": "Roof repair after storm damage", "work_class": "Repair", "permit_class": "R- 435 Renovations/Remodel", "expected": "repair_or_coating", "basis": "repair_or_coating_terms"},
-    {"name": "elastomeric coating", "permittype": "BP", "description": "Apply elastomeric coating to existing flat roof", "work_class": "Repair", "permit_class": "C-1000 Commercial Remodel", "expected": "repair_or_coating", "basis": "repair_or_coating_terms"},
-    {"name": "carport", "permittype": "BP", "description": "New carport attached to residence", "work_class": "Addition", "permit_class": "R- 438 Residential Garage/Carport Addn", "expected": "accessory_roof", "basis": "accessory_terms"},
-    {"name": "sampled row 2023-025460 BP porch overhang", "permittype": "BP", "description": "*Partial demo* Addition/remodel. Addition of a screened porch with roof overhang to rear of existing 1-story noncomplying SFR. Remodel/reconfigure rear portion of house into an enlarged kitchen living room and half bathroom.", "work_class": "Addition and Remodel", "permit_class": "R- 434 Addition & Alterations", "expected": "accessory_roof", "basis": "accessory_terms"},
-    {"name": "re-roof of a carport is ambiguous", "permittype": "BP", "description": "Re-roof carport", "work_class": "Repair", "permit_class": "R- 435 Renovations/Remodel", "expected": "needs_review", "basis": "replacement_and_accessory_terms"},
-    {"name": "new single family house", "permittype": "BP", "description": "New 2-story single family residence with attached garage", "work_class": "New", "permit_class": "R- 101 Single Family Houses", "expected": "primary_roof_new_construction", "basis": "new_building_permit_class"},
-    {"name": "new SFR mentioning its metal roof", "permittype": "BP", "description": "New SFR, standing seam metal roof", "work_class": "New", "permit_class": "R- 101 Single Family Houses", "expected": "primary_roof_new_construction", "basis": "new_building_permit_class"},
-    {"name": "new commercial office building", "permittype": "BP", "description": "New three story office building", "work_class": "New", "permit_class": "C- 324 Office, Bank & Professional Bldgs", "expected": "primary_roof_new_construction", "basis": "new_building_permit_class"},
-    {"name": "new work class on a remodel class is not new construction", "permittype": "BP", "description": "Interior finish out", "work_class": "New", "permit_class": "C-1001 Commercial Finish Out", "expected": "other", "basis": "no_roof_terms"},
-    {"name": "shell building", "permittype": "BP", "description": "Shell building, future tenant finish out", "work_class": "Shell", "permit_class": "C- 327 Stores & Customer Services", "expected": "other", "basis": "no_roof_terms"},
-    {"name": "bare roof mention inside a remodel", "permittype": "BP", "description": "Kitchen remodel, replace windows, paint roof trim", "work_class": "Remodel", "permit_class": "R- 435 Renovations/Remodel", "expected": "needs_review", "basis": "unqualified_roof_mention"},
-    {"name": "severe roof damage without a work term", "permittype": "BP", "description": "Severe roof damage, assess structure", "work_class": "Repair", "permit_class": "R- 435 Renovations/Remodel", "expected": "needs_review", "basis": "unqualified_roof_mention", "note": "the first draft's leading word boundary kept severe roof out of the re roof tier; here it stays ambiguous"},
-    {"name": "entire roof without a work term", "permittype": "BP", "description": "entire roof", "work_class": "Repair", "permit_class": "R- 435 Renovations/Remodel", "expected": "needs_review", "basis": "unqualified_roof_mention"},
-    {"name": "waterproofing is not roofing", "permittype": "BP", "description": "Below-grade waterproofing of foundation", "work_class": "Repair", "permit_class": "C-1000 Commercial Remodel", "expected": "other", "basis": "no_roof_terms"},
-    {"name": "solar on roof is not roofing", "permittype": "BP", "description": "Roof mounted solar photovoltaic system", "work_class": "Remodel", "permit_class": "R- 435 Renovations/Remodel", "expected": "other", "basis": "no_roof_terms"},
-    {"name": "roof deck access is not roofing", "permittype": "BP", "description": "New roof deck with roof access hatch", "work_class": "Addition", "permit_class": "C-1000 Commercial Remodel", "expected": "other", "basis": "no_roof_terms"},
-    {"name": "electrical permit mentioning reroof", "permittype": "EP", "description": "Electrical for reroof", "work_class": "Repair", "permit_class": "Residential", "expected": "other", "basis": "non_building_permit_type"},
-    {"name": "mechanical permit", "permittype": "MP", "description": "Replace roof top unit", "work_class": "Repair", "permit_class": "Commercial", "expected": "other", "basis": "non_building_permit_type"},
-    {"name": "driveway permit", "permittype": "DS", "description": "New driveway approach", "work_class": "New", "permit_class": null, "expected": "other", "basis": "non_building_permit_type"},
-    {"name": "blank permit type", "permittype": "", "description": "Re-roof", "work_class": "Repair", "permit_class": "R- 435 Renovations/Remodel", "expected": "other", "basis": "blank_permit_type"},
-    {"name": "demolition", "permittype": "BP", "description": "Total demolition of single family residence", "work_class": "Demolition", "permit_class": "R- 645 Demolition One Family Homes", "expected": "other", "basis": "no_roof_terms"},
-    {"name": "blank description blank classes", "permittype": "BP", "description": null, "work_class": null, "permit_class": null, "expected": "other", "basis": "no_roof_terms"},
-    {"name": "garage roof replacement", "permittype": "BP", "description": "Replace roof on detached garage", "work_class": "Repair", "permit_class": "R- 435 Renovations/Remodel", "expected": "needs_review", "basis": "replacement_and_accessory_terms", "note": "replace roof plus garage roof: whether the primary roof is included needs review"},
-    {"name": "accessory use permit class with a gazebo", "permittype": "BP", "description": "Gazebo in rear yard", "work_class": "New", "permit_class": "R- 330  Accessory Use to Primary", "expected": "accessory_roof", "basis": "accessory_terms"}
+    {
+      "name": "re-roof in description, filed as Repair",
+      "permittype": "BP",
+      "description": "RE-ROOF RESIDENCE, TEAR OFF AND REPLACE SHINGLES",
+      "work_class": "Repair",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "primary_roof_replacement",
+      "basis": "replacement_terms"
+    },
+    {
+      "name": "reroof one word",
+      "permittype": "BP",
+      "description": "reroof",
+      "work_class": "Remodel",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "primary_roof_replacement",
+      "basis": "replacement_terms"
+    },
+    {
+      "name": "re roof with slash",
+      "permittype": "BP",
+      "description": "re/roof existing house",
+      "work_class": "Repair",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "primary_roof_replacement",
+      "basis": "replacement_terms"
+    },
+    {
+      "name": "roof replacement phrase",
+      "permittype": "BP",
+      "description": "Complete roof replacement, decking repair as needed",
+      "work_class": "Repair",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "primary_roof_replacement",
+      "basis": "replacement_terms"
+    },
+    {
+      "name": "replace the roof",
+      "permittype": "BP",
+      "description": "Replace the roof on existing SFR",
+      "work_class": "Repair",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "primary_roof_replacement",
+      "basis": "replacement_terms"
+    },
+    {
+      "name": "new roof",
+      "permittype": "BP",
+      "description": "New roof, metal standing seam",
+      "work_class": "Remodel",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "primary_roof_replacement",
+      "basis": "replacement_terms"
+    },
+    {
+      "name": "sampled row 2021-015319 BP",
+      "permittype": "BP",
+      "description": "express: replace roof repair drywall damage replace siding and stucco as needed for roof replacement minor cosmetic framing no structural walls affected. Reroute one roof drain",
+      "work_class": "Repair",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "primary_roof_replacement",
+      "basis": "replacement_terms",
+      "note": "roof drain is an exclusion term removed first"
+    },
+    {
+      "name": "re-roof that also mentions solar",
+      "permittype": "BP",
+      "description": "Re-roof and install solar panels",
+      "work_class": "Remodel",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "primary_roof_replacement",
+      "basis": "replacement_terms",
+      "note": "first draft: a re-roof that also mentions solar still is"
+    },
+    {
+      "name": "new roof top unit is not a new roof",
+      "permittype": "BP",
+      "description": "Install new roof top unit (RTU) for HVAC",
+      "work_class": "Remodel",
+      "permit_class": "C-1000 Commercial Remodel",
+      "expected": "other",
+      "basis": "no_roof_terms"
+    },
+    {
+      "name": "roof repair",
+      "permittype": "BP",
+      "description": "Roof repair after storm damage",
+      "work_class": "Repair",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "repair_or_coating",
+      "basis": "repair_or_coating_terms"
+    },
+    {
+      "name": "elastomeric coating",
+      "permittype": "BP",
+      "description": "Apply elastomeric coating to existing flat roof",
+      "work_class": "Repair",
+      "permit_class": "C-1000 Commercial Remodel",
+      "expected": "repair_or_coating",
+      "basis": "repair_or_coating_terms"
+    },
+    {
+      "name": "carport",
+      "permittype": "BP",
+      "description": "New carport attached to residence",
+      "work_class": "Addition",
+      "permit_class": "R- 438 Residential Garage/Carport Addn",
+      "expected": "accessory_roof",
+      "basis": "accessory_terms"
+    },
+    {
+      "name": "sampled row 2023-025460 BP porch overhang",
+      "permittype": "BP",
+      "description": "*Partial demo* Addition/remodel. Addition of a screened porch with roof overhang to rear of existing 1-story noncomplying SFR. Remodel/reconfigure rear portion of house into an enlarged kitchen living room and half bathroom.",
+      "work_class": "Addition and Remodel",
+      "permit_class": "R- 434 Addition & Alterations",
+      "expected": "accessory_roof",
+      "basis": "accessory_terms"
+    },
+    {
+      "name": "re-roof of a carport is ambiguous",
+      "permittype": "BP",
+      "description": "Re-roof carport",
+      "work_class": "Repair",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "needs_review",
+      "basis": "replacement_and_accessory_terms"
+    },
+    {
+      "name": "new single family house",
+      "permittype": "BP",
+      "description": "New 2-story single family residence with attached garage",
+      "work_class": "New",
+      "permit_class": "R- 101 Single Family Houses",
+      "expected": "primary_roof_new_construction",
+      "basis": "new_building_permit_class"
+    },
+    {
+      "name": "new SFR mentioning its metal roof",
+      "permittype": "BP",
+      "description": "New SFR, standing seam metal roof",
+      "work_class": "New",
+      "permit_class": "R- 101 Single Family Houses",
+      "expected": "primary_roof_new_construction",
+      "basis": "new_building_permit_class"
+    },
+    {
+      "name": "new commercial office building",
+      "permittype": "BP",
+      "description": "New three story office building",
+      "work_class": "New",
+      "permit_class": "C- 324 Office, Bank & Professional Bldgs",
+      "expected": "primary_roof_new_construction",
+      "basis": "new_building_permit_class"
+    },
+    {
+      "name": "new work class on a remodel class is not new construction",
+      "permittype": "BP",
+      "description": "Interior finish out",
+      "work_class": "New",
+      "permit_class": "C-1001 Commercial Finish Out",
+      "expected": "other",
+      "basis": "no_roof_terms"
+    },
+    {
+      "name": "shell building",
+      "permittype": "BP",
+      "description": "Shell building, future tenant finish out",
+      "work_class": "Shell",
+      "permit_class": "C- 327 Stores & Customer Services",
+      "expected": "other",
+      "basis": "no_roof_terms"
+    },
+    {
+      "name": "bare roof mention inside a remodel",
+      "permittype": "BP",
+      "description": "Kitchen remodel, replace windows, paint roof trim",
+      "work_class": "Remodel",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "needs_review",
+      "basis": "unqualified_roof_mention"
+    },
+    {
+      "name": "severe roof damage without a work term",
+      "permittype": "BP",
+      "description": "Severe roof damage, assess structure",
+      "work_class": "Repair",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "needs_review",
+      "basis": "unqualified_roof_mention",
+      "note": "the first draft's leading word boundary kept severe roof out of the re roof tier; here it stays ambiguous"
+    },
+    {
+      "name": "entire roof without a work term",
+      "permittype": "BP",
+      "description": "entire roof",
+      "work_class": "Repair",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "needs_review",
+      "basis": "unqualified_roof_mention"
+    },
+    {
+      "name": "waterproofing is not roofing",
+      "permittype": "BP",
+      "description": "Below-grade waterproofing of foundation",
+      "work_class": "Repair",
+      "permit_class": "C-1000 Commercial Remodel",
+      "expected": "other",
+      "basis": "no_roof_terms"
+    },
+    {
+      "name": "solar on roof is not roofing",
+      "permittype": "BP",
+      "description": "Roof mounted solar photovoltaic system",
+      "work_class": "Remodel",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "other",
+      "basis": "no_roof_terms"
+    },
+    {
+      "name": "roof deck access is not roofing",
+      "permittype": "BP",
+      "description": "New roof deck with roof access hatch",
+      "work_class": "Addition",
+      "permit_class": "C-1000 Commercial Remodel",
+      "expected": "other",
+      "basis": "no_roof_terms"
+    },
+    {
+      "name": "electrical permit mentioning reroof",
+      "permittype": "EP",
+      "description": "Electrical for reroof",
+      "work_class": "Repair",
+      "permit_class": "Residential",
+      "expected": "other",
+      "basis": "non_building_permit_type"
+    },
+    {
+      "name": "mechanical permit",
+      "permittype": "MP",
+      "description": "Replace roof top unit",
+      "work_class": "Repair",
+      "permit_class": "Commercial",
+      "expected": "other",
+      "basis": "non_building_permit_type"
+    },
+    {
+      "name": "driveway permit",
+      "permittype": "DS",
+      "description": "New driveway approach",
+      "work_class": "New",
+      "permit_class": null,
+      "expected": "other",
+      "basis": "non_building_permit_type"
+    },
+    {
+      "name": "blank permit type",
+      "permittype": "",
+      "description": "Re-roof",
+      "work_class": "Repair",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "other",
+      "basis": "blank_permit_type"
+    },
+    {
+      "name": "demolition",
+      "permittype": "BP",
+      "description": "Total demolition of single family residence",
+      "work_class": "Demolition",
+      "permit_class": "R- 645 Demolition One Family Homes",
+      "expected": "other",
+      "basis": "no_roof_terms"
+    },
+    {
+      "name": "blank description blank classes",
+      "permittype": "BP",
+      "description": null,
+      "work_class": null,
+      "permit_class": null,
+      "expected": "other",
+      "basis": "no_roof_terms"
+    },
+    {
+      "name": "garage roof replacement",
+      "permittype": "BP",
+      "description": "Replace roof on detached garage",
+      "work_class": "Repair",
+      "permit_class": "R- 435 Renovations/Remodel",
+      "expected": "needs_review",
+      "basis": "replacement_and_accessory_terms",
+      "note": "replace roof plus garage roof: whether the primary roof is included needs review"
+    },
+    {
+      "name": "accessory use permit class with a gazebo",
+      "permittype": "BP",
+      "description": "Gazebo in rear yard",
+      "work_class": "New",
+      "permit_class": "R- 330  Accessory Use to Primary",
+      "expected": "accessory_roof",
+      "basis": "accessory_terms"
+    },
+    {
+      "name": "v2: sampled row 2013-084591 BP new residence with covered porch",
+      "permittype": "BP",
+      "description": "New 1-story single-family residence attached garage covered porch",
+      "work_class": "New",
+      "permit_class": "R- 101 Single Family Houses",
+      "expected": "primary_roof_new_construction",
+      "basis": "new_building_permit_class_over_terms",
+      "note": "v1 read accessory_roof (COVERED PORCH); 42,287 new buildings of the T4 capture changed this way"
+    },
+    {
+      "name": "v2: new residence with a negated carport",
+      "permittype": "BP",
+      "description": "One Stry Frm Res W/No Gar Or Carport",
+      "work_class": "New",
+      "permit_class": "R- 101 Single Family Houses",
+      "expected": "primary_roof_new_construction",
+      "basis": "new_building_permit_class_over_terms"
+    },
+    {
+      "name": "v2: new residence with attached carport and a shingle roof",
+      "permittype": "BP",
+      "description": "A 2150 Sq. Ft. new Single Family residence asphalt shingle roof and stucco siding.  One Covered Carport.",
+      "work_class": "New",
+      "permit_class": "R- 101 Single Family Houses",
+      "expected": "primary_roof_new_construction",
+      "basis": "new_building_permit_class_over_terms",
+      "note": "v1 read needs_review (SHINGLE with CARPORT)"
+    },
+    {
+      "name": "v2: a legacy re-roof coded New stays a re-roof",
+      "permittype": "BP",
+      "description": "Re-Roof And Repair Residence",
+      "work_class": "New",
+      "permit_class": "R- 101 Single Family Houses",
+      "expected": "primary_roof_replacement",
+      "basis": "replacement_terms",
+      "note": "56 rows of the T4 capture"
+    },
+    {
+      "name": "v2: a roof repair of an existing building coded New stays a repair",
+      "permittype": "BP",
+      "description": "Repair Roof On Exist Comm Bldg",
+      "work_class": "New",
+      "permit_class": "C- 324 Office, Bank & Professional Bldgs",
+      "expected": "repair_or_coating",
+      "basis": "repair_or_coating_terms",
+      "note": "6 rows of the T4 capture"
+    },
+    {
+      "name": "v2: a carport addition outside the new-building classes stays accessory",
+      "permittype": "BP",
+      "description": "Three Stry Frm Res With Att Carport",
+      "work_class": "Addition",
+      "permit_class": "R- 438 Residential Garage/Carport Addn",
+      "expected": "accessory_roof",
+      "basis": "accessory_terms"
+    }
   ]
 }
