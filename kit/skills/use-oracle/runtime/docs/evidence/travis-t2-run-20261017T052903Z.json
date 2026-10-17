@@ -309,7 +309,33 @@
  "groups": {},
  "manifest_cid": null,
  "atlas": null,
- "cars": [],
+ "cars": [
+  {
+   "root_cid": "baguqeerazdphhog7enai336delytrqvopdyqw6ouybi4o6qjm2gd43t3a5oq",
+   "group": "county",
+   "kind": "archive",
+   "schema_cid": "bafkreigyrx3yshn4zudxhpcsxd7ylza4ltga3unddqrqjftndl7dptr7ki",
+   "block_count": 546,
+   "car_validation": {
+    "blocks": 546,
+    "properties": 25,
+    "data_groups_validated": 50,
+    "integrity_errors": 0,
+    "root_errors": 0,
+    "index_errors": 0,
+    "graph_errors": 0,
+    "lexicon_errors": 0,
+    "orphans_errors": 0,
+    "result": "CAR passed every check"
+   },
+   "path": "data/travis/runs/20261017T052903Z-pilot/validate/travis-county.car (git-ignored)",
+   "size": 198551,
+   "sha256": "153286f26e019465a970e7c8fdc9a4b16a93ea766c7677773dcd8d2d5e723640",
+   "readback_url": null,
+   "hash_csv_rows": 50,
+   "hashed_zips": 25
+  }
+ ],
  "gateway_checks": [],
  "timings": {
   "unit": "s",
@@ -343,7 +369,10 @@
      "p95": 3.6
     }
    }
-  }
+  },
+  "hash": 1.65,
+  "car_validate": 17.62,
+  "export_tables_failed_after": 0.89
  },
  "cli_commit": "44bb182 (@elephant-xyz/cli 1.58.1, project-local)",
  "lexicon_manifest_url": "http://127.0.0.1:8790/api/manifest (local, amended; official: https://lexicon.elephant.xyz/api/manifest)",
@@ -619,5 +648,15 @@
    "bafkreial73icc2ozqfx2uxemlku6y64rqdwtzc55fexca5izb5brbgro6m",
    "bafkreigyrx3yshn4zudxhpcsxd7ylza4ltga3unddqrqjftndl7dptr7ki"
   ]
- }
+ },
+ "tables": {
+  "status": "blocked",
+  "command": "elephant-cli export-tables travis-county.car --output ./travis-county-tables --part-size 128m --output-json travis-county-tables-export.json --atlas-page ./atlas-page/counties/TX/travis.json --county travis --state TX --fips 48453",
+  "error": "Failed to export tables: table property_seed has two schemas in this car: relationship property_seed and bafkreifeyjufurzvdpoanqk43o55fpa534nczvzutd6qq3j6gka7ixbkxi",
+  "cause": "export-tables names a relationship table by its key and a class table by the class title; the Seed group's relationship key property_seed equals the property_seed class title, and the CLI refuses two schemas under one table name (check present since #249; 44bb182 is elephant-cli main HEAD; no open fix)",
+  "evidence": "docs/evidence/travis-t2-seed-root-tables-check-20261017.json"
+ },
+ "blockers": [
+  "export-tables cannot export an archive whose Seed root carries the property_seed relationship (decision 16); see tables.cause and the seed-root check evidence"
+ ]
 }

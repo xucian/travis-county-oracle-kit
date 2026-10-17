@@ -1,0 +1,53 @@
+{
+ "schemaVersion": "travis.t2-seed-root-tables-check.v1",
+ "checked_at": "2026-10-17T05:35:32Z",
+ "question": "why export-tables fails on the T2 archive, and what Seed root shape the current CLI exports",
+ "cli": "@elephant-xyz/cli 1.58.1 at 44bb182 (elephant-cli main HEAD, 2026-09-25)",
+ "failure": {
+  "run": "20261017T052903Z (amended lexicon a0c05c5-plus-travis)",
+  "error": "table property_seed has two schemas in this car: relationship property_seed and bafkreifeyjufurzvdpoanqk43o55fpa534nczvzutd6qq3j6gka7ixbkxi",
+  "cause": "services/tables-export.service.js writes a relationship table named by the data-group relationship key and a class table named by snake(class title); the official Seed group (live CID bafkreibhurph..., keys address_has_parcel and property_seed) names the property_seed -> unnormalized_address relationship 'property_seed', the same name as the property_seed class table. The check has existed since the command was added (#249)."
+ },
+ "published_precedent": {
+  "atlas_page": "elephant-xyz/atlas counties/FL/jackson.json (group county, schema = live County bafkreia6tj..., tables baguqeerau5coz...)",
+  "tables_in_index": [
+   "address",
+   "address_has_parcel",
+   "parcel",
+   "properties",
+   "property",
+   "property_has_address"
+  ],
+  "reading": "the only published county archive with tables carries a Seed root with address_has_parcel only (no property_seed relationship, no property_seed or unnormalized_address table)"
+ },
+ "scratch_check": {
+  "input": "the 20261016T215528Z pilot output (25 parcels, live-lexicon roots) copied to the scratchpad; in each Seed root the property_seed relationship removed, and property_seed.json, unnormalized_address.json and their relationship file deleted",
+  "validate_live_lexicon": "Properties processed: 25, succeeded: 25, failed: 0 (official live manifest; no amended lexicon)",
+  "car": {
+   "root": "baguqeerahe3ecgiyigcgdg6gmxqsmc5ylzlucf4kb3n5xcqi5tvtiebpv2ta",
+   "blocks": 471,
+   "properties": 25,
+   "data_groups_validated": 50,
+   "integrity_errors": 0,
+   "root_errors": 0,
+   "index_errors": 0,
+   "graph_errors": 0,
+   "lexicon_errors": 0,
+   "orphans_errors": 0,
+   "sha256": "62456f387fd6b25466c63ba6f8b4bbf2020c2b1fa963f71a82b3541bf8a1ebc6"
+  },
+  "export_tables": {
+   "root": "baguqeeram5hefoyihxelublnx3hzdmbdxg5gavyukspzevkwnii7b5zexipq",
+   "tables": 23,
+   "parts": 23,
+   "rows": 444,
+   "part_size_bytes": 134217728,
+   "tables_car_sha256": "d2aaf5fc2bbfdcf2f115c89b93bd2fc976a924b50a16e2dbff2b5ec4a3e960c9"
+  },
+  "status": "scratch only; nothing kept under data/, nothing uploaded"
+ },
+ "options_for_the_operator": [
+  "A: keep decision 16 (full Seed root with property_seed and unnormalized_address): needs the amended lexicon for county_jurisdiction, and export-tables needs an elephant-cli fix (e.g. relationship tables named apart from class tables) before tables exist",
+  "B: Seed root with address_has_parcel only (the Jackson shape): validates against the official live lexicon (no amendment, no deviation, Atlas PR possible), the CAR passes all six checks and export-tables writes the tables; the archive no longer carries property_seed.parcel_id (same value as parcel.parcel_identifier) or unnormalized_address (county_jurisdiction Travis, full_address = address.unnormalized_address); changes decision 16 and every property CID"
+ ]
+}

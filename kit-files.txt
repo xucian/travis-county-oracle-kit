@@ -20,6 +20,7 @@ skills/use-oracle/runtime/docs/evidence/travis-t2-lexicon-reproduction-20261016.
 skills/use-oracle/runtime/docs/evidence/travis-t2-pilot-attempt1-20261016T214212Z.json
 skills/use-oracle/runtime/docs/evidence/travis-t2-run-20261016T215528Z.json
 skills/use-oracle/runtime/docs/evidence/travis-t2-run-20261017T052903Z.json
+skills/use-oracle/runtime/docs/evidence/travis-t2-seed-root-tables-check-20261017.json
 skills/use-oracle/runtime/docs/evidence/travis-t2-smoke-20261016T214105Z.json
 skills/use-oracle/runtime/docs/evidence/travis-tcad-downloads-2026-10-16.jsonl
 skills/use-oracle/runtime/docs/evidence/travis-tcad-prop-counts-2026-10-16.json
