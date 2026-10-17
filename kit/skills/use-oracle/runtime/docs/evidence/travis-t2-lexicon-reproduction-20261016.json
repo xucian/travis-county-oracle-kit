@@ -1,0 +1,374 @@
+{
+ "schemaVersion": "travis.t2-lexicon-reproduction.v1",
+ "checked_at": "2026-10-17T05:23:40Z",
+ "live_manifest": {
+  "url": "https://lexicon.elephant.xyz/api/manifest",
+  "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+  "entries": 159
+ },
+ "fork": {
+  "repository": "/Users/luti/dev/lexicon (built from a scratch clone; the fork was not modified)",
+  "branch": "add-travis-county",
+  "commit": "96224d6",
+  "travis_change": "04943fc adds \"Travis\" after \"Ellis\" to unnormalized_address.county_jurisdiction and address.county_name in src/data/lexicon.json; 96224d6 rebuilds the Model composition only"
+ },
+ "method": {
+  "generator": "the repository's own vite-plugins/json-schema-generator (generateJSONSchemaForClass, generateJSONSchemaForRelationship, generateJSONSchemaForDataGroup) and json-canonicalize, run on src/data/lexicon.json",
+  "publish_order": "the repository's former publisher (75979e7^, ipfs-uploader.ts): classes and <class>_example, then relationships with the class CIDs and relationship_<type>_example, then data groups with the relationship CIDs and <group>_example",
+  "cid": "CIDv1, raw codec, sha2-256 of the canonical UTF-8 bytes (Pinata pinFileToIPFS with cidVersion 1 stores a single-chunk file as a raw leaf); computed locally, nothing uploaded",
+  "script": "src/counties/travis/lexicon-reproduce.ts, run inside a lexicon clone as .t2-repro/reproduce.ts with npx vite-node",
+  "older_commits": "at a0c05c5 and 3c71c77 the two relationship and data-group generator functions are not exported; the scratch clone adds `export` to them (no logic change) before running"
+ },
+ "method_proof": {
+  "commit": "a0c05c5 (2026-09-17, #177; lexicon.json identical at 3c71c77)",
+  "identical": 159,
+  "different": [],
+  "missing_from_build": [],
+  "extra_in_build": [],
+  "result": "the live catalog is reproduced exactly (159 of 159)"
+ },
+ "fork_as_is": {
+  "commit": "96224d6",
+  "identical": 131,
+  "different": [
+   {
+    "name": "unnormalized_address",
+    "live": "bafkreibrfkgavsypoiw5mzvaysuzjd62qaccvvnkbbhgcrtp2othnryhbm",
+    "fork": "bafkreihge2trlc7xpplqlidrk6k45c77ok5sp7ioudo2yptgrpgynssxia",
+    "cause": "Travis enum (fork)"
+   },
+   {
+    "name": "address",
+    "live": "bafkreiebzvyy6prnwf3dcippii7yysrjesnbxpvcpyqmbs2b67hm2taf2a",
+    "fork": "bafkreief6khxtvmcjt6fj6cjavwfwmalofy2dporb5u3nynfrbqxtl4jua",
+    "cause": "Travis enum (fork)"
+   },
+   {
+    "name": "relationship",
+    "live": "bafkreib63dkacof6jotniahlqqrbbvlb3axqbt722qqlqt7f5kybelzvvi",
+    "fork": "bafkreih5jgle4a4y3g7lgh3tpxxkmd4z44was5spqkxlepeuocebagc73u",
+    "cause": "upstream main after the live publication"
+   },
+   {
+    "name": "property_seed_to_unnormalized_address",
+    "live": "bafkreiaq3bf5s2v3yc2dojcxq2seu7au3rc5s67wqbmplod2saccpcuzbu",
+    "fork": "bafkreifbo3pq4vs7wbm2f63xvtbihby3a7lzzwo4y3y3j63gjqxi3t4h6a",
+    "cause": "Travis enum (fork)"
+   },
+   {
+    "name": "address_to_parcel",
+    "live": "bafkreieap27nt53dp332uf6fisvuhvnzbx4mvpddu2btii7p4wjclu5v4m",
+    "fork": "bafkreieiaxup7iruiilf2eop2tbpkuhhlj3zfxokblrdp7yftqox2jpke4",
+    "cause": "Travis enum (fork)"
+   },
+   {
+    "name": "property_to_address",
+    "live": "bafkreieb53fv3pv2bsifxyefuw3flkxxzg35dimaoubd35pe3n5bzdlosy",
+    "fork": "bafkreiemfq5o6vvihz7mguqpphmehjldmobmilasxbuhqlxmjvomvravla",
+    "cause": "Travis enum (fork)"
+   },
+   {
+    "name": "person_to_address",
+    "live": "bafkreihbn54qb2zxjg2egbvcty6m65rk36luxz4r553v22h3wxl6am5wki",
+    "fork": "bafkreid5ll5qz56ctv67dhqtp2reld67jgfq4w4ocdz24ep4xzt4xdl2sm",
+    "cause": "Travis enum (fork)"
+   },
+   {
+    "name": "company_to_address",
+    "live": "bafkreia5hrpc4zgp5tv2vpvaj7l3qbrig57hzirkrl6bejfdcyiu43defe",
+    "fork": "bafkreifch7rv6zh2yrtu5asxhcpgzqzsilqsef6ufg4y373elsoq2xstvu",
+    "cause": "Travis enum (fork)"
+   },
+   {
+    "name": "address_to_fact_sheet",
+    "live": "bafkreicdoqppf2no5ohfylgsvowab2q37djgyplj4egxe4az4tlbrjh4sa",
+    "fork": "bafkreiclmj36qvuhgymgbaw6kjsmc2v4buvoajzearnhfl6xr76p25gwne",
+    "cause": "Travis enum (fork)"
+   },
+   {
+    "name": "address_to_geometry",
+    "live": "bafkreigbrpoyl33mogccs4lpg2oj75sophfm56ag5ny5i4pf7nxys437ja",
+    "fork": "bafkreieagkpoink5zcp2uzj2nczbujrobxzxbylrfvnmchzvhuu3xvg5su",
+    "cause": "Travis enum (fork)"
+   },
+   {
+    "name": "property_improvement_to_address",
+    "live": "bafkreieuk2qcgcx6k5twxdfz66qrag6zr6wv3yy5xbdsfpb47on37bsf5q",
+    "fork": "bafkreiblie5gvh6qs5aoadq6k6kwaz57qtxeyvbc5ovqgdaarb7bciewsm",
+    "cause": "Travis enum (fork)"
+   },
+   {
+    "name": "business_location_to_address",
+    "live": "bafkreiekimw2hzd4zv6mloquspvyw57nmp4bd3kmhfv5jxktbavwmc4rry",
+    "fork": "bafkreicdss6bzfob7aumgmpjznlfi7slaqsohg5p74z5skeo6qatrquzn4",
+    "cause": "Travis enum (fork)"
+   },
+   {
+    "name": "Seed",
+    "live": "bafkreibhurphpjdq33ysit57jtzmdldgngepsdbsw4vm7esawth2ezgaxu",
+    "fork": "bafkreifpq2eednclcrgjqlapighkj6iniegnkk4bklhpksfa6rocbjrg5i",
+    "cause": "Travis enum (fork)"
+   },
+   {
+    "name": "County",
+    "live": "bafkreia6tjziby3upxmidymud5iusd32urrztslgrudkwysc7ydmxoekuq",
+    "fork": "bafkreifkizjpfwrr5htf6yogv2ru6sgxmzkf2pvdnmtctoej2su6q7fdn4",
+    "cause": "Travis enum (fork)"
+   },
+   {
+    "name": "Photo",
+    "live": "bafkreia4sqauj3tfjvou6mp3werbj3muupulav2doiqhdietoywm7qropu",
+    "fork": "bafkreic4ag26p5pg5k4afemmq377ve6y4vtyc2dpgayzmv4ndiagukgwhu",
+    "cause": "upstream main after the live publication"
+   },
+   {
+    "name": "Photo_Metadata",
+    "live": "bafkreigtcflcvntcdjibiv3wot64sr6r2b7b37si7yekqy26aqkdf6zgxy",
+    "fork": "bafkreidgym7s2gjfbib7qaadak7j43bnuoqkd2ygah3zamqy6c3mlzl4v4",
+    "cause": "upstream main after the live publication"
+   },
+   {
+    "name": "HOA_",
+    "live": "bafkreihsoqxuhq7nbsunxovvfbhymskrkksfa2q5be325t6mwrbnedrxo4",
+    "fork": "bafkreianbcmgjim7vrw6sxu4bqhwnjj3knp3mcfojvzwebv5sntndyim6y",
+    "cause": "upstream main after the live publication"
+   },
+   {
+    "name": "Property_Management",
+    "live": "bafkreigqszh64fy5ra7lrkjytsaefr5iauv36fta2vkscniom4echf2v4y",
+    "fork": "bafkreiewd36u4kt4hlk6nnlnqep6zjs34y4amrku2pbs7f3bgimnju6wee",
+    "cause": "upstream main after the live publication"
+   },
+   {
+    "name": "Mortgage",
+    "live": "bafkreidopm3ydngeogo7kn32nx7khpp3cjhjy5ujttipnfyj5rljcrl63y",
+    "fork": "bafkreifj3uai3vvunwjpztov2ynwk4uier3bzqgd7pynxkwang4dlxb2cm",
+    "cause": "upstream main after the live publication"
+   },
+   {
+    "name": "Property_Ranking",
+    "live": "bafkreig7yj6eisui5x52jinr6kymfq7rewafjrugzqyumf2xprkhcy4w7u",
+    "fork": "bafkreiex3dk6m33qrwhp4375s3drydvc54gei43hvpiueklzsnm3dypd2e",
+    "cause": "upstream main after the live publication"
+   },
+   {
+    "name": "Property_Improvement",
+    "live": "bafkreicyzywzwhmguojpi2otgrwsyi37le3u4lnavljbxu76cnrudxaxfu",
+    "fork": "bafkreicae5w3dqp5lefi5wd3vjkjzdtqq3zofrzpqyj45xbvvsz5hvxzla",
+    "cause": "Travis enum (fork)"
+   },
+   {
+    "name": "Environment_Characteristics",
+    "live": "bafkreidohs5fvgl4nopux7drdir2cli2rijpoke4gdh5pqkldv5wq3q5d4",
+    "fork": "bafkreigdchrygtzfmxemfmpvgnahfcwq3j3yzyc5caucrxxt7kwwnwqusq",
+    "cause": "upstream main after the live publication"
+   },
+   {
+    "name": "Safety_and_Security",
+    "live": "bafkreiaxtodlbqo5cmrmht52v7ctgkkeeldbkdtvjoi5kt6pw4xzvmfdmi",
+    "fork": "bafkreih4gqhnjqoo3mhigocf5dvid7fwo2sjv23iwyclgydeeuso7ii5g4",
+    "cause": "upstream main after the live publication"
+   },
+   {
+    "name": "Transportation_and_Access",
+    "live": "bafkreihjkthcax5srw7w5udmjuuchrctnfeb7n2b54uykkswxuo2hwi4t4",
+    "fork": "bafkreihmctwtzkyixg3o3v3e6abn4lr5epq5uoc5vyw63wd4u33ozfksku",
+    "cause": "upstream main after the live publication"
+   },
+   {
+    "name": "School",
+    "live": "bafkreib5pbray5fh6p2owrnj2o7jdvylglafp4p3qsjtq7mgr55ndxgcee",
+    "fork": "bafkreifuh76lxy77jfiqlmk5lm67vo6hmbxtycfo7csxg2odexvfgxpl2i",
+    "cause": "upstream main after the live publication"
+   },
+   {
+    "name": "Tax",
+    "live": "bafkreiee4xb2wrreu5ey2horazkym3wrudbf2ungvutknkjycjrz46hjjy",
+    "fork": "bafkreihspfuhczc6kxmrnm6ctt2g4w3xivulqaxsvu4gmf5nfgjdqu5arq",
+    "cause": "upstream main after the live publication"
+   },
+   {
+    "name": "Sales_History",
+    "live": "bafkreibpwb4ohxbeklpmzcdmbjv5ifnqpcqcilboohdqfctufqpwyymob4",
+    "fork": "bafkreihnrg3mpdt6txjtoyk77nojoqsvyvjbwchhucihnyooxzf3tw6atu",
+    "cause": "upstream main after the live publication"
+   },
+   {
+    "name": "Business_Location",
+    "live": "bafkreihlh2y6vpxrzejjxjjj7ec76bdhpkcorfiw6trtj7juwsyzkxqgd4",
+    "fork": "bafkreif6p572yrl6fwgtwej2kwlbo6dmwsq26zmwzsrjvyjzgrft4lx5rq",
+    "cause": "Travis enum (fork)"
+   }
+  ],
+  "extra_names_not_in_live": [
+   {
+    "name": "license",
+    "fork": "bafkreihjedzoyrbm7msrmmuyrs7pjcxvk52tp6yr3nlb6y4wizhubro4ci"
+   },
+   {
+    "name": "listing_observation",
+    "fork": "bafkreicg2pguf5kl6k4rr6fq3ztds7b3zcissq7ciw7xm7tbie32n3a6uu"
+   },
+   {
+    "name": "sale_availability_assessment",
+    "fork": "bafkreihxolgfeuosrzonbtylqcgdpnfcqm3wucpsqoea6e4bxvl6njxc4i"
+   },
+   {
+    "name": "company_to_license",
+    "fork": "bafkreid6fwjghlbwc2cmjofsmapbg2cqusyjnikq7dwvqas24wagvwirjm"
+   },
+   {
+    "name": "listing_observation_to_address",
+    "fork": "bafkreiflqesx2aas3bttyabe7o2h666dce4g6ptzy5vswofw5fweyulcbu"
+   },
+   {
+    "name": "listing_observation_to_file",
+    "fork": "bafkreihrc6xfdswx6lqb4v43aokycvstlxsnt4ejktthdwti3cypbghsuq"
+   },
+   {
+    "name": "listing_observation_to_property",
+    "fork": "bafkreia2zfavrcqqolfeq7awyxntft3or3o32rityguniplwpmjw7ow5ji"
+   },
+   {
+    "name": "sale_availability_assessment_to_address",
+    "fork": "bafkreie6jc5domo22nyjtyad5ryxtenfvipwlifa7glmbnxbnk5zzy3noa"
+   },
+   {
+    "name": "sale_availability_assessment_to_listing_observation",
+    "fork": "bafkreidgp5dnbytqajvekvtq2wvwqczbgypxmhvt2segnvalggvnxg45ee"
+   },
+   {
+    "name": "sale_availability_assessment_to_property",
+    "fork": "bafkreicg4qiwac5eqd4p5dcaghsd4atjreg3oxgur5bdnfgryawj4xb3nq"
+   },
+   {
+    "name": "Sale_Availability",
+    "fork": "bafkreiadxrejway4bsrxi4retcdpmrpg5tztqlkt7mtiwfox6y5gscwtay"
+   }
+  ],
+  "outside_allowed_set": [
+   "relationship",
+   "Photo",
+   "Photo_Metadata",
+   "HOA_",
+   "Property_Management",
+   "Mortgage",
+   "Property_Ranking",
+   "Environment_Characteristics",
+   "Safety_and_Security",
+   "Transportation_and_Access",
+   "School",
+   "Tax",
+   "Sales_History"
+  ],
+  "cause_of_outside_differences": "upstream main has changes the live catalog does not carry: #178 (license; adds relationship types, so the relationship class type enum changes) and #181 (Sale Availability; adds a data-group label, so the label enum of every data-group schema changes) plus 11 new names",
+  "fork_vs_its_base_04c6143": {
+   "different": [
+    "unnormalized_address",
+    "address",
+    "property_seed_to_unnormalized_address",
+    "address_to_parcel",
+    "property_to_address",
+    "person_to_address",
+    "company_to_address",
+    "address_to_fact_sheet",
+    "address_to_geometry",
+    "property_improvement_to_address",
+    "business_location_to_address",
+    "listing_observation_to_address",
+    "sale_availability_assessment_to_address",
+    "Seed",
+    "County",
+    "Property_Improvement",
+    "Business_Location",
+    "Sale_Availability"
+   ],
+   "note": "the fork's own change touches only unnormalized_address, address and the schemas that embed their CIDs"
+  },
+  "result": "STOP: schemas the fork does not change do not reproduce the live CIDs, so no amended manifest was written and nothing was validated or hashed against it"
+ },
+ "candidate_for_decision": {
+  "construction": "the live publication state (a0c05c5 lexicon.json) plus exactly the two enum lines of 04943fc, built with the same method",
+  "identical": 144,
+  "changed": [
+   {
+    "name": "unnormalized_address",
+    "live": "bafkreibrfkgavsypoiw5mzvaysuzjd62qaccvvnkbbhgcrtp2othnryhbm",
+    "amended": "bafkreihge2trlc7xpplqlidrk6k45c77ok5sp7ioudo2yptgrpgynssxia"
+   },
+   {
+    "name": "address",
+    "live": "bafkreiebzvyy6prnwf3dcippii7yysrjesnbxpvcpyqmbs2b67hm2taf2a",
+    "amended": "bafkreief6khxtvmcjt6fj6cjavwfwmalofy2dporb5u3nynfrbqxtl4jua"
+   },
+   {
+    "name": "property_seed_to_unnormalized_address",
+    "live": "bafkreiaq3bf5s2v3yc2dojcxq2seu7au3rc5s67wqbmplod2saccpcuzbu",
+    "amended": "bafkreifbo3pq4vs7wbm2f63xvtbihby3a7lzzwo4y3y3j63gjqxi3t4h6a"
+   },
+   {
+    "name": "address_to_parcel",
+    "live": "bafkreieap27nt53dp332uf6fisvuhvnzbx4mvpddu2btii7p4wjclu5v4m",
+    "amended": "bafkreieiaxup7iruiilf2eop2tbpkuhhlj3zfxokblrdp7yftqox2jpke4"
+   },
+   {
+    "name": "property_to_address",
+    "live": "bafkreieb53fv3pv2bsifxyefuw3flkxxzg35dimaoubd35pe3n5bzdlosy",
+    "amended": "bafkreiemfq5o6vvihz7mguqpphmehjldmobmilasxbuhqlxmjvomvravla"
+   },
+   {
+    "name": "person_to_address",
+    "live": "bafkreihbn54qb2zxjg2egbvcty6m65rk36luxz4r553v22h3wxl6am5wki",
+    "amended": "bafkreid5ll5qz56ctv67dhqtp2reld67jgfq4w4ocdz24ep4xzt4xdl2sm"
+   },
+   {
+    "name": "company_to_address",
+    "live": "bafkreia5hrpc4zgp5tv2vpvaj7l3qbrig57hzirkrl6bejfdcyiu43defe",
+    "amended": "bafkreifch7rv6zh2yrtu5asxhcpgzqzsilqsef6ufg4y373elsoq2xstvu"
+   },
+   {
+    "name": "address_to_fact_sheet",
+    "live": "bafkreicdoqppf2no5ohfylgsvowab2q37djgyplj4egxe4az4tlbrjh4sa",
+    "amended": "bafkreiclmj36qvuhgymgbaw6kjsmc2v4buvoajzearnhfl6xr76p25gwne"
+   },
+   {
+    "name": "address_to_geometry",
+    "live": "bafkreigbrpoyl33mogccs4lpg2oj75sophfm56ag5ny5i4pf7nxys437ja",
+    "amended": "bafkreieagkpoink5zcp2uzj2nczbujrobxzxbylrfvnmchzvhuu3xvg5su"
+   },
+   {
+    "name": "property_improvement_to_address",
+    "live": "bafkreieuk2qcgcx6k5twxdfz66qrag6zr6wv3yy5xbdsfpb47on37bsf5q",
+    "amended": "bafkreiblie5gvh6qs5aoadq6k6kwaz57qtxeyvbc5ovqgdaarb7bciewsm"
+   },
+   {
+    "name": "business_location_to_address",
+    "live": "bafkreiekimw2hzd4zv6mloquspvyw57nmp4bd3kmhfv5jxktbavwmc4rry",
+    "amended": "bafkreicdss6bzfob7aumgmpjznlfi7slaqsohg5p74z5skeo6qatrquzn4"
+   },
+   {
+    "name": "Seed",
+    "live": "bafkreibhurphpjdq33ysit57jtzmdldgngepsdbsw4vm7esawth2ezgaxu",
+    "amended": "bafkreial73icc2ozqfx2uxemlku6y64rqdwtzc55fexca5izb5brbgro6m"
+   },
+   {
+    "name": "County",
+    "live": "bafkreia6tjziby3upxmidymud5iusd32urrztslgrudkwysc7ydmxoekuq",
+    "amended": "bafkreigyrx3yshn4zudxhpcsxd7ylza4ltga3unddqrqjftndl7dptr7ki"
+   },
+   {
+    "name": "Property_Improvement",
+    "live": "bafkreicyzywzwhmguojpi2otgrwsyi37le3u4lnavljbxu76cnrudxaxfu",
+    "amended": "bafkreifdsy5en6c4ejxtqqjwf36k446icphycx3mwisdlujqsgornhy35m"
+   },
+   {
+    "name": "Business_Location",
+    "live": "bafkreihlh2y6vpxrzejjxjjj7ec76bdhpkcorfiw6trtj7juwsyzkxqgd4",
+    "amended": "bafkreihfbhynvc7zkfhks7ak7ptmrvkpenxi3acnbnctvdw3w3gze3dqsm"
+   }
+  ],
+  "missing": [],
+  "extra": [],
+  "status": "computed for the decision only; not written under data/travis/lexicon-amended and not used"
+ }
+}
