@@ -69,6 +69,35 @@ export function roofAgeColumnsFromLineage(lineage) {
 }
 
 /**
+ * The internal `roof_age_*` columns from a T5 estimate (`t5-roof-age.mjs`): the estimator ran with the parcel's linked
+ * permits, so the source is the permit anchor or the built-year default, never an explicit roll roof date (TCAD prints none).
+ *
+ * @param {Record<string, any>} estimate - One parcel's record from `estimateParcelRoofAge`.
+ * @returns {Record<string, unknown>} Column values.
+ */
+export function roofAgeColumnsFromT5(estimate) {
+  const anchor = estimate.roof_age_anchor;
+  const permitAnchor = anchor && "permit_id" in anchor;
+  return {
+    roof_date: permitAnchor ? anchor.date : estimate.roof_year === null ? null : String(estimate.roof_year),
+    roof_date_precision: permitAnchor ? "day" : estimate.roof_year === null ? "none" : "year",
+    roof_age_years: estimate.estimator.estimated_age_years,
+    roof_age_source: permitAnchor ? "permit_updated" : anchor ? "construction_year_default" : "none",
+    roof_age_confidence: estimate.roof_age_confidence,
+    roof_age_policy_version: estimate.policy.version,
+    roof_age_profile_version: estimate.policy.profile_version,
+    roof_age_profile_sha256: estimate.policy.profile_sha256,
+    roof_age_permit_source_system: permitAnchor ? "travis_austin_socrata_permits" : null,
+    roof_age_permit_id: permitAnchor ? anchor.permit_id : null,
+    roof_age_historical_coverage_state: estimate.estimator.historical_coverage,
+    roof_age_historical_coverage_caveats: JSON.stringify(estimate.roof_age_caveats),
+    roof_age_as_of_date: estimate.roof_age_as_of,
+    roof_age_eligible: estimate.roof_age_basis !== null,
+    roof_age_eligibility_reason: estimate.estimator.eligibility_reason,
+  };
+}
+
+/**
  * Map one parcel's transformed files plus its seed row into a query-table row.
  *
  * @param {object} params - Mapping inputs.
@@ -77,9 +106,11 @@ export function roofAgeColumnsFromLineage(lineage) {
  * @param {Record<string, string> | null} params.seedRow - Matching seed row.
  * @param {Record<string, any> | null} [params.sourcePayload] - The parcel's lexicon-gap sidecar (`source-payload.json`), when present.
  * @param {string} params.asOfDate - Roof-age as-of date (`YYYY-MM-DD`).
+ * @param {Record<string, any> | null} [params.roofAge] - The T5 estimate with the parcel's linked permits (`t5-roof-age.mjs`); without it the columns hold the built-year-only lineage.
+ * @param {{ published: number } | null} [params.permits] - The parcel's published permits (T5); without it `has_permits` is false and `permit_count` 0.
  * @returns {Record<string, unknown>} Flat row.
  */
-export function mapTransformedFilesToQueryTableRow({ parcelId, files, seedRow, sourcePayload = null, asOfDate }) {
+export function mapTransformedFilesToQueryTableRow({ parcelId, files, seedRow, sourcePayload = null, asOfDate, roofAge = null, permits = null }) {
   const property = files["property.json"] ?? {};
   const address = files["address.json"] ?? {};
   const geometry = files["geometry.json"] ?? {};
@@ -140,7 +171,7 @@ export function mapTransformedFilesToQueryTableRow({ parcelId, files, seedRow, s
     lot_area_sqft: lotAreaSqft,
     exterior_wall_material: null,
     roof_covering_material: null,
-    ...roofAgeColumnsFromLineage(lineage),
+    ...(roofAge ? roofAgeColumnsFromT5(roofAge) : roofAgeColumnsFromLineage(lineage)),
     property_type: toText(property.property_type),
     property_usage_type: toText(property.property_usage_type),
     state_cd: toText(payload.state_cd) ?? toText(seedRow?.source_state_cd),
@@ -161,8 +192,8 @@ export function mapTransformedFilesToQueryTableRow({ parcelId, files, seedRow, s
     last_sale_date: sale ? toText(sale.ownership_transfer_date) : null,
     last_sale_price: sale ? toNumber(sale.purchase_price_amount) : null,
     subdivision: toText(property.subdivision),
-    has_permits: false,
-    permit_count: 0,
+    has_permits: (permits?.published ?? 0) > 0,
+    permit_count: permits?.published ?? 0,
     has_sunbiz_tenant: false,
     has_bbb_contractor: false,
     has_pa_corp_tenant: false,

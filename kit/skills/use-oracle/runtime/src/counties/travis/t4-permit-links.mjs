@@ -258,9 +258,10 @@ const bump = (counts, key, by = 1) => {
  * @param {number} [options.reviewSamples] - Most frequent `needs_review` descriptions to report.
  * @param {Set<string> | null} [options.countTcadIds] - Printed `tcad_id` values whose rows are counted whatever their link (cross-checks).
  * @param {import("./t4-tcad-permit-listing.mjs").TcadPermitListing | null} [options.tcadListing] - TCAD's permit listing (the `tcad_permit_listing` fallback); null disables it and is recorded.
+ * @param {((item: { entry: any, link: any, profile: any, listingEntries: any }) => (void | Promise<void>)) | null} [options.onRow] - Called for every captured row, in capture order, after it is profiled and linked (the T5 full run streams the rows to disk here instead of selecting them in memory).
  * @returns {Promise<{ summary: Record<string, any>, selected: Map<string, any[]>, conflictingNumbers: Set<string>, tcadCounts: Map<string, { rows: number, by_unlinked_reason: Record<string, number> }> }>} Counts, the selected rows, the permit numbers printed on differing rows and the per-`tcad_id` counts.
  */
-export async function runLinkPass({ captureDir, roll, asOfDate, select = null, reviewSamples = 40, countTcadIds = null, tcadListing = null }) {
+export async function runLinkPass({ captureDir, roll, asOfDate, select = null, reviewSamples = 40, countTcadIds = null, tcadListing = null, onRow = null }) {
   const started = performance.now();
   const digitsFallback = roll.proof.oneToOne ? { proof: roll.proof, parcelsByDigits: roll.byDigits } : null;
   const permitListing = tcadListing ? { version: tcadListing.version, sourceSha256: tcadListing.index.source.sha256, accountsFor: tcadListing.accountsFor, rollPropIds: roll.propIds } : null;
@@ -478,6 +479,7 @@ export async function runLinkPass({ captureDir, roll, asOfDate, select = null, r
         notInRoll.distinct.add(tcad.value);
       }
     }
+    if (onRow) await onRow({ entry, link, profile: summary, listingEntries: linkEvidence });
     const number = row.permit_number.trim();
     const seen = permitNumberRows.get(number) ?? 0;
     permitNumberRows.set(number, seen + 1);
