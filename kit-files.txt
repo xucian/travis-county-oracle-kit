@@ -49,6 +49,7 @@ skills/use-oracle/runtime/docs/evidence/travis-t4-retired-geo-ids-2026-10-18.jso
 skills/use-oracle/runtime/docs/evidence/travis-t4-ruling-10-tcad-listing-2026-10-18.json
 skills/use-oracle/runtime/docs/evidence/travis-t4-ruling-7-enum-check-2026-10-18.json
 skills/use-oracle/runtime/docs/evidence/travis-t4-run-2026-10-17.json
+skills/use-oracle/runtime/docs/evidence/travis-t5-dry-run-2026-10-18.json
 skills/use-oracle/runtime/docs/evidence/travis-t5-field-coverage-2026-10-18.json
 skills/use-oracle/runtime/docs/evidence/travis-t5-prefix-reruns-2026-10-18.json
 skills/use-oracle/runtime/docs/evidence/travis-tcad-downloads-2026-10-16.jsonl
@@ -124,9 +125,11 @@ skills/use-oracle/runtime/src/counties/travis/t4-run.mjs
 skills/use-oracle/runtime/src/counties/travis/t4-sample.mjs
 skills/use-oracle/runtime/src/counties/travis/t4-shard-bench.mjs
 skills/use-oracle/runtime/src/counties/travis/t4-tcad-permit-listing.mjs
+skills/use-oracle/runtime/src/counties/travis/t5-compare-runs.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-field-coverage.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-loader.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-preflight.mjs
+skills/use-oracle/runtime/src/counties/travis/t5-projection.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-record.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-roof-age.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-run.mjs

@@ -154,3 +154,49 @@ describe("t5-loader: ready gate and tombstones", () => {
     });
   });
 });
+
+describe("t5-run: a resume after SIGKILL stops the elephant-cli processes the killed runner left behind", () => {
+  it("reaps a recorded orphan whose command is elephant-cli, and leaves unrelated processes alone", async () => {
+    const { spawn } = await import("node:child_process");
+    const { T5Run } = await import("../src/counties/travis/t5-run.mjs");
+    await tmp(async (dir) => {
+      const script = path.join(dir, "orphan-elephant-cli.mjs");
+      await writeFile(script, "setTimeout(() => {}, 60000);\n");
+      const other = path.join(dir, "unrelated.mjs");
+      await writeFile(other, "setTimeout(() => {}, 60000);\n");
+      const orphan = spawn(process.execPath, [script], { detached: true, stdio: "ignore" });
+      const bystander = spawn(process.execPath, [other], { detached: true, stdio: "ignore" });
+      orphan.unref();
+      bystander.unref();
+      const alive = (pid) => {
+        try {
+          process.kill(pid, 0);
+          return true;
+        } catch {
+          return false;
+        }
+      };
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        const runDir = path.join(dir, "run");
+        await mkdir(runDir, { recursive: true });
+        await writeFile(path.join(runDir, "run-state.json"), JSON.stringify({ version: "travis-t5-run.v1", run_id: "run", label: "x", attempts: [{ attempt: 1, pid: 999999, status: "running" }], children: { [orphan.pid]: { shard: "s0009", stage: "county.validate" }, [bystander.pid]: { shard: "s0010", stage: "county.validate" } }, status: "running" }));
+        const run = new T5Run({ runDir, label: "x", log: () => {} });
+        await run.open();
+        expect(run.attempt.reaped_orphans.map((item) => item.pid)).toEqual([orphan.pid]);
+        expect(alive(orphan.pid)).toBe(false);
+        expect(alive(bystander.pid)).toBe(true);
+        expect(run.attempt).toMatchObject({ attempt: 2, resumed: true });
+        await run.unlock();
+      } finally {
+        for (const pid of [orphan.pid, bystander.pid]) {
+          try {
+            process.kill(pid, "SIGKILL");
+          } catch {
+            // gone
+          }
+        }
+      }
+    });
+  });
+});

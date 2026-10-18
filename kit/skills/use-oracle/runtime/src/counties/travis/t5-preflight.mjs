@@ -15,8 +15,12 @@ export const SWAP_WARN_SHARE = 0.5;
 export const SWAP_WARN_BYTES = 4 * 1024 ** 3;
 /** The measured 8-shard setting needs about 8 GB for the CLI processes plus the runner (decisions.md 25.9). */
 export const MEMORY_WANTED_BYTES = 12 * 1024 ** 3;
-/** Disk per property measured on the 1,000-parcel run with 4 KB blocks (parcel files, both groups, CARs, tables, logs). */
-export const DISK_BYTES_PER_PROPERTY = 200 * 1024;
+/**
+ * Disk per property of a full run, measured on the T5 dry run (20 shards, hard links counted once): about 180 KB per
+ * parcel plus 20 KB per published permit, at the roll's 4.5 permits per parcel, plus the run's fixed files (the link
+ * pass's per-shard permit files and internal rows, the Loader's permits table) spread over the roll: about 290 KB.
+ */
+export const DISK_BYTES_PER_PROPERTY = 290 * 1024;
 /** Executable names (basename of the command's first token) of VMs that hold memory outside this run. */
 export const VM_EXECUTABLE_PATTERNS = Object.freeze([/^colima$/, /^limactl$/, /^vfkit$/, /^qemu-system/, /^com\.docker\./, /^com\.apple\.Virtualization\.VirtualMachine$/, /^UTM$/, /^prl_/, /^OrbStack/]);
 /** Docker Desktop lives under a path with a space, so its command is matched whole. */
@@ -135,7 +139,7 @@ export async function runPreflight({ runDir, properties, probes = {} }) {
     warnings.push(`a VM is running (${[...new Set(vms.map((item) => item.command.split(/\s+/)[0].split("/").at(-1)))].join(", ")}; about ${gb(resident)} GB resident in its host processes): stop it first (colima stop)`);
   }
   if (memory && memory.available_bytes < MEMORY_WANTED_BYTES) warnings.push(`only ${gb(memory.available_bytes)} GB of memory available (free, inactive and speculative pages); the 8-shard setting wants about ${gb(MEMORY_WANTED_BYTES)} GB`);
-  if (diskAvailable !== null && diskAvailable < diskWanted * 1.5) warnings.push(`${gb(diskAvailable)} GB free on the run's disk; the run writes about ${gb(diskWanted)} GB (${properties} properties)`);
+  if (diskAvailable !== null && diskAvailable < diskWanted * 1.25) warnings.push(`${gb(diskAvailable)} GB free on the run's disk; the run writes about ${gb(diskWanted)} GB (${properties} properties)`);
   return {
     version: PREFLIGHT_VERSION,
     checked_at: new Date().toISOString(),

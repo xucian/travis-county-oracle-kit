@@ -1,0 +1,2135 @@
+{
+ "schemaVersion": "travis.t5-dry-run.v1",
+ "generated_at": "2026-10-18T13:32:30Z",
+ "design": "assignment decisions.md 25.9; T5 phase A step 5: real seed rows (the first 5,000 PROP_IDs of data/seeds/travis.csv), shards of 250 (20 shards), 8 in flight, so each slot runs 2-3 shards; the real elephant-cli 1.58.1, the live lexicon manifest, the full permit capture and TCAD listing",
+ "command": "node --max-old-space-size=12288 src/counties/travis/t5-run.mjs --cli <elephant-cli> --eligibility __ALL__ --label <label> --shard-size 250 --max-shards 20 --concurrency 8 (run A used --max-old-space-size=8192)",
+ "uninterrupted": {
+  "run_id": "20261018T114904Z-t5-dryrun-a",
+  "started_at": "2026-10-18T11:49:04.847Z",
+  "finished_at": "2026-10-18T12:03:28.608Z",
+  "attempts": [
+   {
+    "attempt": 1,
+    "pid": 57595,
+    "started_at": "2026-10-18T11:49:04.848Z",
+    "ended_at": "2026-10-18T12:03:28.608Z",
+    "status": "finished",
+    "resumed": false,
+    "reaped_orphans": 0,
+    "error": null
+   }
+  ],
+  "scope": {
+   "shard_size": 250,
+   "concurrency": 8,
+   "max_shards": 20,
+   "whole_seed": false,
+   "eligibility": "__ALL__",
+   "loader_scope": "dryrun-a"
+  },
+  "appraisal": {
+   "seed": 5000,
+   "ready": 5000,
+   "dead": 0,
+   "invalid": 0,
+   "retryable": 0,
+   "reconciles": true,
+   "rule": "seed = ready + dead + invalid (kit county-ingest-run section 8)",
+   "with_geometry": 4778,
+   "without_geometry": 222
+  },
+  "permit_states": {
+   "done": 3895,
+   "done_zero_permits": 1105,
+   "not_eligible": 0,
+   "failed_permanent": 0
+  },
+  "permits_published": 55539,
+  "tables_county": {
+   "properties": 5000,
+   "address_has_geometry": 4778,
+   "address": 9996,
+   "geometry": 4822,
+   "company_has_mailing_address": 1249,
+   "company": 1249,
+   "parcel_has_geometry": 4822,
+   "parcel": 5000,
+   "property_has_address": 5000,
+   "property": 5000,
+   "property_has_lot": 5000,
+   "lot": 5000,
+   "property_has_parcel": 5000,
+   "property_has_sales_history": 4921,
+   "sales_history": 4921,
+   "property_has_structure": 4098,
+   "structure": 4098,
+   "property_has_tax": 5000,
+   "tax": 5000,
+   "sales_history_has_company": 1188,
+   "address_has_parcel": 5000,
+   "person_has_mailing_address": 3747,
+   "person": 3747,
+   "sales_history_has_person": 3729,
+   "person_has_property": 18,
+   "company_has_property": 61
+  },
+  "tables_property_improvement": {
+   "properties": 3895,
+   "address_has_parcel": 3895,
+   "address": 3895,
+   "parcel": 3895,
+   "property_has_property_improvement": 55539,
+   "property": 3895,
+   "property_improvement": 55539
+  },
+  "tables_internal": {
+   "query_table": 5000,
+   "roof_age": 5000,
+   "permits": 2380707
+  },
+  "tombstones_consumed": {
+   "dead": 0,
+   "invalid": 0
+  },
+  "deltas": {
+   "appraisal": {
+    "new": 5000,
+    "changed": 0,
+    "unchanged": 0,
+    "removed": 0,
+    "dead": 0,
+    "invalid": 0,
+    "retryable": 0
+   },
+   "permit_groups": {
+    "new": 3895,
+    "changed": 0,
+    "unchanged": 0,
+    "removed": 0,
+    "dead": 0,
+    "invalid": 0,
+    "retryable": 0
+   },
+   "permits": {
+    "new": 2380707,
+    "changed": 0,
+    "unchanged": 0,
+    "removed": 0,
+    "dead": 0,
+    "invalid": 0,
+    "retryable": 0
+   }
+  },
+  "roof_age": {
+   "parcels": 5000,
+   "eligible": 4625,
+   "ineligible": 375,
+   "by_basis": {
+    "new_construction": 1187,
+    "year_built": 3003,
+    "none": 375,
+    "completed_replacement": 435
+   },
+   "by_confidence": {
+    "medium": 1187,
+    "low": 3003,
+    "none": 375,
+    "high": 435
+   },
+   "caveats": {
+    "partial_history": 3895,
+    "history_unknown": 1105,
+    "anchor_link_tcad_permit_listing": 2
+   },
+   "anchor_link_method": {
+    "exact": 1620,
+    "tcad_permit_listing": 2
+   },
+   "older_than_threshold": {
+    "threshold_years": 15,
+    "rule": "roof_age_years > threshold",
+    "total": 3733,
+    "by_basis": {
+     "year_built": 2703,
+     "new_construction": 695,
+     "completed_replacement": 335
+    }
+   },
+   "by_historical_coverage": {
+    "partial": 3895,
+    "unknown": 1105
+   }
+  },
+  "timings": {
+   "unit": "ms",
+   "wall_ms": 863761,
+   "last_attempt_ms": 863760,
+   "stages": {
+    "appraisal": {
+     "total_ms": 132388,
+     "shards": 20,
+     "mean_ms": 6619
+    },
+    "permits": {
+     "total_ms": 139555,
+     "shards": 20,
+     "mean_ms": 6978
+    },
+    "reconcile": {
+     "total_ms": 19101,
+     "shards": 20,
+     "mean_ms": 955
+    },
+    "cid_check": {
+     "total_ms": 87,
+     "shards": 20,
+     "mean_ms": 4
+    },
+    "merge": {
+     "total_ms": 111946,
+     "shards": 20,
+     "mean_ms": 5597
+    },
+    "cli_county_validate": {
+     "total_ms": 2678986,
+     "shards": 20,
+     "mean_ms": 133949
+    },
+    "cli_county_hash": {
+     "total_ms": 206497,
+     "shards": 20,
+     "mean_ms": 10325
+    },
+    "cli_county_car_validate": {
+     "total_ms": 101436,
+     "shards": 20,
+     "mean_ms": 5072
+    },
+    "cli_county_export_tables": {
+     "total_ms": 26668,
+     "shards": 20,
+     "mean_ms": 1333
+    },
+    "cli_property_improvement_validate": {
+     "total_ms": 815208,
+     "shards": 20,
+     "mean_ms": 40760
+    },
+    "cli_property_improvement_hash": {
+     "total_ms": 146536,
+     "shards": 20,
+     "mean_ms": 7327
+    },
+    "cli_property_improvement_car_validate": {
+     "total_ms": 50629,
+     "shards": 20,
+     "mean_ms": 2531
+    },
+    "cli_property_improvement_export_tables": {
+     "total_ms": 25575,
+     "shards": 20,
+     "mean_ms": 1279
+    }
+   }
+  },
+  "memory": {
+   "peak_cli_rss_gb": 7.3,
+   "peak_cli_processes": 8,
+   "peak_runner_rss_gb": 6.1,
+   "peak_combined_rss_gb": 7.9,
+   "peak_swap_used_gb": 5.6,
+   "sampled": "every progress tick (60 s) and shard completion; ps RSS"
+  },
+  "disk": {
+   "run_dir_gb": 3.55
+  },
+  "lexicon_manifest": {
+   "url": "https://lexicon.elephant.xyz/api/manifest",
+   "sha256_start": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+   "checks": [
+    {
+     "at": "2026-10-18T11:49:06.477Z",
+     "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+     "attempt": 1
+    }
+   ],
+   "sha256_end": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640"
+  },
+  "no_sleep": {
+   "held": true,
+   "command": "caffeinate -dimsu -w 57595",
+   "pid": 57608
+  },
+  "readiness_report": {
+   "exit": 0,
+   "overall": "PASS",
+   "seed_allowed": true,
+   "ingest_allowed": true,
+   "gates": {
+    "catalog_metadata": "PASS",
+    "parcel": "PASS",
+    "permit": "PASS",
+    "destination": "NOT_APPLICABLE",
+    "enrichment": "PASS"
+   }
+  },
+  "preflight_warnings": [
+   "swap heavily used: 5.6 of 7 GB; close heavy apps (the 8-shard County time doubled with a nearly full swap, decisions.md 25.9)"
+  ],
+  "shards": [
+   {
+    "id": "s0001",
+    "rows": 250,
+    "first": "100008",
+    "last": "100308",
+    "county_root": "baguqeeraqgchyltglwneelcjbwjalalzv6zllrfjjtyo7x3d2rqx5gmwcsha",
+    "property_improvement_root": "baguqeeraqykfrticblcalppbe4xvocaxw6jsvfo46jrb3qzkfcollb6c2p7q",
+    "county_car_sha256": "72b050a3079dba1a7a7275bf0acc169ebce4b96ea002103c66919dc6d19f485c",
+    "property_improvement_car_sha256": "b3bea7b94fd4f82a51ecff9ac4d21b1f025d0b9d79c3919b8f0e72d2519761fe"
+   },
+   {
+    "id": "s0002",
+    "rows": 250,
+    "first": "100309",
+    "last": "100618",
+    "county_root": "baguqeeraukc3ox4vrf5lxjzqezwqksbo6eqxtazefdwtobutcusy4rr4y37q",
+    "property_improvement_root": "baguqeerahpsllx2rnpcudr55yyjqu7b4mdqslsu4wec6tkoyleofemnjrlma",
+    "county_car_sha256": "4cf70e36f1e3b6719fad36e1fd044f19d2205715abed7d79be5cd4bcbaa11e55",
+    "property_improvement_car_sha256": "182dfa87bc48634dd5a8bd1ea532c3fa336fbc8feb1599f641090f5be7a95c98"
+   },
+   {
+    "id": "s0003",
+    "rows": 250,
+    "first": "100619",
+    "last": "100919",
+    "county_root": "baguqeerakbcvomtdltf4uupg3ypq3qtba2nn3ztabeci3izbnbttcjzmxzpq",
+    "property_improvement_root": "baguqeerap6nu6bmujjeqndbay5ltsimvqcymuyaloxvalpmfjxeers6lag4a",
+    "county_car_sha256": "fd53328dee4bcca860607ad587f93f0ad21be76fc86a0302ac55ca37310d4d8e",
+    "property_improvement_car_sha256": "96c9e7ecb0237cd81a82b001592c7be3d1dff9a4f2f1fcabb374344622d87b32"
+   },
+   {
+    "id": "s0004",
+    "rows": 250,
+    "first": "100921",
+    "last": "101231",
+    "county_root": "baguqeera36mazqdfgacoztla5t4u2nyj5pvz7ubr3g6vgimrvtakzihjpw5a",
+    "property_improvement_root": "baguqeeraxy4cfng2snauum4zp2ihwlpryn55ceju744nfvdmvkh6n7gptsjq",
+    "county_car_sha256": "ecb06034d820e74c0ec646548e184930923006b8f4e99e1be003ebd77a0fd644",
+    "property_improvement_car_sha256": "57e44441a9436ea757ccb6f83dcb0c4b8d7f1fb09184b2cd18fabce89510f247"
+   },
+   {
+    "id": "s0005",
+    "rows": 250,
+    "first": "101232",
+    "last": "101551",
+    "county_root": "baguqeera2buqtjkf7tu2o3gzrpj2abvrbdwrjcmhzd2u6mmiz6yqsme7gr2q",
+    "property_improvement_root": "baguqeerac3sz5sjjo5uelezngofgwfqfvpzwpvkjwjcvefa5sticsyru3k2a",
+    "county_car_sha256": "36935d142b954f2c34c2349d22b458d403328c080cc46d4a76f9b01370fbd664",
+    "property_improvement_car_sha256": "539f21d04697c399e90c718020a0af2265aac40cc0373907af1a7e5dd8d090c9"
+   },
+   {
+    "id": "s0006",
+    "rows": 250,
+    "first": "101553",
+    "last": "101993",
+    "county_root": "baguqeera5hkilxhxtyoscr4abtd7dnikfvpghomwst42od2r5734uhplajeq",
+    "property_improvement_root": "baguqeerahm2japn47dxla6mlumysoatcwef4ygbdaoqta3hh3mofgwqyq4uq",
+    "county_car_sha256": "f16574bec5a45cfe4ee4c56d0bd8db521615e3923a1a326ba94507a63ea6a18f",
+    "property_improvement_car_sha256": "859404398edff287eafe168536b8694502016909f28a27d2f92a62012c7e44e9"
+   },
+   {
+    "id": "s0007",
+    "rows": 250,
+    "first": "101994",
+    "last": "102361",
+    "county_root": "baguqeeras3cgpzkh7erpdcxroxyspo4cutifbnr74vxq6zwwhyaxznsrwwua",
+    "property_improvement_root": "baguqeerafyrcblluyl7xbebur5qx6oob5rj5yzh5is6iv67jeonvi2zhq74a",
+    "county_car_sha256": "7bf87417f0d177ec3dbfa0c88254bc766468eda774a517d67f406bcf15b2837e",
+    "property_improvement_car_sha256": "94dc2ff896d95f4dc320e0b0e0ac9930dae3d8790045a2703533660ee3c06f85"
+   },
+   {
+    "id": "s0008",
+    "rows": 250,
+    "first": "102362",
+    "last": "102635",
+    "county_root": "baguqeerahw6ggwim2yswyyu5wrw5njtti7aei3xk2k7ja227i2ee6dqbo5xa",
+    "property_improvement_root": "baguqeera3v4kmzpczbfw2gw4pthbpccyzlpmwzop45lvuvvh4duzzjegulvq",
+    "county_car_sha256": "ac0e192e5a41c5527c5ac28f27e2ed1e76085c4bd5c26f30ac037e239be64d09",
+    "property_improvement_car_sha256": "e72435e9b067370438b5f08e330c9da3bd883e615dbe1b9d14635c53870f180a"
+   },
+   {
+    "id": "s0009",
+    "rows": 250,
+    "first": "102636",
+    "last": "103132",
+    "county_root": "baguqeera7nq3chiciisjjmylfke2l6qb4tnjoguaqozvohvbqbzzuvvriyxq",
+    "property_improvement_root": "baguqeerar7dxk5dh5texgjnvf6krgme6o5fa63povubch2qkhafvhsgyzfia",
+    "county_car_sha256": "2bb72a9bb223e19e70c69717d9d04622a896a4adb4397fd9f8d4fb9689f5bb02",
+    "property_improvement_car_sha256": "23ae48932b57dd44e609299b4f656a177ed1cdc0e9f959148417bf5a91a1331e"
+   },
+   {
+    "id": "s0010",
+    "rows": 250,
+    "first": "103133",
+    "last": "103432",
+    "county_root": "baguqeerajo3m457pkjnn5ydvn276cixsniegtor4d5spduqznl5bqz3n2jsa",
+    "property_improvement_root": "baguqeerayxhsvjjblbi46bhnvlnk7pihhhrrpxo2zcy4yb3rq7k5urlvip3q",
+    "county_car_sha256": "9b2203818aaf15921201335a0125a3ddf267d79c252cd5323a525bcb5a161754",
+    "property_improvement_car_sha256": "fc2cdc0aa7505414b22a9bf2cac0c0445cad4931eceb580281f67be499a7ee17"
+   },
+   {
+    "id": "s0011",
+    "rows": 250,
+    "first": "103433",
+    "last": "103833",
+    "county_root": "baguqeera4kocfoga5jcpj66idtewwe5csmxf2jh3nbbwolrrjg6nshbdqudq",
+    "property_improvement_root": "baguqeerayvhrpza5yht4vftuhwhgrswps37xiuv7gjbkkiyekrptip6nsazq",
+    "county_car_sha256": "92c4487b74c8a08e2ce9c54a21c8d96108703cb96d1957ff7e19b5f9002774c3",
+    "property_improvement_car_sha256": "af12f8ae58d0c5cac42decaa96cbb1d632fcad40abffd028732a60c75188e852"
+   },
+   {
+    "id": "s0012",
+    "rows": 250,
+    "first": "103834",
+    "last": "104214",
+    "county_root": "baguqeera52int43krnwc24ilmqpyjsuzwohfanasyziawp4i7eg7k5qbxiwq",
+    "property_improvement_root": "baguqeeratf3ty3f7ea54siybe663ppr7ix5i2do4rrrbmr3xxlhckul7b7ba",
+    "county_car_sha256": "94d0e4e56fe6fac4a6123b5386ae124656c76cd90dc2dc44a3a26c32f9169766",
+    "property_improvement_car_sha256": "e03d9b862b6a3176f651fc3e04f56c7bb5e9967e7a78a601152f3cecbcb5c015"
+   },
+   {
+    "id": "s0013",
+    "rows": 250,
+    "first": "104215",
+    "last": "104541",
+    "county_root": "baguqeerae6arhmlkce223wvknz2zdi64f5o3bmwrxy6oaet37xxkmue5nt7a",
+    "property_improvement_root": "baguqeerasrrcdbwn245ta3umbd3htlrm3hx45puk2jlrkrragaw4ocbwvwaq",
+    "county_car_sha256": "dde7c44fd22258f2a16c70e26dd4b9afc6134a1b3050702c508bc0db8fe82e48",
+    "property_improvement_car_sha256": "becd61de5923ac124a6e523dc79791b0f678776955b8b7245967de899f4799b2"
+   },
+   {
+    "id": "s0014",
+    "rows": 250,
+    "first": "104542",
+    "last": "104810",
+    "county_root": "baguqeeraxedbnuww7tzzrhjfd46dgfmgqb676vafx2yhttirnwxzb2dfbtxa",
+    "property_improvement_root": "baguqeeraye4zadfslcfslvfg6y2pxkvxvkdny3djfnykp6v776rlolgrnvkq",
+    "county_car_sha256": "7bd5af06855a14b24251a53329c71b2d81a26d1460abb08a1dc562979ba2831c",
+    "property_improvement_car_sha256": "0b57b403a85d79aef5a90903eff00d3b026a3a4a2eaf6438ae6667010aefd92d"
+   },
+   {
+    "id": "s0015",
+    "rows": 250,
+    "first": "104811",
+    "last": "105106",
+    "county_root": "baguqeeraixkylxucuvnwkdalzble2i45z65zwlkacvq2xmj7yp7v7zdooi4q",
+    "property_improvement_root": "baguqeera3axxvcenegil4v7rdhimkof4f3bsfwt5qhh4n476mk3ajxrak6ja",
+    "county_car_sha256": "0ddb45b921d7f62f6f97e4e1cdd2d5c70065f1ae0c5ea680630f140142e63d58",
+    "property_improvement_car_sha256": "ccf3ed94b156982bd99ae6daf2099625ff0c0053f247c594e087901e762afa46"
+   },
+   {
+    "id": "s0016",
+    "rows": 250,
+    "first": "105107",
+    "last": "105453",
+    "county_root": "baguqeeraq3fcsktadlkfvim2g7kh3pxmlms6wwtoz4otzvxsw5oupyklo7fq",
+    "property_improvement_root": "baguqeeramadbhp44u6aoxgu7uqd234l746cnlzznoja5jdshvrqlamz4p6ta",
+    "county_car_sha256": "a4469134f8568640f1a92cf81623ba4e1605a9139ba45f8fa9f27d6427669d7c",
+    "property_improvement_car_sha256": "fcb1848ddddcd0c2d254c90e56431eb774bb2fc0ed548d2d74a081bcfb63f71e"
+   },
+   {
+    "id": "s0017",
+    "rows": 250,
+    "first": "105454",
+    "last": "105750",
+    "county_root": "baguqeeranf6jxztlot762go6xomsdxn65ju442gtzmlbrpphdgenbsd3jkyq",
+    "property_improvement_root": "baguqeeravwmovzzd3yhiknvbya5mar26d2klituhbptgpk6ffxnpp5scspea",
+    "county_car_sha256": "f07a07d7e1deb2424f2c7d99dbea3bf2b1ddc5e17cb71389f622e2eaeb337274",
+    "property_improvement_car_sha256": "b077e8d26794ed0f69b9961b2d530d307b9effc7469c962abe70a6bbd8a1cfc7"
+   },
+   {
+    "id": "s0018",
+    "rows": 250,
+    "first": "105751",
+    "last": "106023",
+    "county_root": "baguqeerawpqo3chvfcwdd3h5amgbf6enaa5v7vdi3aziyrjdqu6bnfr3auma",
+    "property_improvement_root": "baguqeeraj5q3swzfaulyt54hlvrvrm3wt2lfjdokkicacbml6ijzsigpzxka",
+    "county_car_sha256": "d00c064b82cb98cd8c751014c12322bef70301c7d67cf725b3fd81d932b02daf",
+    "property_improvement_car_sha256": "4b81b69873f1a4c82f198468b4a91f5a99bd9c2d754061c5cbb5d090a66f2a50"
+   },
+   {
+    "id": "s0019",
+    "rows": 250,
+    "first": "106024",
+    "last": "106322",
+    "county_root": "baguqeerasc7fn27zdby2dmlcbddcgok6c3hxsimtkw2e4ovv4dacgivjtfpq",
+    "property_improvement_root": "baguqeeraawc5hjpxff3pfat22lvhgkjczftawtrx4kzukudzma2rug5f2zna",
+    "county_car_sha256": "8236899cae02583db2a6e68e4dca63252989a3d3864b9c9814d042056371384b",
+    "property_improvement_car_sha256": "37ba39ab5f5321d497de0df7f9ed6e066007d6cd1a25f264b3870e2192289f81"
+   },
+   {
+    "id": "s0020",
+    "rows": 250,
+    "first": "106323",
+    "last": "106654",
+    "county_root": "baguqeeraq3feomnaxadaaou53brms5c5fnr7votcnbp5wu3hy6ohsroujmia",
+    "property_improvement_root": "baguqeera2fwlq2th2qzyuw2yhx7scsj67mbevea6x4n25ba3neqnvhcfyhia",
+    "county_car_sha256": "5e5c1ff74f8aad9100ab120d6cc3296b723b75951635f837da7539854a141bb9",
+    "property_improvement_car_sha256": "f3ead4e7500d8f8fcd9b66b2692d3aa850a6956c2ecca1c6a28e3791c1f24d36"
+   }
+  ]
+ },
+ "interrupted": {
+  "sigterm": {
+   "kill": {
+    "run": "data/travis/runs/20261018T120634Z-t5-dryrun-b",
+    "signal": "TERM",
+    "runner_exit": 143,
+    "elephant_cli_alive_after_kill": 0,
+    "progress_at_kill": "[t5 2026-10-18T12:13:26Z] shards | shards 8/20 done, 1 in flight (s0013 permits) | parcels 2000/5000 | elapsed 7m | ETA 7m (about 15:20 local) | elephant-cli 0 procs 0 GB, runner 0.5 GB, swap 5.5 GB",
+    "children_at_kill": {
+     "5685": {
+      "shard": "s0009",
+      "stage": "county.validate",
+      "started_at": "2026-10-18T12:13:15.496Z"
+     },
+     "5771": {
+      "shard": "s0010",
+      "stage": "county.validate",
+      "started_at": "2026-10-18T12:13:18.459Z"
+     }
+    },
+    "markers_before_resume": [
+     "shards/s0001/appraisal.done.json",
+     "shards/s0001/cid_check.done.json",
+     "shards/s0001/county.car_validate.done.json",
+     "shards/s0001/county.export_tables.done.json",
+     "shards/s0001/county.hash.done.json",
+     "shards/s0001/county.validate.done.json",
+     "shards/s0001/permits.done.json",
+     "shards/s0001/property_improvement.car_validate.done.json",
+     "shards/s0001/property_improvement.export_tables.done.json",
+     "shards/s0001/property_improvement.hash.done.json",
+     "shards/s0001/property_improvement.validate.done.json",
+     "shards/s0001/reconcile.done.json",
+     "shards/s0002/appraisal.done.json",
+     "shards/s0002/cid_check.done.json",
+     "shards/s0002/county.car_validate.done.json",
+     "shards/s0002/county.export_tables.done.json",
+     "shards/s0002/county.hash.done.json",
+     "shards/s0002/county.validate.done.json",
+     "shards/s0002/merge.done.json",
+     "shards/s0002/permits.done.json",
+     "shards/s0002/property_improvement.car_validate.done.json",
+     "shards/s0002/property_improvement.export_tables.done.json",
+     "shards/s0002/property_improvement.hash.done.json",
+     "shards/s0002/property_improvement.validate.done.json",
+     "shards/s0002/reconcile.done.json",
+     "shards/s0003/appraisal.done.json",
+     "shards/s0003/cid_check.done.json",
+     "shards/s0003/county.car_validate.done.json",
+     "shards/s0003/county.export_tables.done.json",
+     "shards/s0003/county.hash.done.json",
+     "shards/s0003/county.validate.done.json",
+     "shards/s0003/merge.done.json",
+     "shards/s0003/permits.done.json",
+     "shards/s0003/property_improvement.car_validate.done.json",
+     "shards/s0003/property_improvement.export_tables.done.json",
+     "shards/s0003/property_improvement.hash.done.json",
+     "shards/s0003/property_improvement.validate.done.json",
+     "shards/s0003/reconcile.done.json",
+     "shards/s0004/appraisal.done.json",
+     "shards/s0004/cid_check.done.json",
+     "shards/s0004/county.car_validate.done.json",
+     "shards/s0004/county.export_tables.done.json",
+     "shards/s0004/county.hash.done.json",
+     "shards/s0004/county.validate.done.json",
+     "shards/s0004/merge.done.json",
+     "shards/s0004/permits.done.json",
+     "shards/s0004/property_improvement.car_validate.done.json",
+     "shards/s0004/property_improvement.export_tables.done.json",
+     "shards/s0004/property_improvement.hash.done.json",
+     "shards/s0004/property_improvement.validate.done.json",
+     "shards/s0004/reconcile.done.json",
+     "shards/s0005/appraisal.done.json",
+     "shards/s0005/cid_check.done.json",
+     "shards/s0005/county.car_validate.done.json",
+     "shards/s0005/county.export_tables.done.json",
+     "shards/s0005/county.hash.done.json",
+     "shards/s0005/county.validate.done.json",
+     "shards/s0005/merge.done.json",
+     "shards/s0005/permits.done.json",
+     "shards/s0005/property_improvement.car_validate.done.json",
+     "shards/s0005/property_improvement.export_tables.done.json",
+     "shards/s0005/property_improvement.hash.done.json",
+     "shards/s0005/property_improvement.validate.done.json",
+     "shards/s0005/reconcile.done.json",
+     "shards/s0006/appraisal.done.json",
+     "shards/s0006/cid_check.done.json",
+     "shards/s0006/county.car_validate.done.json",
+     "shards/s0006/county.export_tables.done.json",
+     "shards/s0006/county.hash.done.json",
+     "shards/s0006/county.validate.done.json",
+     "shards/s0006/merge.done.json",
+     "shards/s0006/permits.done.json",
+     "shards/s0006/property_improvement.car_validate.done.json",
+     "shards/s0006/property_improvement.export_tables.done.json",
+     "shards/s0006/property_improvement.hash.done.json",
+     "shards/s0006/property_improvement.validate.done.json",
+     "shards/s0006/reconcile.done.json",
+     "shards/s0007/appraisal.done.json",
+     "shards/s0007/cid_check.done.json",
+     "shards/s0007/county.car_validate.done.json",
+     "shards/s0007/county.export_tables.done.json",
+     "shards/s0007/county.hash.done.json",
+     "shards/s0007/county.validate.done.json",
+     "shards/s0007/permits.done.json",
+     "shards/s0007/property_improvement.car_validate.done.json",
+     "shards/s0007/property_improvement.export_tables.done.json",
+     "shards/s0007/property_improvement.hash.done.json",
+     "shards/s0007/property_improvement.validate.done.json",
+     "shards/s0007/reconcile.done.json",
+     "shards/s0008/appraisal.done.json",
+     "shards/s0008/cid_check.done.json",
+     "shards/s0008/county.car_validate.done.json",
+     "shards/s0008/county.export_tables.done.json",
+     "shards/s0008/county.hash.done.json",
+     "shards/s0008/county.validate.done.json",
+     "shards/s0008/merge.done.json",
+     "shards/s0008/permits.done.json",
+     "shards/s0008/property_improvement.car_validate.done.json",
+     "shards/s0008/property_improvement.export_tables.done.json",
+     "shards/s0008/property_improvement.hash.done.json",
+     "shards/s0008/property_improvement.validate.done.json",
+     "shards/s0008/reconcile.done.json",
+     "shards/s0009/appraisal.done.json",
+     "shards/s0009/permits.done.json",
+     "shards/s0009/reconcile.done.json",
+     "shards/s0010/appraisal.done.json",
+     "shards/s0010/permits.done.json",
+     "shards/s0010/reconcile.done.json",
+     "shards/s0011/appraisal.done.json",
+     "shards/s0011/permits.done.json",
+     "shards/s0011/reconcile.done.json",
+     "shards/s0012/appraisal.done.json",
+     "shards/s0013/appraisal.done.json"
+    ]
+   },
+   "record": {
+    "run_id": "20261018T120634Z-t5-dryrun-b",
+    "started_at": "2026-10-18T12:06:34.920Z",
+    "finished_at": "2026-10-18T12:21:29.319Z",
+    "attempts": [
+     {
+      "attempt": 1,
+      "pid": 90392,
+      "started_at": "2026-10-18T12:06:34.921Z",
+      "ended_at": "2026-10-18T12:13:26.218Z",
+      "status": "stopped (SIGTERM)",
+      "resumed": false,
+      "reaped_orphans": 0,
+      "error": "stopped by SIGTERM"
+     },
+     {
+      "attempt": 2,
+      "pid": 5994,
+      "started_at": "2026-10-18T12:13:27.640Z",
+      "ended_at": "2026-10-18T12:21:29.319Z",
+      "status": "finished",
+      "resumed": true,
+      "reaped_orphans": 0,
+      "error": null
+     }
+    ],
+    "scope": {
+     "shard_size": 250,
+     "concurrency": 8,
+     "max_shards": 20,
+     "whole_seed": false,
+     "eligibility": "__ALL__",
+     "loader_scope": "dryrun-b"
+    },
+    "appraisal": {
+     "seed": 5000,
+     "ready": 5000,
+     "dead": 0,
+     "invalid": 0,
+     "retryable": 0,
+     "reconciles": true,
+     "rule": "seed = ready + dead + invalid (kit county-ingest-run section 8)",
+     "with_geometry": 4778,
+     "without_geometry": 222
+    },
+    "permit_states": {
+     "done": 3895,
+     "done_zero_permits": 1105,
+     "not_eligible": 0,
+     "failed_permanent": 0
+    },
+    "permits_published": 55539,
+    "tables_county": {
+     "properties": 5000,
+     "address_has_geometry": 4778,
+     "address": 9996,
+     "geometry": 4822,
+     "company_has_mailing_address": 1249,
+     "company": 1249,
+     "parcel_has_geometry": 4822,
+     "parcel": 5000,
+     "property_has_address": 5000,
+     "property": 5000,
+     "property_has_lot": 5000,
+     "lot": 5000,
+     "property_has_parcel": 5000,
+     "property_has_sales_history": 4921,
+     "sales_history": 4921,
+     "property_has_structure": 4098,
+     "structure": 4098,
+     "property_has_tax": 5000,
+     "tax": 5000,
+     "sales_history_has_company": 1188,
+     "address_has_parcel": 5000,
+     "person_has_mailing_address": 3747,
+     "person": 3747,
+     "sales_history_has_person": 3729,
+     "person_has_property": 18,
+     "company_has_property": 61
+    },
+    "tables_property_improvement": {
+     "properties": 3895,
+     "address_has_parcel": 3895,
+     "address": 3895,
+     "parcel": 3895,
+     "property_has_property_improvement": 55539,
+     "property": 3895,
+     "property_improvement": 55539
+    },
+    "tables_internal": {
+     "query_table": 5000,
+     "roof_age": 5000,
+     "permits": 2380707
+    },
+    "tombstones_consumed": {
+     "dead": 0,
+     "invalid": 0
+    },
+    "deltas": {
+     "appraisal": {
+      "new": 5000,
+      "changed": 0,
+      "unchanged": 0,
+      "removed": 0,
+      "dead": 0,
+      "invalid": 0,
+      "retryable": 0
+     },
+     "permit_groups": {
+      "new": 3895,
+      "changed": 0,
+      "unchanged": 0,
+      "removed": 0,
+      "dead": 0,
+      "invalid": 0,
+      "retryable": 0
+     },
+     "permits": {
+      "new": 2380707,
+      "changed": 0,
+      "unchanged": 0,
+      "removed": 0,
+      "dead": 0,
+      "invalid": 0,
+      "retryable": 0
+     }
+    },
+    "roof_age": {
+     "parcels": 5000,
+     "eligible": 4625,
+     "ineligible": 375,
+     "by_basis": {
+      "new_construction": 1187,
+      "year_built": 3003,
+      "none": 375,
+      "completed_replacement": 435
+     },
+     "by_confidence": {
+      "medium": 1187,
+      "low": 3003,
+      "none": 375,
+      "high": 435
+     },
+     "caveats": {
+      "partial_history": 3895,
+      "history_unknown": 1105,
+      "anchor_link_tcad_permit_listing": 2
+     },
+     "anchor_link_method": {
+      "exact": 1620,
+      "tcad_permit_listing": 2
+     },
+     "older_than_threshold": {
+      "threshold_years": 15,
+      "rule": "roof_age_years > threshold",
+      "total": 3733,
+      "by_basis": {
+       "year_built": 2703,
+       "new_construction": 695,
+       "completed_replacement": 335
+      }
+     },
+     "by_historical_coverage": {
+      "partial": 3895,
+      "unknown": 1105
+     }
+    },
+    "timings": {
+     "unit": "ms",
+     "wall_ms": 894399,
+     "last_attempt_ms": 481679,
+     "stages": {
+      "appraisal": {
+       "total_ms": 153007,
+       "shards": 20,
+       "mean_ms": 7650
+      },
+      "permits": {
+       "total_ms": 129208,
+       "shards": 20,
+       "mean_ms": 6460
+      },
+      "reconcile": {
+       "total_ms": 19985,
+       "shards": 20,
+       "mean_ms": 999
+      },
+      "cid_check": {
+       "total_ms": 83,
+       "shards": 20,
+       "mean_ms": 4
+      },
+      "merge": {
+       "total_ms": 112085,
+       "shards": 20,
+       "mean_ms": 5604
+      },
+      "cli_county_validate": {
+       "total_ms": 2698025,
+       "shards": 20,
+       "mean_ms": 134901
+      },
+      "cli_county_hash": {
+       "total_ms": 194236,
+       "shards": 20,
+       "mean_ms": 9712
+      },
+      "cli_county_car_validate": {
+       "total_ms": 100580,
+       "shards": 20,
+       "mean_ms": 5029
+      },
+      "cli_county_export_tables": {
+       "total_ms": 26398,
+       "shards": 20,
+       "mean_ms": 1320
+      },
+      "cli_property_improvement_validate": {
+       "total_ms": 843893,
+       "shards": 20,
+       "mean_ms": 42195
+      },
+      "cli_property_improvement_hash": {
+       "total_ms": 146534,
+       "shards": 20,
+       "mean_ms": 7327
+      },
+      "cli_property_improvement_car_validate": {
+       "total_ms": 50198,
+       "shards": 20,
+       "mean_ms": 2510
+      },
+      "cli_property_improvement_export_tables": {
+       "total_ms": 25412,
+       "shards": 20,
+       "mean_ms": 1271
+      }
+     }
+    },
+    "memory": {
+     "peak_cli_rss_gb": 7.3,
+     "peak_cli_processes": 8,
+     "peak_runner_rss_gb": 3.2,
+     "peak_combined_rss_gb": 7.4,
+     "peak_swap_used_gb": 5.5,
+     "sampled": "every progress tick (60 s) and shard completion; ps RSS"
+    },
+    "disk": {
+     "run_dir_gb": 3.56
+    },
+    "lexicon_manifest": {
+     "url": "https://lexicon.elephant.xyz/api/manifest",
+     "sha256_start": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+     "checks": [
+      {
+       "at": "2026-10-18T12:06:35.298Z",
+       "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+       "attempt": 1
+      },
+      {
+       "at": "2026-10-18T12:13:28.036Z",
+       "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+       "attempt": 2
+      }
+     ],
+     "sha256_end": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640"
+    },
+    "no_sleep": {
+     "held": true,
+     "command": "caffeinate -dimsu -w 5994",
+     "pid": 6009
+    },
+    "readiness_report": {
+     "exit": 0,
+     "overall": "PASS",
+     "seed_allowed": true,
+     "ingest_allowed": true,
+     "gates": {
+      "catalog_metadata": "PASS",
+      "parcel": "PASS",
+      "permit": "PASS",
+      "destination": "NOT_APPLICABLE",
+      "enrichment": "PASS"
+     }
+    },
+    "preflight_warnings": [
+     "swap heavily used: 5.5 of 7 GB; close heavy apps (the 8-shard County time doubled with a nearly full swap, decisions.md 25.9)"
+    ],
+    "shards": [
+     {
+      "id": "s0001",
+      "rows": 250,
+      "first": "100008",
+      "last": "100308",
+      "county_root": "baguqeeraqgchyltglwneelcjbwjalalzv6zllrfjjtyo7x3d2rqx5gmwcsha",
+      "property_improvement_root": "baguqeeraqykfrticblcalppbe4xvocaxw6jsvfo46jrb3qzkfcollb6c2p7q",
+      "county_car_sha256": "72b050a3079dba1a7a7275bf0acc169ebce4b96ea002103c66919dc6d19f485c",
+      "property_improvement_car_sha256": "b3bea7b94fd4f82a51ecff9ac4d21b1f025d0b9d79c3919b8f0e72d2519761fe"
+     },
+     {
+      "id": "s0002",
+      "rows": 250,
+      "first": "100309",
+      "last": "100618",
+      "county_root": "baguqeeraukc3ox4vrf5lxjzqezwqksbo6eqxtazefdwtobutcusy4rr4y37q",
+      "property_improvement_root": "baguqeerahpsllx2rnpcudr55yyjqu7b4mdqslsu4wec6tkoyleofemnjrlma",
+      "county_car_sha256": "4cf70e36f1e3b6719fad36e1fd044f19d2205715abed7d79be5cd4bcbaa11e55",
+      "property_improvement_car_sha256": "182dfa87bc48634dd5a8bd1ea532c3fa336fbc8feb1599f641090f5be7a95c98"
+     },
+     {
+      "id": "s0003",
+      "rows": 250,
+      "first": "100619",
+      "last": "100919",
+      "county_root": "baguqeerakbcvomtdltf4uupg3ypq3qtba2nn3ztabeci3izbnbttcjzmxzpq",
+      "property_improvement_root": "baguqeerap6nu6bmujjeqndbay5ltsimvqcymuyaloxvalpmfjxeers6lag4a",
+      "county_car_sha256": "fd53328dee4bcca860607ad587f93f0ad21be76fc86a0302ac55ca37310d4d8e",
+      "property_improvement_car_sha256": "96c9e7ecb0237cd81a82b001592c7be3d1dff9a4f2f1fcabb374344622d87b32"
+     },
+     {
+      "id": "s0004",
+      "rows": 250,
+      "first": "100921",
+      "last": "101231",
+      "county_root": "baguqeera36mazqdfgacoztla5t4u2nyj5pvz7ubr3g6vgimrvtakzihjpw5a",
+      "property_improvement_root": "baguqeeraxy4cfng2snauum4zp2ihwlpryn55ceju744nfvdmvkh6n7gptsjq",
+      "county_car_sha256": "ecb06034d820e74c0ec646548e184930923006b8f4e99e1be003ebd77a0fd644",
+      "property_improvement_car_sha256": "57e44441a9436ea757ccb6f83dcb0c4b8d7f1fb09184b2cd18fabce89510f247"
+     },
+     {
+      "id": "s0005",
+      "rows": 250,
+      "first": "101232",
+      "last": "101551",
+      "county_root": "baguqeera2buqtjkf7tu2o3gzrpj2abvrbdwrjcmhzd2u6mmiz6yqsme7gr2q",
+      "property_improvement_root": "baguqeerac3sz5sjjo5uelezngofgwfqfvpzwpvkjwjcvefa5sticsyru3k2a",
+      "county_car_sha256": "36935d142b954f2c34c2349d22b458d403328c080cc46d4a76f9b01370fbd664",
+      "property_improvement_car_sha256": "539f21d04697c399e90c718020a0af2265aac40cc0373907af1a7e5dd8d090c9"
+     },
+     {
+      "id": "s0006",
+      "rows": 250,
+      "first": "101553",
+      "last": "101993",
+      "county_root": "baguqeera5hkilxhxtyoscr4abtd7dnikfvpghomwst42od2r5734uhplajeq",
+      "property_improvement_root": "baguqeerahm2japn47dxla6mlumysoatcwef4ygbdaoqta3hh3mofgwqyq4uq",
+      "county_car_sha256": "f16574bec5a45cfe4ee4c56d0bd8db521615e3923a1a326ba94507a63ea6a18f",
+      "property_improvement_car_sha256": "859404398edff287eafe168536b8694502016909f28a27d2f92a62012c7e44e9"
+     },
+     {
+      "id": "s0007",
+      "rows": 250,
+      "first": "101994",
+      "last": "102361",
+      "county_root": "baguqeeras3cgpzkh7erpdcxroxyspo4cutifbnr74vxq6zwwhyaxznsrwwua",
+      "property_improvement_root": "baguqeerafyrcblluyl7xbebur5qx6oob5rj5yzh5is6iv67jeonvi2zhq74a",
+      "county_car_sha256": "7bf87417f0d177ec3dbfa0c88254bc766468eda774a517d67f406bcf15b2837e",
+      "property_improvement_car_sha256": "94dc2ff896d95f4dc320e0b0e0ac9930dae3d8790045a2703533660ee3c06f85"
+     },
+     {
+      "id": "s0008",
+      "rows": 250,
+      "first": "102362",
+      "last": "102635",
+      "county_root": "baguqeerahw6ggwim2yswyyu5wrw5njtti7aei3xk2k7ja227i2ee6dqbo5xa",
+      "property_improvement_root": "baguqeera3v4kmzpczbfw2gw4pthbpccyzlpmwzop45lvuvvh4duzzjegulvq",
+      "county_car_sha256": "ac0e192e5a41c5527c5ac28f27e2ed1e76085c4bd5c26f30ac037e239be64d09",
+      "property_improvement_car_sha256": "e72435e9b067370438b5f08e330c9da3bd883e615dbe1b9d14635c53870f180a"
+     },
+     {
+      "id": "s0009",
+      "rows": 250,
+      "first": "102636",
+      "last": "103132",
+      "county_root": "baguqeera7nq3chiciisjjmylfke2l6qb4tnjoguaqozvohvbqbzzuvvriyxq",
+      "property_improvement_root": "baguqeerar7dxk5dh5texgjnvf6krgme6o5fa63povubch2qkhafvhsgyzfia",
+      "county_car_sha256": "2bb72a9bb223e19e70c69717d9d04622a896a4adb4397fd9f8d4fb9689f5bb02",
+      "property_improvement_car_sha256": "23ae48932b57dd44e609299b4f656a177ed1cdc0e9f959148417bf5a91a1331e"
+     },
+     {
+      "id": "s0010",
+      "rows": 250,
+      "first": "103133",
+      "last": "103432",
+      "county_root": "baguqeerajo3m457pkjnn5ydvn276cixsniegtor4d5spduqznl5bqz3n2jsa",
+      "property_improvement_root": "baguqeerayxhsvjjblbi46bhnvlnk7pihhhrrpxo2zcy4yb3rq7k5urlvip3q",
+      "county_car_sha256": "9b2203818aaf15921201335a0125a3ddf267d79c252cd5323a525bcb5a161754",
+      "property_improvement_car_sha256": "fc2cdc0aa7505414b22a9bf2cac0c0445cad4931eceb580281f67be499a7ee17"
+     },
+     {
+      "id": "s0011",
+      "rows": 250,
+      "first": "103433",
+      "last": "103833",
+      "county_root": "baguqeera4kocfoga5jcpj66idtewwe5csmxf2jh3nbbwolrrjg6nshbdqudq",
+      "property_improvement_root": "baguqeerayvhrpza5yht4vftuhwhgrswps37xiuv7gjbkkiyekrptip6nsazq",
+      "county_car_sha256": "92c4487b74c8a08e2ce9c54a21c8d96108703cb96d1957ff7e19b5f9002774c3",
+      "property_improvement_car_sha256": "af12f8ae58d0c5cac42decaa96cbb1d632fcad40abffd028732a60c75188e852"
+     },
+     {
+      "id": "s0012",
+      "rows": 250,
+      "first": "103834",
+      "last": "104214",
+      "county_root": "baguqeera52int43krnwc24ilmqpyjsuzwohfanasyziawp4i7eg7k5qbxiwq",
+      "property_improvement_root": "baguqeeratf3ty3f7ea54siybe663ppr7ix5i2do4rrrbmr3xxlhckul7b7ba",
+      "county_car_sha256": "94d0e4e56fe6fac4a6123b5386ae124656c76cd90dc2dc44a3a26c32f9169766",
+      "property_improvement_car_sha256": "e03d9b862b6a3176f651fc3e04f56c7bb5e9967e7a78a601152f3cecbcb5c015"
+     },
+     {
+      "id": "s0013",
+      "rows": 250,
+      "first": "104215",
+      "last": "104541",
+      "county_root": "baguqeerae6arhmlkce223wvknz2zdi64f5o3bmwrxy6oaet37xxkmue5nt7a",
+      "property_improvement_root": "baguqeerasrrcdbwn245ta3umbd3htlrm3hx45puk2jlrkrragaw4ocbwvwaq",
+      "county_car_sha256": "dde7c44fd22258f2a16c70e26dd4b9afc6134a1b3050702c508bc0db8fe82e48",
+      "property_improvement_car_sha256": "becd61de5923ac124a6e523dc79791b0f678776955b8b7245967de899f4799b2"
+     },
+     {
+      "id": "s0014",
+      "rows": 250,
+      "first": "104542",
+      "last": "104810",
+      "county_root": "baguqeeraxedbnuww7tzzrhjfd46dgfmgqb676vafx2yhttirnwxzb2dfbtxa",
+      "property_improvement_root": "baguqeeraye4zadfslcfslvfg6y2pxkvxvkdny3djfnykp6v776rlolgrnvkq",
+      "county_car_sha256": "7bd5af06855a14b24251a53329c71b2d81a26d1460abb08a1dc562979ba2831c",
+      "property_improvement_car_sha256": "0b57b403a85d79aef5a90903eff00d3b026a3a4a2eaf6438ae6667010aefd92d"
+     },
+     {
+      "id": "s0015",
+      "rows": 250,
+      "first": "104811",
+      "last": "105106",
+      "county_root": "baguqeeraixkylxucuvnwkdalzble2i45z65zwlkacvq2xmj7yp7v7zdooi4q",
+      "property_improvement_root": "baguqeera3axxvcenegil4v7rdhimkof4f3bsfwt5qhh4n476mk3ajxrak6ja",
+      "county_car_sha256": "0ddb45b921d7f62f6f97e4e1cdd2d5c70065f1ae0c5ea680630f140142e63d58",
+      "property_improvement_car_sha256": "ccf3ed94b156982bd99ae6daf2099625ff0c0053f247c594e087901e762afa46"
+     },
+     {
+      "id": "s0016",
+      "rows": 250,
+      "first": "105107",
+      "last": "105453",
+      "county_root": "baguqeeraq3fcsktadlkfvim2g7kh3pxmlms6wwtoz4otzvxsw5oupyklo7fq",
+      "property_improvement_root": "baguqeeramadbhp44u6aoxgu7uqd234l746cnlzznoja5jdshvrqlamz4p6ta",
+      "county_car_sha256": "a4469134f8568640f1a92cf81623ba4e1605a9139ba45f8fa9f27d6427669d7c",
+      "property_improvement_car_sha256": "fcb1848ddddcd0c2d254c90e56431eb774bb2fc0ed548d2d74a081bcfb63f71e"
+     },
+     {
+      "id": "s0017",
+      "rows": 250,
+      "first": "105454",
+      "last": "105750",
+      "county_root": "baguqeeranf6jxztlot762go6xomsdxn65ju442gtzmlbrpphdgenbsd3jkyq",
+      "property_improvement_root": "baguqeeravwmovzzd3yhiknvbya5mar26d2klituhbptgpk6ffxnpp5scspea",
+      "county_car_sha256": "f07a07d7e1deb2424f2c7d99dbea3bf2b1ddc5e17cb71389f622e2eaeb337274",
+      "property_improvement_car_sha256": "b077e8d26794ed0f69b9961b2d530d307b9effc7469c962abe70a6bbd8a1cfc7"
+     },
+     {
+      "id": "s0018",
+      "rows": 250,
+      "first": "105751",
+      "last": "106023",
+      "county_root": "baguqeerawpqo3chvfcwdd3h5amgbf6enaa5v7vdi3aziyrjdqu6bnfr3auma",
+      "property_improvement_root": "baguqeeraj5q3swzfaulyt54hlvrvrm3wt2lfjdokkicacbml6ijzsigpzxka",
+      "county_car_sha256": "d00c064b82cb98cd8c751014c12322bef70301c7d67cf725b3fd81d932b02daf",
+      "property_improvement_car_sha256": "4b81b69873f1a4c82f198468b4a91f5a99bd9c2d754061c5cbb5d090a66f2a50"
+     },
+     {
+      "id": "s0019",
+      "rows": 250,
+      "first": "106024",
+      "last": "106322",
+      "county_root": "baguqeerasc7fn27zdby2dmlcbddcgok6c3hxsimtkw2e4ovv4dacgivjtfpq",
+      "property_improvement_root": "baguqeeraawc5hjpxff3pfat22lvhgkjczftawtrx4kzukudzma2rug5f2zna",
+      "county_car_sha256": "8236899cae02583db2a6e68e4dca63252989a3d3864b9c9814d042056371384b",
+      "property_improvement_car_sha256": "37ba39ab5f5321d497de0df7f9ed6e066007d6cd1a25f264b3870e2192289f81"
+     },
+     {
+      "id": "s0020",
+      "rows": 250,
+      "first": "106323",
+      "last": "106654",
+      "county_root": "baguqeeraq3feomnaxadaaou53brms5c5fnr7votcnbp5wu3hy6ohsroujmia",
+      "property_improvement_root": "baguqeera2fwlq2th2qzyuw2yhx7scsj67mbevea6x4n25ba3neqnvhcfyhia",
+      "county_car_sha256": "5e5c1ff74f8aad9100ab120d6cc3296b723b75951635f837da7539854a141bb9",
+      "property_improvement_car_sha256": "f3ead4e7500d8f8fcd9b66b2692d3aa850a6956c2ecca1c6a28e3791c1f24d36"
+     }
+    ]
+   }
+  },
+  "sigkill": {
+   "kill": {
+    "run": "data/travis/runs/20261018T122148Z-t5-dryrun-c",
+    "signal": "KILL",
+    "runner_exit": 137,
+    "elephant_cli_alive_after_kill": 0,
+    "progress_at_kill": "[t5 2026-10-18T12:28:35Z] shards | shards 6/20 done, 7 in flight (s0007 merge, s0001 merge, s0009 county.validate, s0010 county.validate, s0011 county.validate, s0012 permits, s0013 appraisal) | parcels 1500/5000 | elapsed 7m | ETA 10m (about 15:38 local) | elephant-cli 2 procs 1.1 GB, runner 0.5 GB, swap 5.5 GB",
+    "children_at_kill": {
+     "38545": {
+      "shard": "s0009",
+      "stage": "county.validate",
+      "started_at": "2026-10-18T12:28:29.770Z"
+     },
+     "38610": {
+      "shard": "s0010",
+      "stage": "county.validate",
+      "started_at": "2026-10-18T12:28:32.444Z"
+     }
+    },
+    "markers_before_resume": [
+     "shards/s0001/appraisal.done.json",
+     "shards/s0001/cid_check.done.json",
+     "shards/s0001/county.car_validate.done.json",
+     "shards/s0001/county.export_tables.done.json",
+     "shards/s0001/county.hash.done.json",
+     "shards/s0001/county.validate.done.json",
+     "shards/s0001/permits.done.json",
+     "shards/s0001/property_improvement.car_validate.done.json",
+     "shards/s0001/property_improvement.export_tables.done.json",
+     "shards/s0001/property_improvement.hash.done.json",
+     "shards/s0001/property_improvement.validate.done.json",
+     "shards/s0001/reconcile.done.json",
+     "shards/s0002/appraisal.done.json",
+     "shards/s0002/cid_check.done.json",
+     "shards/s0002/county.car_validate.done.json",
+     "shards/s0002/county.export_tables.done.json",
+     "shards/s0002/county.hash.done.json",
+     "shards/s0002/county.validate.done.json",
+     "shards/s0002/merge.done.json",
+     "shards/s0002/permits.done.json",
+     "shards/s0002/property_improvement.car_validate.done.json",
+     "shards/s0002/property_improvement.export_tables.done.json",
+     "shards/s0002/property_improvement.hash.done.json",
+     "shards/s0002/property_improvement.validate.done.json",
+     "shards/s0002/reconcile.done.json",
+     "shards/s0003/appraisal.done.json",
+     "shards/s0003/cid_check.done.json",
+     "shards/s0003/county.car_validate.done.json",
+     "shards/s0003/county.export_tables.done.json",
+     "shards/s0003/county.hash.done.json",
+     "shards/s0003/county.validate.done.json",
+     "shards/s0003/merge.done.json",
+     "shards/s0003/permits.done.json",
+     "shards/s0003/property_improvement.car_validate.done.json",
+     "shards/s0003/property_improvement.export_tables.done.json",
+     "shards/s0003/property_improvement.hash.done.json",
+     "shards/s0003/property_improvement.validate.done.json",
+     "shards/s0003/reconcile.done.json",
+     "shards/s0004/appraisal.done.json",
+     "shards/s0004/cid_check.done.json",
+     "shards/s0004/county.car_validate.done.json",
+     "shards/s0004/county.export_tables.done.json",
+     "shards/s0004/county.hash.done.json",
+     "shards/s0004/county.validate.done.json",
+     "shards/s0004/merge.done.json",
+     "shards/s0004/permits.done.json",
+     "shards/s0004/property_improvement.car_validate.done.json",
+     "shards/s0004/property_improvement.export_tables.done.json",
+     "shards/s0004/property_improvement.hash.done.json",
+     "shards/s0004/property_improvement.validate.done.json",
+     "shards/s0004/reconcile.done.json",
+     "shards/s0005/appraisal.done.json",
+     "shards/s0005/cid_check.done.json",
+     "shards/s0005/county.car_validate.done.json",
+     "shards/s0005/county.export_tables.done.json",
+     "shards/s0005/county.hash.done.json",
+     "shards/s0005/county.validate.done.json",
+     "shards/s0005/merge.done.json",
+     "shards/s0005/permits.done.json",
+     "shards/s0005/property_improvement.car_validate.done.json",
+     "shards/s0005/property_improvement.export_tables.done.json",
+     "shards/s0005/property_improvement.hash.done.json",
+     "shards/s0005/property_improvement.validate.done.json",
+     "shards/s0005/reconcile.done.json",
+     "shards/s0006/appraisal.done.json",
+     "shards/s0006/cid_check.done.json",
+     "shards/s0006/county.car_validate.done.json",
+     "shards/s0006/county.export_tables.done.json",
+     "shards/s0006/county.hash.done.json",
+     "shards/s0006/county.validate.done.json",
+     "shards/s0006/merge.done.json",
+     "shards/s0006/permits.done.json",
+     "shards/s0006/property_improvement.car_validate.done.json",
+     "shards/s0006/property_improvement.export_tables.done.json",
+     "shards/s0006/property_improvement.hash.done.json",
+     "shards/s0006/property_improvement.validate.done.json",
+     "shards/s0006/reconcile.done.json",
+     "shards/s0007/appraisal.done.json",
+     "shards/s0007/cid_check.done.json",
+     "shards/s0007/county.car_validate.done.json",
+     "shards/s0007/county.export_tables.done.json",
+     "shards/s0007/county.hash.done.json",
+     "shards/s0007/county.validate.done.json",
+     "shards/s0007/permits.done.json",
+     "shards/s0007/property_improvement.car_validate.done.json",
+     "shards/s0007/property_improvement.export_tables.done.json",
+     "shards/s0007/property_improvement.hash.done.json",
+     "shards/s0007/property_improvement.validate.done.json",
+     "shards/s0007/reconcile.done.json",
+     "shards/s0008/appraisal.done.json",
+     "shards/s0008/cid_check.done.json",
+     "shards/s0008/county.car_validate.done.json",
+     "shards/s0008/county.export_tables.done.json",
+     "shards/s0008/county.hash.done.json",
+     "shards/s0008/county.validate.done.json",
+     "shards/s0008/merge.done.json",
+     "shards/s0008/permits.done.json",
+     "shards/s0008/property_improvement.car_validate.done.json",
+     "shards/s0008/property_improvement.export_tables.done.json",
+     "shards/s0008/property_improvement.hash.done.json",
+     "shards/s0008/property_improvement.validate.done.json",
+     "shards/s0008/reconcile.done.json",
+     "shards/s0009/appraisal.done.json",
+     "shards/s0009/permits.done.json",
+     "shards/s0009/reconcile.done.json",
+     "shards/s0010/appraisal.done.json",
+     "shards/s0010/permits.done.json",
+     "shards/s0010/reconcile.done.json",
+     "shards/s0011/appraisal.done.json",
+     "shards/s0011/permits.done.json",
+     "shards/s0011/reconcile.done.json",
+     "shards/s0012/appraisal.done.json",
+     "shards/s0013/appraisal.done.json"
+    ]
+   },
+   "record": {
+    "run_id": "20261018T122148Z-t5-dryrun-c",
+    "started_at": "2026-10-18T12:21:48.015Z",
+    "finished_at": "2026-10-18T12:36:35.975Z",
+    "attempts": [
+     {
+      "attempt": 1,
+      "pid": 23544,
+      "started_at": "2026-10-18T12:21:48.015Z",
+      "ended_at": null,
+      "status": "running",
+      "resumed": false,
+      "reaped_orphans": 0,
+      "error": null
+     },
+     {
+      "attempt": 2,
+      "pid": 38768,
+      "started_at": "2026-10-18T12:28:38.068Z",
+      "ended_at": "2026-10-18T12:36:35.975Z",
+      "status": "finished",
+      "resumed": true,
+      "reaped_orphans": 0,
+      "error": null
+     }
+    ],
+    "scope": {
+     "shard_size": 250,
+     "concurrency": 8,
+     "max_shards": 20,
+     "whole_seed": false,
+     "eligibility": "__ALL__",
+     "loader_scope": "dryrun-c"
+    },
+    "appraisal": {
+     "seed": 5000,
+     "ready": 5000,
+     "dead": 0,
+     "invalid": 0,
+     "retryable": 0,
+     "reconciles": true,
+     "rule": "seed = ready + dead + invalid (kit county-ingest-run section 8)",
+     "with_geometry": 4778,
+     "without_geometry": 222
+    },
+    "permit_states": {
+     "done": 3895,
+     "done_zero_permits": 1105,
+     "not_eligible": 0,
+     "failed_permanent": 0
+    },
+    "permits_published": 55539,
+    "tables_county": {
+     "properties": 5000,
+     "address_has_geometry": 4778,
+     "address": 9996,
+     "geometry": 4822,
+     "company_has_mailing_address": 1249,
+     "company": 1249,
+     "parcel_has_geometry": 4822,
+     "parcel": 5000,
+     "property_has_address": 5000,
+     "property": 5000,
+     "property_has_lot": 5000,
+     "lot": 5000,
+     "property_has_parcel": 5000,
+     "property_has_sales_history": 4921,
+     "sales_history": 4921,
+     "property_has_structure": 4098,
+     "structure": 4098,
+     "property_has_tax": 5000,
+     "tax": 5000,
+     "sales_history_has_company": 1188,
+     "address_has_parcel": 5000,
+     "person_has_mailing_address": 3747,
+     "person": 3747,
+     "sales_history_has_person": 3729,
+     "person_has_property": 18,
+     "company_has_property": 61
+    },
+    "tables_property_improvement": {
+     "properties": 3895,
+     "address_has_parcel": 3895,
+     "address": 3895,
+     "parcel": 3895,
+     "property_has_property_improvement": 55539,
+     "property": 3895,
+     "property_improvement": 55539
+    },
+    "tables_internal": {
+     "query_table": 5000,
+     "roof_age": 5000,
+     "permits": 2380707
+    },
+    "tombstones_consumed": {
+     "dead": 0,
+     "invalid": 0
+    },
+    "deltas": {
+     "appraisal": {
+      "new": 5000,
+      "changed": 0,
+      "unchanged": 0,
+      "removed": 0,
+      "dead": 0,
+      "invalid": 0,
+      "retryable": 0
+     },
+     "permit_groups": {
+      "new": 3895,
+      "changed": 0,
+      "unchanged": 0,
+      "removed": 0,
+      "dead": 0,
+      "invalid": 0,
+      "retryable": 0
+     },
+     "permits": {
+      "new": 2380707,
+      "changed": 0,
+      "unchanged": 0,
+      "removed": 0,
+      "dead": 0,
+      "invalid": 0,
+      "retryable": 0
+     }
+    },
+    "roof_age": {
+     "parcels": 5000,
+     "eligible": 4625,
+     "ineligible": 375,
+     "by_basis": {
+      "new_construction": 1187,
+      "year_built": 3003,
+      "none": 375,
+      "completed_replacement": 435
+     },
+     "by_confidence": {
+      "medium": 1187,
+      "low": 3003,
+      "none": 375,
+      "high": 435
+     },
+     "caveats": {
+      "partial_history": 3895,
+      "history_unknown": 1105,
+      "anchor_link_tcad_permit_listing": 2
+     },
+     "anchor_link_method": {
+      "exact": 1620,
+      "tcad_permit_listing": 2
+     },
+     "older_than_threshold": {
+      "threshold_years": 15,
+      "rule": "roof_age_years > threshold",
+      "total": 3733,
+      "by_basis": {
+       "year_built": 2703,
+       "new_construction": 695,
+       "completed_replacement": 335
+      }
+     },
+     "by_historical_coverage": {
+      "partial": 3895,
+      "unknown": 1105
+     }
+    },
+    "timings": {
+     "unit": "ms",
+     "wall_ms": 887960,
+     "last_attempt_ms": 477907,
+     "stages": {
+      "appraisal": {
+       "total_ms": 138440,
+       "shards": 20,
+       "mean_ms": 6922
+      },
+      "permits": {
+       "total_ms": 140560,
+       "shards": 20,
+       "mean_ms": 7028
+      },
+      "reconcile": {
+       "total_ms": 18929,
+       "shards": 20,
+       "mean_ms": 946
+      },
+      "cid_check": {
+       "total_ms": 97,
+       "shards": 20,
+       "mean_ms": 5
+      },
+      "merge": {
+       "total_ms": 99354,
+       "shards": 20,
+       "mean_ms": 4968
+      },
+      "cli_county_validate": {
+       "total_ms": 2670239,
+       "shards": 20,
+       "mean_ms": 133512
+      },
+      "cli_county_hash": {
+       "total_ms": 198820,
+       "shards": 20,
+       "mean_ms": 9941
+      },
+      "cli_county_car_validate": {
+       "total_ms": 100368,
+       "shards": 20,
+       "mean_ms": 5018
+      },
+      "cli_county_export_tables": {
+       "total_ms": 27185,
+       "shards": 20,
+       "mean_ms": 1359
+      },
+      "cli_property_improvement_validate": {
+       "total_ms": 829445,
+       "shards": 20,
+       "mean_ms": 41472
+      },
+      "cli_property_improvement_hash": {
+       "total_ms": 147186,
+       "shards": 20,
+       "mean_ms": 7359
+      },
+      "cli_property_improvement_car_validate": {
+       "total_ms": 50757,
+       "shards": 20,
+       "mean_ms": 2538
+      },
+      "cli_property_improvement_export_tables": {
+       "total_ms": 25467,
+       "shards": 20,
+       "mean_ms": 1273
+      }
+     }
+    },
+    "memory": {
+     "peak_cli_rss_gb": 6.9,
+     "peak_cli_processes": 8,
+     "peak_runner_rss_gb": 2.8,
+     "peak_combined_rss_gb": 7.3,
+     "peak_swap_used_gb": 5.5,
+     "sampled": "every progress tick (60 s) and shard completion; ps RSS"
+    },
+    "disk": {
+     "run_dir_gb": 3.57
+    },
+    "lexicon_manifest": {
+     "url": "https://lexicon.elephant.xyz/api/manifest",
+     "sha256_start": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+     "checks": [
+      {
+       "at": "2026-10-18T12:21:48.472Z",
+       "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+       "attempt": 1
+      },
+      {
+       "at": "2026-10-18T12:28:38.405Z",
+       "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+       "attempt": 2
+      }
+     ],
+     "sha256_end": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640"
+    },
+    "no_sleep": {
+     "held": true,
+     "command": "caffeinate -dimsu -w 38768",
+     "pid": 38781
+    },
+    "readiness_report": {
+     "exit": 0,
+     "overall": "PASS",
+     "seed_allowed": true,
+     "ingest_allowed": true,
+     "gates": {
+      "catalog_metadata": "PASS",
+      "parcel": "PASS",
+      "permit": "PASS",
+      "destination": "NOT_APPLICABLE",
+      "enrichment": "PASS"
+     }
+    },
+    "preflight_warnings": [
+     "swap heavily used: 5.5 of 7 GB; close heavy apps (the 8-shard County time doubled with a nearly full swap, decisions.md 25.9)"
+    ],
+    "shards": [
+     {
+      "id": "s0001",
+      "rows": 250,
+      "first": "100008",
+      "last": "100308",
+      "county_root": "baguqeeraqgchyltglwneelcjbwjalalzv6zllrfjjtyo7x3d2rqx5gmwcsha",
+      "property_improvement_root": "baguqeeraqykfrticblcalppbe4xvocaxw6jsvfo46jrb3qzkfcollb6c2p7q",
+      "county_car_sha256": "72b050a3079dba1a7a7275bf0acc169ebce4b96ea002103c66919dc6d19f485c",
+      "property_improvement_car_sha256": "b3bea7b94fd4f82a51ecff9ac4d21b1f025d0b9d79c3919b8f0e72d2519761fe"
+     },
+     {
+      "id": "s0002",
+      "rows": 250,
+      "first": "100309",
+      "last": "100618",
+      "county_root": "baguqeeraukc3ox4vrf5lxjzqezwqksbo6eqxtazefdwtobutcusy4rr4y37q",
+      "property_improvement_root": "baguqeerahpsllx2rnpcudr55yyjqu7b4mdqslsu4wec6tkoyleofemnjrlma",
+      "county_car_sha256": "4cf70e36f1e3b6719fad36e1fd044f19d2205715abed7d79be5cd4bcbaa11e55",
+      "property_improvement_car_sha256": "182dfa87bc48634dd5a8bd1ea532c3fa336fbc8feb1599f641090f5be7a95c98"
+     },
+     {
+      "id": "s0003",
+      "rows": 250,
+      "first": "100619",
+      "last": "100919",
+      "county_root": "baguqeerakbcvomtdltf4uupg3ypq3qtba2nn3ztabeci3izbnbttcjzmxzpq",
+      "property_improvement_root": "baguqeerap6nu6bmujjeqndbay5ltsimvqcymuyaloxvalpmfjxeers6lag4a",
+      "county_car_sha256": "fd53328dee4bcca860607ad587f93f0ad21be76fc86a0302ac55ca37310d4d8e",
+      "property_improvement_car_sha256": "96c9e7ecb0237cd81a82b001592c7be3d1dff9a4f2f1fcabb374344622d87b32"
+     },
+     {
+      "id": "s0004",
+      "rows": 250,
+      "first": "100921",
+      "last": "101231",
+      "county_root": "baguqeera36mazqdfgacoztla5t4u2nyj5pvz7ubr3g6vgimrvtakzihjpw5a",
+      "property_improvement_root": "baguqeeraxy4cfng2snauum4zp2ihwlpryn55ceju744nfvdmvkh6n7gptsjq",
+      "county_car_sha256": "ecb06034d820e74c0ec646548e184930923006b8f4e99e1be003ebd77a0fd644",
+      "property_improvement_car_sha256": "57e44441a9436ea757ccb6f83dcb0c4b8d7f1fb09184b2cd18fabce89510f247"
+     },
+     {
+      "id": "s0005",
+      "rows": 250,
+      "first": "101232",
+      "last": "101551",
+      "county_root": "baguqeera2buqtjkf7tu2o3gzrpj2abvrbdwrjcmhzd2u6mmiz6yqsme7gr2q",
+      "property_improvement_root": "baguqeerac3sz5sjjo5uelezngofgwfqfvpzwpvkjwjcvefa5sticsyru3k2a",
+      "county_car_sha256": "36935d142b954f2c34c2349d22b458d403328c080cc46d4a76f9b01370fbd664",
+      "property_improvement_car_sha256": "539f21d04697c399e90c718020a0af2265aac40cc0373907af1a7e5dd8d090c9"
+     },
+     {
+      "id": "s0006",
+      "rows": 250,
+      "first": "101553",
+      "last": "101993",
+      "county_root": "baguqeera5hkilxhxtyoscr4abtd7dnikfvpghomwst42od2r5734uhplajeq",
+      "property_improvement_root": "baguqeerahm2japn47dxla6mlumysoatcwef4ygbdaoqta3hh3mofgwqyq4uq",
+      "county_car_sha256": "f16574bec5a45cfe4ee4c56d0bd8db521615e3923a1a326ba94507a63ea6a18f",
+      "property_improvement_car_sha256": "859404398edff287eafe168536b8694502016909f28a27d2f92a62012c7e44e9"
+     },
+     {
+      "id": "s0007",
+      "rows": 250,
+      "first": "101994",
+      "last": "102361",
+      "county_root": "baguqeeras3cgpzkh7erpdcxroxyspo4cutifbnr74vxq6zwwhyaxznsrwwua",
+      "property_improvement_root": "baguqeerafyrcblluyl7xbebur5qx6oob5rj5yzh5is6iv67jeonvi2zhq74a",
+      "county_car_sha256": "7bf87417f0d177ec3dbfa0c88254bc766468eda774a517d67f406bcf15b2837e",
+      "property_improvement_car_sha256": "94dc2ff896d95f4dc320e0b0e0ac9930dae3d8790045a2703533660ee3c06f85"
+     },
+     {
+      "id": "s0008",
+      "rows": 250,
+      "first": "102362",
+      "last": "102635",
+      "county_root": "baguqeerahw6ggwim2yswyyu5wrw5njtti7aei3xk2k7ja227i2ee6dqbo5xa",
+      "property_improvement_root": "baguqeera3v4kmzpczbfw2gw4pthbpccyzlpmwzop45lvuvvh4duzzjegulvq",
+      "county_car_sha256": "ac0e192e5a41c5527c5ac28f27e2ed1e76085c4bd5c26f30ac037e239be64d09",
+      "property_improvement_car_sha256": "e72435e9b067370438b5f08e330c9da3bd883e615dbe1b9d14635c53870f180a"
+     },
+     {
+      "id": "s0009",
+      "rows": 250,
+      "first": "102636",
+      "last": "103132",
+      "county_root": "baguqeera7nq3chiciisjjmylfke2l6qb4tnjoguaqozvohvbqbzzuvvriyxq",
+      "property_improvement_root": "baguqeerar7dxk5dh5texgjnvf6krgme6o5fa63povubch2qkhafvhsgyzfia",
+      "county_car_sha256": "2bb72a9bb223e19e70c69717d9d04622a896a4adb4397fd9f8d4fb9689f5bb02",
+      "property_improvement_car_sha256": "23ae48932b57dd44e609299b4f656a177ed1cdc0e9f959148417bf5a91a1331e"
+     },
+     {
+      "id": "s0010",
+      "rows": 250,
+      "first": "103133",
+      "last": "103432",
+      "county_root": "baguqeerajo3m457pkjnn5ydvn276cixsniegtor4d5spduqznl5bqz3n2jsa",
+      "property_improvement_root": "baguqeerayxhsvjjblbi46bhnvlnk7pihhhrrpxo2zcy4yb3rq7k5urlvip3q",
+      "county_car_sha256": "9b2203818aaf15921201335a0125a3ddf267d79c252cd5323a525bcb5a161754",
+      "property_improvement_car_sha256": "fc2cdc0aa7505414b22a9bf2cac0c0445cad4931eceb580281f67be499a7ee17"
+     },
+     {
+      "id": "s0011",
+      "rows": 250,
+      "first": "103433",
+      "last": "103833",
+      "county_root": "baguqeera4kocfoga5jcpj66idtewwe5csmxf2jh3nbbwolrrjg6nshbdqudq",
+      "property_improvement_root": "baguqeerayvhrpza5yht4vftuhwhgrswps37xiuv7gjbkkiyekrptip6nsazq",
+      "county_car_sha256": "92c4487b74c8a08e2ce9c54a21c8d96108703cb96d1957ff7e19b5f9002774c3",
+      "property_improvement_car_sha256": "af12f8ae58d0c5cac42decaa96cbb1d632fcad40abffd028732a60c75188e852"
+     },
+     {
+      "id": "s0012",
+      "rows": 250,
+      "first": "103834",
+      "last": "104214",
+      "county_root": "baguqeera52int43krnwc24ilmqpyjsuzwohfanasyziawp4i7eg7k5qbxiwq",
+      "property_improvement_root": "baguqeeratf3ty3f7ea54siybe663ppr7ix5i2do4rrrbmr3xxlhckul7b7ba",
+      "county_car_sha256": "94d0e4e56fe6fac4a6123b5386ae124656c76cd90dc2dc44a3a26c32f9169766",
+      "property_improvement_car_sha256": "e03d9b862b6a3176f651fc3e04f56c7bb5e9967e7a78a601152f3cecbcb5c015"
+     },
+     {
+      "id": "s0013",
+      "rows": 250,
+      "first": "104215",
+      "last": "104541",
+      "county_root": "baguqeerae6arhmlkce223wvknz2zdi64f5o3bmwrxy6oaet37xxkmue5nt7a",
+      "property_improvement_root": "baguqeerasrrcdbwn245ta3umbd3htlrm3hx45puk2jlrkrragaw4ocbwvwaq",
+      "county_car_sha256": "dde7c44fd22258f2a16c70e26dd4b9afc6134a1b3050702c508bc0db8fe82e48",
+      "property_improvement_car_sha256": "becd61de5923ac124a6e523dc79791b0f678776955b8b7245967de899f4799b2"
+     },
+     {
+      "id": "s0014",
+      "rows": 250,
+      "first": "104542",
+      "last": "104810",
+      "county_root": "baguqeeraxedbnuww7tzzrhjfd46dgfmgqb676vafx2yhttirnwxzb2dfbtxa",
+      "property_improvement_root": "baguqeeraye4zadfslcfslvfg6y2pxkvxvkdny3djfnykp6v776rlolgrnvkq",
+      "county_car_sha256": "7bd5af06855a14b24251a53329c71b2d81a26d1460abb08a1dc562979ba2831c",
+      "property_improvement_car_sha256": "0b57b403a85d79aef5a90903eff00d3b026a3a4a2eaf6438ae6667010aefd92d"
+     },
+     {
+      "id": "s0015",
+      "rows": 250,
+      "first": "104811",
+      "last": "105106",
+      "county_root": "baguqeeraixkylxucuvnwkdalzble2i45z65zwlkacvq2xmj7yp7v7zdooi4q",
+      "property_improvement_root": "baguqeera3axxvcenegil4v7rdhimkof4f3bsfwt5qhh4n476mk3ajxrak6ja",
+      "county_car_sha256": "0ddb45b921d7f62f6f97e4e1cdd2d5c70065f1ae0c5ea680630f140142e63d58",
+      "property_improvement_car_sha256": "ccf3ed94b156982bd99ae6daf2099625ff0c0053f247c594e087901e762afa46"
+     },
+     {
+      "id": "s0016",
+      "rows": 250,
+      "first": "105107",
+      "last": "105453",
+      "county_root": "baguqeeraq3fcsktadlkfvim2g7kh3pxmlms6wwtoz4otzvxsw5oupyklo7fq",
+      "property_improvement_root": "baguqeeramadbhp44u6aoxgu7uqd234l746cnlzznoja5jdshvrqlamz4p6ta",
+      "county_car_sha256": "a4469134f8568640f1a92cf81623ba4e1605a9139ba45f8fa9f27d6427669d7c",
+      "property_improvement_car_sha256": "fcb1848ddddcd0c2d254c90e56431eb774bb2fc0ed548d2d74a081bcfb63f71e"
+     },
+     {
+      "id": "s0017",
+      "rows": 250,
+      "first": "105454",
+      "last": "105750",
+      "county_root": "baguqeeranf6jxztlot762go6xomsdxn65ju442gtzmlbrpphdgenbsd3jkyq",
+      "property_improvement_root": "baguqeeravwmovzzd3yhiknvbya5mar26d2klituhbptgpk6ffxnpp5scspea",
+      "county_car_sha256": "f07a07d7e1deb2424f2c7d99dbea3bf2b1ddc5e17cb71389f622e2eaeb337274",
+      "property_improvement_car_sha256": "b077e8d26794ed0f69b9961b2d530d307b9effc7469c962abe70a6bbd8a1cfc7"
+     },
+     {
+      "id": "s0018",
+      "rows": 250,
+      "first": "105751",
+      "last": "106023",
+      "county_root": "baguqeerawpqo3chvfcwdd3h5amgbf6enaa5v7vdi3aziyrjdqu6bnfr3auma",
+      "property_improvement_root": "baguqeeraj5q3swzfaulyt54hlvrvrm3wt2lfjdokkicacbml6ijzsigpzxka",
+      "county_car_sha256": "d00c064b82cb98cd8c751014c12322bef70301c7d67cf725b3fd81d932b02daf",
+      "property_improvement_car_sha256": "4b81b69873f1a4c82f198468b4a91f5a99bd9c2d754061c5cbb5d090a66f2a50"
+     },
+     {
+      "id": "s0019",
+      "rows": 250,
+      "first": "106024",
+      "last": "106322",
+      "county_root": "baguqeerasc7fn27zdby2dmlcbddcgok6c3hxsimtkw2e4ovv4dacgivjtfpq",
+      "property_improvement_root": "baguqeeraawc5hjpxff3pfat22lvhgkjczftawtrx4kzukudzma2rug5f2zna",
+      "county_car_sha256": "8236899cae02583db2a6e68e4dca63252989a3d3864b9c9814d042056371384b",
+      "property_improvement_car_sha256": "37ba39ab5f5321d497de0df7f9ed6e066007d6cd1a25f264b3870e2192289f81"
+     },
+     {
+      "id": "s0020",
+      "rows": 250,
+      "first": "106323",
+      "last": "106654",
+      "county_root": "baguqeeraq3feomnaxadaaou53brms5c5fnr7votcnbp5wu3hy6ohsroujmia",
+      "property_improvement_root": "baguqeera2fwlq2th2qzyuw2yhx7scsj67mbevea6x4n25ba3neqnvhcfyhia",
+      "county_car_sha256": "5e5c1ff74f8aad9100ab120d6cc3296b723b75951635f837da7539854a141bb9",
+      "property_improvement_car_sha256": "f3ead4e7500d8f8fcd9b66b2692d3aa850a6956c2ecca1c6a28e3791c1f24d36"
+     }
+    ]
+   }
+  }
+ },
+ "comparison_with_uninterrupted": {
+  "reference": "data/travis/runs/20261018T114904Z-t5-dryrun-a",
+  "runs": [
+   {
+    "run": "data/travis/runs/20261018T120634Z-t5-dryrun-b",
+    "attempts": [
+     {
+      "attempt": 1,
+      "pid": 90392,
+      "started_at": "2026-10-18T12:06:34.921Z",
+      "ended_at": "2026-10-18T12:13:26.218Z",
+      "status": "stopped (SIGTERM)",
+      "reaped_orphans": 0
+     },
+     {
+      "attempt": 2,
+      "pid": 5994,
+      "started_at": "2026-10-18T12:13:27.640Z",
+      "ended_at": "2026-10-18T12:21:29.319Z",
+      "status": "finished",
+      "reaped_orphans": 0
+     }
+    ],
+    "stages_compared": 261,
+    "all_equal_to_reference": true,
+    "differences": [],
+    "final_markers_by_process": {
+     "1": 118,
+     "2": 143
+    },
+    "stages_run_more_than_once": [
+     {
+      "stage": "shards/s0009/county.validate",
+      "runs": 1,
+      "final_attempt": 2
+     },
+     {
+      "stage": "shards/s0010/county.validate",
+      "runs": 1,
+      "final_attempt": 2
+     },
+     {
+      "stage": "shards/s0011/county.validate",
+      "runs": 1,
+      "final_attempt": 2
+     }
+    ],
+    "shards_finished_by_first_process": [
+     "s0001",
+     "s0002",
+     "s0003",
+     "s0004",
+     "s0005",
+     "s0006",
+     "s0007",
+     "s0008"
+    ],
+    "shards_finished_after_resume": [
+     "s0009",
+     "s0010",
+     "s0011",
+     "s0012",
+     "s0013",
+     "s0014",
+     "s0015",
+     "s0016",
+     "s0017",
+     "s0018",
+     "s0019",
+     "s0020"
+    ]
+   },
+   {
+    "run": "data/travis/runs/20261018T122148Z-t5-dryrun-c",
+    "attempts": [
+     {
+      "attempt": 1,
+      "pid": 23544,
+      "started_at": "2026-10-18T12:21:48.015Z",
+      "ended_at": null,
+      "status": "running",
+      "reaped_orphans": 0
+     },
+     {
+      "attempt": 2,
+      "pid": 38768,
+      "started_at": "2026-10-18T12:28:38.068Z",
+      "ended_at": "2026-10-18T12:36:35.975Z",
+      "status": "finished",
+      "reaped_orphans": 0
+     }
+    ],
+    "stages_compared": 261,
+    "all_equal_to_reference": true,
+    "differences": [],
+    "final_markers_by_process": {
+     "1": 114,
+     "2": 147
+    },
+    "stages_run_more_than_once": [
+     {
+      "stage": "shards/s0001/merge",
+      "runs": 1,
+      "final_attempt": 2
+     },
+     {
+      "stage": "shards/s0007/merge",
+      "runs": 1,
+      "final_attempt": 2
+     },
+     {
+      "stage": "shards/s0009/county.validate",
+      "runs": 1,
+      "final_attempt": 2
+     },
+     {
+      "stage": "shards/s0010/county.validate",
+      "runs": 1,
+      "final_attempt": 2
+     },
+     {
+      "stage": "shards/s0011/county.validate",
+      "runs": 1,
+      "final_attempt": 2
+     },
+     {
+      "stage": "shards/s0012/permits",
+      "runs": 1,
+      "final_attempt": 2
+     },
+     {
+      "stage": "shards/s0013/permits",
+      "runs": 1,
+      "final_attempt": 2
+     },
+     {
+      "stage": "shards/s0014/appraisal",
+      "runs": 1,
+      "final_attempt": 2
+     }
+    ],
+    "shards_finished_by_first_process": [
+     "s0002",
+     "s0003",
+     "s0004",
+     "s0005",
+     "s0006",
+     "s0008"
+    ],
+    "shards_finished_after_resume": [
+     "s0001",
+     "s0007",
+     "s0009",
+     "s0010",
+     "s0011",
+     "s0012",
+     "s0013",
+     "s0014",
+     "s0015",
+     "s0016",
+     "s0017",
+     "s0018",
+     "s0019",
+     "s0020"
+    ]
+   }
+  ]
+ },
+ "per_shard_car_digests_equal": {
+  "sigterm": true,
+  "sigkill": true
+ },
+ "projection": {
+  "projection_version": "travis-t5-projection.v1",
+  "dry_run": {
+   "run_id": "20261018T114904Z-t5-dryrun-a",
+   "parcels": 5000,
+   "shards": 20,
+   "shard_size": 250,
+   "concurrency": 8,
+   "permit_parcels": 3895,
+   "permits": 55539,
+   "pool_h": 0.176,
+   "ideal_pool_h": 0.155,
+   "packing": 1.137
+  },
+  "full_scale": {
+   "seed_rows": 441961,
+   "shards": 89,
+   "permit_parcels": 237533,
+   "permits": 1986523
+  },
+  "scales": {
+   "per_parcel": 88.392,
+   "permit_group": 60.984
+  },
+  "stages": [
+   {
+    "stage": "appraisal",
+    "measured_ms": 132388,
+    "shards": 20,
+    "scale": 88.392,
+    "projected_h": 3.25,
+    "basis": "441961 seed rows / 5000"
+   },
+   {
+    "stage": "permits",
+    "measured_ms": 139555,
+    "shards": 20,
+    "scale": 88.392,
+    "projected_h": 3.43,
+    "basis": "441961 seed rows / 5000"
+   },
+   {
+    "stage": "reconcile",
+    "measured_ms": 19101,
+    "shards": 20,
+    "scale": 88.392,
+    "projected_h": 0.47,
+    "basis": "441961 seed rows / 5000"
+   },
+   {
+    "stage": "cid_check",
+    "measured_ms": 87,
+    "shards": 20,
+    "scale": 88.392,
+    "projected_h": 0,
+    "basis": "441961 seed rows / 5000"
+   },
+   {
+    "stage": "merge",
+    "measured_ms": 111946,
+    "shards": 20,
+    "scale": 88.392,
+    "projected_h": 2.75,
+    "basis": "441961 seed rows / 5000"
+   },
+   {
+    "stage": "cli_county_validate",
+    "measured_ms": 2678986,
+    "shards": 20,
+    "scale": 88.392,
+    "projected_h": 65.78,
+    "basis": "441961 seed rows / 5000"
+   },
+   {
+    "stage": "cli_county_hash",
+    "measured_ms": 206497,
+    "shards": 20,
+    "scale": 88.392,
+    "projected_h": 5.07,
+    "basis": "441961 seed rows / 5000"
+   },
+   {
+    "stage": "cli_county_car_validate",
+    "measured_ms": 101436,
+    "shards": 20,
+    "scale": 88.392,
+    "projected_h": 2.49,
+    "basis": "441961 seed rows / 5000"
+   },
+   {
+    "stage": "cli_county_export_tables",
+    "measured_ms": 26668,
+    "shards": 20,
+    "scale": 88.392,
+    "projected_h": 0.65,
+    "basis": "441961 seed rows / 5000"
+   },
+   {
+    "stage": "cli_property_improvement_validate",
+    "measured_ms": 815208,
+    "shards": 20,
+    "scale": 60.984,
+    "projected_h": 13.81,
+    "basis": "larger of 237533 permit-group parcels / 3895 and 1986523 permits / 55539"
+   },
+   {
+    "stage": "cli_property_improvement_hash",
+    "measured_ms": 146536,
+    "shards": 20,
+    "scale": 60.984,
+    "projected_h": 2.48,
+    "basis": "larger of 237533 permit-group parcels / 3895 and 1986523 permits / 55539"
+   },
+   {
+    "stage": "cli_property_improvement_car_validate",
+    "measured_ms": 50629,
+    "shards": 20,
+    "scale": 60.984,
+    "projected_h": 0.86,
+    "basis": "larger of 237533 permit-group parcels / 3895 and 1986523 permits / 55539"
+   },
+   {
+    "stage": "cli_property_improvement_export_tables",
+    "measured_ms": 25575,
+    "shards": 20,
+    "scale": 60.984,
+    "projected_h": 0.43,
+    "basis": "larger of 237533 permit-group parcels / 3895 and 1986523 permits / 55539"
+   }
+  ],
+  "global_h": 0.038,
+  "shard_phase_h": 14.42,
+  "finalize_h": 0.025,
+  "full_run": {
+   "projected_h": 14.48,
+   "within_gate": true,
+   "margin_h": 33.52,
+   "gate_h": 48
+  },
+  "t4_method": {
+   "sequential_h": 59.13,
+   "sharded_h": 14.46,
+   "sharded_within_gate": true,
+   "sample": {
+    "run_dir": "data/travis/runs/20261018T112353Z-t4-feasibility-1000",
+    "parcels": 1000,
+    "parcels_with_permits": 542,
+    "permits_published": 4173
+   }
+  },
+  "memory": {
+   "dry_run": {
+    "peak_cli_rss_gb": 7.3,
+    "peak_cli_processes": 8,
+    "peak_runner_rss_gb": 6.1,
+    "peak_combined_rss_gb": 7.9,
+    "peak_swap_used_gb": 5.6,
+    "sampled": "every progress tick (60 s) and shard completion; ps RSS"
+   },
+   "cli_gb_per_process_dry_run": 0.91,
+   "single_process_bench": {
+    "parcels": 5000,
+    "shards": 1,
+    "peak_gb": 1.05,
+    "gb_per_process": 1.05
+   },
+   "full_run_peak_estimate_gb": 9,
+   "note": "the runner's own peak is the link pass, before the elephant-cli pool starts; during the pool the runner holds well under 1 GB"
+  },
+  "assumptions": [
+   "the dry run's stage times were measured with 8 shards in flight on this machine; they scale linearly with parcels (County side) or with the larger of permit-group parcels and permits (Property Improvement side)",
+   "the dry run's shards are 250 properties; the full run's are 5,000, so each CLI call's fixed start-up cost is spread over 20 times more properties: the projection is conservative on that count",
+   "memory as free as during the dry run (the preflight's swap and VM warnings apply); a nearly full swap doubled the 8-shard County time in the T4 measurements (decisions.md 25.9)",
+   "no upload, pin or gateway time (T6)"
+  ],
+  "benches": {
+   "county_8_shards_of_125": {
+    "parcels": 1000,
+    "shards": 8,
+    "wall_s": 80.2,
+    "peak_cli_rss_bytes": 7510343680,
+    "peak_processes": 8,
+    "all_passed": true,
+    "steps_ms": null
+   },
+   "property_improvement_8_shards": {
+    "parcels": 542,
+    "shards": 8,
+    "wall_s": 20.2,
+    "peak_cli_rss_bytes": 4182097920,
+    "peak_processes": 8,
+    "all_passed": true,
+    "steps_ms": null
+   },
+   "county_1_shard_of_1000": {
+    "parcels": 1000,
+    "shards": 1,
+    "wall_s": 383.2,
+    "peak_cli_rss_bytes": 1049231360,
+    "peak_processes": 1,
+    "all_passed": true,
+    "steps_ms": {
+     "validate": 356699,
+     "hash": 15363,
+     "car_validate": 9733,
+     "export_tables": 1374
+    }
+   },
+   "county_1_shard_of_5000": {
+    "parcels": 5000,
+    "shards": 1,
+    "wall_s": 1896.5,
+    "peak_cli_rss_bytes": 1125122048,
+    "peak_processes": 1,
+    "all_passed": true,
+    "steps_ms": {
+     "validate": 1775494,
+     "hash": 72333,
+     "car_validate": 44028,
+     "export_tables": 4628
+    }
+   }
+  },
+  "swap_during_measurements": "5.5 to 5.7 of 7 GB used (sysctl vm.swapusage before and after); no VM running"
+ }
+}
