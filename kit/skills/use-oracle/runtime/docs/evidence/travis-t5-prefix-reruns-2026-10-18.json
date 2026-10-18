@@ -1,0 +1,362 @@
+{
+ "schemaVersion": "travis.t5-prefix-reruns.v1",
+ "generated_at": "2026-10-18T11:34:17Z",
+ "transform_version": "travis-transform-v4",
+ "note": "pilot and feasibility re-run with t4-run.mjs after the T5 pre-run fixes (no Socrata cross-check: the permit side is unchanged); County roots change, the Property Improvement roots do not (property.json, address.json and parcel.json, which the permit group copies, are unchanged by v4)",
+ "runs": {
+  "pilot": {
+   "before": {
+    "run": "20261018T100555Z-t4-pilot",
+    "transform_version": "travis-transform-v3",
+    "county": {
+     "validate": {
+      "processed": 25,
+      "succeeded": 25,
+      "failed": 0
+     },
+     "error_rows": 0,
+     "car_blocks": 471,
+     "archive_root": "baguqeerahe3ecgiyigcgdg6gmxqsmc5ylzlucf4kb3n5xcqi5tvtiebpv2ta",
+     "car_sha256": "62456f387fd6b25466c63ba6f8b4bbf2020c2b1fa963f71a82b3541bf8a1ebc6",
+     "car_checks_passed": true,
+     "tables": 23,
+     "tables_root": "baguqeeram5hefoyihxelublnx3hzdmbdxg5gavyukspzevkwnii7b5zexipq",
+     "table_rows": {
+      "properties": 25,
+      "person_has_mailing_address": 11,
+      "person": 11,
+      "address": 50,
+      "property_has_address": 25,
+      "property": 25,
+      "property_has_lot": 22,
+      "lot": 22,
+      "property_has_parcel": 25,
+      "parcel": 25,
+      "property_has_sales_history": 18,
+      "sales_history": 18,
+      "property_has_tax": 25,
+      "tax": 25,
+      "sales_history_has_person": 11,
+      "address_has_parcel": 25,
+      "company_has_mailing_address": 14,
+      "company": 14,
+      "company_has_property": 7,
+      "address_has_geometry": 13,
+      "geometry": 13,
+      "parcel_has_geometry": 13,
+      "sales_history_has_company": 7
+     }
+    },
+    "property_improvement": {
+     "validate": {
+      "processed": 6,
+      "succeeded": 6,
+      "failed": 0
+     },
+     "error_rows": 0,
+     "car_blocks": 348,
+     "archive_root": "baguqeeranegqm7efvvxckwfltf6ewzxsuwmmf7kuk2obi6r5svbgw7cqk22q",
+     "car_sha256": "30132cbd10269fb51663d5fe62dd732adb04b542e778ea3121fa26866a96df7d",
+     "car_checks_passed": true,
+     "tables": 7,
+     "tables_root": "baguqeeraxyla6jami62bqvc46xitp4tkyu2boive5b4esf2n5vuwfk2gmafa",
+     "table_rows": {
+      "properties": 6,
+      "address_has_parcel": 6,
+      "address": 6,
+      "parcel": 6,
+      "property_has_property_improvement": 155,
+      "property": 6,
+      "property_improvement": 155
+     }
+    },
+    "property_cid_check": true
+   },
+   "after": {
+    "run": "20261018T112143Z-t4-pilot",
+    "transform_version": "travis-transform-v4",
+    "tcad_extras": {
+     "dir": "data/travis/tcad-extras/travis-tcad-extras-v1",
+     "version": "travis-tcad-extras-v1",
+     "sha256": "5c3b39a9ac57a5ac6b793c85539ebf83cfb45a6ab0f92eee1fef968e8882a604",
+     "archive_sha256": "62d0d1cd22b03f31db8d3986160eb181c5d00044df98a303fce9e17a44e9aa02",
+     "accounts_found": 25
+    },
+    "lexicon_manifest_sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+    "county": {
+     "validate": {
+      "processed": 25,
+      "succeeded": 25,
+      "failed": 0
+     },
+     "error_rows": 0,
+     "car_blocks": 493,
+     "archive_root": "baguqeerairotuzbwrkd5cxddtqv32u5ki6fqfhudsg2bmuddsf37xjp6yk3a",
+     "car_sha256": "af6b0401d3d012d0571a85962e77e4429beedd58ab33c444d6c24edcc6a60d86",
+     "car_checks_passed": true,
+     "tables": 25,
+     "tables_root": "baguqeeragnjfmjgtmcot5njwwgc7jbbhrlgi5lhsxmsfowj4t75agb6eif7q",
+     "table_rows": {
+      "properties": 25,
+      "person_has_mailing_address": 11,
+      "person": 11,
+      "address": 50,
+      "property_has_address": 25,
+      "property": 25,
+      "property_has_lot": 25,
+      "lot": 25,
+      "property_has_parcel": 25,
+      "parcel": 25,
+      "property_has_sales_history": 18,
+      "sales_history": 18,
+      "property_has_tax": 25,
+      "tax": 25,
+      "sales_history_has_person": 11,
+      "address_has_parcel": 25,
+      "company_has_mailing_address": 14,
+      "company": 14,
+      "company_has_property": 7,
+      "property_has_structure": 8,
+      "structure": 8,
+      "address_has_geometry": 13,
+      "geometry": 13,
+      "parcel_has_geometry": 13,
+      "sales_history_has_company": 7
+     }
+    },
+    "property_improvement": {
+     "validate": {
+      "processed": 6,
+      "succeeded": 6,
+      "failed": 0
+     },
+     "error_rows": 0,
+     "car_blocks": 348,
+     "archive_root": "baguqeeranegqm7efvvxckwfltf6ewzxsuwmmf7kuk2obi6r5svbgw7cqk22q",
+     "car_sha256": "30132cbd10269fb51663d5fe62dd732adb04b542e778ea3121fa26866a96df7d",
+     "car_checks_passed": true,
+     "tables": 7,
+     "tables_root": "baguqeeraxyla6jami62bqvc46xitp4tkyu2boive5b4esf2n5vuwfk2gmafa",
+     "table_rows": {
+      "properties": 6,
+      "address_has_parcel": 6,
+      "address": 6,
+      "parcel": 6,
+      "property_has_property_improvement": 155,
+      "property": 6,
+      "property_improvement": 155
+     }
+    },
+    "property_cid_check": true,
+    "county_files": {
+     "structure": 8,
+     "geometry_part": 0,
+     "parcels_multi": 0,
+     "lot": 25
+    }
+   },
+   "county_table_rows_changed": {
+    "lot": {
+     "before": 22,
+     "after": 25
+    },
+    "property_has_lot": {
+     "before": 22,
+     "after": 25
+    },
+    "property_has_structure": {
+     "before": null,
+     "after": 8
+    },
+    "structure": {
+     "before": null,
+     "after": 8
+    }
+   },
+   "county_root_changed": true,
+   "property_improvement_root_unchanged": true
+  },
+  "feasibility-1000": {
+   "before": {
+    "run": "20261018T101630Z-t4-feasibility-1000",
+    "transform_version": "travis-transform-v3",
+    "county": {
+     "validate": {
+      "processed": 1000,
+      "succeeded": 1000,
+      "failed": 0
+     },
+     "error_rows": 0,
+     "car_blocks": 20138,
+     "archive_root": "baguqeerajznciv64kds7dilxfyy5mg33klp4ap2wxfe2frrag7cwhb6gau4a",
+     "car_sha256": "343b1cc7f4a5f9ebe8fa6a50fe129deee3cdbbfddd23bae624f3f2b47e502bd6",
+     "car_checks_passed": true,
+     "tables": 24,
+     "tables_root": "baguqeerag4dmbm2gzcqhvlzetfng4je6v6oklp2ny45azubq4ewv45sizrba",
+     "table_rows": {
+      "properties": 1000,
+      "company_has_mailing_address": 222,
+      "company": 222,
+      "address": 1999,
+      "company_has_property": 32,
+      "property": 1000,
+      "property_has_address": 1000,
+      "property_has_lot": 843,
+      "lot": 843,
+      "property_has_parcel": 1000,
+      "parcel": 1000,
+      "property_has_tax": 1000,
+      "tax": 1000,
+      "address_has_parcel": 1000,
+      "address_has_geometry": 842,
+      "geometry": 842,
+      "parcel_has_geometry": 842,
+      "property_has_sales_history": 964,
+      "sales_history": 964,
+      "sales_history_has_company": 190,
+      "person_has_mailing_address": 777,
+      "person": 777,
+      "sales_history_has_person": 773,
+      "person_has_property": 4
+     }
+    },
+    "property_improvement": {
+     "validate": {
+      "processed": 542,
+      "succeeded": 542,
+      "failed": 0
+     },
+     "error_rows": 0,
+     "car_blocks": 11600,
+     "archive_root": "baguqeerahbiu3sp5wrgqnnugp4dcgsrn3iifuljet5ruumkt4izy3vrg6qyq",
+     "car_sha256": "f79f281937b653f9f46fbc21424e157c2e857e5864902c6dbd32838fd1679773",
+     "car_checks_passed": true,
+     "tables": 7,
+     "tables_root": "baguqeerab4phy3thmss6fweimqiprjf72aruewhnvmfi33wokx3vutq6ybrq",
+     "table_rows": {
+      "properties": 542,
+      "address_has_parcel": 542,
+      "address": 542,
+      "parcel": 542,
+      "property_has_property_improvement": 4173,
+      "property": 542,
+      "property_improvement": 4173
+     }
+    },
+    "property_cid_check": true
+   },
+   "after": {
+    "run": "20261018T112353Z-t4-feasibility-1000",
+    "transform_version": "travis-transform-v4",
+    "tcad_extras": {
+     "dir": "data/travis/tcad-extras/travis-tcad-extras-v1",
+     "version": "travis-tcad-extras-v1",
+     "sha256": "5c3b39a9ac57a5ac6b793c85539ebf83cfb45a6ab0f92eee1fef968e8882a604",
+     "archive_sha256": "62d0d1cd22b03f31db8d3986160eb181c5d00044df98a303fce9e17a44e9aa02",
+     "accounts_found": 1000
+    },
+    "lexicon_manifest_sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+    "county": {
+     "validate": {
+      "processed": 1000,
+      "succeeded": 1000,
+      "failed": 0
+     },
+     "error_rows": 0,
+     "car_blocks": 21938,
+     "archive_root": "baguqeera4fyfdfxvehuiqejspt2wxqive336mfuvnvbbn6h5bii4ps2sixaa",
+     "car_sha256": "1919c04069fcb0f68999c25b5029eb65dca60a9039aa5b5b03adb65bfb4c17f0",
+     "car_checks_passed": true,
+     "tables": 26,
+     "tables_root": "baguqeera62zm5wsicpdl4tbyzkmwgb7qoba2cyt62bbxuyulbfiot442e3ua",
+     "table_rows": {
+      "properties": 1000,
+      "company_has_mailing_address": 222,
+      "company": 222,
+      "address": 1999,
+      "company_has_property": 32,
+      "property": 1000,
+      "property_has_address": 1000,
+      "property_has_lot": 999,
+      "lot": 999,
+      "property_has_parcel": 1000,
+      "parcel": 1000,
+      "property_has_tax": 1000,
+      "tax": 1000,
+      "address_has_parcel": 1000,
+      "address_has_geometry": 842,
+      "geometry": 844,
+      "parcel_has_geometry": 844,
+      "property_has_sales_history": 964,
+      "sales_history": 964,
+      "sales_history_has_company": 190,
+      "person_has_mailing_address": 777,
+      "person": 777,
+      "property_has_structure": 742,
+      "structure": 742,
+      "sales_history_has_person": 773,
+      "person_has_property": 4
+     }
+    },
+    "property_improvement": {
+     "validate": {
+      "processed": 542,
+      "succeeded": 542,
+      "failed": 0
+     },
+     "error_rows": 0,
+     "car_blocks": 11600,
+     "archive_root": "baguqeerahbiu3sp5wrgqnnugp4dcgsrn3iifuljet5ruumkt4izy3vrg6qyq",
+     "car_sha256": "f79f281937b653f9f46fbc21424e157c2e857e5864902c6dbd32838fd1679773",
+     "car_checks_passed": true,
+     "tables": 7,
+     "tables_root": "baguqeerab4phy3thmss6fweimqiprjf72aruewhnvmfi33wokx3vutq6ybrq",
+     "table_rows": {
+      "properties": 542,
+      "address_has_parcel": 542,
+      "address": 542,
+      "parcel": 542,
+      "property_has_property_improvement": 4173,
+      "property": 542,
+      "property_improvement": 4173
+     }
+    },
+    "property_cid_check": true,
+    "county_files": {
+     "structure": 742,
+     "geometry_part": 2,
+     "parcels_multi": 1,
+     "lot": 999
+    }
+   },
+   "county_table_rows_changed": {
+    "geometry": {
+     "before": 842,
+     "after": 844
+    },
+    "lot": {
+     "before": 843,
+     "after": 999
+    },
+    "parcel_has_geometry": {
+     "before": 842,
+     "after": 844
+    },
+    "property_has_lot": {
+     "before": 843,
+     "after": 999
+    },
+    "property_has_structure": {
+     "before": null,
+     "after": 742
+    },
+    "structure": {
+     "before": null,
+     "after": 742
+    }
+   },
+   "county_root_changed": true,
+   "property_improvement_root_unchanged": true
+  }
+ }
+}

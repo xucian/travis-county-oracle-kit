@@ -49,6 +49,8 @@ skills/use-oracle/runtime/docs/evidence/travis-t4-retired-geo-ids-2026-10-18.jso
 skills/use-oracle/runtime/docs/evidence/travis-t4-ruling-10-tcad-listing-2026-10-18.json
 skills/use-oracle/runtime/docs/evidence/travis-t4-ruling-7-enum-check-2026-10-18.json
 skills/use-oracle/runtime/docs/evidence/travis-t4-run-2026-10-17.json
+skills/use-oracle/runtime/docs/evidence/travis-t5-field-coverage-2026-10-18.json
+skills/use-oracle/runtime/docs/evidence/travis-t5-prefix-reruns-2026-10-18.json
 skills/use-oracle/runtime/docs/evidence/travis-tcad-downloads-2026-10-16.jsonl
 skills/use-oracle/runtime/docs/evidence/travis-tcad-prop-counts-2026-10-16.json
 skills/use-oracle/runtime/docs/evidence/travis-tcad-state-code-counts-2026-10-16.json
@@ -122,6 +124,8 @@ skills/use-oracle/runtime/src/counties/travis/t4-run.mjs
 skills/use-oracle/runtime/src/counties/travis/t4-sample.mjs
 skills/use-oracle/runtime/src/counties/travis/t4-shard-bench.mjs
 skills/use-oracle/runtime/src/counties/travis/t4-tcad-permit-listing.mjs
+skills/use-oracle/runtime/src/counties/travis/t5-field-coverage.mjs
+skills/use-oracle/runtime/src/counties/travis/t5-tcad-extras.mjs
 skills/use-oracle/runtime/src/counties/travis/validate.mjs
 skills/use-oracle/runtime/tests/travis-amended-lexicon-server.test.mjs
 skills/use-oracle/runtime/tests/travis-build-seed.test.mjs
@@ -151,4 +155,6 @@ skills/use-oracle/runtime/tests/travis-t4-sample.test.mjs
 skills/use-oracle/runtime/tests/travis-t4-shard-bench.test.mjs
 skills/use-oracle/runtime/tests/travis-t4-socrata-mock.mjs
 skills/use-oracle/runtime/tests/travis-t4-tcad-permit-listing.test.mjs
+skills/use-oracle/runtime/tests/travis-t5-tcad-extras.test.mjs
+skills/use-oracle/runtime/tests/travis-t5-transform-fixes.test.mjs
 skills/use-oracle/runtime/tests/travis-transform.test.mjs

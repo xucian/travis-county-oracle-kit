@@ -113,7 +113,10 @@ export function assertTravisIdentity({ row, files, roots, sourceHosts = TRAVIS_A
   if (Object.hasOwn(address, "county_name") && address.county_name !== TRAVIS_IDENTITY.county) {
     fail(`address.json county_name ${JSON.stringify(address.county_name)} is not ${TRAVIS_IDENTITY.county}`);
   }
-  if (files["geometry.json"]) assertGeometryInCounty(collectGeometryPoints(files["geometry.json"]));
+  // Every geometry: the parcel's point and polygon, and each polygon part of a multi-part parcel (transform v4).
+  for (const [name, body] of Object.entries(files)) {
+    if (/^geometry(_part_\d+)?\.json$/.test(name)) assertGeometryInCounty(collectGeometryPoints(body));
+  }
 }
 
 /**

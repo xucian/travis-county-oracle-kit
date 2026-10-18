@@ -19,7 +19,9 @@
  *     --seed data/seeds/travis-pilot.csv --label pilot --cli <elephant-cli> [--cross-check-socrata] \
  *     [--fault-drill permanent:<PROP_ID>,retryable:<PROP_ID>] [--resume <run-dir>] [--tcad-listing <dir>]
  *
- * The TCAD listing defaults to the one built from the receipted special export; the run stops when it is missing.
+ * The TCAD listing defaults to the one built from the receipted special export; the run stops when it is missing. The
+ * TCAD extras index (`t5-tcad-extras.mjs`, transform v4) defaults to `data/travis/tcad-extras/<version>`; the run stops
+ * when it is missing or no longer matches its index (`--no-tcad-extras` writes what transform v3 wrote, for comparison).
  *
  * @module counties/travis/t4-run
  */
@@ -44,6 +46,8 @@ import { PERMIT_DATASET_ID, PERMIT_DOMAIN, PERMIT_RESOURCE_URL } from "./t4-perm
 import { DEFAULT_SEED, readRollGeoIndex, runLinkPass } from "./t4-permit-links.mjs";
 import { latestCapture, verifyPermitCapture } from "./t4-permit-verify.mjs";
 import { TCAD_PERMIT_LISTING_VERSION, resolveTcadPermitListing } from "./t4-tcad-permit-listing.mjs";
+import { DEFAULT_OUT_DIR as DEFAULT_TCAD_EXTRAS_DIR, readTcadExtras } from "./t5-tcad-extras.mjs";
+import { TRANSFORM_VERSION } from "../../../counties/travis/transforms/transform.mjs";
 import { TRAVIS_PERMIT_SOURCE_HOSTS, assertOutputContract, assertTravisIdentity } from "./validate.mjs";
 
 export const T4_RUN_VERSION = "travis-t4-run.v1";
@@ -268,9 +272,10 @@ const addCounts = (total, add) => {
  * @param {string} [options.runsDir] - Runs root.
  * @param {typeof fetch} [options.fetchImpl] - Fetch for the cross-check (tests).
  * @param {import("./t4-tcad-permit-listing.mjs").TcadPermitListing | null} [options.tcadListing] - TCAD's permit listing (`main` always loads it; null disables the fallback and is recorded).
+ * @param {string | null} [options.tcadExtrasDir] - The TCAD extras index (`t5-tcad-extras.mjs`; `main` always passes it, transform v4); null writes what transform v3 wrote from the seed alone, and is recorded.
  * @returns {Promise<Record<string, any>>} Run record (`<run>/t4-run.json`).
  */
-export async function runT4({ seedPath, label, cli, captureDir, rollSeed = DEFAULT_SEED, manifestFile = null, crossCheck = false, drill = parseFaultDrill(""), resumeDir = null, singleCounty = false, runsDir = path.join(RUNTIME_ROOT, "data", "travis", "runs"), fetchImpl = globalThis.fetch, tcadListing = null }) {
+export async function runT4({ seedPath, label, cli, captureDir, rollSeed = DEFAULT_SEED, manifestFile = null, crossCheck = false, drill = parseFaultDrill(""), resumeDir = null, singleCounty = false, runsDir = path.join(RUNTIME_ROOT, "data", "travis", "runs"), fetchImpl = globalThis.fetch, tcadListing = null, tcadExtrasDir = null }) {
   const runStarted = performance.now();
   const startedAt = new Date();
   const policy = resolveEligibilityPolicy(process.env, { singleCounty });
@@ -318,8 +323,9 @@ export async function runT4({ seedPath, label, cli, captureDir, rollSeed = DEFAU
   const captureSummary = await readJson(path.join(capture, "capture.json"));
   const asOfDate = String(captureSummary.rows_updated_at.end_iso).slice(0, 10);
 
-  // Appraisal (T2 adapter) and its internal export.
-  const appraisal = await time("appraisal_transform", seedRows.length, () => captureAndTransform({ seedRows, htmlDir: path.join(runDir, "html"), outputDir: runDir, jobId, asOfDate }));
+  // Appraisal (T2 adapter, transform v4 with the TCAD extras of these accounts) and its internal export.
+  const extras = tcadExtrasDir ? await time("tcad_extras", seedRows.length, () => readTcadExtras({ dir: tcadExtrasDir, propIds: new Set(seedRows.map((row) => String(row.parcel_id).trim())) })) : null;
+  const appraisal = await time("appraisal_transform", seedRows.length, () => captureAndTransform({ seedRows, htmlDir: path.join(runDir, "html"), outputDir: runDir, jobId, asOfDate, tcadExtras: extras?.byPropId ?? null }));
   const reconciliation = await time("appraisal_reconcile_export", seedRows.length, () => buildReconciliationArtifacts({ outputDir: runDir, seedRows, workingDir: path.join(runDir, "reconciliation"), asOfDate }));
 
   // Eligibility from the transformed property.json.
@@ -501,6 +507,8 @@ export async function runT4({ seedPath, label, cli, captureDir, rollSeed = DEFAU
     as_of_date: asOfDate,
     eligibility_policy: { variable: policy.source, value: policy.raw, mode: policy.mode, fingerprint: policy.fingerprint },
     versions: { run: T4_RUN_VERSION, permit_transform: PERMIT_TRANSFORM_VERSION, status_group: STATUS_GROUP_VERSION, work_classifier: WORK_CLASSIFIER_VERSION, tcad_id_evidence: TCAD_ID_EVIDENCE_VERSION, parcel_link: PARCEL_LINK_VERSION, tcad_permit_listing: tcadListing ? TCAD_PERMIT_LISTING_VERSION : null, improvement_enums: IMPROVEMENT_ENUMS_VERSION },
+    transform_version: TRANSFORM_VERSION,
+    tcad_extras: extras ? { dir: rel(tcadExtrasDir), version: extras.index.version, sha256: extras.index.output.sha256, archive_sha256: extras.index.source.sha256 ?? null, accounts_found: extras.byPropId.size } : null,
     tcad_permit_listing: tcadListing ? { dir: rel(tcadListing.dir), listing_sha256: tcadListing.index.listing.sha256, source_sha256: tcadListing.index.source.sha256, source_url: tcadListing.index.source.url, fetched_at: tcadListing.index.source.fetched_at } : null,
     appraisal: { reconciled: appraisal.reconciled, geometry: appraisal.geometryCount, reconcile_export: { rows: reconciliation.rowCount, expected: reconciliation.expectedCount } },
     eligibility: { eligible: eligible.size, not_eligible: succeeded.size - eligible.size },
@@ -526,7 +534,7 @@ function parseFlags(argv) {
     const token = argv[index];
     if (!token.startsWith("--")) throw new Error(`unexpected argument ${token}`);
     const name = token.slice(2);
-    if (["cross-check-socrata", "single-county", "skip-cli"].includes(name)) flags[name] = true;
+    if (["cross-check-socrata", "single-county", "skip-cli", "no-tcad-extras"].includes(name)) flags[name] = true;
     else {
       if (argv[index + 1] === undefined) throw new Error(`missing value for ${token}`);
       flags[name] = argv[index + 1];
@@ -557,6 +565,7 @@ async function main() {
     resumeDir,
     singleCounty: flags["single-county"] === true,
     tcadListing,
+    tcadExtrasDir: flags["no-tcad-extras"] ? null : path.resolve(typeof flags["tcad-extras"] === "string" ? flags["tcad-extras"] : DEFAULT_TCAD_EXTRAS_DIR),
   });
   const cli = record.cli;
   const line = (group) => (cli[group]?.validate ? `${group} validate ${cli[group].validate.processed?.succeeded}/${cli[group].validate.processed?.processed} (${cli[group].validate.error_rows} error rows), CAR ${cli[group].hash?.car?.blocks} blocks root ${cli[group].hash?.car?.root}, checks ${cli[group].car_validate?.car_validation?.passed ? "pass" : "FAIL"}, ${cli[group].export_tables?.tables?.tables} tables root ${cli[group].export_tables?.tables?.root}` : `${group} ${cli[group]?.skipped ?? "not run"}`);

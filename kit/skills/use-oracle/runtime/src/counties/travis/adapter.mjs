@@ -81,10 +81,15 @@ function parseQuery(value) {
 /**
  * Materialize the `travis.parcel-input.v1` object for one seed row. No network.
  *
+ * The TCAD export fields the seed does not carry (`IMP_ATR.TXT`, `LAND_DET.TXT`, `PROP_ENT.TXT`, the cap adjustment of
+ * `PROP.TXT`) come from the extras index built offline from the same receipted archive (`t5-tcad-extras.mjs`) and ride
+ * as the optional `tcadExtras` block; without it the transform writes what v3 wrote from the seed alone.
+ *
  * @param {Record<string, string>} row - Seed row (`src/counties/travis/seed.mjs#SEED_COLUMNS`).
+ * @param {Record<string, any> | null} [extras] - The account's line of the TCAD extras index, when supplied.
  * @returns {object} Parcel input.
  */
-export function materializeParcelInput(row) {
+export function materializeParcelInput(row, extras = null) {
   const propId = toText(row.parcel_id) || toText(row.source_identifier);
   if (!isValidPropId(propId)) throw new Error(`seed parcel_id is not a printed PROP_ID: ${JSON.stringify(propId)}`);
   const url = toText(row.url);
@@ -132,7 +137,20 @@ export function materializeParcelInput(row) {
     tcad,
     situs: { address: toText(row.address) || null, city: toText(row.city) || null, state: toText(row.state) || "TX", zip: toText(row.zip) || null },
     geometry,
+    ...(extras ? { tcadExtras: extrasForInput(propId, extras) } : {}),
   };
+}
+
+/**
+ * The parts of an extras-index line the transform reads (and the sidecar keeps), checked against the account.
+ *
+ * @param {string} propId - PROP_ID as printed.
+ * @param {Record<string, any>} extras - The account's extras line.
+ * @returns {Record<string, any>} `tcadExtras` block.
+ */
+export function extrasForInput(propId, extras) {
+  if (String(extras.prop_id) !== propId) throw new Error(`TCAD extras line ${String(extras.prop_id)} is not the printed PROP_ID ${propId}`);
+  return { prop: extras.prop ?? null, entities: extras.entities ?? null, imp_atr: extras.imp_atr ?? null, land: extras.land ?? null, imp_info: extras.imp_info ?? null };
 }
 
 /**
@@ -309,6 +327,8 @@ export function readAllTransformedZipJsonFiles(zipPath) {
  * @param {string} [options.jobId] - Retry-ledger job id.
  * @param {string} [options.asOfDate] - Roof-age as-of date.
  * @param {typeof fetch} [options.fetchImpl] - Fetch seam for tests.
+ * @param {Map<string, Record<string, any>> | null} [options.tcadExtras] - TCAD extras lines by PROP_ID (`t5-tcad-extras.mjs`); an account without a line gets no `tcadExtras` block.
+ * @param {Record<string, any> | null} [options.lexiconManifest] - The run's lexicon manifest, when the caller already holds it (skips the resolution below).
  * @returns {Promise<object>} Run manifest, also written to `<outputDir>/manifest.json`.
  */
 export async function captureAndTransform({
@@ -319,11 +339,15 @@ export async function captureAndTransform({
   jobId = DEFAULT_JOB_ID,
   asOfDate = new Date().toISOString().slice(0, 10),
   fetchImpl = globalThis.fetch,
+  tcadExtras = null,
+  lexiconManifest = null,
 }) {
   await mkdir(outputDir, { recursive: true });
   const runStarted = performance.now();
   const manifestStarted = performance.now();
-  const resolved = await resolveLexiconManifest({ htmlDir, allowNetwork: liveFetch, fetchImpl });
+  const resolved = lexiconManifest
+    ? { manifest: lexiconManifest, source: "caller", roots: resolveDataGroupCids(lexiconManifest) }
+    : await resolveLexiconManifest({ htmlDir, allowNetwork: liveFetch, fetchImpl });
   const lexiconManifestResolveMs = performance.now() - manifestStarted;
   /** @type {ParcelTransformResult[]} */
   const results = [];
@@ -344,9 +368,10 @@ export async function captureAndTransform({
         input = JSON.parse(await readFile(fixturePath, "utf8"));
         inputSource = "pre-materialized";
       } else {
-        input = materializeParcelInput(row);
+        input = materializeParcelInput(row, tcadExtras?.get(toText(row.parcel_id)) ?? null);
         inputSource = "seed-row";
       }
+      if (tcadExtras && input.tcadExtras === undefined && tcadExtras.has(input.propId)) input = { ...input, tcadExtras: extrasForInput(input.propId, tcadExtras.get(input.propId)) };
       if (liveFetch === true) {
         const refreshed = await fetchTnrFeatureForParcel({ propId: input.propId, fetchImpl });
         if (refreshed) {

@@ -1,0 +1,2599 @@
+{
+ "schemaVersion": "travis.t5-field-coverage.v1",
+ "generated_at": "2026-10-18T11:22:50.265Z",
+ "transform_version": "travis-transform-v4",
+ "field_coverage_version": "travis-field-coverage-v3",
+ "geometry_parts_version": "travis-geometry-parts-v1",
+ "tcad_extras_mapping_version": "travis-tcad-extras-mapping-v1",
+ "taxing_entity_class_version": "travis-taxing-entity-classes-v1",
+ "enforced_by": "tests/travis-field-coverage.test.mjs, tests/travis-t5-transform-fixes.test.mjs, tests/travis-t5-tcad-extras.test.mjs",
+ "roll": {
+  "rows": 441961,
+  "seed": "data/seeds/travis.csv"
+ },
+ "tcad_extras": {
+  "dir": "data/travis/tcad-extras/travis-tcad-extras-v1",
+  "version": "travis-tcad-extras-v1",
+  "sha256": "5c3b39a9ac57a5ac6b793c85539ebf83cfb45a6ab0f92eee1fef968e8882a604",
+  "archive": {
+   "archive": "data/travis/export/2026 Certified Appraisal Export Supp 0_07182026.zip",
+   "url": "https://traviscad.org/wp-content/largefiles/2026%20Certified%20Appraisal%20Export%20Supp%200_07182026.zip",
+   "bytes": 557228168,
+   "sha256": "62d0d1cd22b03f31db8d3986160eb181c5d00044df98a303fce9e17a44e9aa02",
+   "fetched_at": "2026-10-16T17:42:52Z",
+   "receipt_checked": true
+  },
+  "counts": {
+   "prop": {
+    "records": 493324,
+    "real": 442039,
+    "first_records": 441961,
+    "later_owner_records": 78,
+    "not_in_seed": 0,
+    "ten_percent_cap_positive": 34774
+   },
+   "prop_ent": {
+    "records": 3132081,
+    "matched": 2818759,
+    "other_owner_or_supplement": 530,
+    "not_in_seed": 312792,
+    "by_class": {
+     "other": 825905,
+     "school": 442698,
+     "city": 330441,
+     "county": 441957,
+     "hospital": 441954,
+     "college": 335804
+    }
+   },
+   "imp_atr": {
+    "records": 2609059,
+    "matched": 2598363,
+    "not_in_seed": 10696,
+    "by_description": {
+     "Floor Factor": 560585,
+     "Foundation": 342632,
+     "Grade Factor": 433178,
+     "Shape Factor": 561396,
+     "Ceiling Factor": 23474,
+     "Roof Covering": 341118,
+     "Roof Style": 341658,
+     "Unique Feature": 4,
+     "Location": 4889,
+     "Condo Floor": 125
+    }
+   },
+   "land_det": {
+    "records": 445450,
+    "matched": 445450,
+    "not_in_seed": 0
+   },
+   "imp_info": {
+    "records": 454986,
+    "matched": 443225,
+    "not_in_seed": 11761
+   }
+  },
+  "presence": {
+   "accounts": 441961,
+   "without_prop_record": 0,
+   "roof_covering": {
+    "one_code": 320256,
+    "several_codes": 2460,
+    "none": 119245
+   },
+   "roof_style": {
+    "one_code": 320000,
+    "several_codes": 3472,
+    "none": 118489
+   },
+   "foundation": {
+    "one_code": 321020,
+    "several_codes": 2625,
+    "none": 118316
+   },
+   "land_segments": {
+    "none": 447,
+    "one": 438222,
+    "several": 3292
+   },
+   "entity_class_on_account": {
+    "county": {
+     "none": 4,
+     "one": 441957,
+     "several": 0
+    },
+    "hospital": {
+     "none": 7,
+     "one": 441954,
+     "several": 0
+    },
+    "college": {
+     "none": 106157,
+     "one": 335804,
+     "several": 0
+    },
+    "school": {
+     "none": 4,
+     "one": 441219,
+     "several": 738
+    },
+    "city": {
+     "none": 111546,
+     "one": 330389,
+     "several": 26
+    }
+   }
+  }
+ },
+ "geometry": {
+  "parcels_with_geometry": 373513,
+  "without_geometry": 68448,
+  "single_part": 372897,
+  "multi_part": {
+   "parcels": 616,
+   "parts": 1593,
+   "parts_written": 1593
+  },
+  "inner_rings_dropped": {
+   "parcels": 284,
+   "parts_with_holes": 286,
+   "rings": 605,
+   "vertices": 135508,
+   "on_single_part": 260,
+   "on_multi_part": 24
+  },
+  "rule": "a single-part parcel keeps its point and outer ring in geometry.json (v3's bytes); a multi-part parcel keeps its point in geometry.json (the address's geometry) and gets one geometry_part_<n>.json per part with its outer ring, each linked by parcel_has_geometry",
+  "lexicon_gap": "geometry.polygon holds one ring: inner rings (holes) are not written and are counted in each parcel's sidecar (geometry.inner_rings_dropped)"
+ },
+ "tnr_feature": {
+  "coverage": {
+   "OBJECTID": {
+    "lexicon": [],
+    "sidecar": [
+     "tnr.object_id"
+    ],
+    "seed": "tnr_object_id",
+    "note": "the layer's row id, kept beside the archive"
+   },
+   "PROP_ID": {
+    "lexicon": [
+     "parcel.parcel_identifier"
+    ],
+    "sidecar": [],
+    "seed": "join",
+    "note": "the join key to the roll (the identifier itself comes from the roll)"
+   },
+   "geo_id": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "read",
+    "note": "not written: the roll's geo_id is the one kept (sidecar geo_id); its agreement with the layer's is counted in the coverage record"
+   },
+   "geometry (outer rings)": {
+    "lexicon": [
+     "geometry.polygon"
+    ],
+    "sidecar": [
+     "geometry.parts",
+     "geometry.parts_written"
+    ],
+    "seed": "parcel_polygon",
+    "note": "one geometry per polygon part (transform v4); a single-part parcel keeps point and polygon in geometry.json"
+   },
+   "geometry (centroid)": {
+    "lexicon": [
+     "geometry.latitude",
+     "geometry.longitude",
+     "address.latitude",
+     "address.longitude"
+    ],
+    "sidecar": [],
+    "seed": "latitude",
+    "note": "area-weighted centroid of the outer rings, computed by the seed builder"
+   },
+   "geometry (inner rings)": {
+    "lexicon": [],
+    "sidecar": [
+     "geometry.inner_rings_dropped"
+    ],
+    "seed": null,
+    "note": "lexicon gap: geometry.polygon has no holes"
+   }
+  },
+  "inventory": {
+   "layer": "TCAD_public/MapServer/0 (cached pages, T1)",
+   "request_out_fields": [
+    "OBJECTID,PROP_ID,geo_id"
+   ],
+   "pages": 387,
+   "features": 386682,
+   "attributes": {
+    "OBJECTID": 386682,
+    "PROP_ID": 386682,
+    "geo_id": 386682
+   },
+   "geometry_types": {
+    "Polygon": 385985,
+    "MultiPolygon": 697
+   },
+   "features_without_prop_id": 13130,
+   "features_on_roll_accounts": 373541,
+   "features_on_accounts_outside_the_roll": 11,
+   "geo_id_on_joined_features": {
+    "equal": 373541,
+    "differs": 0,
+    "blank_on_layer": 0
+   }
+  }
+ },
+ "structure": {
+  "accounts_with_codes": 325134,
+  "written": 324617,
+  "by_field": {
+   "roof_covering_material": {
+    "(null)": 315814,
+    "Built-Up Roof": 7443,
+    "Wood Shingle": 1360
+   },
+   "roof_material_type": {
+    "(null)": 12241,
+    "Metal": 21644,
+    "Composition": 276217,
+    "Tile": 13155,
+    "Wood": 1360
+   },
+   "roof_design_type": {
+    "(null)": 5052,
+    "Flat": 8706,
+    "Gable": 126865,
+    "Hip": 183379,
+    "Mansard": 615
+   },
+   "foundation_type": {
+    "Slab on Grade": 296134,
+    "Pier and Beam": 24374,
+    "(null)": 4109
+   }
+  },
+  "conflicting": {
+   "roof_covering": 2460,
+   "roof_style": 3472,
+   "foundation": 2625
+  },
+  "unmapped": {},
+  "by_code": {
+   "roof_covering": {
+    "METAL": 21644,
+    "COMPOSITIO": 276217,
+    "BUILT-UP": 7443,
+    "TILE": 13155,
+    "OTHER": 437,
+    "WOOD SHING": 1360
+   },
+   "roof_style": {
+    "FLAT": 8706,
+    "GABLE": 126865,
+    "HIP": 183379,
+    "MANSARD": 615,
+    "OTHER": 188,
+    "A-FRAME": 53,
+    "BARN": 194
+   },
+   "foundation": {
+    "SLAB": 296134,
+    "PIER AND B": 24374,
+    "OTHER": 447,
+    "FLOATING S": 5,
+    "BLOCKS": 45,
+    "WOOD POST": 15
+   }
+  },
+  "mapping": {
+   "roof_covering": {
+    "BUILT-UP": {
+     "roof_covering_material": "Built-Up Roof",
+     "roof_material_type": null
+    },
+    "COMPOSITIO": {
+     "roof_covering_material": null,
+     "roof_material_type": "Composition"
+    },
+    "METAL": {
+     "roof_covering_material": null,
+     "roof_material_type": "Metal"
+    },
+    "TILE": {
+     "roof_covering_material": null,
+     "roof_material_type": "Tile"
+    },
+    "WOOD SHING": {
+     "roof_covering_material": "Wood Shingle",
+     "roof_material_type": "Wood"
+    },
+    "OTHER": {
+     "roof_covering_material": null,
+     "roof_material_type": null
+    }
+   },
+   "roof_style": {
+    "FLAT": "Flat",
+    "GABLE": "Gable",
+    "HIP": "Hip",
+    "MANSARD": "Mansard",
+    "A-FRAME": null,
+    "BARN": null,
+    "OTHER": null
+   },
+   "foundation": {
+    "SLAB": "Slab on Grade",
+    "PIER AND B": "Pier and Beam",
+    "BLOCKS": null,
+    "FLOATING S": null,
+    "WOOD POST": null,
+    "OTHER": null
+   }
+  },
+  "rule": "one structure per property (property_has_structure); a field is written when the account prints exactly one code for its attribute and the code has a member; the structure is written when at least one field is"
+ },
+ "lot": {
+  "legal_acreage_positive": 368627,
+  "legal_acreage_zero_or_blank": 73334,
+  "sized_from_land_segments": 72997,
+  "land_acres_agree": 72588,
+  "land_acres_disagree_left_null": 409,
+  "still_without_lot": 337
+ },
+ "tax": {
+  "homestead_cap_loss_written": 34774,
+  "by_field": {
+   "county_taxable_value_amount": {
+    "written": 441957,
+    "several_entities": 0,
+    "none": 4
+   },
+   "city_taxable_value_amount": {
+    "written": 330389,
+    "several_entities": 26,
+    "none": 111546
+   },
+   "school_taxable_value_amount": {
+    "written": 441219,
+    "several_entities": 738,
+    "none": 4
+   },
+   "college_taxable_value_amount": {
+    "written": 335804,
+    "several_entities": 0,
+    "none": 106157
+   },
+   "hospital_taxable_value_amount": {
+    "written": 441954,
+    "several_entities": 0,
+    "none": 7
+   }
+  },
+  "other_entities_on_accounts": 441947,
+  "rule": "homestead_cap_loss_amount when ten_percent_cap is positive; per class, the taxable value of the one entity of that class on the account; special districts, exemptions and an account-wide taxable value are not written (TRAVIS_EXPORT_FIELDS_NOT_READ)"
+ },
+ "extras_field_coverage": {
+  "PROP": {
+   "prop_type_cd": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "filter",
+    "note": "only the first R record of a seed account is read (the seed builder's rule)"
+   },
+   "sup_num": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "join",
+    "note": "selects the PROP_ENT rows of that record"
+   },
+   "py_owner_id": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "join",
+    "note": "selects the PROP_ENT rows of that record's owner"
+   },
+   "ten_percent_cap": {
+    "lexicon": [
+     "tax.homestead_cap_loss_amount"
+    ],
+    "sidecar": [
+     "tcad_extras.ten_percent_cap"
+    ],
+    "seed": null,
+    "note": "Ten Percent Homestead Cap Adjustment; written when positive (34,774 accounts), like the agricultural value"
+   }
+  },
+  "PROP_ENT": {
+   "prop_id": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "join",
+    "note": "join key"
+   },
+   "sup_num": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "join",
+    "note": "the seed record's supplement"
+   },
+   "owner_id": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "join",
+    "note": "the seed record's owner"
+   },
+   "entity_cd": {
+    "lexicon": [],
+    "sidecar": [
+     "tcad_extras.taxing_entities"
+    ],
+    "seed": null,
+    "note": "kept with the entity"
+   },
+   "entity_name": {
+    "lexicon": [],
+    "sidecar": [
+     "tcad_extras.taxing_entities"
+    ],
+    "seed": "class",
+    "note": "travis-taxing-entity-classes-v1: county, hospital district, college district, ISD, city or village; every other entity counted"
+   },
+   "taxable_val": {
+    "lexicon": [
+     "tax.county_taxable_value_amount",
+     "tax.hospital_taxable_value_amount",
+     "tax.college_taxable_value_amount",
+     "tax.school_taxable_value_amount",
+     "tax.city_taxable_value_amount"
+    ],
+    "sidecar": [
+     "tcad_extras.taxing_entities"
+    ],
+    "seed": null,
+    "note": "the one entity of the class on the account; two entities of one class (a split account) leave the field out"
+   },
+   "partial_entity": {
+    "lexicon": [],
+    "sidecar": [
+     "tcad_extras.taxing_entities"
+    ],
+    "seed": null,
+    "note": "T when the property is not wholly inside the entity"
+   }
+  },
+  "IMP_ATR": {
+   "prop_id": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "join",
+    "note": "join key"
+   },
+   "imprv_id": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "read",
+    "note": "every improvement of the account is read; one structure per property"
+   },
+   "imprv_det_id": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "read",
+    "note": ""
+   },
+   "imprv_attr_desc": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "select",
+    "note": "Roof Covering, Roof Style and Foundation have a lexicon home; Floor, Shape, Grade and Ceiling Factor, Location, Condo Floor and Unique Feature are appraisal factors (counted only)"
+   },
+   "imprv_attr_cd": {
+    "lexicon": [
+     "structure.roof_covering_material",
+     "structure.roof_material_type",
+     "structure.roof_design_type",
+     "structure.foundation_type"
+    ],
+    "sidecar": [
+     "tcad_extras.imp_atr"
+    ],
+    "seed": null,
+    "note": "travis-tcad-extras-mapping-v1 exact-value tables; one printed code per attribute per account, else null"
+   }
+  },
+  "LAND_DET": {
+   "prop_id": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "join",
+    "note": "join key"
+   },
+   "size_acres": {
+    "lexicon": [
+     "lot.lot_size_acre"
+    ],
+    "sidecar": [
+     "tcad_extras.land"
+    ],
+    "seed": null,
+    "note": "four implied decimals, summed over segments; written only where the roll prints no legal acreage and it agrees with the square feet within 1%"
+   },
+   "size_square_feet": {
+    "lexicon": [
+     "lot.lot_area_sqft"
+    ],
+    "sidecar": [
+     "tcad_extras.land"
+    ],
+    "seed": null,
+    "note": "summed over segments; written only where the roll prints no legal acreage (72,997 of 73,334 such accounts)"
+   }
+  },
+  "IMP_INFO": {
+   "prop_id": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "join",
+    "note": "join key"
+   },
+   "imprv_id": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "read",
+    "note": ""
+   },
+   "imprv_type_cd": {
+    "lexicon": [],
+    "sidecar": [
+     "tcad_extras.improvement_types"
+    ],
+    "seed": null,
+    "note": "inventory (106 type codes); see TRAVIS_EXPORT_FIELDS_NOT_READ"
+   },
+   "imprv_type_desc": {
+    "lexicon": [],
+    "sidecar": [],
+    "seed": "read",
+    "note": "inventory only"
+   }
+  }
+ },
+ "export_fields_not_read_with_lexicon_home": [
+  {
+   "file": "PROP_ENT.TXT",
+   "field": "taxable_val of special districts (ESD, MUD, WCID, PID, road and utility districts)",
+   "lexicon": "tax.special_district_taxable_value_amount",
+   "reason": "an account sits in several special districts and the class holds one value; counted in the sidecar (tcad_extras.taxing_entities_other)"
+  },
+  {
+   "file": "PROP_ENT.TXT",
+   "field": "per-entity exemption amounts (hs_amt, ov65_amt, dv_amt, ex_amt, ...)",
+   "lexicon": "tax.property_exemption_amount",
+   "reason": "exemptions are granted per entity; the account-wide amount is not printed and is not derived"
+  },
+  {
+   "file": "PROP_ENT.TXT",
+   "field": "account-wide taxable value",
+   "lexicon": "tax.property_taxable_value_amount",
+   "reason": "not printed: taxable values are per entity; the per-class fields carry them"
+  },
+  {
+   "file": "IMP_INFO.TXT",
+   "field": "improvement type (imprv_type_cd, imprv_type_desc)",
+   "lexicon": "property.structure_form, structure.number_of_buildings",
+   "reason": "a type describes one improvement of several on an account (houses, garage apartments, detail-only rows); no printed value names the property's form or its building count one to one; the codes are kept in the sidecar"
+  },
+  {
+   "file": "IMP_ATR.TXT",
+   "field": "exterior wall",
+   "lexicon": "structure.exterior_wall_material_primary",
+   "reason": "the 2026 export prints no exterior-wall attribute (0 of 2,609,059 attribute rows)"
+  }
+ ],
+ "taxing_entities": [
+  {
+   "entity_cd": "03",
+   "entity_name": "TRAVIS COUNTY",
+   "class": "county",
+   "rows": 441957,
+   "partial_rows": 8321
+  },
+  {
+   "entity_cd": "2J",
+   "entity_name": "TRAVIS COUNTY HEALTHCARE DISTRICT",
+   "class": "hospital",
+   "rows": 441954,
+   "partial_rows": 8321
+  },
+  {
+   "entity_cd": "0A",
+   "entity_name": "TRAVIS CENTRAL APP DIST",
+   "class": "other",
+   "rows": 441938,
+   "partial_rows": 8311
+  },
+  {
+   "entity_cd": "68",
+   "entity_name": "AUSTIN COMM COLL DIST",
+   "class": "college",
+   "rows": 335804,
+   "partial_rows": 5115
+  },
+  {
+   "entity_cd": "02",
+   "entity_name": "CITY OF AUSTIN",
+   "class": "city",
+   "rows": 248560,
+   "partial_rows": 2102
+  },
+  {
+   "entity_cd": "01",
+   "entity_name": "AUSTIN ISD",
+   "class": "school",
+   "rows": 212454,
+   "partial_rows": 1161
+  },
+  {
+   "entity_cd": "19",
+   "entity_name": "PFLUGERVILLE ISD",
+   "class": "school",
+   "rows": 55559,
+   "partial_rows": 1059
+  },
+  {
+   "entity_cd": "9B",
+   "entity_name": "TRAVIS CO ESD NO 2",
+   "class": "other",
+   "rows": 47141,
+   "partial_rows": 1012
+  },
+  {
+   "entity_cd": "07",
+   "entity_name": "LAKE TRAVIS ISD",
+   "class": "school",
+   "rows": 33833,
+   "partial_rows": 1597
+  },
+  {
+   "entity_cd": "52",
+   "entity_name": "TRAVIS CO ESD NO 6",
+   "class": "other",
+   "rows": 33241,
+   "partial_rows": 1776
+  },
+  {
+   "entity_cd": "06",
+   "entity_name": "DEL VALLE ISD",
+   "class": "school",
+   "rows": 31689,
+   "partial_rows": 1501
+  },
+  {
+   "entity_cd": "34",
+   "entity_name": "MANOR ISD",
+   "class": "school",
+   "rows": 29103,
+   "partial_rows": 480
+  },
+  {
+   "entity_cd": "69",
+   "entity_name": "LEANDER ISD",
+   "class": "school",
+   "rows": 24228,
+   "partial_rows": 1283
+  },
+  {
+   "entity_cd": "20",
+   "entity_name": "CITY OF PFLUGERVILLE",
+   "class": "city",
+   "rows": 23660,
+   "partial_rows": 208
+  },
+  {
+   "entity_cd": "41",
+   "entity_name": "TRAVIS CO ESD NO 1",
+   "class": "other",
+   "rows": 22820,
+   "partial_rows": 582
+  },
+  {
+   "entity_cd": "1B",
+   "entity_name": "TRAVIS CO ESD NO 7",
+   "class": "other",
+   "rows": 22819,
+   "partial_rows": 581
+  },
+  {
+   "entity_cd": "72",
+   "entity_name": "TRAVIS CO ESD NO 12",
+   "class": "other",
+   "rows": 21116,
+   "partial_rows": 494
+  },
+  {
+   "entity_cd": "1G",
+   "entity_name": "TRAVIS CO BCCP",
+   "class": "other",
+   "rows": 18228,
+   "partial_rows": 1126
+  },
+  {
+   "entity_cd": "16",
+   "entity_name": "LAGO VISTA ISD",
+   "class": "school",
+   "rows": 17256,
+   "partial_rows": 425
+  },
+  {
+   "entity_cd": "51",
+   "entity_name": "TRAVIS CO ESD NO 11",
+   "class": "other",
+   "rows": 16666,
+   "partial_rows": 1026
+  },
+  {
+   "entity_cd": "6R",
+   "entity_name": "TRAVIS CO ESD NO 15",
+   "class": "other",
+   "rows": 16503,
+   "partial_rows": 1025
+  },
+  {
+   "entity_cd": "5A",
+   "entity_name": "ROUND ROCK ISD",
+   "class": "school",
+   "rows": 14430,
+   "partial_rows": 420
+  },
+  {
+   "entity_cd": "08",
+   "entity_name": "EANES ISD",
+   "class": "school",
+   "rows": 14001,
+   "partial_rows": 787
+  },
+  {
+   "entity_cd": "17",
+   "entity_name": "TRAVIS CO WCID NO 17",
+   "class": "other",
+   "rows": 13259,
+   "partial_rows": 749
+  },
+  {
+   "entity_cd": "49",
+   "entity_name": "CITY OF LAGO VISTA",
+   "class": "city",
+   "rows": 13235,
+   "partial_rows": 323
+  },
+  {
+   "entity_cd": "10E",
+   "entity_name": "TRAVIS CO ESD NO 17",
+   "class": "other",
+   "rows": 11624,
+   "partial_rows": 252
+  },
+  {
+   "entity_cd": "21",
+   "entity_name": "CITY OF LAKEWAY",
+   "class": "city",
+   "rows": 10132,
+   "partial_rows": 563
+  },
+  {
+   "entity_cd": "HPR1",
+   "entity_name": "HOMESTEAD PRESERVATION REINVESTMENT ZONE 1",
+   "class": "other",
+   "rows": 9659,
+   "partial_rows": 2
+  },
+  {
+   "entity_cd": "05",
+   "entity_name": "CITY OF MANOR",
+   "class": "city",
+   "rows": 8690,
+   "partial_rows": 114
+  },
+  {
+   "entity_cd": "77",
+   "entity_name": "TRAVIS CO ESD NO 8",
+   "class": "other",
+   "rows": 8139,
+   "partial_rows": 304
+  },
+  {
+   "entity_cd": "57",
+   "entity_name": "TRAVIS CO ESD NO 4",
+   "class": "other",
+   "rows": 7602,
+   "partial_rows": 203
+  },
+  {
+   "entity_cd": "39",
+   "entity_name": "TRAVIS CO ESD NO 9",
+   "class": "other",
+   "rows": 7221,
+   "partial_rows": 505
+  },
+  {
+   "entity_cd": "8R",
+   "entity_name": "TRAVIS CO ESD NO 16",
+   "class": "other",
+   "rows": 7111,
+   "partial_rows": 115
+  },
+  {
+   "entity_cd": "2A",
+   "entity_name": "ELGIN ISD",
+   "class": "school",
+   "rows": 6056,
+   "partial_rows": 193
+  },
+  {
+   "entity_cd": "56",
+   "entity_name": "TRAVIS CO ESD NO 5",
+   "class": "other",
+   "rows": 5792,
+   "partial_rows": 47
+  },
+  {
+   "entity_cd": "6F",
+   "entity_name": "CITY OF LEANDER",
+   "class": "city",
+   "rows": 5412,
+   "partial_rows": 478
+  },
+  {
+   "entity_cd": "1C",
+   "entity_name": "TRAVIS CO ESD NO 3",
+   "class": "other",
+   "rows": 5102,
+   "partial_rows": 154
+  },
+  {
+   "entity_cd": "3C",
+   "entity_name": "TRAVIS CO WCID 17 STEINER RANCH (DA)",
+   "class": "other",
+   "rows": 4594,
+   "partial_rows": 183
+  },
+  {
+   "entity_cd": "1L",
+   "entity_name": "BASTROP-TRAVIS COUNTIES ESD NO 1",
+   "class": "other",
+   "rows": 3821,
+   "partial_rows": 103
+  },
+  {
+   "entity_cd": "58",
+   "entity_name": "TRAVIS CO ESD NO 10",
+   "class": "other",
+   "rows": 3466,
+   "partial_rows": 295
+  },
+  {
+   "entity_cd": "84",
+   "entity_name": "NORTHTOWN MUD",
+   "class": "other",
+   "rows": 3402,
+   "partial_rows": 126
+  },
+  {
+   "entity_cd": "10",
+   "entity_name": "TRAVIS CO WCID NO 10",
+   "class": "other",
+   "rows": 3311,
+   "partial_rows": 99
+  },
+  {
+   "entity_cd": "2U",
+   "entity_name": "AUSTIN DOWNTOWN PUBLIC IMPROVE",
+   "class": "other",
+   "rows": 3275,
+   "partial_rows": 6
+  },
+  {
+   "entity_cd": "26",
+   "entity_name": "LAKEWAY MUD",
+   "class": "other",
+   "rows": 3097,
+   "partial_rows": 67
+  },
+  {
+   "entity_cd": "6K",
+   "entity_name": "RMMA REUSE & REDEVELOPMENT",
+   "class": "other",
+   "rows": 2863,
+   "partial_rows": 6
+  },
+  {
+   "entity_cd": "32",
+   "entity_name": "WELLS BRANCH MUD",
+   "class": "other",
+   "rows": 2757,
+   "partial_rows": 46
+  },
+  {
+   "entity_cd": "83",
+   "entity_name": "CITY OF BEE CAVE",
+   "class": "city",
+   "rows": 2700,
+   "partial_rows": 198
+  },
+  {
+   "entity_cd": "3F",
+   "entity_name": "CITY OF CEDAR PARK",
+   "class": "city",
+   "rows": 2686,
+   "partial_rows": 125
+  },
+  {
+   "entity_cd": "50",
+   "entity_name": "CITY OF JONESTOWN",
+   "class": "city",
+   "rows": 2684,
+   "partial_rows": 69
+  },
+  {
+   "entity_cd": "3A",
+   "entity_name": "MARBLE FALLS ISD",
+   "class": "school",
+   "rows": 2609,
+   "partial_rows": 68
+  },
+  {
+   "entity_cd": "5F",
+   "entity_name": "CITY OF ELGIN",
+   "class": "city",
+   "rows": 2315,
+   "partial_rows": 45
+  },
+  {
+   "entity_cd": "3L",
+   "entity_name": "WALLER CREEK TIF",
+   "class": "other",
+   "rows": 2015,
+   "partial_rows": 3
+  },
+  {
+   "entity_cd": "4M",
+   "entity_name": "PILOT KNOB MUD NO 3",
+   "class": "other",
+   "rows": 1984,
+   "partial_rows": 529
+  },
+  {
+   "entity_cd": "LSRD",
+   "entity_name": "LONE STAR RAIL DISTRICT",
+   "class": "other",
+   "rows": 1977,
+   "partial_rows": 198
+  },
+  {
+   "entity_cd": "61",
+   "entity_name": "CITY OF MUSTANG RIDGE",
+   "class": "city",
+   "rows": 1931,
+   "partial_rows": 92
+  },
+  {
+   "entity_cd": "18",
+   "entity_name": "TRAVIS CO WCID NO 18",
+   "class": "other",
+   "rows": 1824,
+   "partial_rows": 30
+  },
+  {
+   "entity_cd": "5M",
+   "entity_name": "LAZY NINE MUD NO 1B",
+   "class": "other",
+   "rows": 1781,
+   "partial_rows": 255
+  },
+  {
+   "entity_cd": "6G",
+   "entity_name": "TRAVIS CO MUD NO 15",
+   "class": "other",
+   "rows": 1755,
+   "partial_rows": 3
+  },
+  {
+   "entity_cd": "1H",
+   "entity_name": "COTTONWD CREEK MUD NO 1",
+   "class": "other",
+   "rows": 1723,
+   "partial_rows": 246
+  },
+  {
+   "entity_cd": "09",
+   "entity_name": "CITY OF WEST LAKE HILLS",
+   "class": "city",
+   "rows": 1684,
+   "partial_rows": 45
+  },
+  {
+   "entity_cd": "2K",
+   "entity_name": "PRESIDENTIAL GLEN MUD",
+   "class": "other",
+   "rows": 1582,
+   "partial_rows": 34
+  },
+  {
+   "entity_cd": "3G",
+   "entity_name": "TRAVIS CO MUD NO 14",
+   "class": "other",
+   "rows": 1561,
+   "partial_rows": 17
+  },
+  {
+   "entity_cd": "7A",
+   "entity_name": "MOORES CROSSING MUD",
+   "class": "other",
+   "rows": 1539,
+   "partial_rows": 11
+  },
+  {
+   "entity_cd": "4T",
+   "entity_name": "MANOR HEIGHTS TIRZ",
+   "class": "other",
+   "rows": 1489,
+   "partial_rows": 21
+  },
+  {
+   "entity_cd": "4P",
+   "entity_name": "PILOT KNOB MUD NO 2",
+   "class": "other",
+   "rows": 1459,
+   "partial_rows": 238
+  },
+  {
+   "entity_cd": "55",
+   "entity_name": "VILLAGE OF BRIARCLIFF",
+   "class": "city",
+   "rows": 1376,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "2R",
+   "entity_name": "TRAVIS CO MUD NO 23",
+   "class": "other",
+   "rows": 1358,
+   "partial_rows": 4
+  },
+  {
+   "entity_cd": "1F",
+   "entity_name": "TANGLEWD FOREST LTD DIST",
+   "class": "other",
+   "rows": 1319,
+   "partial_rows": 6
+  },
+  {
+   "entity_cd": "6L",
+   "entity_name": "TRAVIS CO MUD NO 17",
+   "class": "other",
+   "rows": 1318,
+   "partial_rows": 238
+  },
+  {
+   "entity_cd": "2H",
+   "entity_name": "NE TRAVIS CO UTILITY DIST",
+   "class": "other",
+   "rows": 1316,
+   "partial_rows": 3
+  },
+  {
+   "entity_cd": "1M",
+   "entity_name": "REINVESTMENT ZONE # 1 CITY OF PFLUG",
+   "class": "other",
+   "rows": 1273,
+   "partial_rows": 12
+  },
+  {
+   "entity_cd": "6P",
+   "entity_name": "LOST CREEK LIMITED DISTRICT",
+   "class": "other",
+   "rows": 1272,
+   "partial_rows": 6
+  },
+  {
+   "entity_cd": "71",
+   "entity_name": "TRAVIS CO ESD NO 14",
+   "class": "other",
+   "rows": 1272,
+   "partial_rows": 21
+  },
+  {
+   "entity_cd": "70",
+   "entity_name": "TRAVIS CO MUD NO 2",
+   "class": "other",
+   "rows": 1264,
+   "partial_rows": 26
+  },
+  {
+   "entity_cd": "1A",
+   "entity_name": "HAYS CONSOLIDATED ISD",
+   "class": "school",
+   "rows": 1262,
+   "partial_rows": 17
+  },
+  {
+   "entity_cd": "5T",
+   "entity_name": "ROSE HILL PID",
+   "class": "other",
+   "rows": 1252,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "6M",
+   "entity_name": "TRAVIS CO MUD NO 21",
+   "class": "other",
+   "rows": 1233,
+   "partial_rows": 146
+  },
+  {
+   "entity_cd": "25",
+   "entity_name": "HURST CREEK MUD",
+   "class": "other",
+   "rows": 1220,
+   "partial_rows": 37
+  },
+  {
+   "entity_cd": "7F",
+   "entity_name": "VILLAGE OF POINT VENTURE",
+   "class": "city",
+   "rows": 1142,
+   "partial_rows": 31
+  },
+  {
+   "entity_cd": "23",
+   "entity_name": "TRAVIS CO WCID POINT VENTURE",
+   "class": "other",
+   "rows": 1136,
+   "partial_rows": 29
+  },
+  {
+   "entity_cd": "9I",
+   "entity_name": "LAKESIDE WCID NO 2C",
+   "class": "other",
+   "rows": 1133,
+   "partial_rows": 65
+  },
+  {
+   "entity_cd": "7E",
+   "entity_name": "VILLAGE OF THE HILLS",
+   "class": "city",
+   "rows": 1112,
+   "partial_rows": 4
+  },
+  {
+   "entity_cd": "8P",
+   "entity_name": "RIVER PLACE LIMITED DISTRICT",
+   "class": "other",
+   "rows": 1066,
+   "partial_rows": 42
+  },
+  {
+   "entity_cd": "33",
+   "entity_name": "SHADY HOLLOW MUD",
+   "class": "other",
+   "rows": 1063,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "9J",
+   "entity_name": "LAKESIDE WCID NO 2D",
+   "class": "other",
+   "rows": 1062,
+   "partial_rows": 15
+  },
+  {
+   "entity_cd": "7N",
+   "entity_name": "TRAVIS CO MUD NO 19",
+   "class": "other",
+   "rows": 1040,
+   "partial_rows": 86
+  },
+  {
+   "entity_cd": "7G",
+   "entity_name": "WILBARGER CRK MUD NO 1",
+   "class": "other",
+   "rows": 1005,
+   "partial_rows": 20
+  },
+  {
+   "entity_cd": "6C",
+   "entity_name": "LAKE POINTE MUD",
+   "class": "other",
+   "rows": 1003,
+   "partial_rows": 6
+  },
+  {
+   "entity_cd": "WV",
+   "entity_name": "WHISPER VALLEY PID",
+   "class": "other",
+   "rows": 997,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "8K",
+   "entity_name": "TRAVIS CO ESD NO 13",
+   "class": "other",
+   "rows": 990,
+   "partial_rows": 105
+  },
+  {
+   "entity_cd": "2P",
+   "entity_name": "ESTANCIA HILL COUNTRY PID",
+   "class": "other",
+   "rows": 972,
+   "partial_rows": 2
+  },
+  {
+   "entity_cd": "10D",
+   "entity_name": "MANOR HEIGHTS PID (MIA)",
+   "class": "other",
+   "rows": 952,
+   "partial_rows": 21
+  },
+  {
+   "entity_cd": "73",
+   "entity_name": "ONION CREEK METRO PARK DIST",
+   "class": "other",
+   "rows": 937,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "10L",
+   "entity_name": "TURNERS CROSSING PID (IMP AREA #1)",
+   "class": "other",
+   "rows": 895,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "40",
+   "entity_name": "CITY OF CREEDMOOR",
+   "class": "city",
+   "rows": 886,
+   "partial_rows": 23
+  },
+  {
+   "entity_cd": "5J",
+   "entity_name": "KELLY LANE WCID NO 1",
+   "class": "other",
+   "rows": 835,
+   "partial_rows": 27
+  },
+  {
+   "entity_cd": "7J",
+   "entity_name": "LAKESIDE MUD NO 3",
+   "class": "other",
+   "rows": 835,
+   "partial_rows": 50
+  },
+  {
+   "entity_cd": "4K",
+   "entity_name": "TRAVIS CO MUD NO 12",
+   "class": "other",
+   "rows": 834,
+   "partial_rows": 185
+  },
+  {
+   "entity_cd": "4L",
+   "entity_name": "TRAVIS CO MUD NO 13",
+   "class": "other",
+   "rows": 825,
+   "partial_rows": 254
+  },
+  {
+   "entity_cd": "7R",
+   "entity_name": "TRAVIS CO MUD NO 22",
+   "class": "other",
+   "rows": 729,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "13H",
+   "entity_name": "MANOR TIRZ #2",
+   "class": "other",
+   "rows": 720,
+   "partial_rows": 12
+  },
+  {
+   "entity_cd": "9G",
+   "entity_name": "LAKESIDE WCID NO 2A",
+   "class": "other",
+   "rows": 669,
+   "partial_rows": 52
+  },
+  {
+   "entity_cd": "5K",
+   "entity_name": "KELLY LANE WCID NO 2",
+   "class": "other",
+   "rows": 668,
+   "partial_rows": 27
+  },
+  {
+   "entity_cd": "1J",
+   "entity_name": "CYPRESS RANCH WCID NO 1",
+   "class": "other",
+   "rows": 655,
+   "partial_rows": 10
+  },
+  {
+   "entity_cd": "7T",
+   "entity_name": "LAKESIDE MUD NO 5",
+   "class": "other",
+   "rows": 623,
+   "partial_rows": 3
+  },
+  {
+   "entity_cd": "11",
+   "entity_name": "CITY OF ROLLINGWOOD",
+   "class": "city",
+   "rows": 606,
+   "partial_rows": 7
+  },
+  {
+   "entity_cd": "4J",
+   "entity_name": "TRAVIS CO MUD NO 11",
+   "class": "other",
+   "rows": 596,
+   "partial_rows": 102
+  },
+  {
+   "entity_cd": "3T",
+   "entity_name": "LAGOS PID",
+   "class": "other",
+   "rows": 592,
+   "partial_rows": 2
+  },
+  {
+   "entity_cd": "89",
+   "entity_name": "NE TCRD DIST NO 4 (WELLS PT)",
+   "class": "other",
+   "rows": 587,
+   "partial_rows": 17
+  },
+  {
+   "entity_cd": "9M",
+   "entity_name": "SOUTHEAST TRAVIS CO MUD NO 1",
+   "class": "other",
+   "rows": 570,
+   "partial_rows": 28
+  },
+  {
+   "entity_cd": "11R",
+   "entity_name": "CREEDMOOR MUD",
+   "class": "other",
+   "rows": 562,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "10A",
+   "entity_name": "BELLA FORTUNA PID",
+   "class": "other",
+   "rows": 560,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "7P",
+   "entity_name": "TRAVIS CO MUD NO 20",
+   "class": "other",
+   "rows": 556,
+   "partial_rows": 116
+  },
+  {
+   "entity_cd": "9D",
+   "entity_name": "LAKESIDE WCID NO 1",
+   "class": "other",
+   "rows": 554,
+   "partial_rows": 46
+  },
+  {
+   "entity_cd": "6H",
+   "entity_name": "WEST TRAVIS CO MUD NO 6",
+   "class": "other",
+   "rows": 553,
+   "partial_rows": 27
+  },
+  {
+   "entity_cd": "3R",
+   "entity_name": "TRAVIS CO MUD NO 24",
+   "class": "other",
+   "rows": 546,
+   "partial_rows": 6
+  },
+  {
+   "entity_cd": "8C",
+   "entity_name": "TRAVIS CO MUD NO 3",
+   "class": "other",
+   "rows": 535,
+   "partial_rows": 3
+  },
+  {
+   "entity_cd": "4H",
+   "entity_name": "TRAVIS CO WCID 17 FLINTROCK (DA)",
+   "class": "other",
+   "rows": 533,
+   "partial_rows": 10
+  },
+  {
+   "entity_cd": "3N",
+   "entity_name": "TRAVIS CO MUD NO 18",
+   "class": "other",
+   "rows": 520,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "5G",
+   "entity_name": "VILLAGE OF VOLENTE",
+   "class": "city",
+   "rows": 503,
+   "partial_rows": 15
+  },
+  {
+   "entity_cd": "9H",
+   "entity_name": "LAKESIDE WCID NO 2B",
+   "class": "other",
+   "rows": 499,
+   "partial_rows": 20
+  },
+  {
+   "entity_cd": "10F",
+   "entity_name": "TRAVIS CO MUD NO 26",
+   "class": "other",
+   "rows": 471,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "11K",
+   "entity_name": "MANOR HEIGHTS PID (IMP AREA #4)",
+   "class": "other",
+   "rows": 466,
+   "partial_rows": 12
+  },
+  {
+   "entity_cd": "10P",
+   "entity_name": "BRIARWOOD MUD",
+   "class": "other",
+   "rows": 459,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "3M",
+   "entity_name": "WILLIAMSON/TRAVIS MUD NO 1",
+   "class": "other",
+   "rows": 447,
+   "partial_rows": 28
+  },
+  {
+   "entity_cd": "37",
+   "entity_name": "TRAVIS CO WCID NO 20",
+   "class": "other",
+   "rows": 439,
+   "partial_rows": 23
+  },
+  {
+   "entity_cd": "1R",
+   "entity_name": "TESSERA ON LAKE TRAVIS PID (MIA)",
+   "class": "other",
+   "rows": 434,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "2L",
+   "entity_name": "TRAVIS CO MUD NO 16",
+   "class": "other",
+   "rows": 434,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "10T",
+   "entity_name": "TESSERA ON LAKE TRAVIS PID (IMP AREA #3)",
+   "class": "other",
+   "rows": 431,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "5E",
+   "entity_name": "SENNA HILLS MUD",
+   "class": "other",
+   "rows": 425,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "12H",
+   "entity_name": "MEADOWLARK PRESERVE",
+   "class": "other",
+   "rows": 414,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "10J",
+   "entity_name": "LAGOS PID IMPROVEMENT AREA #1",
+   "class": "other",
+   "rows": 396,
+   "partial_rows": 2
+  },
+  {
+   "entity_cd": "2N",
+   "entity_name": "NORTH AUSTIN MUD NO 1",
+   "class": "other",
+   "rows": 375,
+   "partial_rows": 16
+  },
+  {
+   "entity_cd": "1U",
+   "entity_name": "TESSERA ON LAKE TRAVIS PID (IMP AREA #2)",
+   "class": "other",
+   "rows": 353,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "10U",
+   "entity_name": "MANOR HEIGHTS PID (IMP AREA #3)",
+   "class": "other",
+   "rows": 351,
+   "partial_rows": 7
+  },
+  {
+   "entity_cd": "1T",
+   "entity_name": "TESSERA ON LAKE TRAVIS PID (IMP AREA #1)",
+   "class": "other",
+   "rows": 351,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "11D",
+   "entity_name": "LONGVIEW 71 PID IMPROVEMENT AREA #1",
+   "class": "other",
+   "rows": 347,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "8E",
+   "entity_name": "RNCH @ CYPRSS CRK MUD 1",
+   "class": "other",
+   "rows": 337,
+   "partial_rows": 31
+  },
+  {
+   "entity_cd": "13",
+   "entity_name": "CITY OF SUNSET VALLEY",
+   "class": "city",
+   "rows": 334,
+   "partial_rows": 3
+  },
+  {
+   "entity_cd": "9L",
+   "entity_name": "TRAVIS CO WCID 17 SERENE HILLS (DA)",
+   "class": "other",
+   "rows": 330,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "WH",
+   "entity_name": "WILDHORSE PID (IMP AREA #1)",
+   "class": "other",
+   "rows": 324,
+   "partial_rows": 2
+  },
+  {
+   "entity_cd": "4R",
+   "entity_name": "PILOT KNOB MUD NO 5",
+   "class": "other",
+   "rows": 320,
+   "partial_rows": 7
+  },
+  {
+   "entity_cd": "12E",
+   "entity_name": "WILDHORSE PID (IMP AREA #2)",
+   "class": "other",
+   "rows": 319,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "2F",
+   "entity_name": "CITY OF ROUND ROCK",
+   "class": "city",
+   "rows": 318,
+   "partial_rows": 41
+  },
+  {
+   "entity_cd": "4F",
+   "entity_name": "TRAVIS CO MUD NO 10",
+   "class": "other",
+   "rows": 315,
+   "partial_rows": 26
+  },
+  {
+   "entity_cd": "12P",
+   "entity_name": "WILDHORSE PID (IMP AREA #3)",
+   "class": "other",
+   "rows": 311,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "11G",
+   "entity_name": "TURNERS CROSSING PID (IMP AREA #2)",
+   "class": "other",
+   "rows": 308,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "7C",
+   "entity_name": "TRAVIS CO WCID 17 COMANCHE TRAILS (DA)",
+   "class": "other",
+   "rows": 287,
+   "partial_rows": 35
+  },
+  {
+   "entity_cd": "11L",
+   "entity_name": "LAKESIDE MEADOWS PID (IMP AREA #1)",
+   "class": "other",
+   "rows": 282,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "11A",
+   "entity_name": "VISTA MUD",
+   "class": "other",
+   "rows": 280,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "12",
+   "entity_name": "VILLAGE OF SAN LEANNA",
+   "class": "city",
+   "rows": 280,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "10B",
+   "entity_name": "MANOR HEIGHTS PID (IMP AREA #1",
+   "class": "other",
+   "rows": 273,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "10C",
+   "entity_name": "MANOR HEIGHTS PID (IMP AREA #2",
+   "class": "other",
+   "rows": 262,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "12F",
+   "entity_name": "TURNERS CROSSING PID (IMP AREA #3)",
+   "class": "other",
+   "rows": 260,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "1D",
+   "entity_name": "TRAVIS CO MUD NO 5",
+   "class": "other",
+   "rows": 258,
+   "partial_rows": 51
+  },
+  {
+   "entity_cd": "12K",
+   "entity_name": "MUSTANG RIDGE MUD",
+   "class": "other",
+   "rows": 249,
+   "partial_rows": 17
+  },
+  {
+   "entity_cd": "11F",
+   "entity_name": "DURANGO PID (IMP AREA #1)",
+   "class": "other",
+   "rows": 248,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "1K",
+   "entity_name": "BELVEDERE MUD",
+   "class": "other",
+   "rows": 234,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "12D",
+   "entity_name": "DURANGO PID (IMP AREA #2)",
+   "class": "other",
+   "rows": 233,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "2G",
+   "entity_name": "WMSN CO WSID DIST 3",
+   "class": "other",
+   "rows": 230,
+   "partial_rows": 29
+  },
+  {
+   "entity_cd": "13C",
+   "entity_name": "MANOR TIRZ #3",
+   "class": "other",
+   "rows": 218,
+   "partial_rows": 10
+  },
+  {
+   "entity_cd": "35",
+   "entity_name": "TRAVIS CO WCID NO 19",
+   "class": "other",
+   "rows": 202,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "5H",
+   "entity_name": "VILLAGE OF WEBBERVILLE",
+   "class": "city",
+   "rows": 195,
+   "partial_rows": 34
+  },
+  {
+   "entity_cd": "13D",
+   "entity_name": "MANOR HEIGHTS PID (IMP AREA #5)",
+   "class": "other",
+   "rows": 185,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "5L",
+   "entity_name": "LAZY NINE MUD NO 1A",
+   "class": "other",
+   "rows": 167,
+   "partial_rows": 3
+  },
+  {
+   "entity_cd": "1P",
+   "entity_name": "TRAVIS CO IMPROVEMENT DIST NO 1",
+   "class": "other",
+   "rows": 166,
+   "partial_rows": 3
+  },
+  {
+   "entity_cd": "11T",
+   "entity_name": "MUSTANG VALLEY PID",
+   "class": "other",
+   "rows": 154,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "9N",
+   "entity_name": "SOUTHEAST TRAVIS CO MUD NO 2",
+   "class": "other",
+   "rows": 143,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "6J",
+   "entity_name": "WEST TRAVIS CO MUD NO 8",
+   "class": "other",
+   "rows": 138,
+   "partial_rows": 27
+  },
+  {
+   "entity_cd": "2T",
+   "entity_name": "TRAVIS CO MUD NO 25",
+   "class": "other",
+   "rows": 136,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "10K",
+   "entity_name": "MARTIN TRACT PID",
+   "class": "other",
+   "rows": 135,
+   "partial_rows": 2
+  },
+  {
+   "entity_cd": "12C",
+   "entity_name": "TRIADA MUD",
+   "class": "other",
+   "rows": 131,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "3J",
+   "entity_name": "E SIXTH ST PUB IMP DIST",
+   "class": "other",
+   "rows": 115,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "38",
+   "entity_name": "DRIPPING SPRINGS ISD",
+   "class": "school",
+   "rows": 111,
+   "partial_rows": 35
+  },
+  {
+   "entity_cd": "8L",
+   "entity_name": "TRAVIS CO BEE CAVE ROAD DIST NO 1",
+   "class": "other",
+   "rows": 92,
+   "partial_rows": 14
+  },
+  {
+   "entity_cd": "12A",
+   "entity_name": "TRAVIS CO MUD NO 28",
+   "class": "other",
+   "rows": 89,
+   "partial_rows": 5
+  },
+  {
+   "entity_cd": "6T",
+   "entity_name": "ALTESSA MUD",
+   "class": "other",
+   "rows": 89,
+   "partial_rows": 16
+  },
+  {
+   "entity_cd": "8N",
+   "entity_name": "ANDERSON MILL LIMITED DISTRICT",
+   "class": "other",
+   "rows": 73,
+   "partial_rows": 23
+  },
+  {
+   "entity_cd": "12L",
+   "entity_name": "FIREFLY MUD",
+   "class": "other",
+   "rows": 72,
+   "partial_rows": 4
+  },
+  {
+   "entity_cd": "6D",
+   "entity_name": "TRAVIS CO WCID 17 SOUTHVIEW (DA)",
+   "class": "other",
+   "rows": 68,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "2D",
+   "entity_name": "TRAVIS CO MUD NO 6",
+   "class": "other",
+   "rows": 67,
+   "partial_rows": 2
+  },
+  {
+   "entity_cd": "22",
+   "entity_name": "COUPLAND ISD",
+   "class": "school",
+   "rows": 63,
+   "partial_rows": 17
+  },
+  {
+   "entity_cd": "9C",
+   "entity_name": "TRAVIS CO MUD NO 4",
+   "class": "other",
+   "rows": 46,
+   "partial_rows": 2
+  },
+  {
+   "entity_cd": "10H",
+   "entity_name": "SPANISH OAKS PID",
+   "class": "other",
+   "rows": 44,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "4A",
+   "entity_name": "JOHNSON CITY ISD",
+   "class": "school",
+   "rows": 44,
+   "partial_rows": 17
+  },
+  {
+   "entity_cd": "3P",
+   "entity_name": "PILOT KNOB MUD NO 1",
+   "class": "other",
+   "rows": 43,
+   "partial_rows": 25
+  },
+  {
+   "entity_cd": "4D",
+   "entity_name": "TRAVIS CO MUD NO 8",
+   "class": "other",
+   "rows": 43,
+   "partial_rows": 5
+  },
+  {
+   "entity_cd": "6N",
+   "entity_name": "SOUTH CONGRESS PID",
+   "class": "other",
+   "rows": 41,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "10I",
+   "entity_name": "ENTRADA GLEN PID",
+   "class": "other",
+   "rows": 39,
+   "partial_rows": 2
+  },
+  {
+   "entity_cd": "4N",
+   "entity_name": "PILOT KNOB MUD NO 4",
+   "class": "other",
+   "rows": 26,
+   "partial_rows": 9
+  },
+  {
+   "entity_cd": "3D",
+   "entity_name": "TRAVIS CO MUD NO 7",
+   "class": "other",
+   "rows": 23,
+   "partial_rows": 2
+  },
+  {
+   "entity_cd": "9T",
+   "entity_name": "NEW SWEDEN MUD NO 1",
+   "class": "other",
+   "rows": 13,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "IH",
+   "entity_name": "INDIAN HILLS PID",
+   "class": "other",
+   "rows": 11,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "10R",
+   "entity_name": "COLONY PARK SUSTAINABLE COMMUNITY",
+   "class": "other",
+   "rows": 10,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "13A",
+   "entity_name": "TRAVIS CO MUD NO 34",
+   "class": "other",
+   "rows": 10,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "5D",
+   "entity_name": "TRAVIS CO MUD NO 9",
+   "class": "other",
+   "rows": 10,
+   "partial_rows": 2
+  },
+  {
+   "entity_cd": "1N",
+   "entity_name": "ELGIN TIRZ #1",
+   "class": "other",
+   "rows": 8,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "8T",
+   "entity_name": "COLORADO RIVER PROJECT REINVESTMENT ZONE",
+   "class": "other",
+   "rows": 8,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "12B",
+   "entity_name": "NE GROWTH CORRIDOR WSID DIST NO 1",
+   "class": "other",
+   "rows": 7,
+   "partial_rows": 6
+  },
+  {
+   "entity_cd": "7H",
+   "entity_name": "WILBARGER CRK MUD NO 2",
+   "class": "other",
+   "rows": 7,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "7K",
+   "entity_name": "SUNFIELD MUD NO 1",
+   "class": "other",
+   "rows": 5,
+   "partial_rows": 4
+  },
+  {
+   "entity_cd": "7L",
+   "entity_name": "SUNFIELD MUD NO 2",
+   "class": "other",
+   "rows": 5,
+   "partial_rows": 2
+  },
+  {
+   "entity_cd": "11M",
+   "entity_name": "SE AUSTIN SEMICONDUCTOR REINVESTMENT ZONE #1",
+   "class": "other",
+   "rows": 4,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "11P",
+   "entity_name": "HERO WAY WEST MUD",
+   "class": "other",
+   "rows": 4,
+   "partial_rows": 3
+  },
+  {
+   "entity_cd": "12J",
+   "entity_name": "LUND FARM MUD",
+   "class": "other",
+   "rows": 4,
+   "partial_rows": 4
+  },
+  {
+   "entity_cd": "6I",
+   "entity_name": "WEST TRAVIS CO MUD NO 7",
+   "class": "other",
+   "rows": 4,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "10G",
+   "entity_name": "BACKYARD PID",
+   "class": "other",
+   "rows": 3,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "12N",
+   "entity_name": "LONGVIEW 71 PID IMPROVEMENT AREA #2",
+   "class": "other",
+   "rows": 3,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "13G",
+   "entity_name": "HIDDEN LAKES MUD NO 1",
+   "class": "other",
+   "rows": 3,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "7M",
+   "entity_name": "SUNFIELD MUD NO 3",
+   "class": "other",
+   "rows": 3,
+   "partial_rows": 2
+  },
+  {
+   "entity_cd": "9R",
+   "entity_name": "SOUTHEAST TRAVIS CO MUD NO 4",
+   "class": "other",
+   "rows": 3,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "CLT",
+   "entity_name": "COMMUNITY LAND TRUST",
+   "class": "other",
+   "rows": 3,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "11N",
+   "entity_name": "BURNET CO IMPROVEMENT DIST NO 1",
+   "class": "other",
+   "rows": 2,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "12I",
+   "entity_name": "PERSIMMON PID MIA",
+   "class": "other",
+   "rows": 2,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "12M",
+   "entity_name": "TRAVIS CO MUD NO 29",
+   "class": "other",
+   "rows": 2,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "13E",
+   "entity_name": "PERSIMMON TIRZ",
+   "class": "other",
+   "rows": 2,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "5R",
+   "entity_name": "LAZY NINE MUD NO 1E",
+   "class": "other",
+   "rows": 2,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "9P",
+   "entity_name": "SOUTHEAST TRAVIS CO MUD NO 3",
+   "class": "other",
+   "rows": 2,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "11B",
+   "entity_name": "CENTEX DRAINAGE DISTRICT",
+   "class": "other",
+   "rows": 1,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "11C",
+   "entity_name": "THE GROVE AT MUSTANG RIDGE PID",
+   "class": "other",
+   "rows": 1,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "12R",
+   "entity_name": "WILDHORSE PID (IMP AREA #1 C-4)",
+   "class": "other",
+   "rows": 1,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "12T",
+   "entity_name": "WILDHORSE PID (IMP AREA #1 C-13)",
+   "class": "other",
+   "rows": 1,
+   "partial_rows": 1
+  },
+  {
+   "entity_cd": "13I",
+   "entity_name": "TURNERS CROSSING PID (IMP AREA #4)",
+   "class": "other",
+   "rows": 1,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "5N",
+   "entity_name": "LAZY NINE MUD NO 1C",
+   "class": "other",
+   "rows": 1,
+   "partial_rows": 0
+  },
+  {
+   "entity_cd": "5P",
+   "entity_name": "LAZY NINE MUD NO 1D",
+   "class": "other",
+   "rows": 1,
+   "partial_rows": 1
+  }
+ ],
+ "imp_info_types": [
+  {
+   "type": "01|1 FAM DWELLING",
+   "rows": 313826
+  },
+  {
+   "type": "00|Detail Only",
+   "rows": 30352
+  },
+  {
+   "type": "16|TOWNHOMES",
+   "rows": 22800
+  },
+  {
+   "type": "15|CONDO (STACKED)",
+   "rows": 16009
+  },
+  {
+   "type": "02|2 FAM DWELLING",
+   "rows": 10213
+  },
+  {
+   "type": "11|MOHO SINGLE PP",
+   "rows": 6072
+  },
+  {
+   "type": "120|ADDITIONAL LIVING QUARTER",
+   "rows": 5879
+  },
+  {
+   "type": "12|MOHO DOUBLE PP",
+   "rows": 5718
+  },
+  {
+   "type": "19|SPECIAL (NODEPR)",
+   "rows": 4949
+  },
+  {
+   "type": "22|HIRISE CONDO/APT",
+   "rows": 4826
+  },
+  {
+   "type": "61|WAREHOUSE <20000",
+   "rows": 3854
+  },
+  {
+   "type": "14|MOHO DOUBLE REAL",
+   "rows": 3837
+  },
+  {
+   "type": "13|MOHO SINGLE REAL",
+   "rows": 3791
+  },
+  {
+   "type": "53|OFFICE (SMALL)",
+   "rows": 2019
+  },
+  {
+   "type": "21|GARAGE APARTMENT",
+   "rows": 1892
+  },
+  {
+   "type": "59|OFF/RETAIL (SFR)",
+   "rows": 1604
+  },
+  {
+   "type": "08|APARTMENT 100+",
+   "rows": 1173
+  },
+  {
+   "type": "04|FOURPLEX",
+   "rows": 1125
+  },
+  {
+   "type": "23|SM OFFICE CONDO",
+   "rows": 1124
+  },
+  {
+   "type": "20|SM STORE <10K SF",
+   "rows": 861
+  },
+  {
+   "type": "51|OFFICE LG >35000",
+   "rows": 808
+  },
+  {
+   "type": "83|SVC/REPAIR GAR'G",
+   "rows": 793
+  },
+  {
+   "type": "52|OFFICE MED 10-35",
+   "rows": 786
+  },
+  {
+   "type": "26|LG OFFICE CONDO",
+   "rows": 750
+  },
+  {
+   "type": "05|APARTMENT 5-25",
+   "rows": 696
+  },
+  {
+   "type": "60|INDL 20K+ <25%FO",
+   "rows": 591
+  },
+  {
+   "type": "32|RESTAURANT",
+   "rows": 590
+  },
+  {
+   "type": "43|STRIP CTR >10000",
+   "rows": 543
+  },
+  {
+   "type": "30|STRIP CTR <10000",
+   "rows": 509
+  },
+  {
+   "type": "63|MINI-WAREHOUSE",
+   "rows": 496
+  },
+  {
+   "type": "48|CONVENIENCE STOR",
+   "rows": 492
+  },
+  {
+   "type": "33|FAST FOOD REST",
+   "rows": 416
+  },
+  {
+   "type": "10|MF'D COMMCL BLDG",
+   "rows": 320
+  },
+  {
+   "type": "24|COMMERCIAL SPACE CONDOS",
+   "rows": 264
+  },
+  {
+   "type": "01C|01 SFR COMM",
+   "rows": 261
+  },
+  {
+   "type": "31|NIGHT CLUB/BAR",
+   "rows": 243
+  },
+  {
+   "type": "66|INDL 20K+ >75%FO",
+   "rows": 217
+  },
+  {
+   "type": "58|BANK BRANCH OFF",
+   "rows": 210
+  },
+  {
+   "type": "17|CLUBHOUSE",
+   "rows": 208
+  },
+  {
+   "type": "41|COMM SHOP CTR",
+   "rows": 191
+  },
+  {
+   "type": "54|MEDICAL OFF <10K",
+   "rows": 182
+  },
+  {
+   "type": "70|RELIGIOUS FACILITIES",
+   "rows": 181
+  },
+  {
+   "type": "03|TRIPLEX",
+   "rows": 175
+  },
+  {
+   "type": "64|INDL 20K+ 25-49%",
+   "rows": 174
+  },
+  {
+   "type": "06|APARTMENT 26-49",
+   "rows": 170
+  },
+  {
+   "type": "46|DISC STR >25,000",
+   "rows": 163
+  },
+  {
+   "type": "07|APARTMENT 50-100",
+   "rows": 160
+  },
+  {
+   "type": "42|NGHBOR SHOP CTR",
+   "rows": 156
+  },
+  {
+   "type": "50|OFF HI-RISE >= 6",
+   "rows": 144
+  },
+  {
+   "type": "78|DAY CARE CENTER",
+   "rows": 140
+  },
+  {
+   "type": "55|MEDICAL OFF >10K",
+   "rows": 140
+  },
+  {
+   "type": "35|HOTEL-LMTD SERVC",
+   "rows": 121
+  },
+  {
+   "type": "37|MOTEL-EXTND STAY",
+   "rows": 115
+  },
+  {
+   "type": "87|PARKING GARAGE",
+   "rows": 105
+  },
+  {
+   "type": "65|INDL 20K+ 50-74%",
+   "rows": 101
+  },
+  {
+   "type": "34|HOTEL-FULL SERVC",
+   "rows": 99
+  },
+  {
+   "type": "80|DEALERSHIP",
+   "rows": 85
+  },
+  {
+   "type": "69|MFG/ENG'G/LAB INDUSTRIAL",
+   "rows": 81
+  },
+  {
+   "type": "02C|02 DUPLEX COMM",
+   "rows": 65
+  },
+  {
+   "type": "44|GROCERY STORE",
+   "rows": 64
+  },
+  {
+   "type": "47|RETAIL STORE",
+   "rows": 57
+  },
+  {
+   "type": "84|MINILUBE/TUNE-UP",
+   "rows": 56
+  },
+  {
+   "type": "92|COUNTRY CLUB",
+   "rows": 52
+  },
+  {
+   "type": "47D|DRUGSTORE",
+   "rows": 51
+  },
+  {
+   "type": "29|MAJOR IND MFG",
+   "rows": 49
+  },
+  {
+   "type": "72|FRAT/SORORITY",
+   "rows": 47
+  },
+  {
+   "type": "40|REGIONAL SHOP CT",
+   "rows": 45
+  },
+  {
+   "type": "76AL|ASSISTED LIVING/MEMORY",
+   "rows": 42
+  },
+  {
+   "type": "108|LUXURY HI-RISE APTS 100+",
+   "rows": 42
+  },
+  {
+   "type": "68|TRANSIT WHSE",
+   "rows": 42
+  },
+  {
+   "type": "86|CAR WASH (FULL SERVICE)",
+   "rows": 38
+  },
+  {
+   "type": "88|TREATMENT/REHAB",
+   "rows": 36
+  },
+  {
+   "type": "76IL|INDEPENDENT LIVING",
+   "rows": 33
+  },
+  {
+   "type": "76SN|SKILLED NURSING",
+   "rows": 31
+  },
+  {
+   "type": "04C|04 FOURPLEX COMM",
+   "rows": 31
+  },
+  {
+   "type": "89|ALT LIVING CTR",
+   "rows": 30
+  },
+  {
+   "type": "94|HEALTH CLUB",
+   "rows": 29
+  },
+  {
+   "type": "90|THEATER",
+   "rows": 26
+  },
+  {
+   "type": "96|CLASSROOM",
+   "rows": 26
+  },
+  {
+   "type": "56|BANK - OFFICE",
+   "rows": 25
+  },
+  {
+   "type": "82|SELF-SER BOOTH",
+   "rows": 24
+  },
+  {
+   "type": "67|COMPUTER DATA CENTER",
+   "rows": 24
+  },
+  {
+   "type": "77|HOSPITAL",
+   "rows": 23
+  },
+  {
+   "type": "57|BANK DRIVE THRU",
+   "rows": 21
+  },
+  {
+   "type": "73|DORMITORY",
+   "rows": 18
+  },
+  {
+   "type": "91|MORTUARY/FUNERAL",
+   "rows": 16
+  },
+  {
+   "type": "27|MAJOR IND OFFICE",
+   "rows": 15
+  },
+  {
+   "type": "483|Accessory Dwelling Unit (",
+   "rows": 14
+  },
+  {
+   "type": "81|SERVICE STATION",
+   "rows": 14
+  },
+  {
+   "type": "76CC|CONTINUING CARE",
+   "rows": 14
+  },
+  {
+   "type": "120C|ADU COMM",
+   "rows": 13
+  },
+  {
+   "type": "09|SPECIAL (F-V)",
+   "rows": 13
+  },
+  {
+   "type": "28|MAJOR IND ENG",
+   "rows": 10
+  },
+  {
+   "type": "R|R (Required by Prodigy)",
+   "rows": 9
+  },
+  {
+   "type": "74|DORMITORY HIRISE",
+   "rows": 6
+  },
+  {
+   "type": "39|RESTAURANT (SFR)",
+   "rows": 5
+  },
+  {
+   "type": "93|BOWLING CENTER",
+   "rows": 5
+  },
+  {
+   "type": "03C|03 TRIPLEX COMM",
+   "rows": 4
+  },
+  {
+   "type": "76|RETIREMENT CTR",
+   "rows": 4
+  },
+  {
+   "type": "95|MARINA",
+   "rows": 4
+  },
+  {
+   "type": "21C|GARAGE APT COMM",
+   "rows": 3
+  },
+  {
+   "type": "49|BED/BKFAST(SFR)",
+   "rows": 3
+  },
+  {
+   "type": "98|LSEHLD XMT PROP",
+   "rows": 3
+  },
+  {
+   "type": "45|DEPT STR >25,000",
+   "rows": 2
+  },
+  {
+   "type": "|",
+   "rows": 1
+  },
+  {
+   "type": "77OP|OUTPATIENT (SURGICAL) CEN",
+   "rows": 1
+  }
+ ]
+}

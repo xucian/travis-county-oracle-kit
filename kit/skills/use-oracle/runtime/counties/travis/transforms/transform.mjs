@@ -42,11 +42,124 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const TRANSFORM_VERSION = "travis-transform-v3";
+/**
+ * v4 (T5 pre-run fixes, assignment `docs/progress.md` T5 row): a multi-part parcel keeps one geometry per polygon part
+ * (`geometry_part_<n>.json`, each linked by `parcel_has_geometry`; `geometry.json` stays the parcel's point and the
+ * address's geometry), and the inner rings the lexicon polygon cannot hold are recorded in the sidecar as a lexicon gap;
+ * the TCAD export fields with a lexicon home that v3 left unread are mapped from `input.tcadExtras`
+ * (`t5-tcad-extras.mjs`) with exact-value tables ({@link TCAD_EXTRAS_MAPPING_VERSION}): `structure` from the
+ * `IMP_ATR.TXT` roof covering, roof style and foundation, `lot` from `LAND_DET.TXT` where the roll prints no legal
+ * acreage, and `tax` gains the homestead cap loss and the county, city, school, college and hospital-district taxable
+ * values of `PROP_ENT.TXT`.
+ */
+export const TRANSFORM_VERSION = "travis-transform-v4";
 export const PARCEL_INPUT_SCHEMA_VERSION = "travis.parcel-input.v1";
 export const STATE_CODE = "TX";
 export const OWNER_CLASSIFICATION_VERSION = "travis-owner-classification-v2";
 export const STATE_CODE_MAPPING_VERSION = "travis-state-code-v1";
+export const GEOMETRY_PARTS_VERSION = "travis-geometry-parts-v1";
+export const TCAD_EXTRAS_MAPPING_VERSION = "travis-tcad-extras-mapping-v1";
+
+/**
+ * `IMP_ATR.TXT` "Roof Covering" codes (as printed, cut at 10 characters) to the lexicon `structure` fields. A code names
+ * a material, not a product: COMPOSITIO(N) is neither member "3-Tab Asphalt Shingle" nor "Architectural Asphalt
+ * Shingle", METAL neither "Metal Standing Seam" nor "Metal Corrugated", TILE neither "Clay Tile" nor "Concrete Tile", so
+ * `roof_covering_material` stays null for them and only `roof_material_type` (the material) is written.
+ */
+export const ROOF_COVERING_BY_CODE = Object.freeze({
+  "BUILT-UP": Object.freeze({ roof_covering_material: "Built-Up Roof", roof_material_type: null }),
+  COMPOSITIO: Object.freeze({ roof_covering_material: null, roof_material_type: "Composition" }),
+  METAL: Object.freeze({ roof_covering_material: null, roof_material_type: "Metal" }),
+  TILE: Object.freeze({ roof_covering_material: null, roof_material_type: "Tile" }),
+  "WOOD SHING": Object.freeze({ roof_covering_material: "Wood Shingle", roof_material_type: "Wood" }),
+  OTHER: Object.freeze({ roof_covering_material: null, roof_material_type: null }),
+});
+/** "Roof Style" codes to `structure.roof_design_type`; A-FRAME, BARN and OTHER have no member. */
+export const ROOF_STYLE_BY_CODE = Object.freeze({ FLAT: "Flat", GABLE: "Gable", HIP: "Hip", MANSARD: "Mansard", "A-FRAME": null, BARN: null, OTHER: null });
+/** "Foundation" codes to `structure.foundation_type`; BLOCKS, FLOATING S(LAB), WOOD POST and OTHER have no member. */
+export const FOUNDATION_BY_CODE = Object.freeze({ SLAB: "Slab on Grade", "PIER AND B": "Pier and Beam", BLOCKS: null, "FLOATING S": null, "WOOD POST": null, OTHER: null });
+/** Taxing-entity classes (`t5-tcad-extras.mjs` `classifyTaxingEntity`) to the lexicon `tax` field each fills. */
+export const TAXABLE_VALUE_FIELD_BY_CLASS = Object.freeze({
+  county: "county_taxable_value_amount",
+  city: "city_taxable_value_amount",
+  school: "school_taxable_value_amount",
+  college: "college_taxable_value_amount",
+  hospital: "hospital_taxable_value_amount",
+});
+/** Every property the live `structure` schema requires (all nullable); the transform writes each, null unless mapped. */
+export const STRUCTURE_REQUIRED_FIELDS = Object.freeze([
+  "architectural_style_type", "attachment_type", "exterior_wall_material_primary", "exterior_wall_material_secondary", "exterior_wall_condition",
+  "exterior_wall_insulation_type", "flooring_material_primary", "flooring_material_secondary", "subfloor_material", "flooring_condition",
+  "interior_wall_structure_material", "interior_wall_surface_material_primary", "interior_wall_surface_material_secondary", "interior_wall_finish_primary",
+  "interior_wall_finish_secondary", "interior_wall_condition", "roof_covering_material", "roof_underlayment_type", "roof_structure_material", "roof_design_type",
+  "roof_condition", "roof_age_years", "gutters_material", "gutters_condition", "roof_material_type", "foundation_type", "foundation_material",
+  "foundation_waterproofing", "foundation_condition", "ceiling_structure_material", "ceiling_surface_material", "ceiling_insulation_type",
+  "ceiling_height_average", "ceiling_condition", "exterior_door_material", "interior_door_material", "window_frame_material", "window_glazing_type",
+  "window_operation_type", "window_screen_material", "primary_framing_material", "secondary_framing_material", "structural_damage_indicators",
+]);
+
+/**
+ * The polygon parts of a GeoJSON parcel geometry (`Polygon` or `MultiPolygon`, `[lon, lat]` vertices): each part's outer
+ * ring as lexicon vertices, and the inner rings (holes) the lexicon `geometry.polygon` cannot hold, counted.
+ *
+ * @param {unknown} geometry - GeoJSON geometry, or null.
+ * @returns {{ type: string | null, parts: { vertices: { latitude: number, longitude: number }[], innerRings: number, innerVertices: number }[] }} Parts.
+ */
+export function polygonParts(geometry) {
+  const geo = /** @type {{ type?: string, coordinates?: unknown }} */ (geometry ?? {});
+  /** @type {unknown[]} */
+  let polygons = [];
+  if (geo.type === "Polygon" && Array.isArray(geo.coordinates)) polygons = [geo.coordinates];
+  else if (geo.type === "MultiPolygon" && Array.isArray(geo.coordinates)) polygons = geo.coordinates;
+  const vertexOf = (vertex) => (Array.isArray(vertex) && Number.isFinite(vertex[0]) && Number.isFinite(vertex[1]) ? { latitude: vertex[1], longitude: vertex[0] } : null);
+  const parts = polygons
+    .filter((rings) => Array.isArray(rings) && Array.isArray(rings[0]))
+    .map((rings) => {
+      const list = /** @type {unknown[][]} */ (rings);
+      const inner = list.slice(1).filter(Array.isArray);
+      return {
+        vertices: list[0].map(vertexOf).filter((vertex) => vertex !== null),
+        innerRings: inner.length,
+        innerVertices: inner.reduce((sum, ring) => sum + ring.length, 0),
+      };
+    });
+  return { type: typeof geo.type === "string" ? geo.type : null, parts };
+}
+
+/**
+ * Map one account's printed `IMP_ATR.TXT` codes to `structure` fields: a field is written only when the account prints
+ * exactly one code for its attribute (over all of its improvements) and that code has a member; several codes leave it
+ * null (one structure per property, `property_has_structure`, cannot say which improvement it is).
+ *
+ * @param {{ roof_covering?: string[], roof_style?: string[], foundation?: string[] } | null | undefined} impAtr - Codes per attribute.
+ * @returns {{ fields: Record<string, string | null>, conflicting: string[], unmapped: string[] }} Fields and what kept them null.
+ */
+export function mapStructureAttributes(impAtr) {
+  const fields = { roof_covering_material: null, roof_material_type: null, roof_design_type: null, foundation_type: null };
+  const conflicting = [];
+  const unmapped = [];
+  const one = (kind) => {
+    const codes = impAtr?.[kind] ?? [];
+    if (codes.length > 1) conflicting.push(kind);
+    return codes.length === 1 ? codes[0] : null;
+  };
+  const covering = one("roof_covering");
+  if (covering !== null) {
+    if (Object.hasOwn(ROOF_COVERING_BY_CODE, covering)) Object.assign(fields, ROOF_COVERING_BY_CODE[covering]);
+    else unmapped.push(`roof_covering:${covering}`);
+  }
+  const style = one("roof_style");
+  if (style !== null) {
+    if (Object.hasOwn(ROOF_STYLE_BY_CODE, style)) fields.roof_design_type = ROOF_STYLE_BY_CODE[style];
+    else unmapped.push(`roof_style:${style}`);
+  }
+  const foundation = one("foundation");
+  if (foundation !== null) {
+    if (Object.hasOwn(FOUNDATION_BY_CODE, foundation)) fields.foundation_type = FOUNDATION_BY_CODE[foundation];
+    else unmapped.push(`foundation:${foundation}`);
+  }
+  return { fields, conflicting, unmapped };
+}
 /** Lexicon-gap sidecar written beside `data/`, never inside it (the CLI rejects `source_payload` on validated entities). */
 export const SOURCE_PAYLOAD_FILENAME = "source-payload.json";
 
@@ -380,9 +493,17 @@ export function buildTravisOutput(input, { manifest }) {
   const legal = [text(tcad.legal_desc), text(tcad.legal_desc2)].filter(Boolean).join(" ");
   const builtYear = integer(tcad.yr_built);
   const livingArea = number(tcad.living_area_sqft);
-  // A zero legal acreage means the roll prints none (platted lots); it is never a lot of 0 square feet.
-  const acreage = number(tcad.legal_acreage) !== null && number(tcad.legal_acreage) > 0 ? number(tcad.legal_acreage) : null;
-  const lotSqft = acreage === null ? null : Math.round(acreage * 43560);
+  const extras = input.tcadExtras && typeof input.tcadExtras === "object" ? input.tcadExtras : null;
+  const geometryParts = polygonParts(input.geometry?.polygon ?? null);
+  // A zero legal acreage means the roll prints none (platted lots); it is never a lot of 0 square feet. Such a lot takes
+  // its size from the land segments of LAND_DET.TXT (summed), when they print one (TCAD_EXTRAS_MAPPING_VERSION): the
+  // square feet as printed, and the acres (four implied decimals) only when they agree with them within 1%.
+  const legalAcreage = number(tcad.legal_acreage) !== null && number(tcad.legal_acreage) > 0 ? number(tcad.legal_acreage) : null;
+  const landSqft = legalAcreage === null && extras?.land?.size_square_feet > 0 ? Math.round(extras.land.size_square_feet) : null;
+  const landAcres = landSqft !== null && extras.land.size_acres_4dp > 0 ? extras.land.size_acres_4dp / 10000 : null;
+  const landAcresAgree = landAcres !== null && Math.abs(landAcres * 43560 - landSqft) <= Math.max(1, 0.01 * landSqft);
+  const acreage = legalAcreage ?? (landAcresAgree ? landAcres : null);
+  const lotSqft = legalAcreage !== null ? Math.round(legalAcreage * 43560) : landSqft;
   const ownerConfidential = text(tcad.owner_confidential) === "T";
   const printedOwner = ownerConfidential ? null : text(tcad.py_owner_name);
   const ownerClass = ownerConfidential ? "confidential" : classifyOwnerName(printedOwner);
@@ -415,6 +536,36 @@ export function buildTravisOutput(input, { manifest }) {
       owner_key: printedOwner === null ? null : `${propId}:${printedOwner}`,
     },
     source_snapshot: input.snapshot ?? null,
+    tnr: input.geometry ? { object_id: text(input.geometry.objectId), snapshot_at: text(input.geometry.snapshotAt) } : null,
+    geometry: input.geometry
+      ? {
+          version: GEOMETRY_PARTS_VERSION,
+          geojson_type: geometryParts.type,
+          parts: geometryParts.parts.length,
+          parts_written: 0,
+          inner_rings_dropped: {
+            parts_with_holes: geometryParts.parts.filter((part) => part.innerRings > 0).length,
+            rings: geometryParts.parts.reduce((sum, part) => sum + part.innerRings, 0),
+            vertices: geometryParts.parts.reduce((sum, part) => sum + part.innerVertices, 0),
+          },
+          lexicon_gap: "geometry.polygon holds one ring per geometry; a part's inner rings (holes) have no lexicon home and are not written",
+        }
+      : null,
+    tcad_extras: extras
+      ? {
+          version: TCAD_EXTRAS_MAPPING_VERSION,
+          imp_atr: { roof_covering: extras.imp_atr?.roof_covering ?? [], roof_style: extras.imp_atr?.roof_style ?? [], foundation: extras.imp_atr?.foundation ?? [] },
+          structure_conflicting: [],
+          structure_unmapped: [],
+          land: extras.land ?? null,
+          lot_area_source: null,
+          ten_percent_cap: text(extras.prop?.ten_percent_cap),
+          taxing_entities: extras.entities?.classes ?? {},
+          taxing_entities_other: extras.entities?.other ?? 0,
+          taxable_values_not_written: [],
+          improvement_types: extras.imp_info?.types ?? [],
+        }
+      : null,
   };
 
   files["property.json"] = {
@@ -466,20 +617,30 @@ export function buildTravisOutput(input, { manifest }) {
 
   // --- geometry (TNR feature, its own request) --------------------------------
   if (centroid && input.geometry?.request) {
-    const polygon = Array.isArray(input.geometry.polygon?.coordinates?.[0])
-      ? input.geometry.polygon.coordinates[0]
-          .filter((vertex) => Array.isArray(vertex) && Number.isFinite(vertex[0]) && Number.isFinite(vertex[1]))
-          .map((vertex) => ({ latitude: vertex[1], longitude: vertex[0] }))
-      : [];
+    // One part: the parcel's point and its polygon in one geometry (v3's shape). Several parts: `geometry.json` keeps the
+    // point (the address's geometry) and each part gets its own geometry with its outer ring (GEOMETRY_PARTS_VERSION).
+    const geometryRequest = sourceHttpRequest(input.geometry.request);
+    const drawable = geometryParts.parts.filter((part) => part.vertices.length >= 3);
+    const single = geometryParts.parts.length === 1 && drawable.length === 1;
     files["geometry.json"] = {
       latitude: centroid.latitude,
       longitude: centroid.longitude,
-      ...(polygon.length >= 3 ? { polygon } : {}),
-      source_http_request: sourceHttpRequest(input.geometry.request),
+      ...(single ? { polygon: drawable[0].vertices } : {}),
+      source_http_request: geometryRequest,
       request_identifier: propId,
     };
     addRelationship("parcel_has_geometry", "relationship_parcel_has_geometry.json", "parcel.json", "geometry.json", true);
     addRelationship("address_has_geometry", "relationship_address_has_geometry.json", "address.json", "geometry.json", false);
+    if (single) sourcePayload.geometry.parts_written = 1;
+    else if (geometryParts.parts.length > 1) {
+      drawable.forEach((part, position) => {
+        const name = `geometry_part_${position + 1}.json`;
+        files[name] = { polygon: part.vertices, source_http_request: geometryRequest, request_identifier: propId };
+        addRelationship("parcel_has_geometry", `relationship_parcel_has_geometry_part_${position + 1}.json`, "parcel.json", name, true);
+      });
+      sourcePayload.geometry.parts_written = drawable.length;
+      if (drawable.length < geometryParts.parts.length) warnings.push(`${geometryParts.parts.length - drawable.length} polygon part(s) with fewer than 3 vertices not written`);
+    }
   } else {
     warnings.push("no TNR geometry for this parcel; geometry.json omitted");
   }
@@ -503,6 +664,20 @@ export function buildTravisOutput(input, { manifest }) {
       ...envelope,
     };
     addRelationship("property_has_lot", "relationship_property_has_lot.json", "property.json", "lot.json", false);
+    if (sourcePayload.tcad_extras) sourcePayload.tcad_extras.lot_area_source = legalAcreage !== null ? "PROP.legal_acreage" : landAcresAgree ? "LAND_DET.size_square_feet+size_acres" : "LAND_DET.size_square_feet";
+  }
+
+  // --- structure (IMP_ATR.TXT; one per property) -----------------------------------
+  if (extras?.imp_atr) {
+    const mapped = mapStructureAttributes(extras.imp_atr);
+    sourcePayload.tcad_extras.structure_conflicting = mapped.conflicting;
+    sourcePayload.tcad_extras.structure_unmapped = mapped.unmapped;
+    for (const item of mapped.unmapped) warnings.push(`unmapped IMP_ATR code ${item}; structure field left null`);
+    if (Object.values(mapped.fields).some((value) => value !== null)) {
+      // The Travis transform never writes roof_date or roof_age_years (decisions.md section 5): roof age is the estimator's.
+      files["structure.json"] = { ...Object.fromEntries(STRUCTURE_REQUIRED_FIELDS.map((field) => [field, null])), ...mapped.fields, ...envelope };
+      addRelationship("property_has_structure", "relationship_property_has_structure.json", "property.json", "structure.json", false);
+    }
   }
 
   // --- tax ----------------------------------------------------------------------
@@ -513,11 +688,25 @@ export function buildTravisOutput(input, { manifest }) {
   if (taxYear !== null && (market !== null || assessed !== null || appraised !== null)) {
     const taxName = `tax_${taxYear}.json`;
     // The roll prints market, appraised and assessed values per account. Taxable values are per
-    // taxing entity (PROP_ENT.TXT, not read in v1), so `property_taxable_value_amount` is omitted
-    // rather than proxied from the assessed value. Non-nullable amounts the roll does not print are
+    // taxing entity (PROP_ENT.TXT), so the account-wide `property_taxable_value_amount` is omitted
+    // rather than proxied from the assessed value; the per-class fields below carry them (v4). Non-nullable amounts the roll does not print are
     // omitted; nullable ones are written as null.
     const assessedAmount = assessed ?? appraised;
     const agricultural = number(tcad.ag_use_val);
+    // PROP.TXT ten_percent_cap (the homestead cap adjustment), written when positive like the agricultural value; and
+    // per class, the taxable value of the one taxing entity of that class on the account (PROP_ENT.TXT). An account in
+    // two entities of one class (a parcel split by a boundary) leaves the field out: the lexicon holds one value.
+    const capLoss = extras ? number(extras.prop?.ten_percent_cap) : null;
+    /** @type {Record<string, number>} */
+    const taxableValues = {};
+    if (extras?.entities?.classes) {
+      for (const [entityClass, field] of Object.entries(TAXABLE_VALUE_FIELD_BY_CLASS)) {
+        const list = extras.entities.classes[entityClass] ?? [];
+        const value = list.length === 1 ? number(list[0].taxable_val) : null;
+        if (value !== null) taxableValues[field] = value;
+        else if (list.length > 1) sourcePayload.tcad_extras.taxable_values_not_written.push({ field, reason: "several_entities_of_class", entities: list.length });
+      }
+    }
     files[taxName] = {
       tax_year: taxYear,
       ...(market !== null ? { property_market_value_amount: market } : {}),
@@ -525,6 +714,8 @@ export function buildTravisOutput(input, { manifest }) {
       property_building_amount: improvementValue,
       property_land_amount: landValue,
       ...(agricultural !== null && agricultural > 0 ? { agricultural_valuation_amount: agricultural } : {}),
+      ...(capLoss !== null && capLoss > 0 ? { homestead_cap_loss_amount: capLoss } : {}),
+      ...taxableValues,
       monthly_tax_amount: null,
       yearly_tax_amount: null,
       period_start_date: null,
