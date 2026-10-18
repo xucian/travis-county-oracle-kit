@@ -1,0 +1,648 @@
+{
+ "schemaVersion": "travis.t4-ruling-7-enum-check.v1",
+ "question": "decisions.md section 25.7, approved by the operator on 2026-10-18 \"but just double check\": improvement_type from the permittype code only (BP GeneralBuilding, EP Electrical, MP MechanicalHVAC, PP Plumbing, DS DrivewayPermit), improvement_status, improvement_action and contractor_type null",
+ "live_manifest": {
+  "url": "https://lexicon.elephant.xyz/api/manifest",
+  "fetched_at": "2026-10-18T05:08:59.824Z",
+  "status": 200,
+  "bytes": 18499,
+  "sha256": "7084b9334e66eb525d729e2d399f7216960abf30900081aaed194210be760640",
+  "note": "the same manifest every T2-T4 run used; receipt in runtime data/travis/t4-rulings/lexicon/receipts.jsonl"
+ },
+ "schemas_checked": {
+  "Property_Improvement": "bafkreicyzywzwhmguojpi2otgrwsyi37le3u4lnavljbxu76cnrudxaxfu",
+  "property_improvement": "bafkreid5jnt3qgp4qmb4iea6klbdpprd6evpgrpc3gofseol4s3kdljeam",
+  "proof": "the schema bytes in the elephant-cli cache hash (raw CIDv1, SHA-256) to the CIDs the live manifest names, so the members below are the live schema"
+ },
+ "class_required": [
+  "source_http_request",
+  "request_identifier",
+  "improvement_type",
+  "improvement_status",
+  "completion_date",
+  "contractor_type"
+ ],
+ "members": {
+  "improvement_type": [
+   "GeneralBuilding",
+   "ResidentialConstruction",
+   "CommercialConstruction",
+   "BuildingAddition",
+   "StructureMove",
+   "Demolition",
+   "PoolSpaInstallation",
+   "Electrical",
+   "MechanicalHVAC",
+   "GasInstallation",
+   "Roofing",
+   "Fencing",
+   "DockAndShore",
+   "FireProtectionSystem",
+   "Plumbing",
+   "ExteriorOpeningsAndFinishes",
+   "MobileHomeRV",
+   "LandscapeIrrigation",
+   "ScreenEnclosure",
+   "ShutterAwning",
+   "SiteDevelopment",
+   "CodeViolation",
+   "Complaint",
+   "ContractorLicense",
+   "Sponsorship",
+   "StateLicenseRegistration",
+   "AdministrativeApproval",
+   "AdministrativeAppeal",
+   "BlueSheetHearing",
+   "PlannedDevelopment",
+   "DevelopmentOfRegionalImpact",
+   "Rezoning",
+   "SpecialExceptionZoning",
+   "Variance",
+   "ZoningExtension",
+   "ZoningVerificationLetter",
+   "RequestForRelief",
+   "WaiverRequest",
+   "InformalMeeting",
+   "EnvironmentalMonitoring",
+   "Vacation",
+   "VegetationRemoval",
+   "ComprehensivePlanAmendment",
+   "MinimumUseDetermination",
+   "TransferDevelopmentRightsDetermination",
+   "MapBoundaryDetermination",
+   "TransferDevelopmentRightsCertificate",
+   "UniformCommunityDevelopment",
+   "SpecialCertificateOfAppropriateness",
+   "CertificateToDig",
+   "HistoricDesignation",
+   "PlanningAdministrativeAppeal",
+   "WellPermit",
+   "Solar",
+   "TestBoring",
+   "ExistingWellInspection",
+   "NaturalResourcesComplaint",
+   "NaturalResourcesViolation",
+   "LetterWaterSewer",
+   "UtilitiesConnection",
+   "DrivewayPermit",
+   "RightOfWayPermit"
+  ],
+  "improvement_status": [
+   "Completed",
+   "InProgress",
+   "Planned",
+   "Permitted",
+   "OnHold",
+   "Cancelled"
+  ],
+  "improvement_action": [
+   "New",
+   "Replacement",
+   "Repair",
+   "Alteration",
+   "Addition",
+   "Remove",
+   "Other"
+  ],
+  "contractor_type": [
+   "GeneralContractor",
+   "Specialist",
+   "DIY",
+   "PropertyManager",
+   "Builder",
+   "HandymanService",
+   "Unknown"
+  ]
+ },
+ "member_descriptions": "none: the live class schema lists the enum members without per-member descriptions, so faithfulness is judged by the member name against the printed value",
+ "kit_precedent": "skills/use-oracle/runtime/counties/pinellas/transforms/data_extractor.js mapImprovementType: printed \"general building\" -> GeneralBuilding, \"mechanical\" / \"hvac\" -> MechanicalHVAC, \"electrical\" -> Electrical, \"plumbing\" -> Plumbing, \"driveway\" / \"driveway permit\" -> DrivewayPermit, \"right of way\" -> RightOfWayPermit",
+ "improvement_type_by_code": {
+  "BP": {
+   "rows": 521351,
+   "permit_type_desc_printed": {
+    "Building Permit": 521351
+   },
+   "proposed_member": "GeneralBuilding",
+   "member_in_live_enum": true,
+   "top_permit_class": [
+    [
+     "R- 101 Single Family Houses",
+     115193
+    ],
+    [
+     "C-1000 Commercial Remodel",
+     111884
+    ],
+    [
+     "R- 435 Renovations/Remodel",
+     98628
+    ],
+    [
+     "R- 434 Addition & Alterations",
+     46855
+    ],
+    [
+     "Residential",
+     20196
+    ],
+    [
+     "C- 329 Com Structures Other Than Bldg",
+     15383
+    ],
+    [
+     "R- 645 Demolition One Family Homes",
+     13155
+    ],
+    [
+     "R- 329 Res Structures Other Than Bldg",
+     12762
+    ]
+   ],
+   "top_work_class": [
+    [
+     "New",
+     193699
+    ],
+    [
+     "Remodel",
+     187692
+    ],
+    [
+     "Repair",
+     51093
+    ],
+    [
+     "Addition",
+     29442
+    ],
+    [
+     "Addition and Remodel",
+     22342
+    ],
+    [
+     "Demolition",
+     21449
+    ],
+    [
+     "(blank)",
+     5510
+    ],
+    [
+     "Interior Demo Non-Structural",
+     4309
+    ],
+    [
+     "Life Safety",
+     2499
+    ],
+    [
+     "Relocation",
+     1889
+    ]
+   ],
+   "description_keywords": {
+    "NEW": 175689,
+    "REMODEL": 91864,
+    "DEMOLI": 14911
+   },
+   "finding": "holds: one printed type, \"Building Permit\", on every row; GeneralBuilding is the generic building member. Coarse but not wrong: finer members exist (ResidentialConstruction, CommercialConstruction, BuildingAddition, Demolition, StructureMove) that only permit_class or work_class could select, which the code-only rule does not use"
+  },
+  "EP": {
+   "rows": 689152,
+   "permit_type_desc_printed": {
+    "Electrical Permit": 689152
+   },
+   "proposed_member": "Electrical",
+   "member_in_live_enum": true,
+   "top_permit_class": [
+    [
+     "Residential",
+     240290
+    ],
+    [
+     "R- 101 Single Family Houses",
+     112708
+    ],
+    [
+     "Commercial",
+     79288
+    ],
+    [
+     "C-1000 Commercial Remodel",
+     68736
+    ],
+    [
+     "Sign Permit",
+     40407
+    ],
+    [
+     "R- 434 Addition & Alterations",
+     33834
+    ],
+    [
+     "R- 435 Renovations/Remodel",
+     22335
+    ],
+    [
+     "",
+     15410
+    ]
+   ],
+   "top_work_class": [
+    [
+     "Remodel",
+     281966
+    ],
+    [
+     "New",
+     202526
+    ],
+    [
+     "Repair",
+     57926
+    ],
+    [
+     "(blank)",
+     22138
+    ],
+    [
+     "Upgrade",
+     21608
+    ],
+    [
+     "Auxiliary Power",
+     20092
+    ],
+    [
+     "Addition",
+     19727
+    ],
+    [
+     "Addition and Remodel",
+     17634
+    ],
+    [
+     "Wall",
+     17328
+    ],
+    [
+     "Homebuilder Loop",
+     14314
+    ]
+   ],
+   "description_keywords": {
+    "SERVICE": 71201,
+    "PV": 6129,
+    "SOLAR": 24216
+   },
+   "finding": "holds: one printed type, \"Electrical Permit\"; sign and solar work stays electrical at the type level"
+  },
+  "MP": {
+   "rows": 506530,
+   "permit_type_desc_printed": {
+    "Mechanical Permit": 506530
+   },
+   "proposed_member": "MechanicalHVAC",
+   "member_in_live_enum": true,
+   "top_permit_class": [
+    [
+     "Residential",
+     173671
+    ],
+    [
+     "R- 101 Single Family Houses",
+     111769
+    ],
+    [
+     "C-1000 Commercial Remodel",
+     58193
+    ],
+    [
+     "Commercial",
+     50007
+    ],
+    [
+     "R- 434 Addition & Alterations",
+     27720
+    ],
+    [
+     "R- 435 Renovations/Remodel",
+     16932
+    ],
+    [
+     "",
+     14775
+    ],
+    [
+     "C-1001 Commercial Finish Out",
+     7684
+    ]
+   ],
+   "top_work_class": [
+    [
+     "Remodel",
+     209876
+    ],
+    [
+     "New",
+     160017
+    ],
+    [
+     "Change Out",
+     88342
+    ],
+    [
+     "Addition",
+     17681
+    ],
+    [
+     "Addition and Remodel",
+     13778
+    ],
+    [
+     "Repair",
+     10358
+    ],
+    [
+     "(blank)",
+     4997
+    ],
+    [
+     "Shell",
+     702
+    ],
+    [
+     "Relocation",
+     434
+    ],
+    [
+     "Interior Demo Non-Structural",
+     272
+    ]
+   ],
+   "description_keywords": {
+    "GAS": 4247,
+    "A/C": 10075,
+    "HOOD": 2785,
+    "AC ": 53157,
+    "DUCT": 62459,
+    "WATER HEATER": 1267,
+    "FURNACE": 5991,
+    "KITCHEN HOOD": 117,
+    "HVAC": 51390,
+    "CONDENS": 4877,
+    "HEAT PUMP": 1119
+   },
+   "finding": "holds: one printed type, \"Mechanical Permit\"; the work is HVAC, ducts and hoods (gas named in 0.8% of descriptions); the kit maps \"mechanical\" to MechanicalHVAC"
+  },
+  "PP": {
+   "rows": 547025,
+   "permit_type_desc_printed": {
+    "Plumbing Permit": 547025
+   },
+   "proposed_member": "Plumbing",
+   "member_in_live_enum": true,
+   "top_permit_class": [
+    [
+     "Residential",
+     218957
+    ],
+    [
+     "R- 101 Single Family Houses",
+     112446
+    ],
+    [
+     "C-1000 Commercial Remodel",
+     48479
+    ],
+    [
+     "Commercial",
+     43370
+    ],
+    [
+     "R- 434 Addition & Alterations",
+     27673
+    ],
+    [
+     "R- 435 Renovations/Remodel",
+     25406
+    ],
+    [
+     "",
+     9385
+    ],
+    [
+     "R- 329 Res Structures Other Than Bldg",
+     8587
+    ]
+   ],
+   "top_work_class": [
+    [
+     "Remodel",
+     194858
+    ],
+    [
+     "New",
+     172960
+    ],
+    [
+     "Repair",
+     58260
+    ],
+    [
+     "Irrigation",
+     48067
+    ],
+    [
+     "Change Out",
+     29792
+    ],
+    [
+     "Addition and Remodel",
+     15994
+    ],
+    [
+     "Addition",
+     14881
+    ],
+    [
+     "(blank)",
+     5093
+    ],
+    [
+     "Fireline",
+     3140
+    ],
+    [
+     "Shell",
+     1130
+    ]
+   ],
+   "description_keywords": {
+    "GAS": 41490,
+    "SEWER": 26385,
+    "WATER HEATER": 50970,
+    "IRRIGATION": 54345,
+    "BACKFLOW": 5686
+   },
+   "finding": "holds: one printed type, \"Plumbing Permit\"; irrigation and gas sub-scopes exist (LandscapeIrrigation, GasInstallation) but the printed type is plumbing"
+  },
+  "DS": {
+   "rows": 116649,
+   "permit_type_desc_printed": {
+    "Driveway / Sidewalks": 116649
+   },
+   "proposed_member": "DrivewayPermit",
+   "member_in_live_enum": true,
+   "top_permit_class": [
+    [
+     "Res. Driveway & Sidewalk",
+     88097
+    ],
+    [
+     "Res. Driveway",
+     9216
+    ],
+    [
+     "Com. Driveway & Sidewalk",
+     6911
+    ],
+    [
+     "",
+     3487
+    ],
+    [
+     "Res. Driveway, Sidewalk, Curb, Gutter",
+     2499
+    ],
+    [
+     "Res. Driveway, Curb, Gutter",
+     2089
+    ],
+    [
+     "Com. Driveway,Sidewalk,Curb,Gutter",
+     1091
+    ],
+    [
+     "Com. Sidewalk",
+     841
+    ]
+   ],
+   "top_work_class": [
+    [
+     "New",
+     105675
+    ],
+    [
+     "(blank)",
+     4616
+    ],
+    [
+     "Modification",
+     3874
+    ],
+    [
+     "Repair",
+     2302
+    ],
+    [
+     "Demo",
+     182
+    ]
+   ],
+   "description_keywords": {
+    "DRIVEWAY": 45511,
+    "DRIVE": 45864,
+    "SIDEWALK": 38691,
+    "APPROACH": 43027,
+    "CURB": 4122
+   },
+   "finding": "does not hold for every row: the printed type is \"Driveway / Sidewalks\"; 110,710 of 116,649 rows (94.9%) carry a permit_class that names a driveway, 2,452 name only sidewalk, curb or gutter work ({\"Replace of Curb & Gutter\": 9, \"Com. Sidewalk\": 841, \"Com. Curb, Gutter\": 96, \"Res. Curb, Gutter\": 112, \"Res. Sidewalk\": 821, \"Com. Sidewalk, Curb, Gutter\": 502, \"Res. Sidewalk, Curb, Gutter\": 71}), and 3,487 have no permit_class; DrivewayPermit would misdescribe at least 2,452 rows and is unproven for 3,487"
+  }
+ },
+ "verdict_improvement_type": {
+  "holds": [
+   "BP",
+   "EP",
+   "MP",
+   "PP"
+  ],
+  "does_not_hold": [
+   "DS"
+  ],
+  "applied": false,
+  "why_not_applied": "the ruling approved the five-code mapping on condition that it holds; DS does not map one to one, so nothing was written (the transform stays travis-permit-transform-v1, all four enums null)",
+  "options_for_the_operator": [
+   "four codes as approved and DS null",
+   "DS by permit_class: classes naming a driveway -> DrivewayPermit, the rest null (no longer code-only)",
+   "DS -> RightOfWayPermit for every row, if mew confirms the member covers driveway approaches as well as sidewalks, curbs and gutters (all are right-of-way work in Austin, but the data does not prove every DS permit is)"
+  ]
+ },
+ "partial_improvement_status": {
+  "faithful_printed_values": {
+   "Final": "Completed",
+   "On Hold": "OnHold",
+   "Cancelled": "Cancelled",
+   "Cancelled - Contractor Required": "Cancelled",
+   "Cancelled - New Permit Required": "Cancelled"
+  },
+  "rows_filled": 2011178,
+  "rows_total": 2380707,
+  "share_filled": 0.8448,
+  "left_null": {
+   "Expired": 169679,
+   "VOID": 153349,
+   "Active": 27902,
+   "Withdrawn": 17795,
+   "Pending": 236,
+   "Closed": 129,
+   "Aborted": 121,
+   "Inactive Pending Revision": 94,
+   "Pending Permit": 61,
+   "Re Review": 55,
+   "Denied but Closed": 43,
+   "Suspended": 26,
+   "": 14,
+   "Expired - License": 13,
+   "New Permit Required": 3,
+   "Inactive Contractor": 3,
+   "Revoked": 2,
+   "Application Incomplete": 2,
+   "Rejected": 1,
+   "Awaiting Upload": 1
+  },
+  "not_faithful": "Expired (no member), Active (Permitted or InProgress: the export cannot tell whether work started), VOID (an administrative void, not necessarily cancelled work), Withdrawn and Aborted (ended by the applicant or the city, not printed as cancelled), Pending, Re Review, Suspended and the rest",
+  "correct": "yes for the five printed values above: Final is the finaled permit (the profile already reads only Final as completed work), On Hold and the three Cancelled values name their member",
+  "better": "marginal for this product: the hosted layer serves the printed status and its status_group from the run capture either way; it adds a CID-backed completion flag on 84.5% of the rows for Atlas and MCP consumers. Every later status change gives the permit a new record CID, as a new completion date already does"
+ },
+ "partial_improvement_action": {
+  "exact_name_values": {
+   "New": "New",
+   "Repair": "Repair",
+   "Addition": "Addition"
+  },
+  "rows_exact": 1096547,
+  "semantic_values": {
+   "Remodel": "Alteration",
+   "Modification": "Alteration",
+   "Demolition": "Remove",
+   "Demo": "Remove",
+   "Change Out": "Replacement"
+  },
+  "rows_semantic": 1018592,
+  "rows_total": 2380707,
+  "two_actions_or_no_member": "Addition and Remodel (69,748: two actions), Irrigation, Upgrade, Auxiliary Power, Wall, Homebuilder Loop, Shell, Relocation, Fireline, Life Safety and the rest",
+  "correct": "only the exact names are faithful to the printed field; Remodel -> Alteration, Demolition -> Remove and Change Out -> Replacement are readings, not names",
+  "conflict": "work_class is the filing category, not the work: Austin files re-roofs as Repair or Remodel (findings section 4), so a published improvement_action Repair would sit on 23,290 permits the profile reads as primary-roof replacements; an Atlas consumer would read a re-roof as a repair",
+  "better": "no: it would publish a value that contradicts the roofing signal on the permits that matter most for this product"
+ },
+ "readme_open_permit_questions": {
+  "readme_lines": {
+   "13": "open roofing permits (especially long-open permits)",
+   "105": "Show properties in that area with open roofing permits, prioritizing permits that have remained open for many years",
+   "110": "Which properties near that area have open roofing permits that have been open for many years"
+  },
+  "answered_from": "the printed status_current of the run capture, never from improvement_status: api-contract.md PermitSummary status = status_current as printed (line 404) backed by unpublished_source from the run capture (option iii, decisions.md sections 17 and 20); status_group from the profile mapping of status_current (line 86); open_since from issued or applied date and open_duration_days computed at query time (lines 89-90); is_roofing from the profile classifier. The published records carry permit_number and the confirmed applied, issue, completion and close dates, which the deploy joins to the capture by permit_number",
+  "improvement_status_null_affects_them": false
+ }
+}

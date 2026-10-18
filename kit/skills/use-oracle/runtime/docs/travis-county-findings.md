@@ -522,3 +522,24 @@ the Socrata cross-checks. Run record `docs/evidence/travis-t4-run-2026-10-17.jso
   about 0.3 s, so the roll would take 441,961 requests and about 18 hours at 2 in flight. The bulk path stays; nothing
   needs runtime retrieval.
 
+### 14.1 Operator rulings of 2026-10-18 and the follow-up measures
+
+- **25.6 out of county (approved).** `travis-parcel-link-v2`: the 103,869 Williamson-CAD-form permits are `out_of_county`;
+  `invalid_quarantined` keeps 178.
+- **25.7 published enums (approved, double-checked, reconciled with `mew`).** `travis-improvement-enums-v1`, exact printed
+  values only: `improvement_type` from `permittype` (DS is `RightOfWayPermit`: Austin TPW lists Driveway/Sidewalk among its
+  right-of-way permit types; 2,452 DS rows are sidewalk, curb or gutter only); `improvement_status` from `status_current`
+  (Final, Active, On Hold, the Cancelled values; 85.65% filled); `improvement_action` from the work class of building permits
+  only (a trade permit carries its parent's work class 89.8-99.1% of the time; 92.72% of BP rows filled); `contractor_type`
+  from `contractor_trade` (60.14% filled). Pilot and feasibility validate with 0 errors under permit transform v2.
+- **25.9 shards (measured, not ruled).** The CLI chain on 8, 10 and 12 concurrent shards: 8 is fastest when memory is free;
+  with the swap file nearly full the times double; every sharded variant measured stays inside 48 hours (15.5-33.3 h).
+  Every `elephant-cli` call checks npm for a newer version and exits if one exists (`ELEPHANT_SKIP_UPDATE_CHECK=1`).
+  Projected published size per run: about 8.8 GB distinct, 17.5 GB as counted by Filebase; 74% of a permit record is its
+  partition request.
+- **25.10 retired geo_ids (proof).** The ids are on no 2026 account of any type. Austin's past parcel snapshots (2021, 2022,
+  2026) pair them with the account ids they had; TCAD's JSON `links` and land comments tie those old accounts to current
+  ones, but mostly to several split lots. TCAD's own permit listing names one current account for 7,531 of the permits
+  (97.4% agreement with exact links); point-in-polygon is 99.8% precise but reaches 4,618; a unique street line is 99.07%
+  precise and reaches 25,641; together 35,713 of 196,400. TNR history is not checkable from RO.
+

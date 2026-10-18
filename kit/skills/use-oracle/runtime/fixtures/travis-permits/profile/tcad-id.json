@@ -182,8 +182,26 @@
       },
       "expected_property_id": null,
       "expected_match_method": null,
+      "expected_unlinked_reason": "out_of_county",
+      "note": "travis-parcel-link-v2 (decisions.md section 25.6)"
+    },
+    {
+      "name": "WCAD marker is out of county",
+      "tcad_id": "WCAD",
+      "parcels_by_geo_id": {},
+      "expected_property_id": null,
+      "expected_match_method": null,
+      "expected_unlinked_reason": "out_of_county"
+    },
+    {
+      "name": "a malformed id stays quarantined",
+      "tcad_id": "150986",
+      "parcels_by_geo_id": {},
+      "expected_property_id": null,
+      "expected_match_method": null,
       "expected_unlinked_reason": "invalid_quarantined"
     }
   ],
-  "evidence_version": "travis-tcad-id-evidence-v2"
+  "evidence_version": "travis-tcad-id-evidence-v2",
+  "parcel_link_version": "travis-parcel-link-v2"
 }

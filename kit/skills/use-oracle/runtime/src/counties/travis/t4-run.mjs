@@ -34,7 +34,7 @@ import { appendFailure } from "../../core/run-state.mjs";
 import { COPIED_FROM_APPRAISAL, PERMIT_DATA_DIRNAME, PERMIT_TRANSFORM_VERSION, resolvePermitGroupCids, writeTravisPermitTransform } from "../../../counties/travis/transforms/permit-transform.mjs";
 import { buildReconciliationArtifacts, captureAndTransform, classifyTravisFailure } from "./adapter.mjs";
 import { decideEligibility, resolveEligibilityPolicy } from "./eligibility.mjs";
-import { TCAD_ID_EVIDENCE_VERSION, WORK_CLASSIFIER_VERSION, STATUS_GROUP_VERSION } from "./permit-profile.mjs";
+import { IMPROVEMENT_ENUMS_VERSION, PARCEL_LINK_VERSION, TCAD_ID_EVIDENCE_VERSION, WORK_CLASSIFIER_VERSION, STATUS_GROUP_VERSION } from "./permit-profile.mjs";
 import { captureToFile, compactTimestamp, createCaptureContext, hostLimiter } from "./t3-fetch.mjs";
 import { RUNTIME_ROOT } from "./t3-snapshot.mjs";
 import { PERMIT_DATASET_ID, PERMIT_DOMAIN, PERMIT_RESOURCE_URL } from "./t4-permit-fetch.mjs";
@@ -475,7 +475,7 @@ export async function runT4({ seedPath, label, cli, captureDir, rollSeed = DEFAU
     lexicon_manifest: { ...manifestInfo, sha256: sha256Hex(manifestBytes), seed_cid: roots.seedCid, property_improvement_cid: roots.propertyImprovementCid },
     as_of_date: asOfDate,
     eligibility_policy: { variable: policy.source, value: policy.raw, mode: policy.mode, fingerprint: policy.fingerprint },
-    versions: { run: T4_RUN_VERSION, permit_transform: PERMIT_TRANSFORM_VERSION, status_group: STATUS_GROUP_VERSION, work_classifier: WORK_CLASSIFIER_VERSION, tcad_id_evidence: TCAD_ID_EVIDENCE_VERSION },
+    versions: { run: T4_RUN_VERSION, permit_transform: PERMIT_TRANSFORM_VERSION, status_group: STATUS_GROUP_VERSION, work_classifier: WORK_CLASSIFIER_VERSION, tcad_id_evidence: TCAD_ID_EVIDENCE_VERSION, parcel_link: PARCEL_LINK_VERSION, improvement_enums: IMPROVEMENT_ENUMS_VERSION },
     appraisal: { reconciled: appraisal.reconciled, geometry: appraisal.geometryCount, reconcile_export: { rows: reconciliation.rowCount, expected: reconciliation.expectedCount } },
     eligibility: { eligible: eligible.size, not_eligible: succeeded.size - eligible.size },
     permit_states: stateCounts,

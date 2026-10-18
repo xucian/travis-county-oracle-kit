@@ -39,6 +39,15 @@ export const DATE_EVIDENCE_VERSION = "travis-date-evidence-v1";
 export const TCAD_ID_NORMALIZATION_VERSION = "travis-tcad-id-digits-v1";
 /** Reasons a printed `tcad_id` is not a usable Geographic ID (v2 adds the neighbouring-district forms, T4 capture). */
 export const TCAD_ID_EVIDENCE_VERSION = "travis-tcad-id-evidence-v2";
+/**
+ * Unlinked reasons of the parcel link. v2 (operator ruling, assignment decisions.md section 25.6, 2026-10-18) adds
+ * `out_of_county`: a `tcad_id` printed as a Williamson CAD account is another county's parcel, outside the Travis
+ * population, and is no longer counted as `invalid_quarantined`.
+ */
+export const PARCEL_LINK_VERSION = "travis-parcel-link-v2";
+export const UNLINKED_REASONS = Object.freeze(["no_candidate", "multiple_candidates", "invalid_quarantined", "out_of_county"]);
+/** `tcad_id` evidence reasons that name another county's parcel. */
+export const OUT_OF_COUNTY_TCAD_ID_REASONS = Object.freeze(["williamson_cad_account_form", "williamson_cad_marker"]);
 export const TRAVIS_ROOF_AGE_PROFILE_VERSION = "travis-roof-age-profile-v1";
 
 /** Dates before this are migration artifacts in the export (the earliest applied date is 1921-09-20). */
@@ -648,7 +657,7 @@ export function proveDigitsOnlyNormalization(geoIds) {
  * @typedef {object} ParcelLinkResult
  * @property {string | null} propertyId - `PROP_ID` of the one matching parcel, else null.
  * @property {{ match_method: "exact" | "normalized_digits", normalization_version: string | null, confidence: "exact" | "normalized" } | null} propertyLink
- * @property {"no_candidate" | "multiple_candidates" | "invalid_quarantined" | null} unlinkedReason
+ * @property {"no_candidate" | "multiple_candidates" | "invalid_quarantined" | "out_of_county" | null} unlinkedReason
  * @property {TcadIdEvidence} tcadIdEvidence
  */
 
@@ -666,7 +675,7 @@ export function proveDigitsOnlyNormalization(geoIds) {
 export function linkPermitToParcel({ tcadId, parcelsByGeoId, digitsFallback = null }) {
   const evidence = tcadIdEvidence(tcadId);
   const unlinked = (unlinkedReason) => ({ propertyId: null, propertyLink: null, unlinkedReason, tcadIdEvidence: evidence });
-  if (evidence.evidenceState === "invalid_quarantined") return unlinked("invalid_quarantined");
+  if (evidence.evidenceState === "invalid_quarantined") return unlinked(OUT_OF_COUNTY_TCAD_ID_REASONS.includes(evidence.reason) ? "out_of_county" : "invalid_quarantined");
   if (evidence.evidenceState === "unknown") return unlinked("no_candidate");
 
   const exact = parcelsByGeoId.get(evidence.value) ?? [];
@@ -839,8 +848,70 @@ export function summarizePermitRow(row, { asOfDate }) {
       dateEvidence: DATE_EVIDENCE_VERSION,
       tcadIdNormalization: TCAD_ID_NORMALIZATION_VERSION,
       tcadIdEvidence: TCAD_ID_EVIDENCE_VERSION,
+      parcelLink: PARCEL_LINK_VERSION,
       roofAgeProfile: compiledTravisRoofAgeProfile.version,
       roofAgeProfileSha256: compiledTravisRoofAgeProfile.sha256,
     },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Lexicon enum tables for the published property_improvement record.
+// ---------------------------------------------------------------------------
+
+/**
+ * Exact printed value to lexicon member, per required enum property of `property_improvement` (live schema
+ * `bafkreid5jnt3qgp4qmb4iea6klbdpprd6evpgrpc3gofseol4s3kdljeam`; assignment decisions.md section 25.7, approved by the
+ * operator on 2026-10-18 and reconciled with the `mew` check). A value is matched exactly as printed (trimmed, case and
+ * punctuation kept); anything unlisted is null, so no mapping claims more than the printed value says.
+ *
+ * - `improvement_type` from `permittype` (each code prints one `permit_type_desc`): DS "Driveway / Sidewalks" is a
+ *   right-of-way permit type of Austin Transportation and Public Works ("driveway, sidewalk, curb, or gutter work").
+ * - `improvement_status` from `status_current`: Final is the finaled permit; Active is issued (every row prints an issue
+ *   date) with no evidence that work started, so `Permitted`, never `InProgress`; Expired, VOID, Withdrawn, Aborted,
+ *   Pending and the rest have no faithful member.
+ * - `improvement_action` from `work_class` on building permits only: a trade or driveway permit filed under a building
+ *   permit carries its parent's work class (EP 98.8%, MP 99.1%, PP 89.8%, DS 91.0% of those with a parent in the T4
+ *   capture), so on them it names the project, not the permit's own work. It is Austin's filing category: most re-roofs
+ *   are filed `Remodel` and publish `Alteration`; the roofing signal is the profile's classifier, not this field.
+ * - `contractor_type` from `contractor_trade` (five printed values in the T4 capture, blank included).
+ */
+export const IMPROVEMENT_ENUMS_VERSION = "travis-improvement-enums-v1";
+export const IMPROVEMENT_TYPE_BY_PERMITTYPE = Object.freeze({ BP: "GeneralBuilding", EP: "Electrical", MP: "MechanicalHVAC", PP: "Plumbing", DS: "RightOfWayPermit" });
+export const IMPROVEMENT_STATUS_BY_STATUS = Object.freeze({
+  Final: "Completed",
+  Active: "Permitted",
+  "On Hold": "OnHold",
+  Cancelled: "Cancelled",
+  "Cancelled - Contractor Required": "Cancelled",
+  "Cancelled - New Permit Required": "Cancelled",
+});
+export const IMPROVEMENT_ACTION_PERMITTYPES = Object.freeze(["BP"]);
+export const IMPROVEMENT_ACTION_BY_WORK_CLASS = Object.freeze({ New: "New", Repair: "Repair", Addition: "Addition", Remodel: "Alteration", "Remodel Mobile Home": "Alteration", Demolition: "Remove" });
+export const CONTRACTOR_TYPE_BY_TRADE = Object.freeze({ "General Contractor": "GeneralContractor", "Electrical Contractor": "Specialist", "Mechanical Contractor": "Specialist", "Plumbing Contractor": "Specialist" });
+
+/**
+ * @param {Readonly<Record<string, string>>} table - Exact-value table.
+ * @param {unknown} value - Printed value.
+ * @returns {string | null} Member, or null when the printed value is not listed.
+ */
+const exactMember = (table, value) => {
+  const printed = value === null || value === undefined ? "" : String(value).trim();
+  return Object.hasOwn(table, printed) ? table[printed] : null;
+};
+
+/**
+ * The four required enum values of one permit's `property_improvement` record ({@link IMPROVEMENT_ENUMS_VERSION}).
+ *
+ * @param {Record<string, unknown>} row - Printed permit row.
+ * @returns {{ improvement_type: string | null, improvement_status: string | null, improvement_action: string | null, contractor_type: string | null }} Values.
+ */
+export function mapImprovementEnums(row) {
+  const permitType = row.permittype === null || row.permittype === undefined ? "" : String(row.permittype).trim();
+  return {
+    improvement_type: exactMember(IMPROVEMENT_TYPE_BY_PERMITTYPE, permitType),
+    improvement_status: exactMember(IMPROVEMENT_STATUS_BY_STATUS, row.status_current),
+    improvement_action: IMPROVEMENT_ACTION_PERMITTYPES.includes(permitType) ? exactMember(IMPROVEMENT_ACTION_BY_WORK_CLASS, row.work_class) : null,
+    contractor_type: exactMember(CONTRACTOR_TYPE_BY_TRADE, row.contractor_trade),
   };
 }

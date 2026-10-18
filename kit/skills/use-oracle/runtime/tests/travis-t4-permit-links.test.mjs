@@ -69,7 +69,7 @@ describe("T4 permit link pass", () => {
       const { summary, selected } = await runLinkPass({ captureDir: capture.versionDir, roll, asOfDate: "2026-10-17", select: new Set(["100001", "100003", "1234567"]) });
       expect(summary.rows).toBe(9);
       expect(summary.link_method).toEqual({ exact: 5, normalized_digits: 0 });
-      expect(summary.unlinked_reasons).toEqual({ no_candidate: 2, multiple_candidates: 1, invalid_quarantined: 1 });
+      expect(summary.unlinked_reasons).toEqual({ no_candidate: 2, multiple_candidates: 1, invalid_quarantined: 0, out_of_county: 1 });
       expect(summary.no_candidate_detail).toEqual({ blank_tcad_id: 1, ten_digit_not_in_roll: 1 });
       expect(summary.linked_parcels).toBe(2);
       expect(summary.issue_date_max).toBe("2021-03-01");

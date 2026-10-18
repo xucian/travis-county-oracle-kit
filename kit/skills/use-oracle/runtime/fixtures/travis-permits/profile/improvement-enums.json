@@ -1,0 +1,301 @@
+{
+  "version": "travis-improvement-enums-v1",
+  "lexicon_schema": "bafkreid5jnt3qgp4qmb4iea6klbdpprd6evpgrpc3gofseol4s3kdljeam",
+  "live_members": {
+    "improvement_type": [
+      "GeneralBuilding",
+      "ResidentialConstruction",
+      "CommercialConstruction",
+      "BuildingAddition",
+      "StructureMove",
+      "Demolition",
+      "PoolSpaInstallation",
+      "Electrical",
+      "MechanicalHVAC",
+      "GasInstallation",
+      "Roofing",
+      "Fencing",
+      "DockAndShore",
+      "FireProtectionSystem",
+      "Plumbing",
+      "ExteriorOpeningsAndFinishes",
+      "MobileHomeRV",
+      "LandscapeIrrigation",
+      "ScreenEnclosure",
+      "ShutterAwning",
+      "SiteDevelopment",
+      "CodeViolation",
+      "Complaint",
+      "ContractorLicense",
+      "Sponsorship",
+      "StateLicenseRegistration",
+      "AdministrativeApproval",
+      "AdministrativeAppeal",
+      "BlueSheetHearing",
+      "PlannedDevelopment",
+      "DevelopmentOfRegionalImpact",
+      "Rezoning",
+      "SpecialExceptionZoning",
+      "Variance",
+      "ZoningExtension",
+      "ZoningVerificationLetter",
+      "RequestForRelief",
+      "WaiverRequest",
+      "InformalMeeting",
+      "EnvironmentalMonitoring",
+      "Vacation",
+      "VegetationRemoval",
+      "ComprehensivePlanAmendment",
+      "MinimumUseDetermination",
+      "TransferDevelopmentRightsDetermination",
+      "MapBoundaryDetermination",
+      "TransferDevelopmentRightsCertificate",
+      "UniformCommunityDevelopment",
+      "SpecialCertificateOfAppropriateness",
+      "CertificateToDig",
+      "HistoricDesignation",
+      "PlanningAdministrativeAppeal",
+      "WellPermit",
+      "Solar",
+      "TestBoring",
+      "ExistingWellInspection",
+      "NaturalResourcesComplaint",
+      "NaturalResourcesViolation",
+      "LetterWaterSewer",
+      "UtilitiesConnection",
+      "DrivewayPermit",
+      "RightOfWayPermit"
+    ],
+    "improvement_status": [
+      "Completed",
+      "InProgress",
+      "Planned",
+      "Permitted",
+      "OnHold",
+      "Cancelled"
+    ],
+    "improvement_action": [
+      "New",
+      "Replacement",
+      "Repair",
+      "Alteration",
+      "Addition",
+      "Remove",
+      "Other"
+    ],
+    "contractor_type": [
+      "GeneralContractor",
+      "Specialist",
+      "DIY",
+      "PropertyManager",
+      "Builder",
+      "HandymanService",
+      "Unknown"
+    ]
+  },
+  "cases": [
+    {
+      "row": {
+        "permittype": "BP",
+        "status_current": "Final",
+        "work_class": "Remodel",
+        "contractor_trade": "General Contractor"
+      },
+      "expected": {
+        "improvement_type": "GeneralBuilding",
+        "improvement_status": "Completed",
+        "improvement_action": "Alteration",
+        "contractor_type": "GeneralContractor"
+      },
+      "note": "most re-roofs are filed Remodel: the action is Austin's filing category"
+    },
+    {
+      "row": {
+        "permittype": "BP",
+        "status_current": "Active",
+        "work_class": "New",
+        "contractor_trade": ""
+      },
+      "expected": {
+        "improvement_type": "GeneralBuilding",
+        "improvement_status": "Permitted",
+        "improvement_action": "New",
+        "contractor_type": null
+      }
+    },
+    {
+      "row": {
+        "permittype": "BP",
+        "status_current": "Expired",
+        "work_class": "Addition and Remodel",
+        "contractor_trade": "General Contractor"
+      },
+      "expected": {
+        "improvement_type": "GeneralBuilding",
+        "improvement_status": null,
+        "improvement_action": null,
+        "contractor_type": "GeneralContractor"
+      },
+      "note": "Expired has no member; two actions have no single member"
+    },
+    {
+      "row": {
+        "permittype": "BP",
+        "status_current": "Withdrawn",
+        "work_class": "Demolition",
+        "contractor_trade": "Plumbing Contractor"
+      },
+      "expected": {
+        "improvement_type": "GeneralBuilding",
+        "improvement_status": null,
+        "improvement_action": "Remove",
+        "contractor_type": "Specialist"
+      }
+    },
+    {
+      "row": {
+        "permittype": "BP",
+        "status_current": "VOID",
+        "work_class": "Remodel Mobile Home",
+        "contractor_trade": null
+      },
+      "expected": {
+        "improvement_type": "GeneralBuilding",
+        "improvement_status": null,
+        "improvement_action": "Alteration",
+        "contractor_type": null
+      }
+    },
+    {
+      "row": {
+        "permittype": "BP",
+        "status_current": "On Hold",
+        "work_class": "Repair",
+        "contractor_trade": "Mechanical Contractor"
+      },
+      "expected": {
+        "improvement_type": "GeneralBuilding",
+        "improvement_status": "OnHold",
+        "improvement_action": "Repair",
+        "contractor_type": "Specialist"
+      }
+    },
+    {
+      "row": {
+        "permittype": "BP",
+        "status_current": "Cancelled - Contractor Required",
+        "work_class": "Shell",
+        "contractor_trade": ""
+      },
+      "expected": {
+        "improvement_type": "GeneralBuilding",
+        "improvement_status": "Cancelled",
+        "improvement_action": null,
+        "contractor_type": null
+      }
+    },
+    {
+      "row": {
+        "permittype": "EP",
+        "status_current": "Final",
+        "work_class": "New",
+        "contractor_trade": "Electrical Contractor"
+      },
+      "expected": {
+        "improvement_type": "Electrical",
+        "improvement_status": "Completed",
+        "improvement_action": null,
+        "contractor_type": "Specialist"
+      },
+      "note": "a trade permit's work class is its parent project's: no action"
+    },
+    {
+      "row": {
+        "permittype": "MP",
+        "status_current": "Cancelled",
+        "work_class": "Change Out",
+        "contractor_trade": "Mechanical Contractor"
+      },
+      "expected": {
+        "improvement_type": "MechanicalHVAC",
+        "improvement_status": "Cancelled",
+        "improvement_action": null,
+        "contractor_type": "Specialist"
+      }
+    },
+    {
+      "row": {
+        "permittype": "PP",
+        "status_current": "Cancelled - New Permit Required",
+        "work_class": "Irrigation",
+        "contractor_trade": "Plumbing Contractor"
+      },
+      "expected": {
+        "improvement_type": "Plumbing",
+        "improvement_status": "Cancelled",
+        "improvement_action": null,
+        "contractor_type": "Specialist"
+      }
+    },
+    {
+      "row": {
+        "permittype": "DS",
+        "status_current": "Pending",
+        "work_class": "New",
+        "contractor_trade": "General Contractor"
+      },
+      "expected": {
+        "improvement_type": "RightOfWayPermit",
+        "improvement_status": null,
+        "improvement_action": null,
+        "contractor_type": "GeneralContractor"
+      },
+      "note": "DS is an Austin TPW right-of-way permit type (driveway, sidewalk, curb or gutter work)"
+    },
+    {
+      "row": {
+        "permittype": "bp",
+        "status_current": "final",
+        "work_class": "remodel",
+        "contractor_trade": "general contractor"
+      },
+      "expected": {
+        "improvement_type": null,
+        "improvement_status": null,
+        "improvement_action": null,
+        "contractor_type": null
+      },
+      "note": "exact as printed: case is not folded"
+    },
+    {
+      "row": {
+        "permittype": " BP ",
+        "status_current": " Final ",
+        "work_class": " New ",
+        "contractor_trade": " General Contractor "
+      },
+      "expected": {
+        "improvement_type": "GeneralBuilding",
+        "improvement_status": "Completed",
+        "improvement_action": "New",
+        "contractor_type": "GeneralContractor"
+      },
+      "note": "surrounding whitespace only is trimmed"
+    },
+    {
+      "row": {
+        "permittype": "XX",
+        "status_current": "Pending Permit",
+        "work_class": "New",
+        "contractor_trade": "Roofing Contractor"
+      },
+      "expected": {
+        "improvement_type": null,
+        "improvement_status": null,
+        "improvement_action": null,
+        "contractor_type": null
+      },
+      "note": "unlisted values are null"
+    }
+  ]
+}

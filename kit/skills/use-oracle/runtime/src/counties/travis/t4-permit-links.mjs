@@ -37,6 +37,8 @@ import {
   WORK_CLASSIFIER_VERSION,
   DATE_EVIDENCE_VERSION,
   TCAD_ID_NORMALIZATION_VERSION,
+  TCAD_ID_EVIDENCE_VERSION,
+  PARCEL_LINK_VERSION,
   classifyDateEvidence,
   classifyRoofWork,
   linkPermitToParcel,
@@ -246,7 +248,7 @@ export async function runLinkPass({ captureDir, roll, asOfDate, select = null, r
     rows: 0,
     by_permittype: {},
     link_method: { exact: 0, normalized_digits: 0 },
-    unlinked_reasons: { no_candidate: 0, multiple_candidates: 0, invalid_quarantined: 0 },
+    unlinked_reasons: { no_candidate: 0, multiple_candidates: 0, invalid_quarantined: 0, out_of_county: 0 },
     no_candidate_detail: { blank_tcad_id: 0, ten_digit_not_in_roll: 0 },
     by_permittype_link: {},
     tcad_id: { confirmed_present: 0, unknown: 0, invalid_quarantined: 0 },
@@ -329,7 +331,7 @@ export async function runLinkPass({ captureDir, roll, asOfDate, select = null, r
         bump(counts.roofing.by_class_linked, summary.roofWorkClass);
       }
     }
-    const typeLink = (counts.by_permittype_link[type] ??= { exact: 0, normalized_digits: 0, no_candidate: 0, multiple_candidates: 0, invalid_quarantined: 0 });
+    const typeLink = (counts.by_permittype_link[type] ??= { exact: 0, normalized_digits: 0, no_candidate: 0, multiple_candidates: 0, invalid_quarantined: 0, out_of_county: 0 });
     if (link.propertyId) {
       counts.link_method[link.propertyLink.match_method] += 1;
       typeLink[link.propertyLink.match_method] += 1;
@@ -394,7 +396,7 @@ export async function runLinkPass({ captureDir, roll, asOfDate, select = null, r
   const linked = counts.link_method.exact + counts.link_method.normalized_digits;
   const summary = {
     link_pass_version: LINK_PASS_VERSION,
-    versions: { status_group: STATUS_GROUP_VERSION, lifecycle: LIFECYCLE_MAPPING_VERSION, work_classifier: WORK_CLASSIFIER_VERSION, date_evidence: DATE_EVIDENCE_VERSION, tcad_id_normalization: TCAD_ID_NORMALIZATION_VERSION },
+    versions: { status_group: STATUS_GROUP_VERSION, lifecycle: LIFECYCLE_MAPPING_VERSION, work_classifier: WORK_CLASSIFIER_VERSION, date_evidence: DATE_EVIDENCE_VERSION, tcad_id_normalization: TCAD_ID_NORMALIZATION_VERSION, tcad_id_evidence: TCAD_ID_EVIDENCE_VERSION, parcel_link: PARCEL_LINK_VERSION },
     as_of_date: asOfDate,
     roll: { ...roll.stats, seed_sha256: roll.seedSha256, digits_only_proof: { ...roll.proof, collisions: roll.proof.collisions.length }, digits_fallback_enabled: digitsFallback !== null },
     ...counts,
@@ -408,7 +410,7 @@ export async function runLinkPass({ captureDir, roll, asOfDate, select = null, r
     permit_number: { distinct: permitNumberRows.size, blank_rows: blankNumbers, printed_more_than_once: duplicateNumbers, rows_under_repeated_numbers: duplicateRows, repeated_rows_identical_to_first: identicalDuplicates, printed_on_differing_rows: conflictingNumbers.size },
     williamson_cad_tcad_id: {
       ...williamson,
-      note: "tcad_id printed in the Williamson CAD account form (R + 6 digits) or as WCAD: another county's parcel id, invalid_quarantined, outside the Travis parcel population; north_of_30_40 counts the rows with coordinates north of latitude 30.40",
+      note: "tcad_id printed in the Williamson CAD account form (R + 6 digits) or as WCAD: another county's parcel id; tcad_id evidence invalid_quarantined, unlinked reason out_of_county (travis-parcel-link-v2, decisions.md section 25.6), outside the Travis parcel population; north_of_30_40 counts the rows with coordinates north of latitude 30.40",
     },
     ten_digit_not_in_roll: {
       rows: notInRoll.rows,

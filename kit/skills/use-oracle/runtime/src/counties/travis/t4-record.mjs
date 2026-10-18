@@ -6,6 +6,7 @@
  *   node src/counties/travis/t4-record.mjs --pilot <run-dir> --pilot-none <run-dir> --drill <run-dir> --feasibility <run-dir> \
  *     [--capture <dir>] [--link-proof <evidence.json>] [--harvest <evidence.json>] [--readiness <report.json>] [--tests <summary>] \
  *     [--bench-county <shard-bench.json>] [--bench-property_improvement <shard-bench.json>] [--more-bench <file,file>] [--kit-commit <sha>] \
+ *     [--size-projection <file>] \
  *     --out docs/evidence/travis-t4-run-<date>.json
  *
  * @module counties/travis/t4-record
@@ -19,6 +20,7 @@ import { RUNTIME_ROOT } from "./t3-snapshot.mjs";
 import { partitionReceipts } from "./t4-permit-links.mjs";
 import { latestCapture } from "./t4-permit-verify.mjs";
 import { projectFullRun } from "./t4-projection.mjs";
+import { PERMIT_DATASET as PERMIT_SOURCE } from "./t4-permit-fetch.mjs";
 
 export const T4_RECORD_VERSION = "travis.t4-run-record.v1";
 
@@ -161,7 +163,16 @@ async function main() {
     pilot: { all: runSummary(pilot), appraisal_only: runSummary(none), fault_drill: runSummary(drill) },
     feasibility: runSummary(feasibility),
     projection,
-    shard_bench: [...Object.values(shardBench), ...extraBench].map((bench) => ({ group: bench.group, parcels: bench.parcels, shards: bench.shards, wall_ms: bench.wall_ms, wall_ms_per_parcel: bench.wall_ms_per_parcel, all_passed: bench.all_passed, shard_ms: bench.results.map((result) => result.ms) })),
+    shard_bench: [...Object.values(shardBench), ...extraBench].map((bench) => ({ group: bench.group, tag: bench.tag ?? null, started_at: bench.started_at ?? null, parcels: bench.parcels, shards: bench.shards, wall_ms: bench.wall_ms, wall_ms_per_parcel: bench.wall_ms_per_parcel, memory: bench.memory ?? null, all_passed: bench.all_passed, shard_ms: bench.results.map((result) => result.ms) })),
+    size_projection: flags["size-projection"] ? await readJson(path.resolve(flags["size-projection"])) : null,
+    limitations: [
+      { source: PERMIT_SOURCE, availability: "supported_partial", source_access_status: "available", incomplete_reason: "out_of_county", detail: `${linkProof.unlinked_reasons.out_of_county.toLocaleString("en-US")} Austin permits on Williamson County parcels (tcad_id printed as a Williamson CAD account): outside Travis, left out of the Travis permit totals (decisions.md section 25.6)`, evidence: "docs/evidence/travis-t4-link-proof-v1792239863.json", records_request: null },
+      { source: PERMIT_SOURCE, availability: "supported_partial", source_access_status: "available", incomplete_reason: "no_candidate", detail: `${linkProof.ten_digit_not_in_roll.rows.toLocaleString("en-US")} permits on ${linkProof.ten_digit_not_in_roll.distinct_geo_ids.toLocaleString("en-US")} geo_ids no 2026 account prints, and ${linkProof.no_candidate_detail.blank_tcad_id.toLocaleString("en-US")} with a blank tcad_id: loaded internally, not linked to a property (decisions.md section 25.10)`, evidence: "docs/evidence/travis-t4-retired-geo-ids-2026-10-18.json", records_request: null },
+      { source: PERMIT_SOURCE, availability: "supported_partial", source_access_status: "available", incomplete_reason: "multiple_candidates", detail: `${linkProof.unlinked_reasons.multiple_candidates.toLocaleString("en-US")} permits on ${linkProof.roll.shared_geo_ids.toLocaleString("en-US")} geo_ids shared by ${linkProof.roll.accounts_on_shared_geo_ids.toLocaleString("en-US")} accounts (mostly condominium regimes): not linked to one property`, evidence: "docs/evidence/travis-t4-link-proof-v1792239863.json", records_request: null },
+      { source: PERMIT_SOURCE, availability: "supported_partial", source_access_status: "available", incomplete_reason: "invalid_quarantined", detail: `${linkProof.unlinked_reasons.invalid_quarantined.toLocaleString("en-US")} permits with a malformed tcad_id`, evidence: "docs/evidence/travis-t4-link-proof-v1792239863.json", records_request: null },
+      { source: PERMIT_SOURCE, availability: "supported_partial", source_access_status: "available", incomplete_reason: "status_indexed_only", detail: "the status is the daily export's value with its capture time; open roofing permits are not refreshed from the permit's live page in v1", evidence: "docs/decisions.md section 5", records_request: null },
+      { source: "travis-other-jurisdictions", availability: "unsupported", source_access_status: "blocked", incomplete_reason: "blocked_or_custodian_only", detail: "the 22 jurisdictions other than Austin stay blocked or custodian-only as classified (travis-sources.yaml)", evidence: "docs/travis-sources.yaml", records_request: "per jurisdiction in travis-sources.yaml" },
+    ],
     readiness_report: readiness ? { overall: readiness.overall, seed_allowed: readiness.seed_allowed, gates: Object.fromEntries((readiness.gates ?? []).map((gate) => [gate.gate, gate.status])) } : null,
     tests: flags.tests ?? null,
     loader_watermarks: [],

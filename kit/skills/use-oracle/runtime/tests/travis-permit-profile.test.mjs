@@ -415,3 +415,21 @@ describe("Travis roof-age profile through the bundled estimator", () => {
     });
   });
 });
+
+describe("Travis property_improvement enum tables (decisions.md section 25.7)", async () => {
+  const { CONTRACTOR_TYPE_BY_TRADE, IMPROVEMENT_ACTION_BY_WORK_CLASS, IMPROVEMENT_ENUMS_VERSION, IMPROVEMENT_STATUS_BY_STATUS, IMPROVEMENT_TYPE_BY_PERMITTYPE, mapImprovementEnums } = await import("../src/counties/travis/permit-profile.mjs");
+  it("maps every fixture case exactly and leaves unlisted values null", async () => {
+    const fixture = await loadJson(PROFILE_FIXTURES, "improvement-enums.json");
+    expect(fixture.version).toBe(IMPROVEMENT_ENUMS_VERSION);
+    for (const testCase of fixture.cases) expect(mapImprovementEnums(testCase.row), JSON.stringify(testCase.row)).toEqual(testCase.expected);
+  });
+
+  it("only names members of the live schema", async () => {
+    const { live_members: members } = await loadJson(PROFILE_FIXTURES, "improvement-enums.json");
+    for (const member of Object.values(IMPROVEMENT_TYPE_BY_PERMITTYPE)) expect(members.improvement_type).toContain(member);
+    for (const member of Object.values(IMPROVEMENT_STATUS_BY_STATUS)) expect(members.improvement_status).toContain(member);
+    for (const member of Object.values(IMPROVEMENT_ACTION_BY_WORK_CLASS)) expect(members.improvement_action).toContain(member);
+    for (const member of Object.values(CONTRACTOR_TYPE_BY_TRADE)) expect(members.contractor_type).toContain(member);
+    expect(Object.values(IMPROVEMENT_STATUS_BY_STATUS)).not.toContain("InProgress");
+  });
+});

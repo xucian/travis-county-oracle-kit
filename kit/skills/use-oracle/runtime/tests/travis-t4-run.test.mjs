@@ -75,7 +75,7 @@ describe("T4 run orchestration (no elephant-cli)", () => {
       expect(record.permit_states).toEqual({ done: 1, done_zero_permits: 1 });
       expect(record.parcels["900001"]).toMatchObject({ status: "done", permits_linked: 2, permits_published: 2, permits_printing_geo_id: 2 });
       expect(record.parcels["900002"]).toMatchObject({ status: "done_zero_permits", permits_linked: 0, permits_printing_geo_id: 0 });
-      expect(record.permits.link_pass_capture_totals).toMatchObject({ rows: 3, linked: 2, unlinked_reasons: { invalid_quarantined: 1 } });
+      expect(record.permits.link_pass_capture_totals).toMatchObject({ rows: 3, linked: 2, unlinked_reasons: { out_of_county: 1 } });
       expect(record.groups).toEqual({ county: 2, property_improvement: 1 });
       const runDir = path.join(RUNTIME, record.run_dir);
       expect((await readdir(path.join(runDir, "validate", "property_improvement"))).sort()).toEqual(["900001"]);

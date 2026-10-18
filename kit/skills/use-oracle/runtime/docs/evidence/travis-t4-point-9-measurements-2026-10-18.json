@@ -1,0 +1,351 @@
+{
+ "schemaVersion": "travis.t4-point-9-measurements.v1",
+ "question": "decisions.md section 25.9 (not ruled; measure, do not change): the shard benchmark at 8, 10 and 12 concurrent shards per group, wall time, peak memory and projected full-run hours; network requests of a T5 full run; projected published sizes; shard checkpointing",
+ "machine": {
+  "model": "Apple M1 Max, 10 cores (8 performance, 2 efficiency), 32 GB",
+  "load_during_measurement": "swap 14.4 GB used of 15.4 GB at 05:59Z (vm.swapusage), a virtualization VM resident with about 4 GB, VS Code and browsers open; the benchmark measures this machine as it is used, not a clean one",
+  "swap_at_end": "14.37 GB used"
+ },
+ "feasibility_run": {
+  "dir": "data/travis/runs/20261018T052540Z-t4-feasibility-1000",
+  "parcels": 1000,
+  "parcels_with_permits": 530,
+  "permits": 4151
+ },
+ "benchmarks": [
+  {
+   "when": "2026-10-17 night",
+   "group": "county",
+   "shards": 4,
+   "parcels": 1000,
+   "wall_s": 117.3,
+   "peak_cli_rss_gb": null,
+   "peak_processes": null,
+   "slowest_shard_stage_ms": {
+    "validate": 105449,
+    "hash": 7198,
+    "car_validate": 4458,
+    "export_tables": 992
+   },
+   "all_passed": true
+  },
+  {
+   "when": "2026-10-17 night",
+   "group": "county",
+   "shards": 8,
+   "parcels": 1000,
+   "wall_s": 85.2,
+   "peak_cli_rss_gb": null,
+   "peak_processes": null,
+   "slowest_shard_stage_ms": {
+    "validate": 74618,
+    "hash": 6211,
+    "car_validate": 4364,
+    "export_tables": 1331
+   },
+   "all_passed": true
+  },
+  {
+   "when": "2026-10-17 night",
+   "group": "property_improvement",
+   "shards": 8,
+   "parcels": 530,
+   "wall_s": 21.9,
+   "peak_cli_rss_gb": null,
+   "peak_processes": null,
+   "slowest_shard_stage_ms": {
+    "validate": 15840,
+    "hash": 3546,
+    "car_validate": 2206,
+    "export_tables": 1130
+   },
+   "all_passed": true
+  },
+  {
+   "when": "2026-10-18 pass 1",
+   "group": "county",
+   "shards": 10,
+   "parcels": 1000,
+   "wall_s": 133.5,
+   "peak_cli_rss_gb": 8.88,
+   "peak_processes": 10,
+   "slowest_shard_stage_ms": {
+    "validate": 115131,
+    "hash": 9313,
+    "car_validate": 8026,
+    "export_tables": 2684
+   },
+   "all_passed": true
+  },
+  {
+   "when": "2026-10-18 pass 1",
+   "group": "county",
+   "shards": 12,
+   "parcels": 1000,
+   "wall_s": 158.7,
+   "peak_cli_rss_gb": 9.27,
+   "peak_processes": 12,
+   "slowest_shard_stage_ms": {
+    "validate": 137429,
+    "hash": 10255,
+    "car_validate": 9681,
+    "export_tables": 3523
+   },
+   "all_passed": true
+  },
+  {
+   "when": "2026-10-18 pass 1",
+   "group": "county",
+   "shards": 8,
+   "parcels": 1000,
+   "wall_s": 94.8,
+   "peak_cli_rss_gb": 7.69,
+   "peak_processes": 8,
+   "slowest_shard_stage_ms": {
+    "validate": 82423,
+    "hash": 6921,
+    "car_validate": 5388,
+    "export_tables": 1491
+   },
+   "all_passed": true
+  },
+  {
+   "when": "2026-10-18 pass 1",
+   "group": "property_improvement",
+   "shards": 10,
+   "parcels": 530,
+   "wall_s": 43.5,
+   "peak_cli_rss_gb": 4.56,
+   "peak_processes": 10,
+   "slowest_shard_stage_ms": {
+    "validate": 30484,
+    "hash": 6871,
+    "car_validate": 4663,
+    "export_tables": 2738
+   },
+   "all_passed": true
+  },
+  {
+   "when": "2026-10-18 pass 1",
+   "group": "property_improvement",
+   "shards": 12,
+   "parcels": 530,
+   "wall_s": 46.1,
+   "peak_cli_rss_gb": 5.72,
+   "peak_processes": 12,
+   "slowest_shard_stage_ms": {
+    "validate": 31456,
+    "hash": 7742,
+    "car_validate": 5444,
+    "export_tables": 3283
+   },
+   "all_passed": true
+  },
+  {
+   "when": "2026-10-18 pass 1",
+   "group": "property_improvement",
+   "shards": 8,
+   "parcels": 530,
+   "wall_s": 39.1,
+   "peak_cli_rss_gb": 4.1,
+   "peak_processes": 8,
+   "slowest_shard_stage_ms": {
+    "validate": 28207,
+    "hash": 5638,
+    "car_validate": 3776,
+    "export_tables": 2174
+   },
+   "all_passed": true
+  },
+  {
+   "when": "2026-10-18 repeat, reverse order",
+   "group": "county",
+   "shards": 10,
+   "parcels": 1000,
+   "wall_s": 173.7,
+   "peak_cli_rss_gb": 7.81,
+   "peak_processes": 10,
+   "slowest_shard_stage_ms": {
+    "validate": 153073,
+    "hash": 10590,
+    "car_validate": 8989,
+    "export_tables": 3085
+   },
+   "all_passed": true
+  },
+  {
+   "when": "2026-10-18 repeat, reverse order",
+   "group": "county",
+   "shards": 12,
+   "parcels": 1000,
+   "wall_s": 157.5,
+   "peak_cli_rss_gb": 8.75,
+   "peak_processes": 12,
+   "slowest_shard_stage_ms": {
+    "validate": 135381,
+    "hash": 11029,
+    "car_validate": 10095,
+    "export_tables": 3802
+   },
+   "all_passed": true
+  },
+  {
+   "when": "2026-10-18 repeat, reverse order",
+   "group": "county",
+   "shards": 8,
+   "parcels": 1000,
+   "wall_s": 204.6,
+   "peak_cli_rss_gb": 6.13,
+   "peak_processes": 8,
+   "slowest_shard_stage_ms": {
+    "validate": 182370,
+    "hash": 11285,
+    "car_validate": 9154,
+    "export_tables": 3115
+   },
+   "all_passed": true
+  },
+  {
+   "when": "2026-10-18 repeat, reverse order",
+   "group": "property_improvement",
+   "shards": 10,
+   "parcels": 530,
+   "wall_s": 46.7,
+   "peak_cli_rss_gb": 4.88,
+   "peak_processes": 10,
+   "slowest_shard_stage_ms": {
+    "validate": 32464,
+    "hash": 7416,
+    "car_validate": 5030,
+    "export_tables": 2819
+   },
+   "all_passed": true
+  },
+  {
+   "when": "2026-10-18 repeat, reverse order",
+   "group": "property_improvement",
+   "shards": 12,
+   "parcels": 530,
+   "wall_s": 53.4,
+   "peak_cli_rss_gb": 5.94,
+   "peak_processes": 12,
+   "slowest_shard_stage_ms": {
+    "validate": 37069,
+    "hash": 8770,
+    "car_validate": 6232,
+    "export_tables": 3769
+   },
+   "all_passed": true
+  },
+  {
+   "when": "2026-10-18 repeat, reverse order",
+   "group": "property_improvement",
+   "shards": 8,
+   "parcels": 530,
+   "wall_s": 45.2,
+   "peak_cli_rss_gb": 4.01,
+   "peak_processes": 8,
+   "slowest_shard_stage_ms": {
+    "validate": 32763,
+    "hash": 6347,
+    "car_validate": 4426,
+    "export_tables": 2324
+   },
+   "all_passed": true
+  }
+ ],
+ "projection_full_run_hours": {
+  "sequential": 62.41,
+  "sequential_2026_10_17": 59.97,
+  "sharded": {
+   "8 shards, pass 1": {
+    "full_run_h": 18.99,
+    "county_cli_h": 11.64,
+    "property_improvement_cli_h": 5.18
+   },
+   "8 shards, repeat": {
+    "full_run_h": 33.28,
+    "county_cli_h": 25.12,
+    "property_improvement_cli_h": 5.99
+   },
+   "10 shards, pass 1": {
+    "full_run_h": 24.32,
+    "county_cli_h": 16.39,
+    "property_improvement_cli_h": 5.76
+   },
+   "10 shards, repeat": {
+    "full_run_h": 29.67,
+    "county_cli_h": 21.32,
+    "property_improvement_cli_h": 6.18
+   },
+   "12 shards, pass 1": {
+    "full_run_h": 27.75,
+    "county_cli_h": 19.48,
+    "property_improvement_cli_h": 6.1
+   },
+   "12 shards, repeat": {
+    "full_run_h": 28.58,
+    "county_cli_h": 19.34,
+    "property_improvement_cli_h": 7.07
+   }
+  },
+  "sharded_2026_10_17_8_shards": 15.47,
+  "gate_h": 48
+ },
+ "reading": "8 shards is fastest when the machine has memory to spare (85.2 s County, 21.9 s Property Improvement on the night of 2026-10-17); with the swap file nearly full the same 8 shards took 94.8 and then 204.6 s for the County chain; 10 and 12 shards add processes on the 2 efficiency cores and 1-2 GB of resident memory without gaining time. Every sharded variant measured stays inside 48 hours (15.5 to 33.3 h); the sequential run does not (62.4 h).",
+ "peak_memory": "the CLI processes together peaked at 6.1-7.7 GB on 8 County shards, 7.8-8.9 GB on 10 and 8.8-9.3 GB on 12; the Property Improvement chain at 4.0-5.9 GB",
+ "t5_network": {
+  "runner": "t4-run.mjs (the T5 runner builds on it) makes one request, the lexicon manifest (https://lexicon.elephant.xyz/api/manifest); --manifest <file> replaces it with a saved copy. The Socrata cross-check runs only with --cross-check-socrata (a pilot flag); no Socrata, TCAD or TNR request otherwise: the appraisal side reads the seed (liveFetch false) and the permit side reads the verified capture. A fresh Socrata capture is a separate command (t4-permit-fetch.mjs) run before the full run if a newer window is wanted",
+  "elephant_cli": {
+   "every_invocation": "an update check against https://registry.npmjs.org/-/package/@elephant-xyz%2Fcli/dist-tags, cached 30 minutes; if npm reports a newer version than 1.58.1 the CLI prints \"update required\" and exits 1, which would stop a long run midway; ELEPHANT_SKIP_UPDATE_CHECK=1 disables it (bin/elephant-cli, dist/services/update-check.service.js)",
+   "validate_and_hash": "fetch the lexicon manifest again (dist/services/schema-manifest.service.js; ELEPHANT_SCHEMA_MANIFEST_URL overrides the URL)",
+   "schemas": "read from ~/.elephant-cli/schema-cache; fetched from https://ipfs.filebase.io, https://gateway.pinata.cloud or https://trustless-gateway.link only on a cache miss (dist/utils/schema-fetcher.js)",
+   "export_tables": "reads the schema cache; no other request found"
+  },
+  "recommendation_for_t5": "run with ELEPHANT_SKIP_UPDATE_CHECK=1 and the CLI version pinned; record the lexicon manifest SHA-256 at the start and the end of the run and stop if it changes"
+ },
+ "projected_published_sizes": {
+  "county": {
+   "sample_parcels": 1000,
+   "car_bytes": 8078795,
+   "blocks": 20138,
+   "parts": 24,
+   "parts_bytes": 2314865,
+   "tables_index_bytes": 3711,
+   "scale": 441.961,
+   "projected_car_gb": 3.57,
+   "projected_parts_gb": 1.02,
+   "projected_distinct_gb": 4.25,
+   "projected_filebase_counted_gb": 8.49
+  },
+  "property_improvement": {
+   "sample_parcels": 530,
+   "car_bytes": 9085449,
+   "blocks": 11484,
+   "parts": 7,
+   "parts_bytes": 824007,
+   "tables_index_bytes": 1270,
+   "scale": 476.751,
+   "projected_car_gb": 4.33,
+   "projected_parts_gb": 0.39,
+   "projected_distinct_gb": 4.51,
+   "projected_filebase_counted_gb": 9.02
+  },
+  "total": {
+   "projected_car_gb": 7.9,
+   "projected_parts_gb": 1.41,
+   "projected_distinct_gb": 8.76,
+   "projected_filebase_counted_gb": 17.51
+  },
+  "method": "feasibility run 20261018T052540Z (1,000 parcels; 530 with 4,151 permits): CAR bytes and table part bytes scaled like the projection (County by 441.961, Property Improvement by 476.751); distinct = archive block bytes (CAR bytes less about 39 bytes of CAR framing per block) + parts + index; counted by Filebase = 2 x (archive blocks + parts) + index, because the tables root is pinned recursively and its DAG links the archive root and every part, which are also pinned on their own (the formula reproduces the 505,699 bytes Filebase counted for the T2 pilot); Parquet compresses better at scale, so the parts are an upper estimate",
+  "permit_record_note": "74% of a published property_improvement record (1,309 of 1,767 bytes on average) is its source_http_request, mostly the 60-column $select of the partition GET; that request is what keeps the CID stable across runs and the applicant columns out of every request"
+ },
+ "t5_checkpointing": {
+  "unit": "a shard of at most 5,000 properties (the kit CAR cap), assigned deterministically from the sorted PROP_IDs, so a rerun builds the same shards",
+  "per_parcel_stages": "already resumable: the appraisal transform rewrites identical bytes; permit-status.json carries the policy, capture and transform fingerprint, so --resume skips done parcels, keeps failed_permanent dead and redoes failed_retryable (shown by the T4 fault drill)",
+  "per_shard_cli_chain": "each stage (validate, hash, CAR validate, export-tables) writes to a staging name and, only after the CLI exits 0 and its output parses, renames it and writes shards/<id>/<stage>.done.json atomically, holding the input digest (sorted per-parcel file digests, lexicon manifest SHA-256, CLI version) and the output digests (CAR SHA-256, roots); on resume a stage whose marker matches the recomputed input digest is skipped, and a stage without a marker (the in-flight one) is rerun from its inputs; so a crash or a sleep loses at most the shards in flight, one stage each",
+  "run_progress": "a run-level progress file rewritten atomically after each shard stage (counts, timings) for monitoring; the final run record is assembled from the markers",
+  "sleep": "run under caffeinate -i (no idle sleep while the run lasts); a lid-close or forced sleep is a crash for this purpose and resumes as above",
+  "status": "design only; T5 builds it"
+ }
+}

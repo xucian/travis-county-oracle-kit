@@ -1,0 +1,499 @@
+{
+ "schemaVersion": "travis.t4-retired-geo-ids.v1",
+ "question": "decisions.md section 25.10: is a lineage source for the permits whose 10-digit tcad_id no 2026 account prints really not publicly available, and does it matter for the README? Investigated from RO egress, public pages and files only, no login, CAPTCHA or bypass; every capture has a receipt (runtime data/travis/t4-rulings/lineage/receipts.jsonl and the austin-*/receipts.jsonl files)",
+ "population": {
+  "permits": 196400,
+  "distinct_geo_ids": 6260,
+  "capture": "v1792239863",
+  "note": "every one of them is absent from all 493,324 PROP.TXT records of the 2026 certified export (all account types), except 63 permits whose geo_id a mobile-home account prints",
+  "prop_txt_account_types": {
+   "absent": 196337,
+   "MH": 63
+  }
+ },
+ "a_tcad": {
+  "public_information_page": {
+   "url": "https://traviscad.org/publicinformation",
+   "range": null,
+   "fetched_at": "2026-10-18T05:17:31.545Z",
+   "status": 200,
+   "bytes": 128436,
+   "sha256": "a6f587899047782e51985dc131b32695a526de87719617f66340b6998de1e3d0",
+   "error": null
+  },
+  "export_layout": "Legacy8.0.33 layout (the T1 download): no prior, parent, child, split, merge or history field in any of its record types; the only change marker is the supplemental export sup_action A/M/D (add, modify, delete), which pairs no old with new id",
+  "certified_special_export_json": {
+   "file": {
+    "url": "https://traviscad.org/wp-content/largefiles/2026%20Certified%20JSON%20SUPP%200%2007182026.zip",
+    "range": null,
+    "fetched_at": "2026-10-18T05:19:33.067Z",
+    "status": 200,
+    "bytes": 3554021795,
+    "sha256": "6f7a758568fd03fa200e996d2756559eb53e13241238a004cbadac09ff4c2346",
+    "error": null
+   },
+   "members": [
+    [
+     "Travis-protaxExport-20260719.json",
+     4294967295,
+     4294967295
+    ]
+   ],
+   "accounts": 493246,
+   "fields_that_bear_on_lineage": "links[] (linkID, linkedPID), events[], inactive/reactivate, permits[] (TCAD's own permit records per account: permitNumber in the Austin form, issue and completion dates, status); no prior geo_id field",
+   "links": {
+    "link_pairs": 157032,
+    "by_type_pair": {
+     "R->absent": 76477,
+     "R->P": 31048,
+     "P->R": 30751,
+     "R->MH": 7602,
+     "MH->R": 7602,
+     "P->absent": 1610,
+     "R->R": 1542,
+     "MH->absent": 192,
+     "P->P": 177,
+     "MH->MH": 15,
+     "MH->P": 8,
+     "P->MH": 8
+    }
+   },
+   "events": "top event types are exemption removals and comments; no split or merge event (follow-up tcad_event_types_top)",
+   "lineage_through_links": {
+    "retired_geo_ids_with_old_property_id": 6016,
+    "old_property_id_linked_from_current_accounts": 4164,
+    "permits_covered": 162110,
+    "one_current_seed_account": 45,
+    "several_current_accounts": 4047
+   },
+   "permit_listing": {
+    "listed_on_one_seed_account": 7531,
+    "listed_on_several": 463,
+    "listed_on_non_seed_only": 26,
+    "not_listed": 188380
+   }
+  },
+  "land_comment_report_2026": {
+   "file": {
+    "url": "https://traviscad.org/wp-content/uploads/land_comments_2026.csv",
+    "range": null,
+    "fetched_at": "2026-10-18T05:18:04.687Z",
+    "status": 200,
+    "bytes": 21228695,
+    "sha256": "2e2c565dd56b826abca2e885cff394ab32fd80e1d75910804b704e87b4899008",
+    "error": null
+   },
+   "rows": 206939,
+   "mentions": {
+    "SPLIT": 11328,
+    "MERGE": 10583
+   },
+   "example": "\"SPLIT OUT OF 787408\", \"-10.301AC SPLIT INTO 935527 (2019169457) FOR 2020\", \"DELE/MERGE W/871317\": free-text lineage between account ids, written by appraisers",
+   "lineage_through_comments": {
+    "retired_geo_ids": 6260,
+    "retired_permits": 196400,
+    "with_old_property_id": 6016,
+    "reached": 230,
+    "reached_permits": 9062,
+    "one_current_account": 221,
+    "one_permits": 8959,
+    "several": 9,
+    "several_permits": 103
+   }
+  },
+  "ears_submission_manual": {
+   "file": {
+    "url": "https://traviscad.org/wp-content/uploads/96-1051-Electronic-Appraisal-Roll-Submission-Manual.pdf",
+    "range": null,
+    "fetched_at": "2026-10-18T05:18:04.110Z",
+    "status": 200,
+    "bytes": 7610716,
+    "sha256": "e93aa72cb71fb160e4f2b72417e6205135863766fcf65c6ee474b8bbb1bea00d",
+    "error": null
+   },
+   "finding": "the EARS parent account number (AJR009) groups properties that form one economic unit (a house and the adjacent lot), not a predecessor account"
+  },
+  "subdivision_condominium_report_2026": {
+   "file": {
+    "url": "https://traviscad.org/wp-content/uploads/2026-NewSubdivisionListReport.pdf",
+    "range": null,
+    "fetched_at": "2026-10-18T05:18:04.484Z",
+    "status": 200,
+    "bytes": 1656731,
+    "sha256": "0ce136851241751b1ca236e88b0b2082a2a5b2089bc6f45f36f9b4d5401f6732",
+    "error": null
+   },
+   "finding": "lists new subdivisions and condominiums by name and code; no old geo_id"
+  }
+ },
+ "b_tnr_gis": {
+  "requests": [
+   {
+    "url": "https://gis.traviscountytx.gov/server1/rest/services?f=json",
+    "range": null,
+    "fetched_at": "2026-10-18T05:19:46.170Z",
+    "status": null,
+    "bytes": null,
+    "sha256": null,
+    "error": "fetch failed"
+   },
+   {
+    "url": "https://gis.traviscountytx.gov/server1/rest/services/Boundaries_and_Jurisdictions?f=json",
+    "range": null,
+    "fetched_at": "2026-10-18T05:19:56.715Z",
+    "status": null,
+    "bytes": null,
+    "sha256": null,
+    "error": "fetch failed"
+   }
+  ],
+  "finding": "gis.traviscountytx.gov does not answer from RO (connection timeout, as T1 recorded: the host rejects non-US clients); whether the TNR services keep historical or retired parcel layers cannot be checked without US egress"
+ },
+ "c_austin": {
+  "catalog_queries": [
+   "TCAD",
+   "parcel",
+   "property id",
+   "subdivision",
+   "plat",
+   "land use inventory",
+   "address"
+  ],
+  "candidates": {
+   "kk8y-6cmt": "Land Database 2021 (one-off, 271,568 rows): pid_10 and prop_id",
+   "6qkk-xgys": "Land Use Inventory Detailed of 2022-12-01 (280,889 rows): parcel_id_10 and property_id",
+   "7vsm-dvxg": "Land Use Inventory Detailed of 2026-07-05 (284,958 rows): parcel_id_10 and property_id",
+   "it4s-wgjk": "Subdivision Review Cases: the case tract tcad_id, not the lots"
+  },
+  "metadata": {
+   "kk8y-6cmt": {
+    "url": "https://data.austintexas.gov/api/views/kk8y-6cmt.json",
+    "range": null,
+    "fetched_at": "2026-10-18T05:21:14.599Z",
+    "status": 200,
+    "bytes": 99519,
+    "sha256": "531c9ca3e593670aa68933b003f5bb3f3db9066d4c8056f0008dadcb5023f74e",
+    "error": null
+   },
+   "7vsm-dvxg": {
+    "url": "https://data.austintexas.gov/api/views/7vsm-dvxg.json",
+    "range": null,
+    "fetched_at": "2026-10-18T05:21:15.908Z",
+    "status": 200,
+    "bytes": 23506,
+    "sha256": "830e120e2508ecab9f5fcd2e375bf8a60974f21e9e0677ffa9b164821df5bfd5",
+    "error": null
+   },
+   "6qkk-xgys": {
+    "url": "https://data.austintexas.gov/api/views/6qkk-xgys.json",
+    "range": null,
+    "fetched_at": "2026-10-18T05:21:16.602Z",
+    "status": 200,
+    "bytes": 24006,
+    "sha256": "59d1025fd852f8e92629907efa8e054f7fa8e55de8b210ea31959b0dd50ef4a2",
+    "error": null
+   },
+   "it4s-wgjk": {
+    "url": "https://data.austintexas.gov/api/views/it4s-wgjk.json",
+    "range": null,
+    "fetched_at": "2026-10-18T05:21:17.989Z",
+    "status": 200,
+    "bytes": 114505,
+    "sha256": "43b5c06606f5a2456428af8e4e6ec0a6ae59c60fda64d2261c21ece65b7feacb",
+    "error": null
+   }
+  },
+  "snapshots_vs_retired_geo_ids": {
+   "kk8y-6cmt": {
+    "label": "Land Database 2021",
+    "distinct_parcel_ids": 250370,
+    "retired_geo_ids_found": 3808,
+    "permits_on_them": 130892,
+    "found_with_several_property_ids": 52,
+    "property_id_still_in_2026_roll_once": 57,
+    "permits_on_those": 1631,
+    "property_id_gone_from_2026_roll": 3746,
+    "examples_same_account_new_geo_id": [
+     {
+      "old_geo_id": "0103031101",
+      "prop_id": "381664",
+      "geo_id_2026": "0426441108",
+      "permits": 142
+     },
+     {
+      "old_geo_id": "0212131301",
+      "prop_id": "708749",
+      "geo_id_2026": "0160380403",
+      "permits": 11
+     },
+     {
+      "old_geo_id": "0212211401",
+      "prop_id": "203839",
+      "geo_id_2026": "0212011707",
+      "permits": 14
+     },
+     {
+      "old_geo_id": "0403071201",
+      "prop_id": "830424",
+      "geo_id_2026": "0447070405",
+      "permits": 99
+     },
+     {
+      "old_geo_id": "0204120501",
+      "prop_id": "192199",
+      "geo_id_2026": "0204120419",
+      "permits": 18
+     },
+     {
+      "old_geo_id": "0110020106",
+      "prop_id": "533424",
+      "geo_id_2026": "0432251206",
+      "permits": 12
+     },
+     {
+      "old_geo_id": "0209095801",
+      "prop_id": "198494",
+      "geo_id_2026": "0209090416",
+      "permits": 16
+     },
+     {
+      "old_geo_id": "0212100909",
+      "prop_id": "724127",
+      "geo_id_2026": "0125250125",
+      "permits": 23
+     },
+     {
+      "old_geo_id": "0219060305",
+      "prop_id": "807396",
+      "geo_id_2026": "0217180803",
+      "permits": 7
+     },
+     {
+      "old_geo_id": "0218090901",
+      "prop_id": "119713",
+      "geo_id_2026": "0119090814",
+      "permits": 11
+     }
+    ]
+   },
+   "6qkk-xgys": {
+    "label": "Land Use Inventory Detailed (2022-12-01)",
+    "distinct_parcel_ids": 257839,
+    "retired_geo_ids_found": 4527,
+    "permits_on_them": 152627,
+    "found_with_several_property_ids": 16,
+    "property_id_still_in_2026_roll_once": 7,
+    "permits_on_those": 74,
+    "property_id_gone_from_2026_roll": 4520,
+    "examples_same_account_new_geo_id": [
+     {
+      "old_geo_id": "0212102501",
+      "prop_id": "923500",
+      "geo_id_2026": "0212102503",
+      "permits": 17
+     },
+     {
+      "old_geo_id": "0401092001",
+      "prop_id": "942304",
+      "geo_id_2026": "0401092003",
+      "permits": 21
+     },
+     {
+      "old_geo_id": "0234030110",
+      "prop_id": "235807",
+      "geo_id_2026": "0234030111",
+      "permits": 11
+     },
+     {
+      "old_geo_id": "0204063301",
+      "prop_id": "934641",
+      "geo_id_2026": "0258230213",
+      "permits": 9
+     },
+     {
+      "old_geo_id": "0400310302",
+      "prop_id": "302441",
+      "geo_id_2026": "0400100302",
+      "permits": 13
+     },
+     {
+      "old_geo_id": "0139530928",
+      "prop_id": "710293",
+      "geo_id_2026": "0139500928",
+      "permits": 1
+     },
+     {
+      "old_geo_id": "0161550609",
+      "prop_id": "740152",
+      "geo_id_2026": "0131550609",
+      "permits": 2
+     }
+    ]
+   },
+   "7vsm-dvxg": {
+    "label": "Land Use Inventory Detailed (2026-07-05)",
+    "distinct_parcel_ids": 284791,
+    "retired_geo_ids_found": 5873,
+    "permits_on_them": 189516,
+    "found_with_several_property_ids": 8,
+    "property_id_still_in_2026_roll_once": 2,
+    "permits_on_those": 81,
+    "property_id_gone_from_2026_roll": 5871,
+    "examples_same_account_new_geo_id": [
+     {
+      "old_geo_id": "0227110114",
+      "prop_id": "860648",
+      "geo_id_2026": "0227110111",
+      "permits": 79
+     },
+     {
+      "old_geo_id": "0161550609",
+      "prop_id": "740152",
+      "geo_id_2026": "0131550609",
+      "permits": 2
+     }
+    ]
+   }
+  },
+  "finding": "the snapshots print the retired geo_ids beside the account ids they had then (5,873 of the 6,260 in the 2026-07-05 inventory, which is built from older appraisal parcel layers); 5,871 of those account ids are gone from the 2026 roll: they name retired accounts, not current ones"
+ },
+ "d_point_in_polygon": {
+  "kit_rule": "query-db-loading-matching \"Permit/property matching\": exact folio or source identity first; normalized parcel or address evidence only as explicit fallbacks; record match method, version, confidence and source hashes; keep unresolved permits unlinked. A permit coordinate is location evidence of the same grade as address evidence: allowed only as an explicit, separately labelled candidate fallback (for example match_method permit_point_in_polygon, confidence candidate), and a property_link method the contract does not list today",
+  "polygons": 374490,
+  "retired_with_coordinates": 162389,
+  "result": {
+   "none": 157771,
+   "one": 4618,
+   "several": 0
+  },
+  "one_polygon_by_permittype": {
+   "BP": 1185,
+   "DS": 97,
+   "EP": 1481,
+   "MP": 998,
+   "PP": 857
+  },
+  "precision_on_exact_links_every_5th": {
+   "linked_with_coordinates": 343067,
+   "pip_one": 342651,
+   "pip_one_equal": 341955,
+   "pip_several_includes": 0,
+   "pip_none": 416,
+   "tcad_listed_one": 44546,
+   "tcad_listed_one_equal": 43378,
+   "tcad_not_listed": 350775
+  },
+  "why_so_few": "157,771 of the points fall in no 2026 TNR polygon: the lots carved from these tracts are mostly among the accounts the TNR layer does not draw yet (new lots and condominiums without their own polygon, T1)"
+ },
+ "other_candidate_methods": {
+  "tcad_permit_listing": {
+   "retired_permits_on_one_current_account": 7531,
+   "agreement_with_exact_links": "43,378 of 44,546 sampled exact links where TCAD lists one account (97.4%); TCAD lists about 11% of permits"
+  },
+  "street_line": {
+   "retired": {
+    "compared": 196394,
+    "one": 25641,
+    "several": 2463,
+    "none": 168290
+   },
+   "validation_every_5th": {
+    "compared": 395644,
+    "one": 285711,
+    "one_equal": 283041
+   }
+  },
+  "lineage_and_street_line": "split children reached through TCAD links, narrowed to one by the permit street line"
+ },
+ "coverage_by_method": {
+  "all": {
+   "permits": 196400,
+   "tcad_permit_listing": 7531,
+   "point_in_polygon": 4618,
+   "street_line": 25641,
+   "lineage_and_street_line": 20179,
+   "any": 35713,
+   "methods_disagree": 229
+  },
+  "roofing": {
+   "permits": 23250,
+   "tcad_permit_listing": 4024,
+   "point_in_polygon": 307,
+   "street_line": 3853,
+   "lineage_and_street_line": 3213,
+   "any": 6881,
+   "methods_disagree": 46
+  },
+  "open_roofing": {
+   "permits": 700,
+   "tcad_permit_listing": 21,
+   "point_in_polygon": 14,
+   "street_line": 122,
+   "lineage_and_street_line": 24,
+   "any": 155,
+   "methods_disagree": 1
+  },
+  "stalled_roofing": {
+   "permits": 849,
+   "tcad_permit_listing": 142,
+   "point_in_polygon": 19,
+   "street_line": 87,
+   "lineage_and_street_line": 56,
+   "any": 222,
+   "methods_disagree": 1
+  },
+  "anchor_eligible": {
+   "permits": 19057,
+   "tcad_permit_listing": 3658,
+   "point_in_polygon": 211,
+   "street_line": 3408,
+   "lineage_and_street_line": 2933,
+   "any": 6058,
+   "methods_disagree": 36
+  }
+ },
+ "e_readme_impact": {
+  "roofing_permits_unlinked": 23250,
+  "share_of_all_roofing_permits": "11.3% (of 206,131)",
+  "open_roofing_unlinked": 700,
+  "share_of_open_roofing": "15.9% (of 4,399)",
+  "stalled_roofing_unlinked": 849,
+  "share_of_stalled_roofing": "12.8% (of 6,609)",
+  "roof_age": {
+   "roofing_permits": 23250,
+   "roofing_by_class": {
+    "primary_roof_new_construction": 20090,
+    "primary_roof_replacement": 1337,
+    "accessory_roof": 1743,
+    "repair_or_coating": 80
+   },
+   "open_roofing": 700,
+   "stalled_roofing": 849,
+   "roof_age_anchor_eligible": 19057,
+   "anchor_eligible_with_one_polygon": 211,
+   "anchor_eligible_listed_on_one_tcad_account": 3658,
+   "parcels_without_an_exact_anchor_that_would_gain_one": {
+    "point_in_polygon": 45,
+    "tcad_listing": 3070
+   },
+   "parcels_with_an_exact_anchor": 105731
+  },
+  "reachable_by_any_candidate_method": {
+   "roofing": 6881,
+   "open_roofing": 155,
+   "stalled_roofing": 222,
+   "anchor_eligible": 6058
+  },
+  "readme_lines": "13 (open, long-open permits), 33 (roof age), 105 and 110 (open roofing permits in an area): the permits are loaded internally and counted under limitations, never shown on a property"
+ },
+ "conclusion": "A lineage exists only between accounts (TCAD JSON links and land comments), keyed to the retired geo_ids through Austin's past snapshots, and for 4,047 of the 4,164 ids it reaches it ends in several current accounts, the lots of a split, so it does not attribute a permit to one parcel. No public source maps most of these permits to one current account: 160,687 of 196,400 (81.8%) are reached by no method at all. TNR historical layers are the one source not checkable from RO.",
+ "scripts": [
+  "src/counties/travis/t4-retired-geo-id-study.mjs (main, followUp, methodCoverage)"
+ ],
+ "methods": {
+  "austin_snapshots": "each snapshot's geo_id-like column (pid_10 or parcel_id_10) against the 6,260 retired geo_ids, and the account id beside it against the 2026 seed",
+  "land_comments": "regular expressions SPLIT OUT OF <id>, SPLIT INTO <id> and MERGE ... <id> over the Comment column; a current account is reached when a comment ties it to an old account id the snapshots print beside the retired geo_id",
+  "tcad_json": "tar -xOf over the zip (libarchive reads zip64), the top-level array split into accounts and parsed one by one",
+  "point_in_polygon": "ray casting against the outer ring of each seed polygon (TNR, 2026-10-16), holes excluded, in a 0.005-degree grid"
+ }
+}

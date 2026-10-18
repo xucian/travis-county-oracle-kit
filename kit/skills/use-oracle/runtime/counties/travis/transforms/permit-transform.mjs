@@ -16,8 +16,8 @@
  * `completion_date` from `completed_date`, each only when the profile's date evidence is `confirmed_present`;
  * `permit_close_date` from `statusdate` only when `status_current` is `Final` (the profile's close-date rule). The four
  * enum properties the class requires (`improvement_type`, `improvement_status`, `improvement_action`,
- * `contractor_type`) are written as null: whether exact code mappings are published is an open operator decision
- * (decisions.md section 25). Provenance: `source_http_request` is the partition GET that captured the row (method, URL,
+ * `contractor_type`) come from the profile's exact-value tables (`travis-improvement-enums-v1`, decisions.md section
+ * 25.7): an unlisted printed value is null. Provenance: `source_http_request` is the partition GET that captured the row (method, URL,
  * query; never reconstructed), `request_identifier` the linked parcel's PROP_ID as printed (decisions.md section 3).
  *
  * Everything without a lexicon home (description, printed status, expiry, permit class and work class, the printed
@@ -33,15 +33,15 @@
 import { copyFile, mkdir, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { classifyDateEvidence, classifyLifecycleStatus } from "../../../src/counties/travis/permit-profile.mjs";
+import { IMPROVEMENT_ENUMS_VERSION, classifyDateEvidence, classifyLifecycleStatus, mapImprovementEnums } from "../../../src/counties/travis/permit-profile.mjs";
 
-export const PERMIT_TRANSFORM_VERSION = "travis-permit-transform-v1";
+export const PERMIT_TRANSFORM_VERSION = "travis-permit-transform-v2";
 export const PERMIT_SOURCE_PAYLOAD_FILENAME = "permit-source-payload.json";
 export const PERMIT_DATA_DIRNAME = "permit-data";
 /** Files the permit group copies from the parcel's appraisal output (byte for byte). */
 export const COPIED_FROM_APPRAISAL = Object.freeze(["property.json", "address.json", "parcel.json", "relationship_address_has_parcel.json"]);
-/** The enum properties the class requires; null until the operator rules (decisions.md section 25). */
-export const NULL_REQUIRED_ENUMS = Object.freeze(["improvement_type", "improvement_status", "improvement_action", "contractor_type"]);
+/** The enum properties the class requires, filled by {@link mapImprovementEnums} (null when the printed value is unlisted). */
+export const REQUIRED_ENUMS = Object.freeze(["improvement_type", "improvement_status", "improvement_action", "contractor_type"]);
 
 /**
  * Resolve the Property Improvement and Seed schema CIDs from a live manifest (or the `{entries}` wrapper).
@@ -157,7 +157,7 @@ export function buildTravisPermitOutput({ propId, entries, manifest, seedRootNam
       completion_date: fields.completion_date,
       permit_close_date: fields.permit_close_date,
       final_inspection_date: null,
-      ...Object.fromEntries(NULL_REQUIRED_ENUMS.map((key) => [key, null])),
+      ...mapImprovementEnums(entry.row),
       source_http_request: lexiconRequest(entry.request),
       request_identifier: propId,
     };
@@ -172,6 +172,7 @@ export function buildTravisPermitOutput({ propId, entries, manifest, seedRootNam
   const sourcePayload = {
     schemaVersion: "travis.permit-source-payload.v1",
     permit_transform_version: PERMIT_TRANSFORM_VERSION,
+    improvement_enums_version: IMPROVEMENT_ENUMS_VERSION,
     prop_id: propId,
     as_of_date: asOfDate,
     published: payloadPermits,

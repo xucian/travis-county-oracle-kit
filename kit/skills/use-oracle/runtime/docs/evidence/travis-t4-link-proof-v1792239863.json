@@ -1,11 +1,11 @@
 {
  "schemaVersion": "travis.t4-link-proof.v1",
- "kind": "T4 geo_id link proof and permit profile over the whole capture v1792239863 and the whole seed (441,961 accounts); work classifier v2, tcad_id evidence v2",
+ "kind": "T4 geo_id link proof and permit profile over the whole capture v1792239863 and the whole seed (441,961 accounts); work classifier v2, tcad_id evidence v2, parcel link v2 (out_of_county, decisions.md section 25.6)",
  "command": "node --max-old-space-size=12288 src/counties/travis/t4-permit-links.mjs",
- "kit_commit": "90f8c34",
+ "kit_commit": "12708b4",
  "resources": {
-  "wall_s": 94.04,
-  "max_rss_bytes": 2981019648
+  "wall_s": 95.96,
+  "max_rss_bytes": 1961377792
  },
  "link_pass_version": "travis-t4-link-pass.v1",
  "versions": {
@@ -13,7 +13,9 @@
   "lifecycle": "travis-lifecycle-v1",
   "work_classifier": "travis-work-classifier-v2",
   "date_evidence": "travis-date-evidence-v1",
-  "tcad_id_normalization": "travis-tcad-id-digits-v1"
+  "tcad_id_normalization": "travis-tcad-id-digits-v1",
+  "tcad_id_evidence": "travis-tcad-id-evidence-v2",
+  "parcel_link": "travis-parcel-link-v2"
  },
  "as_of_date": "2026-10-17",
  "roll": {
@@ -49,7 +51,8 @@
  "unlinked_reasons": {
   "no_candidate": 259419,
   "multiple_candidates": 38249,
-  "invalid_quarantined": 104047
+  "invalid_quarantined": 178,
+  "out_of_county": 103869
  },
  "no_candidate_detail": {
   "blank_tcad_id": 63019,
@@ -61,35 +64,40 @@
    "normalized_digits": 0,
    "no_candidate": 56959,
    "multiple_candidates": 9060,
-   "invalid_quarantined": 20313
+   "invalid_quarantined": 33,
+   "out_of_county": 20280
   },
   "DS": {
    "exact": 100101,
    "normalized_digits": 0,
    "no_candidate": 9987,
    "multiple_candidates": 649,
-   "invalid_quarantined": 5912
+   "invalid_quarantined": 24,
+   "out_of_county": 5888
   },
   "EP": {
    "exact": 570769,
    "normalized_digits": 0,
    "no_candidate": 78415,
    "multiple_candidates": 10869,
-   "invalid_quarantined": 29099
+   "invalid_quarantined": 37,
+   "out_of_county": 29062
   },
   "MP": {
    "exact": 420694,
    "normalized_digits": 0,
    "no_candidate": 54405,
    "multiple_candidates": 9639,
-   "invalid_quarantined": 21792
+   "invalid_quarantined": 27,
+   "out_of_county": 21765
   },
   "PP": {
    "exact": 452409,
    "normalized_digits": 0,
    "no_candidate": 59653,
    "multiple_candidates": 8032,
-   "invalid_quarantined": 26931
+   "invalid_quarantined": 57,
+   "out_of_county": 26874
   }
  },
  "tcad_id": {
@@ -231,13 +239,13 @@
   "no_candidate:AUSTIN FULL PURPOSE": 211866,
   "no_candidate:(blank)": 24897,
   "multiple_candidates:AUSTIN FULL PURPOSE": 36441,
-  "invalid_quarantined:AUSTIN FULL PURPOSE": 88498,
+  "out_of_county:AUSTIN FULL PURPOSE": 88325,
   "no_candidate:AUSTIN 2 MILE ETJ": 6038,
-  "invalid_quarantined:AUSTIN 2 MILE ETJ": 12572,
+  "out_of_county:AUSTIN 2 MILE ETJ": 12572,
   "no_candidate:OTHER": 1268,
   "no_candidate:AUSTIN LTD": 10957,
   "multiple_candidates:WEST LAKE HILLS FULL PURPOSE": 353,
-  "invalid_quarantined:AUSTIN LTD": 276,
+  "out_of_county:AUSTIN LTD": 271,
   "multiple_candidates:SB 2038 ETJ RELEASE": 60,
   "multiple_candidates:AUSTIN 2 MILE ETJ": 817,
   "no_candidate:WEST LAKE HILLS FULL PURPOSE": 519,
@@ -247,15 +255,17 @@
   "no_candidate:WEST LAKE HILLS ETJ": 172,
   "no_candidate:SUNSET VALLEY FULL PURPOSE": 29,
   "no_candidate:BASTROP ETJ": 46,
-  "invalid_quarantined:ROUND ROCK ETJ": 2644,
+  "out_of_county:ROUND ROCK ETJ": 2644,
   "no_candidate:AUSTIN 5 MILE ETJ": 929,
-  "invalid_quarantined:SB 2038 ETJ RELEASE": 42,
+  "out_of_county:SB 2038 ETJ RELEASE": 42,
   "no_candidate:ROUND ROCK ETJ": 17,
   "multiple_candidates:AUSTIN LTD": 199,
   "multiple_candidates:THE HILLS FULL PURPOSE": 61,
   "no_candidate:BEE CAVE FULL PURPOSE": 731,
   "no_candidate:BEE CAVE ETJ": 128,
-  "invalid_quarantined:CEDAR PARK FULL PURPOSE": 10,
+  "out_of_county:CEDAR PARK FULL PURPOSE": 10,
+  "invalid_quarantined:AUSTIN FULL PURPOSE": 173,
+  "invalid_quarantined:AUSTIN LTD": 5,
   "multiple_candidates:LAKEWAY FULL PURPOSE": 51,
   "no_candidate:CEDAR PARK FULL PURPOSE": 1,
   "no_candidate:PFLUGERVILLE FULL PURPOSE": 42,
@@ -270,7 +280,7 @@
   "no_candidate:CREEDMOOR FULL PURPOSE": 2,
   "multiple_candidates:BEE CAVE ETJ": 15,
   "no_candidate:BEAR CREEK FULL PURPOSE": 1,
-  "invalid_quarantined:(blank)": 5,
+  "out_of_county:(blank)": 5,
   "no_candidate:PFLUGERVILLE ETJ": 1,
   "no_candidate:MUSTANG RIDGE ETJ": 3
  },
@@ -313,7 +323,7 @@
    "CEDAR PARK FULL PURPOSE": 10,
    "(blank)": 5
   },
-  "note": "tcad_id printed in the Williamson CAD account form (R + 6 digits) or as WCAD: another county's parcel id, invalid_quarantined, outside the Travis parcel population; north_of_30_40 counts the rows with coordinates north of latitude 30.40"
+  "note": "tcad_id printed in the Williamson CAD account form (R + 6 digits) or as WCAD: another county's parcel id; tcad_id evidence invalid_quarantined, unlinked reason out_of_county (travis-parcel-link-v2, decisions.md section 25.6), outside the Travis parcel population; north_of_30_40 counts the rows with coordinates north of latitude 30.40"
  },
  "ten_digit_not_in_roll": {
   "rows": 196400,
@@ -517,8 +527,8 @@
   }
  ],
  "needs_review_distinct_descriptions": 4925,
- "elapsed_ms": 87329,
- "rows_per_minute": 1635673,
+ "elapsed_ms": 88838,
+ "rows_per_minute": 1607903,
  "capture": {
   "dir": "data/travis/permits/v1792239863",
   "dataset": "austin-issued-construction-permits/3syk-w9eu",
@@ -535,6 +545,6 @@
   "path": "data/seeds/travis.csv",
   "sha256": "8b79ca01f6bad5332b0fc82122d6d3783a582815e86fd7c9dd10e400620e17f8",
   "rows": 441961,
-  "read_ms": 6410
+  "read_ms": 6719
  }
 }

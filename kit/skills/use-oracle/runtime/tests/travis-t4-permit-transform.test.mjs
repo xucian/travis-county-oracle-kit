@@ -12,7 +12,6 @@ import { linkPermitToParcel, summarizePermitRow } from "../src/counties/travis/p
 import { TRAVIS_PERMIT_SOURCE_HOSTS, assertOutputContract, assertTravisIdentity } from "../src/counties/travis/validate.mjs";
 import {
   COPIED_FROM_APPRAISAL,
-  NULL_REQUIRED_ENUMS,
   PERMIT_DATA_DIRNAME,
   PERMIT_SOURCE_PAYLOAD_FILENAME,
   buildTravisPermitOutput,
@@ -166,11 +165,14 @@ describe("T4 permit transform (Property Improvement group)", () => {
         completion_date: null,
         permit_close_date: null,
         final_inspection_date: null,
-        ...Object.fromEntries(NULL_REQUIRED_ENUMS.map((key) => [key, null])),
+        improvement_type: "Electrical",
+        improvement_status: "Permitted",
+        improvement_action: null,
+        contractor_type: null,
         source_http_request: REQUEST,
         request_identifier: "900001",
       });
-      expect(files["property_improvement_2.json"]).toMatchObject({ permit_number: "2021-015319 BP", completion_date: "2021-05-24", permit_close_date: "2021-05-25" });
+      expect(files["property_improvement_2.json"]).toMatchObject({ permit_number: "2021-015319 BP", completion_date: "2021-05-24", permit_close_date: "2021-05-25", improvement_type: "GeneralBuilding", improvement_status: "Completed", improvement_action: "Repair", contractor_type: null });
       expect(files["relationship_property_has_property_improvement_2.json"]).toEqual({ from: { "/": "./property.json" }, to: { "/": "./property_improvement_2.json" } });
       const sidecar = JSON.parse(await readFile(path.join(parcelDir, PERMIT_SOURCE_PAYLOAD_FILENAME), "utf8"));
       expect(sidecar.published.map((item) => item.permit_number)).toEqual(["2019-000001 EP", "2021-015319 BP"]);

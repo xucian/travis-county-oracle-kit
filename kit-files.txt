@@ -44,6 +44,9 @@ skills/use-oracle/runtime/docs/evidence/travis-t3-window-verify-20261017T192341Z
 skills/use-oracle/runtime/docs/evidence/travis-t3-withheld-record-ids-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-t4-harvest-v1792239863.json
 skills/use-oracle/runtime/docs/evidence/travis-t4-link-proof-v1792239863.json
+skills/use-oracle/runtime/docs/evidence/travis-t4-point-9-measurements-2026-10-18.json
+skills/use-oracle/runtime/docs/evidence/travis-t4-retired-geo-ids-2026-10-18.json
+skills/use-oracle/runtime/docs/evidence/travis-t4-ruling-7-enum-check-2026-10-18.json
 skills/use-oracle/runtime/docs/evidence/travis-t4-run-2026-10-17.json
 skills/use-oracle/runtime/docs/evidence/travis-tcad-downloads-2026-10-16.jsonl
 skills/use-oracle/runtime/docs/evidence/travis-tcad-prop-counts-2026-10-16.json
@@ -57,6 +60,7 @@ skills/use-oracle/runtime/docs/travis-readiness-2026-10-16-us-egress.json
 skills/use-oracle/runtime/docs/travis-readiness-2026-10-16.json
 skills/use-oracle/runtime/docs/travis-sources.yaml
 skills/use-oracle/runtime/fixtures/travis-permits/profile/date-evidence.json
+skills/use-oracle/runtime/fixtures/travis-permits/profile/improvement-enums.json
 skills/use-oracle/runtime/fixtures/travis-permits/profile/status-group.json
 skills/use-oracle/runtime/fixtures/travis-permits/profile/tcad-id.json
 skills/use-oracle/runtime/fixtures/travis-permits/profile/work-class.json
@@ -112,6 +116,7 @@ skills/use-oracle/runtime/src/counties/travis/t4-permit-links.mjs
 skills/use-oracle/runtime/src/counties/travis/t4-permit-verify.mjs
 skills/use-oracle/runtime/src/counties/travis/t4-projection.mjs
 skills/use-oracle/runtime/src/counties/travis/t4-record.mjs
+skills/use-oracle/runtime/src/counties/travis/t4-retired-geo-id-study.mjs
 skills/use-oracle/runtime/src/counties/travis/t4-run.mjs
 skills/use-oracle/runtime/src/counties/travis/t4-sample.mjs
 skills/use-oracle/runtime/src/counties/travis/t4-shard-bench.mjs
@@ -138,6 +143,7 @@ skills/use-oracle/runtime/tests/travis-t4-permit-links.test.mjs
 skills/use-oracle/runtime/tests/travis-t4-permit-transform.test.mjs
 skills/use-oracle/runtime/tests/travis-t4-permit-verify.test.mjs
 skills/use-oracle/runtime/tests/travis-t4-projection.test.mjs
+skills/use-oracle/runtime/tests/travis-t4-retired-geo-id-study.test.mjs
 skills/use-oracle/runtime/tests/travis-t4-run.test.mjs
 skills/use-oracle/runtime/tests/travis-t4-sample.test.mjs
 skills/use-oracle/runtime/tests/travis-t4-shard-bench.test.mjs
