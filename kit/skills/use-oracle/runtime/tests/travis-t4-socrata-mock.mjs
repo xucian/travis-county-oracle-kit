@@ -2,7 +2,9 @@
  * Shared test helpers for the T4 permit tests: a mocked data.austintexas.gov for 3syk-w9eu (metadata, count, group-by
  * plan, partition pages) over a handful of synthetic permits. Not a test file itself.
  */
-import { mkdtemp, rm } from "node:fs/promises";
+import AdmZip from "adm-zip";
+import { createHash } from "node:crypto";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -104,3 +106,35 @@ export async function withOut(run) {
 
 export const context = (net) => ({ fetchImpl: net.fetchImpl, sleep: noSleep, log: silent });
 
+
+/**
+ * One account of a TCAD special export (JSON) with TCAD's own permits: `[permitNumber, refPropertyRoll, issueDate]`.
+ *
+ * @param {number} pID - Account id.
+ * @param {(string | null)[][]} permits - Listed permits.
+ * @param {string} [propType] - Account type.
+ * @returns {Record<string, any>} Account.
+ */
+export const tcadAccount = (pID, permits, propType = "R") => ({ pID, propType, links: [], permits: permits.map(([permitNumber, refPropertyRoll = null, issueDate = null]) => ({ permitNumber, refPropertyRoll, issueDate, projectNotes: "a } brace { inside a string" })) });
+
+/**
+ * A small TCAD special export (one JSON array of accounts in a zip) and its receipt, laid out like the capture of
+ * ruling 25.10 (`data/travis/t4-rulings/lineage/`).
+ *
+ * @param {string} dir - Directory.
+ * @param {Record<string, any>[]} accounts - Accounts.
+ * @param {{ file?: string, text?: string }} [options] - Zip file name; raw JSON text instead of the accounts.
+ * @returns {Promise<{ zipPath: string, receiptsPath: string, receipt: Record<string, any> }>} Paths and receipt.
+ */
+export async function writeSpecialExport(dir, accounts, { file = "2026-certified-json-supp-0.zip", text = null } = {}) {
+  await mkdir(dir, { recursive: true });
+  const zip = new AdmZip();
+  zip.addFile("Travis-protaxExport-test.json", Buffer.from(text ?? JSON.stringify(accounts, null, 1), "utf8"));
+  const zipPath = path.join(dir, file);
+  zip.writeZip(zipPath);
+  const bytes = await readFile(zipPath);
+  const receipt = { source: "t4-ruling-10-lineage", kind: "file", file, method: "GET", url: `https://traviscad.org/wp-content/largefiles/${file}`, fetched_at: "2026-10-18T05:19:33.067Z", status: 200, bytes: bytes.length, sha256: createHash("sha256").update(bytes).digest("hex"), headers: { "last-modified": "Wed, 22 Jul 2026 12:08:52 GMT" } };
+  const receiptsPath = path.join(dir, "receipts.jsonl");
+  await writeFile(receiptsPath, `${JSON.stringify({ ...receipt, kind: "probe", file: "other.html" })}\n${JSON.stringify(receipt)}\n`);
+  return { zipPath, receiptsPath, receipt };
+}

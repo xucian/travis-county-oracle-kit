@@ -1,13 +1,14 @@
 {
- "schemaVersion": "travis.t4-link-proof.v1",
- "kind": "T4 geo_id link proof and permit profile over the whole capture v1792239863 and the whole seed (441,961 accounts); work classifier v2, tcad_id evidence v2, parcel link v2 (out_of_county, decisions.md section 25.6)",
- "command": "node --max-old-space-size=12288 src/counties/travis/t4-permit-links.mjs",
- "kit_commit": "12708b4",
+ "schemaVersion": "travis.t4-link-proof.v2",
+ "kind": "T4 geo_id link proof and permit profile over the whole capture v1792239863 and the whole seed (441,961 accounts); work classifier v2, tcad_id evidence v2, parcel link v3 (out_of_county, decisions.md section 25.6; the tcad_permit_listing fallback for retired geo_ids, section 25.10)",
+ "command": "node --max-old-space-size=12288 src/counties/travis/t4-permit-links.mjs (the TCAD listing built first by node --max-old-space-size=8192 src/counties/travis/t4-tcad-permit-listing.mjs)",
+ "kit_commit": "00bea93",
  "resources": {
-  "wall_s": 95.96,
-  "max_rss_bytes": 1961377792
+  "wall_s": 97.3,
+  "max_rss_bytes": 5301682176,
+  "note": "the loaded listing holds about 0.4 GB of live heap; the rest of the resident set is garbage the 12 GB heap limit lets accumulate (v2 pass: 96.0 s, 1.96 GB)"
  },
- "link_pass_version": "travis-t4-link-pass.v1",
+ "link_pass_version": "travis-t4-link-pass.v2",
  "versions": {
   "status_group": "travis-status-group-v1",
   "lifecycle": "travis-lifecycle-v1",
@@ -15,7 +16,8 @@
   "date_evidence": "travis-date-evidence-v1",
   "tcad_id_normalization": "travis-tcad-id-digits-v1",
   "tcad_id_evidence": "travis-tcad-id-evidence-v2",
-  "parcel_link": "travis-parcel-link-v2"
+  "parcel_link": "travis-parcel-link-v3",
+  "tcad_permit_listing": "travis-tcad-permit-listing-v1"
  },
  "as_of_date": "2026-10-17",
  "roll": {
@@ -46,23 +48,25 @@
  },
  "link_method": {
   "exact": 1978992,
-  "normalized_digits": 0
+  "normalized_digits": 0,
+  "tcad_permit_listing": 7531
  },
  "unlinked_reasons": {
-  "no_candidate": 259419,
+  "no_candidate": 251888,
   "multiple_candidates": 38249,
   "invalid_quarantined": 178,
   "out_of_county": 103869
  },
  "no_candidate_detail": {
   "blank_tcad_id": 63019,
-  "ten_digit_not_in_roll": 196400
+  "ten_digit_not_in_roll": 188869
  },
  "by_permittype_link": {
   "BP": {
    "exact": 435019,
    "normalized_digits": 0,
-   "no_candidate": 56959,
+   "tcad_permit_listing": 6808,
+   "no_candidate": 50151,
    "multiple_candidates": 9060,
    "invalid_quarantined": 33,
    "out_of_county": 20280
@@ -70,7 +74,8 @@
   "DS": {
    "exact": 100101,
    "normalized_digits": 0,
-   "no_candidate": 9987,
+   "tcad_permit_listing": 1,
+   "no_candidate": 9986,
    "multiple_candidates": 649,
    "invalid_quarantined": 24,
    "out_of_county": 5888
@@ -78,7 +83,8 @@
   "EP": {
    "exact": 570769,
    "normalized_digits": 0,
-   "no_candidate": 78415,
+   "tcad_permit_listing": 523,
+   "no_candidate": 77892,
    "multiple_candidates": 10869,
    "invalid_quarantined": 37,
    "out_of_county": 29062
@@ -86,7 +92,8 @@
   "MP": {
    "exact": 420694,
    "normalized_digits": 0,
-   "no_candidate": 54405,
+   "tcad_permit_listing": 15,
+   "no_candidate": 54390,
    "multiple_candidates": 9639,
    "invalid_quarantined": 27,
    "out_of_county": 21765
@@ -94,7 +101,8 @@
   "PP": {
    "exact": 452409,
    "normalized_digits": 0,
-   "no_candidate": 59653,
+   "tcad_permit_listing": 184,
+   "no_candidate": 59469,
    "multiple_candidates": 8032,
    "invalid_quarantined": 57,
    "out_of_county": 26874
@@ -220,49 +228,60 @@
  },
  "roofing": {
   "permits": 206131,
-  "linked": 166650,
+  "linked": 170674,
   "by_status_group": {
    "closed": 195109,
    "stalled": 6609,
    "open": 4399,
    "needs_review": 14
   },
+  "by_status_group_linked": {
+   "closed": 161518,
+   "stalled": 5529,
+   "open": 3619,
+   "needs_review": 8
+  },
   "by_class_linked": {
-   "primary_roof_new_construction": 121637,
-   "accessory_roof": 23203,
-   "primary_roof_replacement": 20660,
-   "repair_or_coating": 1150
+   "primary_roof_new_construction": 125403,
+   "accessory_roof": 23328,
+   "primary_roof_replacement": 20786,
+   "repair_or_coating": 1157
+  },
+  "linked_by_method": {
+   "exact": 166650,
+   "normalized_digits": 0,
+   "tcad_permit_listing": 4024
   },
   "bp_rows": 521351
  },
  "jurisdiction_of_unlinked": {
-  "no_candidate:AUSTIN FULL PURPOSE": 211866,
+  "no_candidate:AUSTIN FULL PURPOSE": 205393,
   "no_candidate:(blank)": 24897,
   "multiple_candidates:AUSTIN FULL PURPOSE": 36441,
   "out_of_county:AUSTIN FULL PURPOSE": 88325,
-  "no_candidate:AUSTIN 2 MILE ETJ": 6038,
+  "no_candidate:AUSTIN 2 MILE ETJ": 5837,
   "out_of_county:AUSTIN 2 MILE ETJ": 12572,
   "no_candidate:OTHER": 1268,
-  "no_candidate:AUSTIN LTD": 10957,
+  "no_candidate:AUSTIN LTD": 10303,
   "multiple_candidates:WEST LAKE HILLS FULL PURPOSE": 353,
   "out_of_county:AUSTIN LTD": 271,
   "multiple_candidates:SB 2038 ETJ RELEASE": 60,
   "multiple_candidates:AUSTIN 2 MILE ETJ": 817,
-  "no_candidate:WEST LAKE HILLS FULL PURPOSE": 519,
-  "no_candidate:LAKEWAY FULL PURPOSE": 1402,
-  "no_candidate:SB 2038 ETJ RELEASE": 221,
+  "no_candidate:WEST LAKE HILLS FULL PURPOSE": 516,
+  "no_candidate:LAKEWAY FULL PURPOSE": 1256,
+  "no_candidate:SB 2038 ETJ RELEASE": 182,
   "no_candidate:LAGO VISTA ETJ": 17,
   "no_candidate:WEST LAKE HILLS ETJ": 172,
   "no_candidate:SUNSET VALLEY FULL PURPOSE": 29,
   "no_candidate:BASTROP ETJ": 46,
   "out_of_county:ROUND ROCK ETJ": 2644,
-  "no_candidate:AUSTIN 5 MILE ETJ": 929,
+  "no_candidate:AUSTIN 5 MILE ETJ": 921,
   "out_of_county:SB 2038 ETJ RELEASE": 42,
   "no_candidate:ROUND ROCK ETJ": 17,
   "multiple_candidates:AUSTIN LTD": 199,
   "multiple_candidates:THE HILLS FULL PURPOSE": 61,
   "no_candidate:BEE CAVE FULL PURPOSE": 731,
-  "no_candidate:BEE CAVE ETJ": 128,
+  "no_candidate:BEE CAVE ETJ": 123,
   "out_of_county:CEDAR PARK FULL PURPOSE": 10,
   "invalid_quarantined:AUSTIN FULL PURPOSE": 173,
   "invalid_quarantined:AUSTIN LTD": 5,
@@ -272,7 +291,7 @@
   "no_candidate:ROLLINGWOOD FULL PURPOSE": 40,
   "no_candidate:POINT VENTURE FULL PURPOSE": 2,
   "multiple_candidates:(blank)": 200,
-  "no_candidate:LAKEWAY ETJ": 79,
+  "no_candidate:LAKEWAY ETJ": 77,
   "multiple_candidates:AUSTIN 5 MILE ETJ": 39,
   "multiple_candidates:BEE CAVE FULL PURPOSE": 9,
   "no_candidate:THE HILLS FULL PURPOSE": 11,
@@ -284,17 +303,17 @@
   "no_candidate:PFLUGERVILLE ETJ": 1,
   "no_candidate:MUSTANG RIDGE ETJ": 3
  },
- "linked": 1978992,
- "unlinked": 401715,
- "linked_share": 0.8313,
- "linked_parcels": 232640,
+ "linked": 1986523,
+ "unlinked": 394184,
+ "linked_share": 0.8344,
+ "linked_parcels": 237533,
  "issue_date_max": "2026-10-16",
  "permits_per_linked_parcel": {
   "p50": 6,
   "p90": 13,
-  "p99": 58,
+  "p99": 56,
   "max": 13418,
-  "mean": 8.51
+  "mean": 8.36
  },
  "status_vocabulary": {
   "distinct": 25,
@@ -362,7 +381,141 @@
     "in_roll": 352220
    }
   },
-  "note": "a 10-digit tcad_id that no 2026 roll account prints (no_candidate): a geo_id retired since the permit, for example a tract later subdivided; it stays unlinked (decisions.md section 5 links on geo_id only)"
+  "note": "a 10-digit tcad_id that no 2026 roll account prints: a geo_id retired since the permit, for example a tract later subdivided; it links only through TCAD's permit listing when that names exactly one current account (tcad_permit_listing, travis-parcel-link-v3, decisions.md section 25.10), else it stays no_candidate; rows counts every such permit, linked or not"
+ },
+ "tcad_permit_listing": {
+  "listing_version": "travis-tcad-permit-listing-v1",
+  "source": {
+   "dataset": "tcad-2026-certified-special-export-json",
+   "url": "https://traviscad.org/wp-content/largefiles/2026%20Certified%20JSON%20SUPP%200%2007182026.zip",
+   "file": "2026-certified-json-supp-0.zip",
+   "fetched_at": "2026-10-18T05:19:33.067Z",
+   "bytes": 3554021795,
+   "sha256": "6f7a758568fd03fa200e996d2756559eb53e13241238a004cbadac09ff4c2346",
+   "receipts": "data/travis/t4-rulings/lineage/receipts.jsonl",
+   "last_modified": "Wed, 22 Jul 2026 12:08:52 GMT",
+   "etag": "\"6a60b2d4-d3d611a3\""
+  },
+  "listing": {
+   "dir": "data/travis/tcad-permit-listing/6f7a758568fd03fa",
+   "sha256": "7b2bf8e62af758aad4bd1ca53557a4d1fd1f3fc87731a6ecad4ee05f8a96a999",
+   "rows": 1121918,
+   "permit_numbers": 781459,
+   "accounts_listing_permits": 341900
+  },
+  "precedence": "exact geo_id, then normalized_digits; the listing only for a ten-digit tcad_id that no current account prints, and only when it names exactly one current account; anything else stays no_candidate",
+  "retired": {
+   "permits": 196400,
+   "linked": 7531,
+   "listed_on_several_current_accounts": 463,
+   "listed_on_other_accounts_only": 26,
+   "not_listed": 188380,
+   "linked_ref_property_roll": {
+    "printed": 4468,
+    "linked_account_geo_id": 294,
+    "blank": 253,
+    "other": 2516
+   },
+   "linked_issue_date_equal": 7121,
+   "linked_by_permittype": {
+    "BP": 6808,
+    "DS": 1,
+    "EP": 523,
+    "MP": 15,
+    "PP": 184
+   },
+   "linked_parcels": 5034,
+   "parcels_linked_only_through_listing": 4893
+  },
+  "overlap_with_exact": {
+   "exact_links": 1978992,
+   "listed_on_one_current_account": 222931,
+   "agree": 216904,
+   "listed_on_several_current_accounts": 1611,
+   "several_include_the_linked_account": 1553,
+   "listed_on_other_accounts_only": 99,
+   "not_listed": 1754351,
+   "ref_property_roll_equals_printed_when_listed_on_one": 181923,
+   "agree_when_ref_property_roll_equals_printed": 178879,
+   "by_permittype": {
+    "BP": {
+     "listed_on_one_current_account": 202591,
+     "agree": 197314
+    },
+    "DS": {
+     "listed_on_one_current_account": 157,
+     "agree": 153
+    },
+    "EP": {
+     "listed_on_one_current_account": 13306,
+     "agree": 12789
+    },
+    "MP": {
+     "listed_on_one_current_account": 1321,
+     "agree": 1262
+    },
+    "PP": {
+     "listed_on_one_current_account": 5556,
+     "agree": 5386
+    }
+   },
+   "roofing": {
+    "listed_on_one_current_account": 64734,
+    "agree": 62918,
+    "agreement_share": 0.9719
+   },
+   "agreement_share": 0.973
+  }
+ },
+ "readme_impact": {
+  "definitions": {
+   "not_on_a_property": "loaded internally and counted under limitations, never published on a property (README.md 13, 105, 110)",
+   "anchor_eligible": "primary_roof_replacement or primary_roof_new_construction, lifecycle completed, completed_date confirmed_present"
+  },
+  "roofing": {
+   "permits": 206131,
+   "linked": 170674,
+   "not_on_a_property": 35457,
+   "not_on_a_property_retired_geo_id": 19226
+  },
+  "open_roofing": {
+   "permits": 4399,
+   "linked": 3619,
+   "not_on_a_property": 780,
+   "not_on_a_property_retired_geo_id": 679
+  },
+  "stalled_roofing": {
+   "permits": 6609,
+   "linked": 5529,
+   "not_on_a_property": 1080,
+   "not_on_a_property_retired_geo_id": 707
+  },
+  "retired_geo_id_roofing": {
+   "permits": 23250,
+   "linked": 4024,
+   "open": 700,
+   "open_linked": 21,
+   "stalled": 849,
+   "stalled_linked": 142,
+   "anchor_eligible": 19053,
+   "anchor_eligible_linked": 3658
+  },
+  "recovered_by_tcad_permit_listing": {
+   "permits": 7531,
+   "roofing": 4024,
+   "open_roofing": 21,
+   "stalled_roofing": 142,
+   "anchor_eligible": 3658
+  },
+  "roof_age_anchor": {
+   "seed_parcels": 441961,
+   "parcels_with_an_anchor_through_geo_id": 105663,
+   "parcels_with_an_anchor": 108733,
+   "parcels_whose_anchor_comes_only_through_the_listing": 3070,
+   "parcels_without_a_permit_anchor": 333228,
+   "anchor_eligible_permits_unlinked_on_retired_geo_ids": 15395,
+   "note": "a parcel without a permit anchor falls back to the built year (low confidence) or to no age; the anchor-eligible permits that stay unlinked sit on parcels no public source names, so at most that many more parcels fall back because of them"
+  }
  },
  "needs_review_descriptions_top": [
   {
@@ -527,8 +680,8 @@
   }
  ],
  "needs_review_distinct_descriptions": 4925,
- "elapsed_ms": 88838,
- "rows_per_minute": 1607903,
+ "elapsed_ms": 89672,
+ "rows_per_minute": 1592946,
  "capture": {
   "dir": "data/travis/permits/v1792239863",
   "dataset": "austin-issued-construction-permits/3syk-w9eu",
@@ -545,6 +698,6 @@
   "path": "data/seeds/travis.csv",
   "sha256": "8b79ca01f6bad5332b0fc82122d6d3783a582815e86fd7c9dd10e400620e17f8",
   "rows": 441961,
-  "read_ms": 6719
+  "read_ms": 6749
  }
 }

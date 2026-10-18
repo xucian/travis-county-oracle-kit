@@ -22,7 +22,8 @@
  *
  * Everything without a lexicon home (description, printed status, expiry, permit class and work class, the printed
  * contractor fields, coordinates, the public permit page, valuations, the profile's classification and evidence, the
- * row digest and locator) goes to the sidecar `permit-source-payload.json` beside `data/`, never into the archive.
+ * link and its evidence - for a `tcad_permit_listing` link, TCAD's listed entries on the linked account - and the row
+ * digest and locator) goes to the sidecar `permit-source-payload.json` beside `data/`, never into the archive.
  *
  * A permit number printed on two rows that differ is `conflicting`: both rows stay in the sidecar and neither is
  * written into the group. Identical repeated rows are written once.
@@ -195,7 +196,7 @@ function payloadOf(entry, dateEvidence) {
     printed: entry.row,
     profile: entry.profile ?? null,
     date_evidence: dateEvidence,
-    link: { property_id: entry.link.propertyId, property_link: entry.link.propertyLink, tcad_id_evidence: entry.link.tcadIdEvidence },
+    link: { property_id: entry.link.propertyId, property_link: entry.link.propertyLink, tcad_id_evidence: entry.link.tcadIdEvidence, listing: entry.link.listing ?? null, listing_entries: entry.listingEntries ?? null },
     capture: { file: entry.file, row_index: entry.index, row_sha256: entry.rowSha256, receipt_sha256: entry.receiptSha256 ?? null, fetched_at: entry.fetchedAt, source_http_request: entry.request },
   };
 }

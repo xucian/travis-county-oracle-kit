@@ -18,7 +18,6 @@
  *
  * @module counties/travis/t4-retired-geo-id-study
  */
-import { spawn } from "node:child_process";
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
@@ -28,67 +27,11 @@ import { classifyDateEvidence, summarizePermitRow } from "./permit-profile.mjs";
 import { RUNTIME_ROOT } from "./t3-snapshot.mjs";
 import { DEFAULT_SEED, readRollGeoIndex, streamCapturedPermits, streamCsvFile } from "./t4-permit-links.mjs";
 import { latestCapture } from "./t4-permit-verify.mjs";
+import { forEachArrayElement, zipMemberStream } from "./t4-tcad-permit-listing.mjs";
+
+export { forEachArrayElement };
 
 export const STUDY_VERSION = "travis-t4-retired-geo-id-study.v1";
-
-/**
- * Stream one zip member through `tar -xOf` (libarchive reads zip64).
- *
- * @param {string} zipPath - Zip file.
- * @param {string | null} [member] - Member name (all members when null).
- * @returns {import("node:stream").Readable} Member bytes.
- */
-function zipMemberStream(zipPath, member = null) {
-  const child = spawn("tar", ["-xOf", zipPath, ...(member ? [member] : [])], { stdio: ["ignore", "pipe", "inherit"] });
-  return child.stdout;
-}
-
-/**
- * Split a top-level JSON array into its element texts (string-aware brace depth), calling `onObject` for each.
- *
- * @param {import("node:stream").Readable} stream - JSON text.
- * @param {(text: string) => void} onObject - Element handler.
- * @returns {Promise<number>} Elements seen.
- */
-export async function forEachArrayElement(stream, onObject) {
-  stream.setEncoding("utf8");
-  let depth = 0;
-  let inString = false;
-  let escaped = false;
-  let buffer = "";
-  let start = -1;
-  let count = 0;
-  for await (const chunk of stream) {
-    const base = buffer.length;
-    buffer += chunk;
-    for (let index = base; index < buffer.length; index += 1) {
-      const code = buffer.charCodeAt(index);
-      if (inString) {
-        if (escaped) escaped = false;
-        else if (code === 92) escaped = true;
-        else if (code === 34) inString = false;
-        continue;
-      }
-      if (code === 34) inString = true;
-      else if (code === 123 || code === 91) {
-        depth += 1;
-        if (depth === 2 && code === 123) start = index;
-      } else if (code === 125 || code === 93) {
-        if (depth === 2 && code === 125 && start >= 0) {
-          onObject(buffer.slice(start, index + 1));
-          count += 1;
-          start = -1;
-        }
-        depth -= 1;
-      }
-    }
-    if (start >= 0) {
-      buffer = buffer.slice(start);
-      start = 0;
-    } else buffer = "";
-  }
-  return count;
-}
 
 /**
  * Every account of the TCAD JSON export, reduced to what the study needs.

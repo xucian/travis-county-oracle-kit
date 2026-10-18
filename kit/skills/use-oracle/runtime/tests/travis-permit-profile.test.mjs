@@ -13,14 +13,18 @@ import {
   CLOSED_STATUSES,
   EXCLUSION_TERMS,
   EXPIRED_STATUS,
+  LINK_CONFIDENCE,
+  LINK_METHODS,
   NEW_BUILDING_PERMIT_CLASSES,
   OBSERVED_UNMAPPED_STATUSES,
   OPEN_STATUSES,
+  PARCEL_LINK_VERSION,
   REPAIR_TERMS,
   REPLACEMENT_TERMS,
   ROOFING_WORK_CLASSES,
   STATUS_GROUP_VERSION,
   TCAD_ID_EVIDENCE_VERSION,
+  TCAD_PERMIT_LISTING_VERSION,
   TCAD_ID_NORMALIZATION_VERSION,
   TRAVIS_PERMIT_SOURCE_SYSTEM,
   TRAVIS_ROOF_AGE_PROFILE_VERSION,
@@ -269,6 +273,39 @@ describe("Travis tcad_id evidence, normalization proof and parcel link", () => {
 
     const exact = linkPermitToParcel({ tcadId: "0219080719", parcelsByGeoId });
     expect(exact.propertyLink).toEqual({ match_method: "exact", normalization_version: null, confidence: "exact" });
+  });
+
+  it("reads TCAD's permit listing only for a retired id, and links only to exactly one current account (ruling 25.10)", async () => {
+    const fixture = await loadJson(PROFILE_FIXTURES, "tcad-id.json");
+    expect(fixture.parcel_link_version).toBe(PARCEL_LINK_VERSION);
+    expect(fixture.listing_version).toBe(TCAD_PERMIT_LISTING_VERSION);
+    expect(LINK_METHODS).toEqual(["exact", "normalized_digits", "tcad_permit_listing"]);
+    const sourceSha256 = "a".repeat(64);
+    for (const testCase of fixture.listing_cases) {
+      const reads = [];
+      const permitListing = {
+        version: TCAD_PERMIT_LISTING_VERSION,
+        sourceSha256,
+        accountsFor: (number) => {
+          reads.push(number);
+          return testCase.listing[String(number).trim()] ?? [];
+        },
+        rollPropIds: new Set(testCase.roll),
+      };
+      const result = linkPermitToParcel({ tcadId: testCase.tcad_id, permitNumber: testCase.permit_number, parcelsByGeoId: new Map(Object.entries(testCase.parcels_by_geo_id)), permitListing });
+      expect(result.propertyId, testCase.name).toBe(testCase.expected_property_id);
+      expect(result.propertyLink?.match_method ?? null, testCase.name).toBe(testCase.expected_match_method);
+      expect(result.unlinkedReason, testCase.name).toBe(testCase.expected_unlinked_reason);
+      expect(result.listing, testCase.name).toEqual(testCase.expected_listing);
+      // The listing is consulted only where the printed id names no current parcel.
+      expect(reads.length > 0, testCase.name).toBe(testCase.expected_listing !== null);
+      if (testCase.expected_match_method === "tcad_permit_listing") {
+        expect(result.propertyLink, testCase.name).toEqual({ match_method: "tcad_permit_listing", normalization_version: null, confidence: LINK_CONFIDENCE.tcad_permit_listing, listing_version: TCAD_PERMIT_LISTING_VERSION, listing_source_sha256: sourceSha256 });
+      }
+    }
+    expect(LINK_CONFIDENCE.tcad_permit_listing).toBe("official_listing");
+    // Without the listing a retired id stays no_candidate (the v2 behaviour).
+    expect(linkPermitToParcel({ tcadId: "0999999999", permitNumber: "2021-000003 BP", parcelsByGeoId: new Map() })).toMatchObject({ propertyId: null, unlinkedReason: "no_candidate", listing: null });
   });
 });
 

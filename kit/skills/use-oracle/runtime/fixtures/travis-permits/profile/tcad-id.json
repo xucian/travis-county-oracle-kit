@@ -203,5 +203,303 @@
     }
   ],
   "evidence_version": "travis-tcad-id-evidence-v2",
-  "parcel_link_version": "travis-parcel-link-v2"
+  "parcel_link_version": "travis-parcel-link-v3",
+  "listing_version": "travis-tcad-permit-listing-v1",
+  "listing_cases": [
+    {
+      "name": "exact geo_id wins over a listing that names another account",
+      "tcad_id": "0219080719",
+      "permit_number": "2021-000001 BP",
+      "parcels_by_geo_id": {
+        "0219080719": [
+          "123456"
+        ]
+      },
+      "listing": {
+        "2021-000001 BP": [
+          "654321"
+        ]
+      },
+      "roll": [
+        "123456",
+        "123457",
+        "654321",
+        "654322"
+      ],
+      "expected_property_id": "123456",
+      "expected_match_method": "exact",
+      "expected_unlinked_reason": null,
+      "expected_listing": null,
+      "note": "precedence: the listing is never read when the printed id names a parcel"
+    },
+    {
+      "name": "a shared geo_id stays multiple_candidates even when the listing names one account",
+      "tcad_id": "0219080719",
+      "permit_number": "2021-000002 BP",
+      "parcels_by_geo_id": {
+        "0219080719": [
+          "123456",
+          "123457"
+        ]
+      },
+      "listing": {
+        "2021-000002 BP": [
+          "123456"
+        ]
+      },
+      "roll": [
+        "123456",
+        "123457",
+        "654321",
+        "654322"
+      ],
+      "expected_property_id": null,
+      "expected_match_method": null,
+      "expected_unlinked_reason": "multiple_candidates",
+      "expected_listing": null,
+      "note": "precedence: the listing applies to retired ids only, never to shared ones"
+    },
+    {
+      "name": "a retired id links to the one current account the listing names",
+      "tcad_id": "0999999999",
+      "permit_number": "2021-000003 BP",
+      "parcels_by_geo_id": {
+        "0219080719": [
+          "123456"
+        ]
+      },
+      "listing": {
+        "2021-000003 BP": [
+          "654321"
+        ]
+      },
+      "roll": [
+        "123456",
+        "123457",
+        "654321",
+        "654322"
+      ],
+      "expected_property_id": "654321",
+      "expected_match_method": "tcad_permit_listing",
+      "expected_unlinked_reason": null,
+      "expected_listing": {
+        "listed_accounts": 1,
+        "current_accounts": 1
+      }
+    },
+    {
+      "name": "the listing key is the permit number as printed, trimmed",
+      "tcad_id": "0999999999",
+      "permit_number": " 2021-000003 BP ",
+      "parcels_by_geo_id": {
+        "0219080719": [
+          "123456"
+        ]
+      },
+      "listing": {
+        "2021-000003 BP": [
+          "654321"
+        ]
+      },
+      "roll": [
+        "123456",
+        "123457",
+        "654321",
+        "654322"
+      ],
+      "expected_property_id": "654321",
+      "expected_match_method": "tcad_permit_listing",
+      "expected_unlinked_reason": null,
+      "expected_listing": {
+        "listed_accounts": 1,
+        "current_accounts": 1
+      }
+    },
+    {
+      "name": "one current account plus an account outside the roll is still one current account",
+      "tcad_id": "0999999999",
+      "permit_number": "2021-000004 BP",
+      "parcels_by_geo_id": {
+        "0219080719": [
+          "123456"
+        ]
+      },
+      "listing": {
+        "2021-000004 BP": [
+          "654321",
+          "700001"
+        ]
+      },
+      "roll": [
+        "123456",
+        "123457",
+        "654321",
+        "654322"
+      ],
+      "expected_property_id": "654321",
+      "expected_match_method": "tcad_permit_listing",
+      "expected_unlinked_reason": null,
+      "expected_listing": {
+        "listed_accounts": 2,
+        "current_accounts": 1
+      },
+      "note": "700001 is not a seed account (for example a business personal property account)"
+    },
+    {
+      "name": "several current accounts are ambiguous and stay no_candidate",
+      "tcad_id": "0999999999",
+      "permit_number": "2021-000005 BP",
+      "parcels_by_geo_id": {
+        "0219080719": [
+          "123456"
+        ]
+      },
+      "listing": {
+        "2021-000005 BP": [
+          "654321",
+          "654322"
+        ]
+      },
+      "roll": [
+        "123456",
+        "123457",
+        "654321",
+        "654322"
+      ],
+      "expected_property_id": null,
+      "expected_match_method": null,
+      "expected_unlinked_reason": "no_candidate",
+      "expected_listing": {
+        "listed_accounts": 2,
+        "current_accounts": 2
+      }
+    },
+    {
+      "name": "a listing on accounts outside the roll only stays no_candidate",
+      "tcad_id": "0999999999",
+      "permit_number": "2021-000006 BP",
+      "parcels_by_geo_id": {
+        "0219080719": [
+          "123456"
+        ]
+      },
+      "listing": {
+        "2021-000006 BP": [
+          "700001"
+        ]
+      },
+      "roll": [
+        "123456",
+        "123457",
+        "654321",
+        "654322"
+      ],
+      "expected_property_id": null,
+      "expected_match_method": null,
+      "expected_unlinked_reason": "no_candidate",
+      "expected_listing": {
+        "listed_accounts": 1,
+        "current_accounts": 0
+      }
+    },
+    {
+      "name": "an unlisted retired id stays no_candidate",
+      "tcad_id": "0999999999",
+      "permit_number": "2021-000007 BP",
+      "parcels_by_geo_id": {
+        "0219080719": [
+          "123456"
+        ]
+      },
+      "listing": {},
+      "roll": [
+        "123456",
+        "123457",
+        "654321",
+        "654322"
+      ],
+      "expected_property_id": null,
+      "expected_match_method": null,
+      "expected_unlinked_reason": "no_candidate",
+      "expected_listing": {
+        "listed_accounts": 0,
+        "current_accounts": 0
+      }
+    },
+    {
+      "name": "a blank tcad_id never reads the listing",
+      "tcad_id": "",
+      "permit_number": "2021-000008 BP",
+      "parcels_by_geo_id": {
+        "0219080719": [
+          "123456"
+        ]
+      },
+      "listing": {
+        "2021-000008 BP": [
+          "654321"
+        ]
+      },
+      "roll": [
+        "123456",
+        "123457",
+        "654321",
+        "654322"
+      ],
+      "expected_property_id": null,
+      "expected_match_method": null,
+      "expected_unlinked_reason": "no_candidate",
+      "expected_listing": null
+    },
+    {
+      "name": "a Williamson CAD account never reads the listing",
+      "tcad_id": "R320021",
+      "permit_number": "2021-000009 BP",
+      "parcels_by_geo_id": {
+        "0219080719": [
+          "123456"
+        ]
+      },
+      "listing": {
+        "2021-000009 BP": [
+          "654321"
+        ]
+      },
+      "roll": [
+        "123456",
+        "123457",
+        "654321",
+        "654322"
+      ],
+      "expected_property_id": null,
+      "expected_match_method": null,
+      "expected_unlinked_reason": "out_of_county",
+      "expected_listing": null
+    },
+    {
+      "name": "a malformed id never reads the listing",
+      "tcad_id": "150986",
+      "permit_number": "2021-000010 BP",
+      "parcels_by_geo_id": {
+        "0219080719": [
+          "123456"
+        ]
+      },
+      "listing": {
+        "2021-000010 BP": [
+          "654321"
+        ]
+      },
+      "roll": [
+        "123456",
+        "123457",
+        "654321",
+        "654322"
+      ],
+      "expected_property_id": null,
+      "expected_match_method": null,
+      "expected_unlinked_reason": "invalid_quarantined",
+      "expected_listing": null
+    }
+  ]
 }

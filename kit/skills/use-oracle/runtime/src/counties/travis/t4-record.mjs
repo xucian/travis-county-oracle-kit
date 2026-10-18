@@ -6,8 +6,12 @@
  *   node src/counties/travis/t4-record.mjs --pilot <run-dir> --pilot-none <run-dir> --drill <run-dir> --feasibility <run-dir> \
  *     [--capture <dir>] [--link-proof <evidence.json>] [--harvest <evidence.json>] [--readiness <report.json>] [--tests <summary>] \
  *     [--bench-county <shard-bench.json>] [--bench-property_improvement <shard-bench.json>] [--more-bench <file,file>] [--kit-commit <sha>] \
- *     [--size-projection <file>] \
+ *     [--size-projection <file>] [--projection-run <run-dir>] [--ruling-10 <evidence.json>] \
  *     --out docs/evidence/travis-t4-run-<date>.json
+ *
+ * `--projection-run` names the feasibility run the projection is measured on (default `--feasibility`): the shard
+ * benchmarks of decisions.md 25.9 measured one run, and the projection stays on it while its full-scale counts come from
+ * the current link proof.
  *
  * @module counties/travis/t4-record
  */
@@ -76,6 +80,34 @@ function runSummary(run) {
   };
 }
 
+/** @param {number} value @returns {string} */
+const n = (value) => value.toLocaleString("en-US");
+
+/**
+ * The `no_candidate` limitation: what stays unlinked, with its roofing share (README.md 13, 33, 105, 110).
+ *
+ * @param {Record<string, any>} linkProof - Link proof.
+ * @returns {string} Detail.
+ */
+export function noCandidateDetail(linkProof) {
+  const retired = linkProof.tcad_permit_listing?.retired;
+  if (!retired) return `${n(linkProof.ten_digit_not_in_roll.rows)} permits on ${n(linkProof.ten_digit_not_in_roll.distinct_geo_ids)} geo_ids no 2026 account prints, and ${n(linkProof.no_candidate_detail.blank_tcad_id)} with a blank tcad_id: loaded internally, not linked to a property (decisions.md section 25.10)`;
+  const impact = linkProof.readme_impact;
+  return `${n(linkProof.unlinked_reasons.no_candidate)} permits: ${n(linkProof.no_candidate_detail.ten_digit_not_in_roll)} on geo_ids no 2026 account prints that TCAD's permit listing does not attribute to exactly one current account (${n(retired.listed_on_several_current_accounts)} listed on several, ${n(retired.listed_on_other_accounts_only)} only on accounts outside the roll, ${n(retired.not_listed)} not listed) and ${n(linkProof.no_candidate_detail.blank_tcad_id)} with a blank tcad_id: loaded internally, not linked to a property. Among the retired-id permits ${n(impact.roofing.not_on_a_property_retired_geo_id)} are roofing permits (${n(impact.open_roofing.not_on_a_property_retired_geo_id)} open, ${n(impact.stalled_roofing.not_on_a_property_retired_geo_id)} stalled) and ${n(impact.roof_age_anchor.anchor_eligible_permits_unlinked_on_retired_geo_ids)} could anchor a roof age; their parcels are unknown, so at most that many parcels fall back to the built year because of them (decisions.md section 25.10)`;
+}
+
+/**
+ * The limitation of the `tcad_permit_listing` links.
+ *
+ * @param {Record<string, any>} linkProof - Link proof.
+ * @returns {string} Detail.
+ */
+export function listingLinkDetail(linkProof) {
+  const listing = linkProof.tcad_permit_listing;
+  const impact = linkProof.readme_impact;
+  return `${n(listing.retired.linked)} permits on retired geo_ids (${n(impact.recovered_by_tcad_permit_listing.roofing)} roofing, ${n(impact.recovered_by_tcad_permit_listing.open_roofing)} open) are linked through TCAD's own permit listing (match_method tcad_permit_listing, confidence official_listing), not through the geo_id they print, which stays the retired id as printed; on the ${n(listing.overlap_with_exact.listed_on_one_current_account)} exactly linked permits TCAD lists on one account it names the same account ${(listing.overlap_with_exact.agreement_share * 100).toFixed(2)}% of the time; a roof-age anchor from such a permit carries the caveat anchor_link_tcad_permit_listing (decisions.md section 25.10)`;
+}
+
 /** @param {string[]} argv @returns {Record<string, string>} */
 function parseFlags(argv) {
   /** @type {Record<string, string>} */
@@ -92,6 +124,8 @@ async function main() {
   for (const required of ["pilot", "pilot-none", "drill", "feasibility", "out"]) if (!flags[required]) throw new Error(`--${required} is required`);
   const load = (dir) => readJson(path.join(path.resolve(dir), "t4-run.json"));
   const [pilot, none, drill, feasibility] = await Promise.all([load(flags.pilot), load(flags["pilot-none"]), load(flags.drill), load(flags.feasibility)]);
+  const projectionRun = flags["projection-run"] ? await load(flags["projection-run"]) : feasibility;
+  const ruling10 = flags["ruling-10"] ? await readJson(path.resolve(flags["ruling-10"])) : null;
   const captureDir = path.resolve(flags.capture ?? (await latestCapture()));
   const harvest = await readJson(path.resolve(flags.harvest ?? path.join(RUNTIME_ROOT, "docs", "evidence", "travis-t4-harvest-v1792239863.json")));
   const linkProof = await readJson(path.resolve(flags["link-proof"] ?? path.join(RUNTIME_ROOT, "docs", "evidence", "travis-t4-link-proof-v1792239863.json")));
@@ -101,7 +135,7 @@ async function main() {
   const shardBench = {};
   for (const group of ["county", "property_improvement"]) if (flags[`bench-${group}`]) shardBench[group] = await readJson(path.resolve(flags[`bench-${group}`]));
   const projection = projectFullRun({
-    run: feasibility,
+    run: projectionRun,
     harvest: { elapsed_ms: harvest.harvest.throughput.elapsed_ms, rows: harvest.harvest.rows, bytes: harvest.harvest.bytes, requests: harvest.harvest.requests },
     full: { rows: linkProof.rows, linked: linkProof.linked, linked_parcels: linkProof.linked_parcels, seed_rows: linkProof.roll.seed_rows },
     shardBench,
@@ -146,6 +180,18 @@ async function main() {
       roll: linkProof.roll,
       williamson_cad_tcad_id: { account_form_rows: linkProof.williamson_cad_tcad_id.account_form_rows, marker_rows: linkProof.williamson_cad_tcad_id.marker_rows, with_coordinates: linkProof.williamson_cad_tcad_id.with_coordinates, north_of_30_40: linkProof.williamson_cad_tcad_id.north_of_30_40 },
       ten_digit_not_in_roll: { rows: linkProof.ten_digit_not_in_roll.rows, distinct_geo_ids: linkProof.ten_digit_not_in_roll.distinct_geo_ids },
+      tcad_permit_listing: linkProof.tcad_permit_listing
+        ? {
+            listing_version: linkProof.tcad_permit_listing.listing_version,
+            source: { url: linkProof.tcad_permit_listing.source.url, fetched_at: linkProof.tcad_permit_listing.source.fetched_at, bytes: linkProof.tcad_permit_listing.source.bytes, sha256: linkProof.tcad_permit_listing.source.sha256, receipts: linkProof.tcad_permit_listing.source.receipts },
+            listing: linkProof.tcad_permit_listing.listing,
+            precedence: linkProof.tcad_permit_listing.precedence,
+            retired: linkProof.tcad_permit_listing.retired,
+            overlap_with_exact: { listed_on_one_current_account: linkProof.tcad_permit_listing.overlap_with_exact.listed_on_one_current_account, agree: linkProof.tcad_permit_listing.overlap_with_exact.agree, agreement_share: linkProof.tcad_permit_listing.overlap_with_exact.agreement_share, roofing: linkProof.tcad_permit_listing.overlap_with_exact.roofing },
+            classification: ruling10?.classification?.decision ?? null,
+            evidence: "docs/evidence/travis-t4-ruling-10-tcad-listing-2026-10-18.json",
+          }
+        : null,
       permit_number: linkProof.permit_number,
     },
     evidence_states: linkProof.evidence_states,
@@ -162,12 +208,15 @@ async function main() {
     },
     pilot: { all: runSummary(pilot), appraisal_only: runSummary(none), fault_drill: runSummary(drill) },
     feasibility: runSummary(feasibility),
+    readme_impact: linkProof.readme_impact ? { ...linkProof.readme_impact, before_ruling_25_10: ruling10?.readme_impact?.before ?? null, evidence: "docs/evidence/travis-t4-ruling-10-tcad-listing-2026-10-18.json" } : null,
+    projection_basis: projectionRun === feasibility ? "the feasibility run above" : `the feasibility run ${projectionRun.run_dir}, which the shard benchmarks and the size projection measured (decisions.md section 25.9), with the full-scale counts of the current link proof`,
     projection,
     shard_bench: [...Object.values(shardBench), ...extraBench].map((bench) => ({ group: bench.group, tag: bench.tag ?? null, started_at: bench.started_at ?? null, parcels: bench.parcels, shards: bench.shards, wall_ms: bench.wall_ms, wall_ms_per_parcel: bench.wall_ms_per_parcel, memory: bench.memory ?? null, all_passed: bench.all_passed, shard_ms: bench.results.map((result) => result.ms) })),
     size_projection: flags["size-projection"] ? await readJson(path.resolve(flags["size-projection"])) : null,
     limitations: [
       { source: PERMIT_SOURCE, availability: "supported_partial", source_access_status: "available", incomplete_reason: "out_of_county", detail: `${linkProof.unlinked_reasons.out_of_county.toLocaleString("en-US")} Austin permits on Williamson County parcels (tcad_id printed as a Williamson CAD account): outside Travis, left out of the Travis permit totals (decisions.md section 25.6)`, evidence: "docs/evidence/travis-t4-link-proof-v1792239863.json", records_request: null },
-      { source: PERMIT_SOURCE, availability: "supported_partial", source_access_status: "available", incomplete_reason: "no_candidate", detail: `${linkProof.ten_digit_not_in_roll.rows.toLocaleString("en-US")} permits on ${linkProof.ten_digit_not_in_roll.distinct_geo_ids.toLocaleString("en-US")} geo_ids no 2026 account prints, and ${linkProof.no_candidate_detail.blank_tcad_id.toLocaleString("en-US")} with a blank tcad_id: loaded internally, not linked to a property (decisions.md section 25.10)`, evidence: "docs/evidence/travis-t4-retired-geo-ids-2026-10-18.json", records_request: null },
+      { source: PERMIT_SOURCE, availability: "supported_partial", source_access_status: "available", incomplete_reason: "no_candidate", detail: noCandidateDetail(linkProof), evidence: linkProof.tcad_permit_listing?.retired ? "docs/evidence/travis-t4-ruling-10-tcad-listing-2026-10-18.json" : "docs/evidence/travis-t4-retired-geo-ids-2026-10-18.json", records_request: null },
+      ...(linkProof.tcad_permit_listing?.retired ? [{ source: PERMIT_SOURCE, availability: "supported_partial", source_access_status: "available", incomplete_reason: "tcad_permit_listing_link", detail: listingLinkDetail(linkProof), evidence: "docs/evidence/travis-t4-ruling-10-tcad-listing-2026-10-18.json", records_request: null }] : []),
       { source: PERMIT_SOURCE, availability: "supported_partial", source_access_status: "available", incomplete_reason: "multiple_candidates", detail: `${linkProof.unlinked_reasons.multiple_candidates.toLocaleString("en-US")} permits on ${linkProof.roll.shared_geo_ids.toLocaleString("en-US")} geo_ids shared by ${linkProof.roll.accounts_on_shared_geo_ids.toLocaleString("en-US")} accounts (mostly condominium regimes): not linked to one property`, evidence: "docs/evidence/travis-t4-link-proof-v1792239863.json", records_request: null },
       { source: PERMIT_SOURCE, availability: "supported_partial", source_access_status: "available", incomplete_reason: "invalid_quarantined", detail: `${linkProof.unlinked_reasons.invalid_quarantined.toLocaleString("en-US")} permits with a malformed tcad_id`, evidence: "docs/evidence/travis-t4-link-proof-v1792239863.json", records_request: null },
       { source: PERMIT_SOURCE, availability: "supported_partial", source_access_status: "available", incomplete_reason: "status_indexed_only", detail: "the status is the daily export's value with its capture time; open roofing permits are not refreshed from the permit's live page in v1", evidence: "docs/decisions.md section 5", records_request: null },

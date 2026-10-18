@@ -1,0 +1,219 @@
+{
+ "schemaVersion": "travis.t4-ruling-10-tcad-listing.v1",
+ "ruling": "assignment decisions.md section 25.10, option B, approved by the operator on 2026-10-18 for roofing coverage: retired geo_ids stay no_candidate by default; one new, separately labelled link method from TCAD's own permit listing; exact geo_id always wins; the listing applies only to a permit that would otherwise be no_candidate because its ten-digit tcad_id is retired, and only where it names exactly one current account; anything ambiguous stays unlinked. The unique-street-address and coordinate methods are not added.",
+ "kit_commit": "00bea93",
+ "capture": "data/travis/permits/v1792239863 (2,380,707 rows; t4-permit-verify OK)",
+ "source": {
+  "capture": {
+   "dataset": "tcad-2026-certified-special-export-json",
+   "url": "https://traviscad.org/wp-content/largefiles/2026%20Certified%20JSON%20SUPP%200%2007182026.zip",
+   "file": "2026-certified-json-supp-0.zip",
+   "fetched_at": "2026-10-18T05:19:33.067Z",
+   "bytes": 3554021795,
+   "sha256": "6f7a758568fd03fa200e996d2756559eb53e13241238a004cbadac09ff4c2346",
+   "receipts": "data/travis/t4-rulings/lineage/receipts.jsonl",
+   "last_modified": "Wed, 22 Jul 2026 12:08:52 GMT",
+   "etag": "\"6a60b2d4-d3d611a3\""
+  },
+  "verified": "byte count and SHA-256 of the file on disk equal its receipt (checked 2026-10-18 before the build, and again by the build); nothing re-fetched, so no request to traviscad.org was needed or made",
+  "index": {
+   "dir": "data/travis/tcad-permit-listing/6f7a758568fd03fa",
+   "sha256": "7b2bf8e62af758aad4bd1ca53557a4d1fd1f3fc87731a6ecad4ee05f8a96a999",
+   "rows": 1121918,
+   "permit_numbers": 781459,
+   "accounts_listing_permits": 341900,
+   "listing_version": "travis-tcad-permit-listing-v1",
+   "build": "node --max-old-space-size=8192 src/counties/travis/t4-tcad-permit-listing.mjs (194.1 s, 0.68 GB resident; 493,246 accounts read, 341,900 list at least one permit, 1,121,918 distinct (permit, account) pairs)"
+  }
+ },
+ "method": {
+  "match_method": "tcad_permit_listing",
+  "confidence": "official_listing",
+  "parcel_link_version": "travis-parcel-link-v3",
+  "listing_version": "travis-tcad-permit-listing-v1",
+  "recorded_on_each_link": [
+   "match_method",
+   "normalization_version (null)",
+   "confidence",
+   "listing_version",
+   "listing_source_sha256",
+   "the listed entries on the linked account (sidecar: refPropertyRoll, issue date)"
+  ],
+  "precedence": "exact geo_id, then normalized_digits; the listing only for a ten-digit tcad_id that no current account prints, and only when it names exactly one current account; anything else stays no_candidate",
+  "key": "permit_number as Austin prints it, trimmed, equal to TCAD's permitNumber, trimmed; no other normalization",
+  "current_account": "an account of the 2026 seed (441,961 real-property accounts); a business personal property or mobile-home account is not a parcel of the population, so a permit listed on one seed account and such an account still names one current account"
+ },
+ "classification": {
+  "decision": "link (an explicit, separately labelled fallback), not a candidate",
+  "rules": "kit query-db-loading-matching, Permit/property matching 1-6",
+  "reasoning": [
+   "1-2. The permit's own target-parcel evidence is its printed tcad_id, and exact geo_id identity is used first: the listing is never read for a permit whose id names a current account (or several).",
+   "3. Fallbacks are allowed only as explicit fallbacks. TCAD is the appraisal district that issues the account ids; its listing joins two printed identifiers (Austin's permit number and TCAD's account id). That is official parcel-authority evidence, stronger in kind than the address evidence the rule already admits as a fallback, and it runs only after the exact and digits-only paths find no candidate.",
+   "4. Valid unmatched permits keep null links: a permit listed on several current accounts (463), only on accounts outside the roll (26) or not listed (188,380) stays no_candidate.",
+   "5. A related parcel must be reconciled to the target. The printed target is retired, so no current account can be compared with it directly. Per record, TCAD's own permit record on the linked account names the retired id the permit prints for 4,468 of the 7,531 links (59.3%). Over the population, where both methods apply (222,931 exactly linked permits that TCAD lists on one current account), the listing names the same account for 97.30% (98.33% where TCAD's record names the printed id, 92.73% where it does not; roofing 97.19%). Because the reconciliation is measured, not exact, the method is labelled apart and never reported as exact.",
+   "6. Method, version, confidence and source hashes are recorded on every link, in the run record and here.",
+   "Under the skill a candidate is evidence that is not accepted: it is never linked, published or used for roof age (normalized parcel ids 'only as bounded matching candidates'; name, phone, address, BBB and places matches 'candidates only'; the contract's registry and license candidates). This evidence is accepted under rule 3, so the method links; its confidence value is official_listing, not candidate."
+  ],
+  "consequences": "a listing-linked permit is published in the Property Improvement group under the account TCAD names, like an exact link; property_link.match_method tcad_permit_listing tells it apart; geo_id stays the retired id as printed; a roof-age anchor taken from such a permit carries the caveat anchor_link_tcad_permit_listing (T5's estimator input carries the link method)"
+ },
+ "link_counts": {
+  "before": {
+   "parcel_link_version": "travis-parcel-link-v2",
+   "link_method": {
+    "exact": 1978992,
+    "normalized_digits": 0
+   },
+   "linked": 1978992,
+   "linked_share": 0.8313,
+   "linked_parcels": 232640,
+   "unlinked_reasons": {
+    "no_candidate": 259419,
+    "multiple_candidates": 38249,
+    "invalid_quarantined": 178,
+    "out_of_county": 103869
+   },
+   "no_candidate_detail": {
+    "blank_tcad_id": 63019,
+    "ten_digit_not_in_roll": 196400
+   }
+  },
+  "after": {
+   "parcel_link_version": "travis-parcel-link-v3",
+   "link_method": {
+    "exact": 1978992,
+    "normalized_digits": 0,
+    "tcad_permit_listing": 7531
+   },
+   "linked": 1986523,
+   "linked_share": 0.8344,
+   "linked_parcels": 237533,
+   "unlinked_reasons": {
+    "no_candidate": 251888,
+    "multiple_candidates": 38249,
+    "invalid_quarantined": 178,
+    "out_of_county": 103869
+   },
+   "no_candidate_detail": {
+    "blank_tcad_id": 63019,
+    "ten_digit_not_in_roll": 188869
+   }
+  },
+  "unchanged": "exact 1,978,992, multiple_candidates 38,249, invalid_quarantined 178, out_of_county 103,869, every profile count and evidence state"
+ },
+ "recovered_by_tcad_permit_listing": {
+  "permits": 7531,
+  "parcels": 5034,
+  "parcels_with_no_geo_id_link": 4893,
+  "by_permittype": {
+   "BP": 6808,
+   "DS": 1,
+   "EP": 523,
+   "MP": 15,
+   "PP": 184
+  },
+  "roofing": 4024,
+  "open_roofing": 21,
+  "stalled_roofing": 142,
+  "roof_age_anchor_eligible": 3658,
+  "parcels_gaining_a_roof_age_anchor": 3070,
+  "issue_date_equal_to_tcad_record": 7121,
+  "ref_property_roll": {
+   "printed": 4468,
+   "linked_account_geo_id": 294,
+   "blank": 253,
+   "other": 2516
+  }
+ },
+ "stays_no_candidate": {
+  "total": 251888,
+  "blank_tcad_id": 63019,
+  "retired_geo_id": 188869,
+  "retired_geo_id_by_listing": {
+   "listed_on_several_current_accounts": 463,
+   "listed_on_other_accounts_only": 26,
+   "not_listed": 188380
+  },
+  "retired_geo_id_roofing": 19226,
+  "retired_geo_id_open_roofing": 679,
+  "retired_geo_id_stalled_roofing": 707
+ },
+ "agreement_on_the_overlap": {
+  "exact_links": 1978992,
+  "listed_on_one_current_account": 222931,
+  "agree": 216904,
+  "listed_on_several_current_accounts": 1611,
+  "several_include_the_linked_account": 1553,
+  "listed_on_other_accounts_only": 99,
+  "not_listed": 1754351,
+  "ref_property_roll_equals_printed_when_listed_on_one": 181923,
+  "agree_when_ref_property_roll_equals_printed": 178879,
+  "by_permittype": {
+   "BP": {
+    "listed_on_one_current_account": 202591,
+    "agree": 197314
+   },
+   "DS": {
+    "listed_on_one_current_account": 157,
+    "agree": 153
+   },
+   "EP": {
+    "listed_on_one_current_account": 13306,
+    "agree": 12789
+   },
+   "MP": {
+    "listed_on_one_current_account": 1321,
+    "agree": 1262
+   },
+   "PP": {
+    "listed_on_one_current_account": 5556,
+    "agree": 5386
+   }
+  },
+  "roofing": {
+   "listed_on_one_current_account": 64734,
+   "agree": 62918,
+   "agreement_share": 0.9719
+  },
+  "agreement_share": 0.973,
+  "agreement_share_when_tcad_record_names_the_printed_id": 0.9833,
+  "agreement_share_otherwise": 0.9273,
+  "note": "every exactly linked permit (not a sample; the 25.10 study sampled every fifth: 97.4%)"
+ },
+ "readme_impact": {
+  "definitions": {
+   "not_on_a_property": "loaded internally and counted under limitations, never published on a property (README.md 13, 105, 110)",
+   "anchor_eligible": "primary_roof_replacement or primary_roof_new_construction, lifecycle completed, completed_date confirmed_present"
+  },
+  "before": {
+   "roofing_not_on_a_property": 39481,
+   "roofing_not_on_a_property_retired_geo_id": 23250,
+   "open_roofing_not_on_a_property": 801,
+   "open_roofing_not_on_a_property_retired_geo_id": 700,
+   "stalled_roofing_not_on_a_property": 1222,
+   "stalled_roofing_not_on_a_property_retired_geo_id": 849,
+   "parcels_with_a_permit_anchor": 105663,
+   "parcels_without_a_permit_anchor": 336298,
+   "parcels_falling_back_to_built_year_although_tcad_lists_their_anchor_permit": 3070,
+   "anchor_eligible_permits_unlinked_on_retired_geo_ids": 19053
+  },
+  "after": {
+   "roofing_not_on_a_property": 35457,
+   "roofing_not_on_a_property_retired_geo_id": 19226,
+   "open_roofing_not_on_a_property": 780,
+   "open_roofing_not_on_a_property_retired_geo_id": 679,
+   "stalled_roofing_not_on_a_property": 1080,
+   "stalled_roofing_not_on_a_property_retired_geo_id": 707,
+   "parcels_with_a_permit_anchor": 108733,
+   "parcels_without_a_permit_anchor": 333228,
+   "parcels_falling_back_to_built_year_although_tcad_lists_their_anchor_permit": 0,
+   "anchor_eligible_permits_unlinked_on_retired_geo_ids": 15395
+  },
+  "readme_lines": "13 (roof age, open and long-open permits), 36 (roof age or its best proxies), 105 and 110 (open roofing permits in an area); the 25.10 study's \"33 (roof age)\" is line 36"
+ },
+ "consistent_with_the_study": "reproduces docs/evidence/travis-t4-retired-geo-ids-2026-10-18.json: 7,531 permits, 4,024 roofing, 21 open and 142 stalled roofing, 3,658 anchor-eligible, 3,070 parcels gaining an anchor; 463 listed on several current accounts, 26 on other accounts only, 188,380 not listed. The anchor-eligible retired permits are 19,053 here against the study's 19,057 and the parcels with a geo_id anchor 105,663 against 105,731, because the README-impact counters use the profile's completion-date evidence (a completion date before the applied date is quarantined) where the study used a plain date check.",
+ "scripts": [
+  "src/counties/travis/t4-tcad-permit-listing.mjs",
+  "src/counties/travis/t4-permit-links.mjs (runLinkPass: tcad_permit_listing, readme_impact)",
+  "src/counties/travis/permit-profile.mjs (linkPermitToParcel, travis-parcel-link-v3)"
+ ]
+}

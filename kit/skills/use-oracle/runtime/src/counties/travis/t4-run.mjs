@@ -5,7 +5,8 @@
  * except for the public lexicon manifest (and the optional Socrata cross-check):
  *
  *   verify capture -> appraisal transform (the T2 adapter) -> internal reconcile-export -> eligibility (`__ALL__` /
- *   `__NONE__`) -> roll index -> permit link pass (the bulk "harvest by parcel") -> permit transform per eligible
+ *   `__NONE__`) -> roll index -> permit link pass (the bulk "harvest by parcel", with TCAD's permit listing as the
+ *   `tcad_permit_listing` fallback for retired geo_ids, decisions.md 25.10) -> permit transform per eligible
  *   parcel -> per-group directories -> elephant-cli validate, hash, CAR validate and export-tables for the County and the
  *   Property Improvement groups (local files only: no upload, no pin, no Atlas PR) -> property-CID check across the two
  *   archives.
@@ -16,7 +17,9 @@
  *
  *   PROPERTY_FIRST_PERMIT_ELIGIBLE_USAGE_TYPES_TRAVIS=__ALL__ node --max-old-space-size=12288 src/counties/travis/t4-run.mjs \
  *     --seed data/seeds/travis-pilot.csv --label pilot --cli <elephant-cli> [--cross-check-socrata] \
- *     [--fault-drill permanent:<PROP_ID>,retryable:<PROP_ID>] [--resume <run-dir>]
+ *     [--fault-drill permanent:<PROP_ID>,retryable:<PROP_ID>] [--resume <run-dir>] [--tcad-listing <dir>]
+ *
+ * The TCAD listing defaults to the one built from the receipted special export; the run stops when it is missing.
  *
  * @module counties/travis/t4-run
  */
@@ -40,6 +43,7 @@ import { RUNTIME_ROOT } from "./t3-snapshot.mjs";
 import { PERMIT_DATASET_ID, PERMIT_DOMAIN, PERMIT_RESOURCE_URL } from "./t4-permit-fetch.mjs";
 import { DEFAULT_SEED, readRollGeoIndex, runLinkPass } from "./t4-permit-links.mjs";
 import { latestCapture, verifyPermitCapture } from "./t4-permit-verify.mjs";
+import { TCAD_PERMIT_LISTING_VERSION, resolveTcadPermitListing } from "./t4-tcad-permit-listing.mjs";
 import { TRAVIS_PERMIT_SOURCE_HOSTS, assertOutputContract, assertTravisIdentity } from "./validate.mjs";
 
 export const T4_RUN_VERSION = "travis-t4-run.v1";
@@ -230,6 +234,24 @@ async function crossCheckSocrata({ dir, geoIds, captured, captureVersion, issueD
 }
 
 /**
+ * Linked permits by link method.
+ *
+ * @param {any[]} entries - One parcel's rows from the link pass.
+ * @returns {Record<string, number>} Counts.
+ */
+function linkMethodsOf(entries) {
+  /** @type {Record<string, number>} */
+  const counts = {};
+  for (const entry of entries) counts[entry.link.propertyLink.match_method] = (counts[entry.link.propertyLink.match_method] ?? 0) + 1;
+  return counts;
+}
+
+/** @param {Record<string, number>} total @param {Record<string, number> | undefined} add */
+const addCounts = (total, add) => {
+  for (const [key, value] of Object.entries(add ?? {})) total[key] = (total[key] ?? 0) + value;
+};
+
+/**
  * Run the T4 stages for one seed.
  *
  * @param {object} options - Options.
@@ -245,9 +267,10 @@ async function crossCheckSocrata({ dir, geoIds, captured, captureVersion, issueD
  * @param {boolean} [options.singleCounty] - Allow the bare eligibility variable.
  * @param {string} [options.runsDir] - Runs root.
  * @param {typeof fetch} [options.fetchImpl] - Fetch for the cross-check (tests).
+ * @param {import("./t4-tcad-permit-listing.mjs").TcadPermitListing | null} [options.tcadListing] - TCAD's permit listing (`main` always loads it; null disables the fallback and is recorded).
  * @returns {Promise<Record<string, any>>} Run record (`<run>/t4-run.json`).
  */
-export async function runT4({ seedPath, label, cli, captureDir, rollSeed = DEFAULT_SEED, manifestFile = null, crossCheck = false, drill = parseFaultDrill(""), resumeDir = null, singleCounty = false, runsDir = path.join(RUNTIME_ROOT, "data", "travis", "runs"), fetchImpl = globalThis.fetch }) {
+export async function runT4({ seedPath, label, cli, captureDir, rollSeed = DEFAULT_SEED, manifestFile = null, crossCheck = false, drill = parseFaultDrill(""), resumeDir = null, singleCounty = false, runsDir = path.join(RUNTIME_ROOT, "data", "travis", "runs"), fetchImpl = globalThis.fetch, tcadListing = null }) {
   const runStarted = performance.now();
   const startedAt = new Date();
   const policy = resolveEligibilityPolicy(process.env, { singleCounty });
@@ -320,7 +343,7 @@ export async function runT4({ seedPath, label, cli, captureDir, rollSeed = DEFAU
   if (eligible.size > 0) {
     roll = await time("roll_index", 0, () => readRollGeoIndex(rollSeed));
     timings.roll_index.items = roll.stats.seed_rows;
-    linkPass = await time("permit_link_pass", 0, () => runLinkPass({ captureDir: capture, roll, asOfDate, select: eligible, countTcadIds: new Set([...eligible].map((id) => geoIdOf.get(id)).filter(Boolean)) }));
+    linkPass = await time("permit_link_pass", 0, () => runLinkPass({ captureDir: capture, roll, asOfDate, select: eligible, countTcadIds: new Set([...eligible].map((id) => geoIdOf.get(id)).filter(Boolean)), tcadListing }));
     timings.permit_link_pass.items = linkPass.summary.rows;
   } else {
     timings.roll_index = { skipped: "no eligible parcel" };
@@ -330,13 +353,13 @@ export async function runT4({ seedPath, label, cli, captureDir, rollSeed = DEFAU
   // Permit transform per parcel.
   /** @type {Map<string, any>} */
   const states = new Map();
-  const permitStage = { permits_linked: 0, permits_published: 0, conflicting: 0, identical_repeats: 0, parcels_written: 0 };
+  const permitStage = { permits_linked: 0, permits_published: 0, conflicting: 0, identical_repeats: 0, parcels_written: 0, by_link_method: {} };
   await time("permit_transform", eligible.size, async () => {
     for (const row of seedRows) {
       const parcelId = String(row.parcel_id).trim();
       const parcelDir = path.join(runDir, parcelId);
       const statusFile = path.join(parcelDir, "permit-status.json");
-      const fingerprint = { policy: policy.fingerprint, capture: captureSummary.rows_updated_at.end, permit_transform: PERMIT_TRANSFORM_VERSION };
+      const fingerprint = { policy: policy.fingerprint, capture: captureSummary.rows_updated_at.end, permit_transform: PERMIT_TRANSFORM_VERSION, parcel_link: PARCEL_LINK_VERSION, tcad_permit_listing: tcadListing ? tcadListing.index.listing.sha256 : null };
       if (resumeDir && existsSync(statusFile)) {
         const prior = await readJson(statusFile);
         if (DONE_STATES.has(prior.status) && JSON.stringify(prior.fingerprint) === JSON.stringify(fingerprint)) {
@@ -346,6 +369,7 @@ export async function runT4({ seedPath, label, cli, captureDir, rollSeed = DEFAU
             permitStage.parcels_written += 1;
           }
           permitStage.permits_linked += prior.permits_linked ?? 0;
+          addCounts(permitStage.by_link_method, prior.permits_by_link_method);
           continue;
         }
       }
@@ -372,8 +396,9 @@ export async function runT4({ seedPath, label, cli, captureDir, rollSeed = DEFAU
             }
             await rename(written.dataDir, path.join(parcelDir, PERMIT_DATA_DIRNAME));
           }
-          state = { status: written.published > 0 ? "done" : "done_zero_permits", permits_linked: entries.length, permits_published: written.published, conflicting: written.conflicting, identical_repeats: written.identicalRepeats };
+          state = { status: written.published > 0 ? "done" : "done_zero_permits", permits_linked: entries.length, permits_by_link_method: linkMethodsOf(entries), permits_published: written.published, conflicting: written.conflicting, identical_repeats: written.identicalRepeats };
           permitStage.permits_linked += entries.length;
+          addCounts(permitStage.by_link_method, state.permits_by_link_method);
           permitStage.permits_published += written.published;
           permitStage.conflicting += written.conflicting;
           permitStage.identical_repeats += written.identicalRepeats;
@@ -475,7 +500,8 @@ export async function runT4({ seedPath, label, cli, captureDir, rollSeed = DEFAU
     lexicon_manifest: { ...manifestInfo, sha256: sha256Hex(manifestBytes), seed_cid: roots.seedCid, property_improvement_cid: roots.propertyImprovementCid },
     as_of_date: asOfDate,
     eligibility_policy: { variable: policy.source, value: policy.raw, mode: policy.mode, fingerprint: policy.fingerprint },
-    versions: { run: T4_RUN_VERSION, permit_transform: PERMIT_TRANSFORM_VERSION, status_group: STATUS_GROUP_VERSION, work_classifier: WORK_CLASSIFIER_VERSION, tcad_id_evidence: TCAD_ID_EVIDENCE_VERSION, parcel_link: PARCEL_LINK_VERSION, improvement_enums: IMPROVEMENT_ENUMS_VERSION },
+    versions: { run: T4_RUN_VERSION, permit_transform: PERMIT_TRANSFORM_VERSION, status_group: STATUS_GROUP_VERSION, work_classifier: WORK_CLASSIFIER_VERSION, tcad_id_evidence: TCAD_ID_EVIDENCE_VERSION, parcel_link: PARCEL_LINK_VERSION, tcad_permit_listing: tcadListing ? TCAD_PERMIT_LISTING_VERSION : null, improvement_enums: IMPROVEMENT_ENUMS_VERSION },
+    tcad_permit_listing: tcadListing ? { dir: rel(tcadListing.dir), listing_sha256: tcadListing.index.listing.sha256, source_sha256: tcadListing.index.source.sha256, source_url: tcadListing.index.source.url, fetched_at: tcadListing.index.source.fetched_at } : null,
     appraisal: { reconciled: appraisal.reconciled, geometry: appraisal.geometryCount, reconcile_export: { rows: reconciliation.rowCount, expected: reconciliation.expectedCount } },
     eligibility: { eligible: eligible.size, not_eligible: succeeded.size - eligible.size },
     permit_states: stateCounts,
@@ -516,8 +542,9 @@ async function main() {
   const previous = resumeDir ? await readJson(path.join(resumeDir, "t4-run.json")) : null;
   const seedPath = typeof flags.seed === "string" ? path.resolve(flags.seed) : resumeDir ? path.join(resumeDir, "seed.csv") : null;
   const label = typeof flags.label === "string" ? flags.label : previous?.label;
-  if (!seedPath || !label) throw new Error("usage: t4-run.mjs --seed <csv> --label <name> --cli <elephant-cli> [--capture <dir>] [--roll-seed <csv>] [--manifest <file>] [--cross-check-socrata] [--fault-drill permanent:<id>,retryable:<id>] [--resume <run-dir>] [--single-county] [--skip-cli]");
+  if (!seedPath || !label) throw new Error("usage: t4-run.mjs --seed <csv> --label <name> --cli <elephant-cli> [--capture <dir>] [--roll-seed <csv>] [--manifest <file>] [--cross-check-socrata] [--fault-drill permanent:<id>,retryable:<id>] [--resume <run-dir>] [--tcad-listing <dir>] [--single-county] [--skip-cli]");
   if (!flags["skip-cli"] && typeof flags.cli !== "string") throw new Error("--cli <path to elephant-cli> is required (or --skip-cli)");
+  const tcadListing = await resolveTcadPermitListing({ dir: typeof flags["tcad-listing"] === "string" ? path.resolve(flags["tcad-listing"]) : null });
   const record = await runT4({
     seedPath,
     label,
@@ -529,6 +556,7 @@ async function main() {
     drill: parseFaultDrill(typeof flags["fault-drill"] === "string" ? flags["fault-drill"] : ""),
     resumeDir,
     singleCounty: flags["single-county"] === true,
+    tcadListing,
   });
   const cli = record.cli;
   const line = (group) => (cli[group]?.validate ? `${group} validate ${cli[group].validate.processed?.succeeded}/${cli[group].validate.processed?.processed} (${cli[group].validate.error_rows} error rows), CAR ${cli[group].hash?.car?.blocks} blocks root ${cli[group].hash?.car?.root}, checks ${cli[group].car_validate?.car_validation?.passed ? "pass" : "FAIL"}, ${cli[group].export_tables?.tables?.tables} tables root ${cli[group].export_tables?.tables?.root}` : `${group} ${cli[group]?.skipped ?? "not run"}`);
@@ -542,6 +570,7 @@ async function main() {
       permit_states: record.permit_states,
       permits_linked: record.permits.permits_linked,
       permits_published: record.permits.permits_published,
+      by_link_method: record.permits.by_link_method,
       property_cid_check: record.property_cid_check?.same_property_cid ?? null,
       socrata_cross_check: record.socrata_cross_check ? `${record.socrata_cross_check.equal}/${record.socrata_cross_check.geo_ids} equal through ${record.socrata_cross_check.issued_through}` : null,
       total_s: round(record.timings.total_ms / 1000),

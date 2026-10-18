@@ -40,12 +40,25 @@ export const TCAD_ID_NORMALIZATION_VERSION = "travis-tcad-id-digits-v1";
 /** Reasons a printed `tcad_id` is not a usable Geographic ID (v2 adds the neighbouring-district forms, T4 capture). */
 export const TCAD_ID_EVIDENCE_VERSION = "travis-tcad-id-evidence-v2";
 /**
- * Unlinked reasons of the parcel link. v2 (operator ruling, assignment decisions.md section 25.6, 2026-10-18) adds
- * `out_of_county`: a `tcad_id` printed as a Williamson CAD account is another county's parcel, outside the Travis
- * population, and is no longer counted as `invalid_quarantined`.
+ * The parcel link. v2 (operator ruling, assignment decisions.md section 25.6, 2026-10-18) adds `out_of_county`: a
+ * `tcad_id` printed as a Williamson CAD account is another county's parcel, outside the Travis population, and is no
+ * longer counted as `invalid_quarantined`. v3 (operator ruling 25.10, option B, 2026-10-18) adds one fallback link
+ * method, `tcad_permit_listing`: a permit whose ten-digit `tcad_id` no current account prints links to the one current
+ * account on which TCAD's own permit listing records its permit number. `geo_id` always wins; the listing is read only
+ * for such a retired id; several current accounts, or none, leave the permit `no_candidate`.
  */
-export const PARCEL_LINK_VERSION = "travis-parcel-link-v2";
+export const PARCEL_LINK_VERSION = "travis-parcel-link-v3";
 export const UNLINKED_REASONS = Object.freeze(["no_candidate", "multiple_candidates", "invalid_quarantined", "out_of_county"]);
+/** Link methods in precedence order. */
+export const LINK_METHODS = Object.freeze(["exact", "normalized_digits", "tcad_permit_listing"]);
+/**
+ * The confidence each method records. `official_listing` names the evidence (an official TCAD record that ties the
+ * permit number to one current account), not a review candidate: under `query-db-loading-matching` a candidate is never
+ * linked or published, and this method links (decisions.md section 25.10).
+ */
+export const LINK_CONFIDENCE = Object.freeze({ exact: "exact", normalized_digits: "normalized", tcad_permit_listing: "official_listing" });
+/** Version of the `tcad_permit_listing` method and of the index it reads (`t4-tcad-permit-listing.mjs`). */
+export const TCAD_PERMIT_LISTING_VERSION = "travis-tcad-permit-listing-v1";
 /** `tcad_id` evidence reasons that name another county's parcel. */
 export const OUT_OF_COUNTY_TCAD_ID_REASONS = Object.freeze(["williamson_cad_account_form", "williamson_cad_marker"]);
 export const TRAVIS_ROOF_AGE_PROFILE_VERSION = "travis-roof-age-profile-v1";
@@ -656,54 +669,72 @@ export function proveDigitsOnlyNormalization(geoIds) {
 /**
  * @typedef {object} ParcelLinkResult
  * @property {string | null} propertyId - `PROP_ID` of the one matching parcel, else null.
- * @property {{ match_method: "exact" | "normalized_digits", normalization_version: string | null, confidence: "exact" | "normalized" } | null} propertyLink
+ * @property {{ match_method: "exact" | "normalized_digits" | "tcad_permit_listing", normalization_version: string | null, confidence: "exact" | "normalized" | "official_listing", listing_version?: string, listing_source_sha256?: string } | null} propertyLink
  * @property {"no_candidate" | "multiple_candidates" | "invalid_quarantined" | "out_of_county" | null} unlinkedReason
  * @property {TcadIdEvidence} tcadIdEvidence
+ * @property {{ listed_accounts: number, current_accounts: number } | null} listing - Set only for a retired ten-digit id read against the listing: how many accounts list the permit number, and how many of them are current roll accounts.
  */
 
 /**
- * Link one permit to one parcel on `geo_id` exactly as printed first. The
- * digits-only comparison runs only when a proof with `oneToOne: true` is
- * supplied. Zero or several candidates stay valid-unlinked.
+ * @typedef {object} PermitListingLookup
+ * @property {string} version - {@link TCAD_PERMIT_LISTING_VERSION}.
+ * @property {string} sourceSha256 - SHA-256 of the receipted TCAD capture the listing was built from.
+ * @property {(permitNumber: unknown) => readonly string[]} accountsFor - Distinct accounts on which TCAD lists the permit number.
+ * @property {{ has: (propId: string) => boolean }} rollPropIds - The current roll accounts (the seed's PROP_IDs).
+ */
+
+/**
+ * Link one permit to one parcel ({@link PARCEL_LINK_VERSION}), in precedence order:
+ *
+ * 1. `geo_id` exactly as printed (`exact`); several accounts on the id are `multiple_candidates`.
+ * 2. The digits-only comparison (`normalized_digits`), only with a proof that is `oneToOne: true`.
+ * 3. Only for a ten-digit `tcad_id` that no roll account prints (a retired id) and only when the listing is supplied:
+ *    TCAD's own permit listing (`tcad_permit_listing`), when it records the permit number on exactly one current roll
+ *    account. Several current accounts, or none, leave the permit `no_candidate` (the printed id still names no current
+ *    parcel), with the listing counts kept for the reconciliation.
+ *
+ * A blank, quarantined or out-of-county `tcad_id` never reaches the listing. Zero or several candidates stay
+ * valid-unlinked.
  *
  * @param {object} input - Permit id and the roll indexes.
  * @param {unknown} input.tcadId - `tcad_id` as printed.
  * @param {Map<string, readonly string[]>} input.parcelsByGeoId - `geo_id` as printed to the `PROP_ID`s carrying it.
  * @param {{ proof: { oneToOne: boolean, normalizationVersion: string }, parcelsByDigits: Map<string, readonly string[]> } | null} [input.digitsFallback] - Enabled only with a one-to-one proof.
+ * @param {unknown} [input.permitNumber] - `permit_number` as printed (read only by the listing fallback).
+ * @param {PermitListingLookup | null} [input.permitListing] - TCAD's permit listing; null leaves every retired id `no_candidate`.
  * @returns {ParcelLinkResult} Link decision.
  */
-export function linkPermitToParcel({ tcadId, parcelsByGeoId, digitsFallback = null }) {
+export function linkPermitToParcel({ tcadId, parcelsByGeoId, digitsFallback = null, permitNumber = null, permitListing = null }) {
   const evidence = tcadIdEvidence(tcadId);
-  const unlinked = (unlinkedReason) => ({ propertyId: null, propertyLink: null, unlinkedReason, tcadIdEvidence: evidence });
+  const unlinked = (unlinkedReason, listing = null) => ({ propertyId: null, propertyLink: null, unlinkedReason, tcadIdEvidence: evidence, listing });
+  const linked = (propertyId, propertyLink, listing = null) => ({ propertyId, propertyLink, unlinkedReason: null, tcadIdEvidence: evidence, listing });
   if (evidence.evidenceState === "invalid_quarantined") return unlinked(OUT_OF_COUNTY_TCAD_ID_REASONS.includes(evidence.reason) ? "out_of_county" : "invalid_quarantined");
   if (evidence.evidenceState === "unknown") return unlinked("no_candidate");
 
   const exact = parcelsByGeoId.get(evidence.value) ?? [];
-  if (exact.length === 1) {
-    return {
-      propertyId: exact[0],
-      propertyLink: { match_method: "exact", normalization_version: null, confidence: "exact" },
-      unlinkedReason: null,
-      tcadIdEvidence: evidence,
-    };
-  }
+  if (exact.length === 1) return linked(exact[0], { match_method: "exact", normalization_version: null, confidence: LINK_CONFIDENCE.exact });
   if (exact.length > 1) return unlinked("multiple_candidates");
 
   if (digitsFallback && digitsFallback.proof?.oneToOne === true) {
     const candidates = digitsFallback.parcelsByDigits.get(normalizeTcadIdDigits(evidence.value)) ?? [];
     if (candidates.length === 1) {
-      return {
-        propertyId: candidates[0],
-        propertyLink: {
-          match_method: "normalized_digits",
-          normalization_version: digitsFallback.proof.normalizationVersion,
-          confidence: "normalized",
-        },
-        unlinkedReason: null,
-        tcadIdEvidence: evidence,
-      };
+      return linked(candidates[0], { match_method: "normalized_digits", normalization_version: digitsFallback.proof.normalizationVersion, confidence: LINK_CONFIDENCE.normalized_digits });
     }
     if (candidates.length > 1) return unlinked("multiple_candidates");
+  }
+
+  if (permitListing && evidence.reason === "ten_digit_geo_id") {
+    const listed = new Set(permitListing.accountsFor(permitNumber));
+    const current = [...listed].filter((propId) => permitListing.rollPropIds.has(propId));
+    const listing = { listed_accounts: listed.size, current_accounts: current.length };
+    if (current.length === 1) {
+      return linked(
+        current[0],
+        { match_method: "tcad_permit_listing", normalization_version: null, confidence: LINK_CONFIDENCE.tcad_permit_listing, listing_version: permitListing.version, listing_source_sha256: permitListing.sourceSha256 },
+        listing,
+      );
+    }
+    return unlinked("no_candidate", listing);
   }
   return unlinked("no_candidate");
 }

@@ -532,7 +532,10 @@ the Socrata cross-checks. Run record `docs/evidence/travis-t4-run-2026-10-17.jso
   (Final, Active, On Hold, the Cancelled values; 85.65% filled); `improvement_action` from the work class of building permits
   only (a trade permit carries its parent's work class 89.8-99.1% of the time; 92.72% of BP rows filled); `contractor_type`
   from `contractor_trade` (60.14% filled). Pilot and feasibility validate with 0 errors under permit transform v2.
-- **25.9 shards (measured, not ruled).** The CLI chain on 8, 10 and 12 concurrent shards: 8 is fastest when memory is free;
+- **25.9 shards (measured, then approved on 2026-10-18).** All five permit types are published (every linked permit);
+  the CLI runs per shard of at most 5,000 properties, 8 shards in flight per group. The T5 design notes (done-markers with
+  input and output digests, `ELEPHANT_SKIP_UPDATE_CHECK=1`, memory freed first, `caffeinate -i`) are in assignment
+  decisions.md 25.9. Measured: the CLI chain on 8, 10 and 12 concurrent shards: 8 is fastest when memory is free;
   with the swap file nearly full the times double; every sharded variant measured stays inside 48 hours (15.5-33.3 h).
   Every `elephant-cli` call checks npm for a newer version and exits if one exists (`ELEPHANT_SKIP_UPDATE_CHECK=1`).
   Projected published size per run: about 8.8 GB distinct, 17.5 GB as counted by Filebase; 74% of a permit record is its
@@ -542,4 +545,15 @@ the Socrata cross-checks. Run record `docs/evidence/travis-t4-run-2026-10-17.jso
   ones, but mostly to several split lots. TCAD's own permit listing names one current account for 7,531 of the permits
   (97.4% agreement with exact links); point-in-polygon is 99.8% precise but reaches 4,618; a unique street line is 99.07%
   precise and reaches 25,641; together 35,713 of 196,400. TNR history is not checkable from RO.
+- **25.10 ruled (option B, approved on 2026-10-18).** `travis-parcel-link-v3` adds one fallback, `tcad_permit_listing`
+  (confidence `official_listing`): after exact `geo_id` and the digits-only path, a permit whose ten-digit id no current
+  account prints links to the one current account on which TCAD's permit listing records its number. The listing is read
+  offline from the receipted special export (`t4-tcad-permit-listing.mjs`; bytes and SHA-256 checked against the receipt,
+  nothing re-fetched). Result over the whole capture: linked 1,978,992 -> 1,986,523 (83.13% -> 83.44%) on 232,640 -> 237,533
+  parcels; 7,531 recovered (4,024 roofing, 21 open and 142 stalled roofing, 3,658 roof-age anchor-eligible; 3,070 parcels
+  gain an anchor); `no_candidate` 259,419 -> 251,888 (463 listed on several current accounts, 26 on other accounts only,
+  188,380 not listed, 63,019 blank). On the 222,931 exactly linked permits TCAD lists on one current account it names the
+  same account 97.30% of the time; TCAD's own record names the printed retired id on 4,468 of the 7,531 listing links.
+  Under `query-db-loading-matching` it is a link (explicit fallback on official evidence), not a candidate; the
+  reasoning is in `docs/evidence/travis-t4-ruling-10-tcad-listing-2026-10-18.json` and assignment decisions.md 25.10.
 
