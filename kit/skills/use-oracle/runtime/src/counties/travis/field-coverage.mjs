@@ -117,7 +117,7 @@ export const TRAVIS_EXTRAS_FIELD_COVERAGE = Object.freeze({
       ["structure.roof_covering_material", "structure.roof_material_type", "structure.roof_design_type", "structure.foundation_type"],
       ["tcad_extras.imp_atr"],
       null,
-      "travis-tcad-extras-mapping-v1 exact-value tables; one printed code per attribute per account, else null",
+      "travis-tcad-extras-mapping-v2 exact-value tables; one printed code per attribute per account, else null",
     ),
   }),
   LAND_DET: Object.freeze({

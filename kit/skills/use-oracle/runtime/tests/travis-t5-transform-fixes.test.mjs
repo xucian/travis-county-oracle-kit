@@ -131,6 +131,8 @@ describe("transform v4: the TCAD fields T2 left unread (T5 pre-run fix)", () => 
     expect(mapStructureAttributes({ roof_covering: ["COMPOSITIO"], roof_style: ["HIP"], foundation: ["SLAB"] }).fields).toEqual({ roof_covering_material: null, roof_material_type: "Composition", roof_design_type: "Hip", foundation_type: "Slab on Grade" });
     expect(mapStructureAttributes({ roof_covering: ["BUILT-UP"], roof_style: ["FLAT"], foundation: ["PIER AND B"] }).fields).toEqual({ roof_covering_material: "Built-Up Roof", roof_material_type: null, roof_design_type: "Flat", foundation_type: "Pier and Beam" });
     expect(mapStructureAttributes({ roof_covering: ["WOOD SHING"] }).fields).toMatchObject({ roof_covering_material: "Wood Shingle", roof_material_type: "Wood" });
+    expect(mapStructureAttributes({ foundation: ["FLOATING S"] }).fields).toMatchObject({ foundation_type: "Slab on Grade" });
+    expect(mapStructureAttributes({ foundation: ["BLOCKS"] }).fields).toMatchObject({ foundation_type: null });
     const conflicting = mapStructureAttributes({ roof_covering: ["COMPOSITIO", "METAL"], roof_style: ["GABLE"], foundation: [] });
     expect(conflicting.fields).toEqual({ roof_covering_material: null, roof_material_type: null, roof_design_type: "Gable", foundation_type: null });
     expect(conflicting.conflicting).toEqual(["roof_covering"]);

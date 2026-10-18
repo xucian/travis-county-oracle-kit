@@ -58,7 +58,7 @@ export const STATE_CODE = "TX";
 export const OWNER_CLASSIFICATION_VERSION = "travis-owner-classification-v2";
 export const STATE_CODE_MAPPING_VERSION = "travis-state-code-v1";
 export const GEOMETRY_PARTS_VERSION = "travis-geometry-parts-v1";
-export const TCAD_EXTRAS_MAPPING_VERSION = "travis-tcad-extras-mapping-v1";
+export const TCAD_EXTRAS_MAPPING_VERSION = "travis-tcad-extras-mapping-v2";
 
 /**
  * `IMP_ATR.TXT` "Roof Covering" codes (as printed, cut at 10 characters) to the lexicon `structure` fields. A code names
@@ -76,8 +76,8 @@ export const ROOF_COVERING_BY_CODE = Object.freeze({
 });
 /** "Roof Style" codes to `structure.roof_design_type`; A-FRAME, BARN and OTHER have no member. */
 export const ROOF_STYLE_BY_CODE = Object.freeze({ FLAT: "Flat", GABLE: "Gable", HIP: "Hip", MANSARD: "Mansard", "A-FRAME": null, BARN: null, OTHER: null });
-/** "Foundation" codes to `structure.foundation_type`; BLOCKS, FLOATING S(LAB), WOOD POST and OTHER have no member. */
-export const FOUNDATION_BY_CODE = Object.freeze({ SLAB: "Slab on Grade", "PIER AND B": "Pier and Beam", BLOCKS: null, "FLOATING S": null, "WOOD POST": null, OTHER: null });
+/** "Foundation" codes to `structure.foundation_type`; a floating slab is a slab on grade (v2, decisions.md 26.8); BLOCKS, WOOD POST and OTHER have no member. */
+export const FOUNDATION_BY_CODE = Object.freeze({ SLAB: "Slab on Grade", "PIER AND B": "Pier and Beam", BLOCKS: null, "FLOATING S": "Slab on Grade", "WOOD POST": null, OTHER: null });
 /** Taxing-entity classes (`t5-tcad-extras.mjs` `classifyTaxingEntity`) to the lexicon `tax` field each fills. */
 export const TAXABLE_VALUE_FIELD_BY_CLASS = Object.freeze({
   county: "county_taxable_value_amount",
