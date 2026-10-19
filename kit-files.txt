@@ -53,6 +53,7 @@ skills/use-oracle/runtime/docs/evidence/travis-t5-dry-run-2026-10-18.json
 skills/use-oracle/runtime/docs/evidence/travis-t5-field-coverage-2026-10-18.json
 skills/use-oracle/runtime/docs/evidence/travis-t5-prefix-reruns-2026-10-18.json
 skills/use-oracle/runtime/docs/evidence/travis-t5-run-20261018T143520Z.json
+skills/use-oracle/runtime/docs/evidence/travis-t6-publication-20261018T143520Z.json
 skills/use-oracle/runtime/docs/evidence/travis-tcad-downloads-2026-10-16.jsonl
 skills/use-oracle/runtime/docs/evidence/travis-tcad-prop-counts-2026-10-16.json
 skills/use-oracle/runtime/docs/evidence/travis-tcad-state-code-counts-2026-10-16.json
@@ -138,6 +139,7 @@ skills/use-oracle/runtime/src/counties/travis/t5-roof-age.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-run.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-shards.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-tcad-extras.mjs
+skills/use-oracle/runtime/src/counties/travis/t6-publish.mjs
 skills/use-oracle/runtime/src/counties/travis/validate.mjs
 skills/use-oracle/runtime/tests/travis-amended-lexicon-server.test.mjs
 skills/use-oracle/runtime/tests/travis-build-seed.test.mjs
@@ -174,4 +176,5 @@ skills/use-oracle/runtime/tests/travis-t5-run.test.mjs
 skills/use-oracle/runtime/tests/travis-t5-tcad-extras.test.mjs
 skills/use-oracle/runtime/tests/travis-t5-transform-fixes.test.mjs
 skills/use-oracle/runtime/tests/travis-t5-units.test.mjs
+skills/use-oracle/runtime/tests/travis-t6-publish.test.mjs
 skills/use-oracle/runtime/tests/travis-transform.test.mjs

@@ -1,0 +1,205 @@
+{
+  "schemaVersion": "travis.t6-publication.v1",
+  "run_id": "20261018T143520Z-t5-full",
+  "status": "stopped at the Filebase upload (decisions.md 28.7)",
+  "kit_commit": "bfb3b50 (t6-publish.mjs), failure recording fixed after the stop",
+  "cli": "elephant-cli 1.58.1",
+  "node": "v22.22.0",
+  "layout": "D: 177 shard archives as they are, no Atlas PR (decisions.md 28.3, operator's go 2026-10-19)",
+  "pre_upload_checks": {
+    "verify": {
+      "status": "verified",
+      "files": 683910,
+      "bytes": 28609472173,
+      "capture_mismatches": 0,
+      "loader": true,
+      "run_json": "equal",
+      "kit": "557207e"
+    },
+    "car_records": {
+      "archives": 177,
+      "six_checks_all_zero": true,
+      "bytes_equal_record": true,
+      "tables_point_at_their_archive": true,
+      "problems": []
+    },
+    "import_test": {
+      "car": "largest archive",
+      "root": "baguqeeragvldbuocl6umryzmthsrobbb6iytnvxvounjos7j4v5646ukpl5q",
+      "imported_root": "baguqeeragvldbuocl6umryzmthsrobbb6iytnvxvounjos7j4v5646ukpl5q",
+      "pinned": true,
+      "roots_equal": true,
+      "imported_blocks": 146786,
+      "kubo": "0.43.1",
+      "repo": "scratch, offline",
+      "recorded_blocks": 146786,
+      "seconds": 38
+    },
+    "tables_cars": {
+      "cars": 177,
+      "blocks": 9383,
+      "bytes": 1427990944,
+      "every_part_cid_equal": true,
+      "every_block_verified": true
+    },
+    "sizes": {
+      "archive_bytes": 8605884174,
+      "part_bytes": 1426831183,
+      "tables_car_bytes": 472062,
+      "distinct_bytes": 10033187419,
+      "filebase_counted_bytes": 20066374838,
+      "filebase_plan_bytes": 500000000000,
+      "pinata_upper_bound_bytes": 18639071593,
+      "pinata_plan_bytes": 1000000000000,
+      "note": "Filebase counts the archive and the parts twice (T5); the Pinata bound counts each archive twice because the recursive pin of a tables root walks its county_root link"
+    }
+  },
+  "upload": {
+    "api": "https://rpc.filebase.io",
+    "concurrency": 4,
+    "started": "2026-10-19T13:14:07Z",
+    "stopped": "2026-10-19T13:24:15Z",
+    "read_back": [
+      {
+        "group": "county",
+        "shard": "s0001",
+        "kind": "archive",
+        "root": "baguqeerajqevrlhfhnhl2llxyq7auibfmpmxosbrj5y2qedhxqudppfme6la",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerajqevrlhfhnhl2llxyq7auibfmpmxosbrj5y2qedhxqudppfme6la"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0001",
+        "kind": "archive",
+        "root": "baguqeeraapcmfezjev6ux3twbhdaza5iykl5tj7ukriyravy3yn5b7cp6ueq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraapcmfezjev6ux3twbhdaza5iykl5tj7ukriyravy3yn5b7cp6ueq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0002",
+        "kind": "archive",
+        "root": "baguqeeramtky5rdk5eqg7ms4wuc7ll4ljw3zpqq3lkdvu7xyk2e3pklwi6ua",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeramtky5rdk5eqg7ms4wuc7ll4ljw3zpqq3lkdvu7xyk2e3pklwi6ua"
+      },
+      {
+        "group": "county",
+        "shard": "s0002",
+        "kind": "archive",
+        "root": "baguqeera2hk3k4txgzn6l4cs4k4zruc2dlsnl7jtqxd6pa7l6milfs6y73hq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2hk3k4txgzn6l4cs4k4zruc2dlsnl7jtqxd6pa7l6milfs6y73hq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0002",
+        "kind": "tables",
+        "root": "baguqeeraqirxninc7dtpgwxirvm4d7gbcaaeywxmivxswlmpu3fdsjjf4vla",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraqirxninc7dtpgwxirvm4d7gbcaaeywxmivxswlmpu3fdsjjf4vla"
+      },
+      {
+        "group": "county",
+        "shard": "s0003",
+        "kind": "archive",
+        "root": "baguqeerauwajllm55poebhkiz37fxwnumnxseqouqea7iqhzjxcmpjllbzcq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerauwajllm55poebhkiz37fxwnumnxseqouqea7iqhzjxcmpjllbzcq"
+      },
+      {
+        "group": "county",
+        "shard": "s0003",
+        "kind": "tables",
+        "root": "baguqeeradj2i7fho3nnmdwtp5cyopedysqsfmjrfs4sf42ygkqiaoctgjola",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeradj2i7fho3nnmdwtp5cyopedysqsfmjrfs4sf42ygkqiaoctgjola"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0003",
+        "kind": "archive",
+        "root": "baguqeera2mo74uogow2gv6vsogc3b6mlj5v7hzqlkas4drx3cmpigobecbja",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2mo74uogow2gv6vsogc3b6mlj5v7hzqlkas4drx3cmpigobecbja"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0003",
+        "kind": "tables",
+        "root": "baguqeera5ciiyezwll2jqpsaagqjo5sg2z75jfilw3ofdpedocrqy5rh2cya",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera5ciiyezwll2jqpsaagqjo5sg2z75jfilw3ofdpedocrqy5rh2cya"
+      },
+      {
+        "group": "county",
+        "shard": "s0004",
+        "kind": "archive",
+        "root": "baguqeera7f2uylqkggn4vu5fmtxg5tevbeqevwmxdtkgo46fkem65fqsbhta",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7f2uylqkggn4vu5fmtxg5tevbeqevwmxdtkgo46fkem65fqsbhta"
+      }
+    ],
+    "failures": [
+      {
+        "group": "county",
+        "shard": "s0001",
+        "kind": "tables",
+        "cli_message": "Upload failed: fetch failed",
+        "seconds": 315,
+        "filebase_after": {
+          "checked_at": "2026-10-19T13:25:52.517Z",
+          "tables_root_pinned": true,
+          "tables_root_type": "recursive",
+          "parts_pinned": 26,
+          "parts": 26,
+          "control_pinned": false
+        }
+      },
+      {
+        "group": "county",
+        "shard": "s0002",
+        "kind": "tables",
+        "cli_message": "Upload failed: fetch failed",
+        "seconds": 315,
+        "filebase_after": {
+          "checked_at": "2026-10-19T13:25:56.803Z",
+          "tables_root_pinned": false,
+          "tables_root_type": null,
+          "parts_pinned": 26,
+          "parts": 26,
+          "control_pinned": false
+        }
+      },
+      {
+        "group": "county",
+        "shard": "s0004",
+        "kind": "tables",
+        "cli_message": "Upload failed: fetch failed",
+        "seconds": 313,
+        "filebase_after": {
+          "checked_at": "2026-10-19T13:26:01.597Z",
+          "tables_root_pinned": false,
+          "tables_root_type": null,
+          "parts_pinned": 26,
+          "parts": 26,
+          "control_pinned": false
+        }
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0001",
+        "kind": "tables",
+        "cli_message": "Upload failed: fetch failed",
+        "seconds": 309,
+        "filebase_after": {
+          "checked_at": "2026-10-19T13:26:03.170Z",
+          "tables_root_pinned": false,
+          "tables_root_type": null,
+          "parts_pinned": 7,
+          "parts": 7,
+          "control_pinned": false
+        }
+      }
+    ],
+    "diagnosis": "every part of the four failed tables uploads is pinned on Filebase; each failed about 300 s after it started, Node 22's default fetch headers timeout, on the CLI's dag/import?pin-roots=true of tables.car (it sets no timeout of its own), which pins the tables root recursively and so walks the shard's archive; the three tables uploads that succeeded took 22-135 s"
+  },
+  "not_run": [
+    "filebase-pins of every CID",
+    "gateway checks",
+    "Pinata pins",
+    "manifest",
+    "manifest pin"
+  ]
+}
