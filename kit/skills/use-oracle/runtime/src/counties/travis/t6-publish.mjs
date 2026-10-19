@@ -251,11 +251,26 @@ export async function mapLimited(items, limit, task) {
   return results;
 }
 
+const FETCH_TIMEOUT_PRELOAD = new URL("./cli-fetch-timeout.mjs", import.meta.url).href;
+
+/**
+ * The CLI's environment: with `fetchTimeoutMs`, Node's fetch timeouts are raised for the CLI process only, through
+ * the cli-fetch-timeout.mjs preload (decisions.md 28.7 (a)).
+ *
+ * @param {number | undefined} fetchTimeoutMs - Timeout in ms, or undefined for Node's defaults.
+ * @returns {Record<string, string>} Environment.
+ */
+export function cliEnv(fetchTimeoutMs) {
+  const env = { ...process.env, ELEPHANT_SKIP_UPDATE_CHECK: "1" };
+  if (!fetchTimeoutMs) return env;
+  return { ...env, CLI_FETCH_TIMEOUT_MS: String(fetchTimeoutMs), NODE_OPTIONS: [process.env.NODE_OPTIONS, `--import=${FETCH_TIMEOUT_PRELOAD}`].filter(Boolean).join(" ") };
+}
+
 /** Spawn the CLI with its output in `logFile`; resolves to the exit code. */
-function runCli(cli, args, logFile) {
+function runCli(cli, args, logFile, env = cliEnv()) {
   return new Promise((resolve) => {
     const fd = openSync(logFile, "a");
-    const child = spawn(cli, args, { stdio: ["ignore", fd, fd], env: { ...process.env, ELEPHANT_SKIP_UPDATE_CHECK: "1" } });
+    const child = spawn(cli, args, { stdio: ["ignore", fd, fd], env });
     child.on("error", () => { closeSync(fd); resolve(-1); });
     child.on("close", (code) => { closeSync(fd); resolve(code ?? -1); });
   });
@@ -264,10 +279,11 @@ function runCli(cli, args, logFile) {
 /**
  * Upload every archive CAR, then its tables directory, through the CLI; an existing summary is checked, not redone.
  *
- * @param {{ plan: object, out: string, cli: string, api: string, concurrency?: number, runtimeDir: string, run?: Function }} options - Plan, output, CLI, Kubo RPC API.
+ * @param {{ plan: object, out: string, cli: string, api: string, concurrency?: number, runtimeDir: string, fetchTimeoutMs?: number, run?: Function }} options - Plan, output, CLI, Kubo RPC API, the CLI's fetch timeout.
  * @returns {Promise<{ failed: object | null, failures: object[], results: object[] }>} Per root: shard, group, kind, root, gateway URL; every failure, the first as `failed`.
  */
-export async function uploadAll({ plan, out, cli, api, concurrency = 4, runtimeDir, run = runCli }) {
+export async function uploadAll({ plan, out, cli, api, concurrency = 4, runtimeDir, fetchTimeoutMs, run = runCli }) {
+  const env = cliEnv(fetchTimeoutMs);
   await mkdir(path.join(out, "uploads"), { recursive: true });
   const results = [];
   const failures = [];
@@ -277,7 +293,7 @@ export async function uploadAll({ plan, out, cli, api, concurrency = 4, runtimeD
       if (failures.length > 0) return;
       const base = path.join(out, "uploads", `${archive.group}-${archive.shard}-${kind}`);
       if (!existsSync(`${base}.json`)) {
-        const code = await run(cli, ["upload", path.resolve(runtimeDir, input), "--api", api, "--output-json", `${base}.json`], `${base}.log`);
+        const code = await run(cli, ["upload", path.resolve(runtimeDir, input), "--api", api, "--output-json", `${base}.json`], `${base}.log`, env);
         if (code !== 0 || !existsSync(`${base}.json`)) {
           failures.push({ shard: archive.shard, group: archive.group, kind, exit_code: code, log: `${base}.log`, at: new Date().toISOString() });
           return;
@@ -550,7 +566,7 @@ async function main(argv) {
     await write(path.join(out, "tables-cars.json"), results);
     console.log(JSON.stringify({ cars: results.length, blocks: results.reduce((total, entry) => total + entry.block_count, 0), bytes: results.reduce((total, entry) => total + entry.size, 0) }));
   } else if (command === "upload") {
-    const { failed, failures, results } = await uploadAll({ plan, out, cli: flags.cli, api: flags.api ?? "https://rpc.filebase.io", concurrency: Number(flags.concurrency ?? 4), runtimeDir });
+    const { failed, failures, results } = await uploadAll({ plan, out, cli: flags.cli, api: flags.api ?? "https://rpc.filebase.io", concurrency: Number(flags.concurrency ?? 4), runtimeDir, fetchTimeoutMs: flags["fetch-timeout-minutes"] ? Number(flags["fetch-timeout-minutes"]) * MINUTE : undefined });
     await write(path.join(out, "uploads.json"), { failed, failures, results });
     console.log(JSON.stringify({ uploaded: results.length, failures }));
     if (failed) process.exitCode = 1;

@@ -94,6 +94,7 @@ skills/use-oracle/runtime/fixtures/travis-t3/pages/tsbpe-free-licensee-list.html
 skills/use-oracle/runtime/src/counties/travis/adapter.mjs
 skills/use-oracle/runtime/src/counties/travis/amended-lexicon-server.mjs
 skills/use-oracle/runtime/src/counties/travis/build-seed.mjs
+skills/use-oracle/runtime/src/counties/travis/cli-fetch-timeout.mjs
 skills/use-oracle/runtime/src/counties/travis/eligibility.mjs
 skills/use-oracle/runtime/src/counties/travis/enrichment-profile.mjs
 skills/use-oracle/runtime/src/counties/travis/field-coverage.mjs

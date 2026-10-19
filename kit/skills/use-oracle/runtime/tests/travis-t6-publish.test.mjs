@@ -2,11 +2,13 @@ import { describe, expect, it } from "vitest";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { createServer } from "node:http";
+import { execFile } from "node:child_process";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
 import { rawCid, readCarBlocks } from "../src/counties/travis/publish.mjs";
-import { buildPlan, buildShardManifest, cliLibraries, gatewayJobs, importFromCli, pinRoots, runGatewayChecks, summarizeGateways, unixfsCid, uploadAll, writeTablesCar } from "../src/counties/travis/t6-publish.mjs";
+import { buildPlan, buildShardManifest, cliLibraries, gatewayJobs, importFromCli, pinRoots, runGatewayChecks, summarizeGateways, unixfsCid, uploadAll, writeTablesCar, cliEnv } from "../src/counties/travis/t6-publish.mjs";
 
 const CLI = process.env.ELEPHANT_CLI ?? "/Users/luti/dev/oracle-property-intelligence-platform-pipeline-travis-tx/node_modules/.bin/elephant-cli";
 const hasCli = existsSync(CLI);
@@ -211,6 +213,20 @@ describe("T6 gateway checks and Pinata pins", () => {
       expect(both.failures.map((failure) => failure.shard).sort()).toEqual(["s0002", "s0003"]);
     } finally {
       await rm(out, { recursive: true, force: true });
+    }
+  });
+
+  it("raises Node's fetch timeouts for the CLI process only, through the preload", async () => {
+    const server = createServer((request, response) => setTimeout(() => response.end("ok"), 1500));
+    await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const url = `http://127.0.0.1:${server.address().port}/`;
+    const probe = (env) => new Promise((resolve) => execFile(process.execPath, ["-e", `fetch(${JSON.stringify(url)}).then((r) => console.log("status", r.status), (e) => console.log("failed", e.cause?.code))`], { env }, (error, stdout) => resolve(stdout.trim())));
+    try {
+      expect(cliEnv().NODE_OPTIONS ?? "").not.toContain("cli-fetch-timeout");
+      expect(await probe(cliEnv(500))).toBe("failed UND_ERR_HEADERS_TIMEOUT");
+      expect(await probe(cliEnv(10_000))).toBe("status 200");
+    } finally {
+      server.close();
     }
   });
 });
