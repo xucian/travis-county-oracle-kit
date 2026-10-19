@@ -32,7 +32,7 @@
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { createReadStream, createWriteStream, existsSync, openSync, closeSync } from "node:fs";
-import { appendFile, mkdir, readFile, realpath, rename, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, readFile, realpath, rename, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
@@ -277,13 +277,30 @@ function runCli(cli, args, logFile, env = cliEnv()) {
 }
 
 /**
- * Upload every archive CAR, then its tables directory, through the CLI; an existing summary is checked, not redone.
+ * Whether one failed CLI upload may be retried (decisions.md 28.7, decision (8) (i)): only a network error (Node's
+ * `fetch failed`) or a 5xx answer to the CLI's `add` or `dag/import`. Anything else (a 4xx, a CID or root mismatch, a
+ * readback timeout) is final.
  *
- * @param {{ plan: object, out: string, cli: string, api: string, concurrency?: number, runtimeDir: string, fetchTimeoutMs?: number, run?: Function }} options - Plan, output, CLI, Kubo RPC API, the CLI's fetch timeout.
- * @returns {Promise<{ failed: object | null, failures: object[], results: object[] }>} Per root: shard, group, kind, root, gateway URL; every failure, the first as `failed`.
+ * @param {string} text - The CLI's output for that attempt.
+ * @returns {string | null} Why it is retryable, or null.
  */
-export async function uploadAll({ plan, out, cli, api, concurrency = 4, runtimeDir, fetchTimeoutMs, run = runCli }) {
+export function retryableFailure(text) {
+  if (/Upload failed: fetch failed\b/.test(text)) return "network error (fetch failed)";
+  const answer = text.match(/(dag\/import failed|add failed for \S+): (5\d\d) /);
+  return answer ? `HTTP ${answer[2]} on ${answer[1].startsWith("add") ? "add" : "dag/import"}` : null;
+}
+
+/**
+ * Upload every archive CAR, then its tables directory, through the CLI; an existing summary is checked, not redone.
+ * A retryable failure (retryableFailure) is tried again up to `tries` times in all, `backoffMs` apart; every failed
+ * attempt is recorded.
+ *
+ * @param {{ plan: object, out: string, cli: string, api: string, concurrency?: number, runtimeDir: string, fetchTimeoutMs?: number, tries?: number, backoffMs?: number[], run?: Function, sleepImpl?: (ms: number) => Promise<void> }} options - Plan, output, CLI, Kubo RPC API, the CLI's fetch timeout, the retry policy.
+ * @returns {Promise<{ failed: object | null, failures: object[], retries: object[], results: object[] }>} Per root: shard, group, kind, root, gateway URL; every failure (the first as `failed`); every failed attempt.
+ */
+export async function uploadAll({ plan, out, cli, api, concurrency = 4, runtimeDir, fetchTimeoutMs, tries = 3, backoffMs = [2 * MINUTE, 4 * MINUTE], run = runCli, sleepImpl = sleep }) {
   const env = cliEnv(fetchTimeoutMs);
+  const retries = [];
   await mkdir(path.join(out, "uploads"), { recursive: true });
   const results = [];
   const failures = [];
@@ -292,12 +309,20 @@ export async function uploadAll({ plan, out, cli, api, concurrency = 4, runtimeD
     for (const [kind, input, expected] of [["archive", archive.path, archive.root], ["tables", tables?.dir, tables?.root]]) {
       if (failures.length > 0) return;
       const base = path.join(out, "uploads", `${archive.group}-${archive.shard}-${kind}`);
-      if (!existsSync(`${base}.json`)) {
+      for (let attempt = 1; !existsSync(`${base}.json`); attempt += 1) {
+        const offset = existsSync(`${base}.log`) ? (await stat(`${base}.log`)).size : 0;
         const code = await run(cli, ["upload", path.resolve(runtimeDir, input), "--api", api, "--output-json", `${base}.json`], `${base}.log`, env);
-        if (code !== 0 || !existsSync(`${base}.json`)) {
-          failures.push({ shard: archive.shard, group: archive.group, kind, exit_code: code, log: `${base}.log`, at: new Date().toISOString() });
+        if (code === 0 && existsSync(`${base}.json`)) break;
+        const text = existsSync(`${base}.log`) ? (await readFile(`${base}.log`)).subarray(offset).toString("utf8") : "";
+        const reason = code === 0 ? null : retryableFailure(text);
+        const record = { shard: archive.shard, group: archive.group, kind, attempt, exit_code: code, retryable: Boolean(reason), reason: reason ?? (text.trim().split("\n").filter(Boolean).pop() ?? "").slice(0, 300), at: new Date().toISOString() };
+        retries.push(record);
+        if (!reason || attempt >= tries) {
+          failures.push({ ...record, log: `${base}.log` });
           return;
         }
+        await sleepImpl(backoffMs[attempt - 1] ?? backoffMs[backoffMs.length - 1]);
+        if (failures.length > 0) return;
       }
       const summary = JSON.parse(await readFile(`${base}.json`, "utf8"));
       if (summary.root !== expected || (kind === "tables" && summary.countyRoot !== undefined && summary.countyRoot !== archive.root)) {
@@ -307,7 +332,7 @@ export async function uploadAll({ plan, out, cli, api, concurrency = 4, runtimeD
       results.push({ shard: archive.shard, group: archive.group, kind, root: summary.root, gateway_url: summary.gatewayUrl ?? null });
     }
   });
-  return { failed: failures[0] ?? null, failures, results };
+  return { failed: failures[0] ?? null, failures, retries, results };
 }
 
 /** Every root and part CID of the plan, once each. */
@@ -566,9 +591,10 @@ async function main(argv) {
     await write(path.join(out, "tables-cars.json"), results);
     console.log(JSON.stringify({ cars: results.length, blocks: results.reduce((total, entry) => total + entry.block_count, 0), bytes: results.reduce((total, entry) => total + entry.size, 0) }));
   } else if (command === "upload") {
-    const { failed, failures, results } = await uploadAll({ plan, out, cli: flags.cli, api: flags.api ?? "https://rpc.filebase.io", concurrency: Number(flags.concurrency ?? 4), runtimeDir, fetchTimeoutMs: flags["fetch-timeout-minutes"] ? Number(flags["fetch-timeout-minutes"]) * MINUTE : undefined });
-    await write(path.join(out, "uploads.json"), { failed, failures, results });
-    console.log(JSON.stringify({ uploaded: results.length, failures }));
+    const { failed, failures, retries, results } = await uploadAll({ plan, out, cli: flags.cli, api: flags.api ?? "https://rpc.filebase.io", concurrency: Number(flags.concurrency ?? 4), runtimeDir, fetchTimeoutMs: flags["fetch-timeout-minutes"] ? Number(flags["fetch-timeout-minutes"]) * MINUTE : undefined });
+    const previous = existsSync(path.join(out, "uploads.json")) ? (await read(path.join(out, "uploads.json"))).retries ?? [] : [];
+    await write(path.join(out, "uploads.json"), { failed, failures, retries: [...previous, ...retries], results });
+    console.log(JSON.stringify({ uploaded: results.length, retries: retries.length, failures }));
     if (failed) process.exitCode = 1;
   } else if (command === "filebase-pins") {
     const cids = planCids(plan);

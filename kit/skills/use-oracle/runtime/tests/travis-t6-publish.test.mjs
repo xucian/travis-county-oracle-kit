@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 import { rawCid, readCarBlocks } from "../src/counties/travis/publish.mjs";
-import { buildPlan, buildShardManifest, cliLibraries, gatewayJobs, importFromCli, pinRoots, runGatewayChecks, summarizeGateways, unixfsCid, uploadAll, writeTablesCar, cliEnv } from "../src/counties/travis/t6-publish.mjs";
+import { buildPlan, buildShardManifest, cliLibraries, gatewayJobs, importFromCli, pinRoots, runGatewayChecks, summarizeGateways, unixfsCid, uploadAll, writeTablesCar, cliEnv, retryableFailure } from "../src/counties/travis/t6-publish.mjs";
 
 const CLI = process.env.ELEPHANT_CLI ?? "/Users/luti/dev/oracle-property-intelligence-platform-pipeline-travis-tx/node_modules/.bin/elephant-cli";
 const hasCli = existsSync(CLI);
@@ -227,6 +227,41 @@ describe("T6 gateway checks and Pinata pins", () => {
       expect(await probe(cliEnv(10_000))).toBe("status 200");
     } finally {
       server.close();
+    }
+  });
+
+  it("retries an upload only on a 5xx or a network error, at most 3 tries, 2 and 4 minutes apart, keeping every attempt", async () => {
+    const out = await mkdtemp(path.join(tmpdir(), "travis-t6-retry-"));
+    try {
+      expect(retryableFailure("❌ Upload failed: add failed for /x/part-00000.parquet: 502 Bad Gateway: <html>")).toBe("HTTP 502 on add");
+      expect(retryableFailure("❌ Upload failed: dag/import failed: 503 Service Unavailable: busy")).toBe("HTTP 503 on dag/import");
+      expect(retryableFailure("❌ Upload failed: fetch failed")).toBe("network error (fetch failed)");
+      expect(retryableFailure("❌ Upload failed: add failed for /x/p.parquet: 403 Forbidden: no")).toBeNull();
+      expect(retryableFailure("❌ Upload failed: Timed out waiting for the root")).toBeNull();
+      const script = { "s0001.car": ["fetch failed", "add failed for /x/a.parquet: 502 Bad Gateway: x", "ok"], "s0001-tables": ["ok"], "s0002.car": ["add failed for /x/b.parquet: 403 Forbidden: x"], "s0003.car": ["fetch failed", "fetch failed", "fetch failed"] };
+      const run = async (cli, args, logFile) => {
+        const name = path.basename(args[1]);
+        const next = script[name].shift();
+        if (next === "ok") {
+          await writeFile(args[args.length - 1], JSON.stringify(name.endsWith("-tables") ? { root: `t-${name.slice(0, 5)}`, countyRoot: `a-${name.slice(0, 5)}` } : { root: `a-${name.slice(0, 5)}` }));
+          return 0;
+        }
+        await writeFile(logFile, `❌ Upload failed: ${next}\n`, { flag: "a" });
+        return 1;
+      };
+      const waits = [];
+      const plan = (shard) => ({ archives: [{ shard, group: "county", path: `${shard}.car`, root: `a-${shard}` }], tables: [{ shard, group: "county", dir: `${shard}-tables`, root: `t-${shard}` }] });
+      const ok = await uploadAll({ plan: plan("s0001"), out, cli: "cli", api: "https://rpc", runtimeDir: "/r", run, sleepImpl: async (ms) => { waits.push(ms); } });
+      expect(ok.results.map((result) => result.root)).toEqual(["a-s0001", "t-s0001"]);
+      expect(ok.retries.map((entry) => [entry.attempt, entry.reason])).toEqual([[1, "network error (fetch failed)"], [2, "HTTP 502 on add"]]);
+      expect(waits).toEqual([120_000, 240_000]);
+      const refused = await uploadAll({ plan: plan("s0002"), out, cli: "cli", api: "https://rpc", runtimeDir: "/r", run, sleepImpl: async () => {} });
+      expect(refused.failures).toMatchObject([{ shard: "s0002", attempt: 1, retryable: false }]);
+      const third = await uploadAll({ plan: plan("s0003"), out, cli: "cli", api: "https://rpc", runtimeDir: "/r", run, sleepImpl: async () => {} });
+      expect(third.failures).toMatchObject([{ shard: "s0003", attempt: 3, retryable: true }]);
+      expect(third.retries).toHaveLength(3);
+    } finally {
+      await rm(out, { recursive: true, force: true });
     }
   });
 });

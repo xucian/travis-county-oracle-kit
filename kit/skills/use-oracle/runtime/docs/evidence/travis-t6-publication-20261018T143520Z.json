@@ -1,8 +1,8 @@
 {
   "schemaVersion": "travis.t6-publication.v1",
   "run_id": "20261018T143520Z-t5-full",
-  "status": "stopped at the Filebase upload, attempt 2 (decisions.md 28.7)",
-  "kit_commit": "bfb3b50, 3b86fc9, 387a324 (the CLI fetch-timeout preload)",
+  "status": "uploaded with readback; stopped at the 4everland gateway sample (decisions.md 28.7)",
+  "kit_commit": "bfb3b50, 3b86fc9, 387a324 (fetch-timeout preload), 2d45598 (bounded retry)",
   "cli": "elephant-cli 1.58.1",
   "node": "v22.22.0",
   "layout": "D: 177 shard archives as they are, no Atlas PR (decisions.md 28.3, operator's go 2026-10-19)",
@@ -173,6 +173,35 @@
             "max": 349
           }
         }
+      },
+      {
+        "attempt": 3,
+        "started": "2026-10-19T17:27:57Z",
+        "finished": "2026-10-19T20:38:25Z",
+        "concurrency": 8,
+        "cli_fetch_timeout": "30 minutes",
+        "retry": "at most 3 tries for fetch failed or a 5xx, 2 and 4 minutes apart",
+        "read_back": 354,
+        "failures": [],
+        "retried_attempts": 17,
+        "retried_by_reason": [
+          {
+            "what": "county tables",
+            "reason": "network error (fetch failed)",
+            "count": 12
+          },
+          {
+            "what": "property_improvement tables",
+            "reason": "network error (fetch failed)",
+            "count": 4
+          },
+          {
+            "what": "county tables",
+            "reason": "HTTP 500 on dag/import",
+            "count": 1
+          }
+        ],
+        "max_attempt": 2
       }
     ],
     "read_back": [
@@ -199,17 +228,17 @@
       },
       {
         "group": "property_improvement",
-        "shard": "s0002",
+        "shard": "s0003",
         "kind": "archive",
-        "root": "baguqeeramtky5rdk5eqg7ms4wuc7ll4ljw3zpqq3lkdvu7xyk2e3pklwi6ua",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeramtky5rdk5eqg7ms4wuc7ll4ljw3zpqq3lkdvu7xyk2e3pklwi6ua"
+        "root": "baguqeera2mo74uogow2gv6vsogc3b6mlj5v7hzqlkas4drx3cmpigobecbja",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2mo74uogow2gv6vsogc3b6mlj5v7hzqlkas4drx3cmpigobecbja"
       },
       {
         "group": "property_improvement",
         "shard": "s0002",
-        "kind": "tables",
-        "root": "baguqeeraqirxninc7dtpgwxirvm4d7gbcaaeywxmivxswlmpu3fdsjjf4vla",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraqirxninc7dtpgwxirvm4d7gbcaaeywxmivxswlmpu3fdsjjf4vla"
+        "kind": "archive",
+        "root": "baguqeeramtky5rdk5eqg7ms4wuc7ll4ljw3zpqq3lkdvu7xyk2e3pklwi6ua",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeramtky5rdk5eqg7ms4wuc7ll4ljw3zpqq3lkdvu7xyk2e3pklwi6ua"
       },
       {
         "group": "county",
@@ -220,17 +249,31 @@
       },
       {
         "group": "county",
-        "shard": "s0003",
-        "kind": "tables",
-        "root": "baguqeeradj2i7fho3nnmdwtp5cyopedysqsfmjrfs4sf42ygkqiaoctgjola",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeradj2i7fho3nnmdwtp5cyopedysqsfmjrfs4sf42ygkqiaoctgjola"
+        "shard": "s0004",
+        "kind": "archive",
+        "root": "baguqeera7f2uylqkggn4vu5fmtxg5tevbeqevwmxdtkgo46fkem65fqsbhta",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7f2uylqkggn4vu5fmtxg5tevbeqevwmxdtkgo46fkem65fqsbhta"
       },
       {
         "group": "property_improvement",
-        "shard": "s0003",
+        "shard": "s0004",
         "kind": "archive",
-        "root": "baguqeera2mo74uogow2gv6vsogc3b6mlj5v7hzqlkas4drx3cmpigobecbja",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2mo74uogow2gv6vsogc3b6mlj5v7hzqlkas4drx3cmpigobecbja"
+        "root": "baguqeeraidfcn4k3ytddoddqsczdgt5jrtvfyizqmcuumrlgjf7ybhyx76sa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraidfcn4k3ytddoddqsczdgt5jrtvfyizqmcuumrlgjf7ybhyx76sa"
+      },
+      {
+        "group": "county",
+        "shard": "s0001",
+        "kind": "tables",
+        "root": "baguqeeraycviaomerv6iztjpj2hszfodqrksah7o2ih567euppvixrgljw4q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraycviaomerv6iztjpj2hszfodqrksah7o2ih567euppvixrgljw4q"
+      },
+      {
+        "group": "county",
+        "shard": "s0002",
+        "kind": "tables",
+        "root": "baguqeerasbhgimv2ddkhpp46ikkzw3hqmtpddmc5iugci6atvf5f64fvoa7a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerasbhgimv2ddkhpp46ikkzw3hqmtpddmc5iugci6atvf5f64fvoa7a"
       },
       {
         "group": "property_improvement",
@@ -240,11 +283,11 @@
         "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera5ciiyezwll2jqpsaagqjo5sg2z75jfilw3ofdpedocrqy5rh2cya"
       },
       {
-        "group": "county",
-        "shard": "s0004",
-        "kind": "archive",
-        "root": "baguqeera7f2uylqkggn4vu5fmtxg5tevbeqevwmxdtkgo46fkem65fqsbhta",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7f2uylqkggn4vu5fmtxg5tevbeqevwmxdtkgo46fkem65fqsbhta"
+        "group": "property_improvement",
+        "shard": "s0002",
+        "kind": "tables",
+        "root": "baguqeeraqirxninc7dtpgwxirvm4d7gbcaaeywxmivxswlmpu3fdsjjf4vla",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraqirxninc7dtpgwxirvm4d7gbcaaeywxmivxswlmpu3fdsjjf4vla"
       },
       {
         "group": "property_improvement",
@@ -254,11 +297,18 @@
         "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3ma3ob2rvyu7jqtwjsoiw5snam3f3iiwcnorlrbqsivirhyg2xca"
       },
       {
-        "group": "property_improvement",
+        "group": "county",
+        "shard": "s0003",
+        "kind": "tables",
+        "root": "baguqeeradj2i7fho3nnmdwtp5cyopedysqsfmjrfs4sf42ygkqiaoctgjola",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeradj2i7fho3nnmdwtp5cyopedysqsfmjrfs4sf42ygkqiaoctgjola"
+      },
+      {
+        "group": "county",
         "shard": "s0004",
-        "kind": "archive",
-        "root": "baguqeeraidfcn4k3ytddoddqsczdgt5jrtvfyizqmcuumrlgjf7ybhyx76sa",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraidfcn4k3ytddoddqsczdgt5jrtvfyizqmcuumrlgjf7ybhyx76sa"
+        "kind": "tables",
+        "root": "baguqeerazsomfesiv6ne6yfsqhjmslsei23rpatn4oa6owxrin4pzey2emda",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerazsomfesiv6ne6yfsqhjmslsei23rpatn4oa6owxrin4pzey2emda"
       },
       {
         "group": "property_improvement",
@@ -275,67 +325,11 @@
         "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraykbm226xugtorc4zsmjpcw22jdbgw43wlvluk3mk7wiozickg63q"
       },
       {
-        "group": "county",
-        "shard": "s0001",
-        "kind": "tables",
-        "root": "baguqeeraycviaomerv6iztjpj2hszfodqrksah7o2ih567euppvixrgljw4q",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraycviaomerv6iztjpj2hszfodqrksah7o2ih567euppvixrgljw4q"
-      },
-      {
         "group": "property_improvement",
         "shard": "s0005",
         "kind": "archive",
         "root": "baguqeerahz4r5uaut5xwmr4rit76vsbdvh7ivufezpuyvlyjkvr2jnwrzpiq",
         "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerahz4r5uaut5xwmr4rit76vsbdvh7ivufezpuyvlyjkvr2jnwrzpiq"
-      },
-      {
-        "group": "property_improvement",
-        "shard": "s0005",
-        "kind": "tables",
-        "root": "baguqeeraquqxtjvycxvyq5yrrekmo4clzyq3gffai4pprmaj6trve7ffjz3a",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraquqxtjvycxvyq5yrrekmo4clzyq3gffai4pprmaj6trve7ffjz3a"
-      },
-      {
-        "group": "county",
-        "shard": "s0006",
-        "kind": "archive",
-        "root": "baguqeeral5gkkrkkhxd3463r22jfahlsp5jgbsb7boivub5cu2w22oyddkba",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeral5gkkrkkhxd3463r22jfahlsp5jgbsb7boivub5cu2w22oyddkba"
-      },
-      {
-        "group": "county",
-        "shard": "s0004",
-        "kind": "tables",
-        "root": "baguqeerazsomfesiv6ne6yfsqhjmslsei23rpatn4oa6owxrin4pzey2emda",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerazsomfesiv6ne6yfsqhjmslsei23rpatn4oa6owxrin4pzey2emda"
-      },
-      {
-        "group": "property_improvement",
-        "shard": "s0006",
-        "kind": "archive",
-        "root": "baguqeera3nkz32toev6wcl7ndmi6vshjvntcua56sm2ivjzxsbjo27rzi5zq",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3nkz32toev6wcl7ndmi6vshjvntcua56sm2ivjzxsbjo27rzi5zq"
-      },
-      {
-        "group": "county",
-        "shard": "s0002",
-        "kind": "tables",
-        "root": "baguqeerasbhgimv2ddkhpp46ikkzw3hqmtpddmc5iugci6atvf5f64fvoa7a",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerasbhgimv2ddkhpp46ikkzw3hqmtpddmc5iugci6atvf5f64fvoa7a"
-      },
-      {
-        "group": "county",
-        "shard": "s0007",
-        "kind": "archive",
-        "root": "baguqeera3x6gczwm4pnsvsd7oktrw7gsdscip4pr4ktu2xfdhjsv5udheudq",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3x6gczwm4pnsvsd7oktrw7gsdscip4pr4ktu2xfdhjsv5udheudq"
-      },
-      {
-        "group": "property_improvement",
-        "shard": "s0006",
-        "kind": "tables",
-        "root": "baguqeeraebladsgkzd25zzgzh5tus3n3j7r7k2fziww4gyt5x6a5apnm4wba",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraebladsgkzd25zzgzh5tus3n3j7r7k2fziww4gyt5x6a5apnm4wba"
       },
       {
         "group": "property_improvement",
@@ -346,10 +340,24 @@
       },
       {
         "group": "county",
+        "shard": "s0007",
+        "kind": "archive",
+        "root": "baguqeera3x6gczwm4pnsvsd7oktrw7gsdscip4pr4ktu2xfdhjsv5udheudq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3x6gczwm4pnsvsd7oktrw7gsdscip4pr4ktu2xfdhjsv5udheudq"
+      },
+      {
+        "group": "county",
         "shard": "s0006",
-        "kind": "tables",
-        "root": "baguqeerar6mfooicq4byk5pdytafv5kdmz6fc4kuqfujz3eeb6p23ism3i3a",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerar6mfooicq4byk5pdytafv5kdmz6fc4kuqfujz3eeb6p23ism3i3a"
+        "kind": "archive",
+        "root": "baguqeeral5gkkrkkhxd3463r22jfahlsp5jgbsb7boivub5cu2w22oyddkba",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeral5gkkrkkhxd3463r22jfahlsp5jgbsb7boivub5cu2w22oyddkba"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0006",
+        "kind": "archive",
+        "root": "baguqeera3nkz32toev6wcl7ndmi6vshjvntcua56sm2ivjzxsbjo27rzi5zq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3nkz32toev6wcl7ndmi6vshjvntcua56sm2ivjzxsbjo27rzi5zq"
       },
       {
         "group": "county",
@@ -357,6 +365,20 @@
         "kind": "archive",
         "root": "baguqeerangke3kvfscm5i3zpgjavjvkkx3cpstsujfam62q3ofggcvulvjea",
         "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerangke3kvfscm5i3zpgjavjvkkx3cpstsujfam62q3ofggcvulvjea"
+      },
+      {
+        "group": "county",
+        "shard": "s0005",
+        "kind": "tables",
+        "root": "baguqeeraevgq2zkjeep5wuj3dc5wqmqjaomwlyc7vy67h6qy5pm62zspdrwq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraevgq2zkjeep5wuj3dc5wqmqjaomwlyc7vy67h6qy5pm62zspdrwq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0005",
+        "kind": "tables",
+        "root": "baguqeeraquqxtjvycxvyq5yrrekmo4clzyq3gffai4pprmaj6trve7ffjz3a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraquqxtjvycxvyq5yrrekmo4clzyq3gffai4pprmaj6trve7ffjz3a"
       },
       {
         "group": "property_improvement",
@@ -374,19 +396,2527 @@
       },
       {
         "group": "county",
-        "shard": "s0005",
+        "shard": "s0006",
         "kind": "tables",
-        "root": "baguqeeraevgq2zkjeep5wuj3dc5wqmqjaomwlyc7vy67h6qy5pm62zspdrwq",
-        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraevgq2zkjeep5wuj3dc5wqmqjaomwlyc7vy67h6qy5pm62zspdrwq"
+        "root": "baguqeerar6mfooicq4byk5pdytafv5kdmz6fc4kuqfujz3eeb6p23ism3i3a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerar6mfooicq4byk5pdytafv5kdmz6fc4kuqfujz3eeb6p23ism3i3a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0006",
+        "kind": "tables",
+        "root": "baguqeeraebladsgkzd25zzgzh5tus3n3j7r7k2fziww4gyt5x6a5apnm4wba",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraebladsgkzd25zzgzh5tus3n3j7r7k2fziww4gyt5x6a5apnm4wba"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0011",
+        "kind": "archive",
+        "root": "baguqeera4phihney4f57f5r7n2kwvvo63b3vjgjpc6m5lehxfcbvxhx5zfqq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera4phihney4f57f5r7n2kwvvo63b3vjgjpc6m5lehxfcbvxhx5zfqq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0009",
+        "kind": "archive",
+        "root": "baguqeeraknjdcexsu5xkaplmkwttdxildljxsosqug5az3gjhyjah3dbdm3q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraknjdcexsu5xkaplmkwttdxildljxsosqug5az3gjhyjah3dbdm3q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0010",
+        "kind": "archive",
+        "root": "baguqeerai477fo64lsyspaxciwwjxtj3piin4h4aqlvndu7xz5sqveqekxhq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerai477fo64lsyspaxciwwjxtj3piin4h4aqlvndu7xz5sqveqekxhq"
+      },
+      {
+        "group": "county",
+        "shard": "s0010",
+        "kind": "archive",
+        "root": "baguqeeracngla5fqopwffqjllagzuncueriqtieyj5c6j4utmztxob6nhvqq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeracngla5fqopwffqjllagzuncueriqtieyj5c6j4utmztxob6nhvqq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0011",
+        "kind": "tables",
+        "root": "baguqeerafkyqvji6tz67yms4fnzsduzq5hbia6yrijpchyp2aiislxvi4d7a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerafkyqvji6tz67yms4fnzsduzq5hbia6yrijpchyp2aiislxvi4d7a"
+      },
+      {
+        "group": "county",
+        "shard": "s0009",
+        "kind": "archive",
+        "root": "baguqeera2hvukoghetfggzfnlcyoq543isprhhbcp5ka2pottm72hrewjs5q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2hvukoghetfggzfnlcyoq543isprhhbcp5ka2pottm72hrewjs5q"
+      },
+      {
+        "group": "county",
+        "shard": "s0011",
+        "kind": "archive",
+        "root": "baguqeera2yzcnuakttywyycdeqc256hfkiogz3kkg6fq4237rjikrknnrd7a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2yzcnuakttywyycdeqc256hfkiogz3kkg6fq4237rjikrknnrd7a"
+      },
+      {
+        "group": "county",
+        "shard": "s0012",
+        "kind": "archive",
+        "root": "baguqeeransk6vaqdwnp3mduskpkppjobxvmqilncxtuviejmau76y4wwj52a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeransk6vaqdwnp3mduskpkppjobxvmqilncxtuviejmau76y4wwj52a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0008",
+        "kind": "archive",
+        "root": "baguqeerabh7o2iztatujgtxaj3cdi4urfb3dnhqilyshqakivf7hyvm6ay6a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerabh7o2iztatujgtxaj3cdi4urfb3dnhqilyshqakivf7hyvm6ay6a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0010",
+        "kind": "tables",
+        "root": "baguqeerav5qeq7yctg44ci2pmfwjnytkaamsmba4mdj4dqefzdsl7vyti75q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerav5qeq7yctg44ci2pmfwjnytkaamsmba4mdj4dqefzdsl7vyti75q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0012",
+        "kind": "archive",
+        "root": "baguqeeraqpxn6mtexqgrt5u4vicbzvujcbl4drm7urjv72x2vrpycuvywsda",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraqpxn6mtexqgrt5u4vicbzvujcbl4drm7urjv72x2vrpycuvywsda"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0012",
+        "kind": "tables",
+        "root": "baguqeerajdqnb6vupptmrkkmbjqmihvrbzfoolv634upgjuplmfjt6i33pxa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerajdqnb6vupptmrkkmbjqmihvrbzfoolv634upgjuplmfjt6i33pxa"
+      },
+      {
+        "group": "county",
+        "shard": "s0013",
+        "kind": "archive",
+        "root": "baguqeeraga77bhjdfyrciukbfevx7v2vkabf5dmbg7v7n6jpdidg6uaqn3lq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraga77bhjdfyrciukbfevx7v2vkabf5dmbg7v7n6jpdidg6uaqn3lq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0009",
+        "kind": "tables",
+        "root": "baguqeeradl6wxwv2ebl46smqzztfwwfoyamkhzzk3oels6qvi4o44sn2l3ma",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeradl6wxwv2ebl46smqzztfwwfoyamkhzzk3oels6qvi4o44sn2l3ma"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0013",
+        "kind": "archive",
+        "root": "baguqeera2fnd5gf22s3lkstmg2n7owqyi5w7wcwihtebuwpvmgtcx5i3zrzq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2fnd5gf22s3lkstmg2n7owqyi5w7wcwihtebuwpvmgtcx5i3zrzq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0013",
+        "kind": "tables",
+        "root": "baguqeerae32r5vbovmcvfqfq5btdxappu37cou55yhnh6rgrfddfhpzndpqq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerae32r5vbovmcvfqfq5btdxappu37cou55yhnh6rgrfddfhpzndpqq"
+      },
+      {
+        "group": "county",
+        "shard": "s0014",
+        "kind": "archive",
+        "root": "baguqeeraonq6ruwb2wvq55mdy3fbfrxlntbl4dfcms6qlsnb3yw3srg5sznq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraonq6ruwb2wvq55mdy3fbfrxlntbl4dfcms6qlsnb3yw3srg5sznq"
+      },
+      {
+        "group": "county",
+        "shard": "s0014",
+        "kind": "tables",
+        "root": "baguqeeraysk4shbamux4o6g4bo7ru7zpuyv75v5hst44koe57uydmek6ak7a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraysk4shbamux4o6g4bo7ru7zpuyv75v5hst44koe57uydmek6ak7a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0014",
+        "kind": "archive",
+        "root": "baguqeerajb6egaiwvavv6yvdpfobmdia463qo67em43d66hgni4cyvg4g65a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerajb6egaiwvavv6yvdpfobmdia463qo67em43d66hgni4cyvg4g65a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0014",
+        "kind": "tables",
+        "root": "baguqeerae4ltqcmdmieog4oupg2un2qvelk7uzxdgr7m3nwkarbvhpvzkayq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerae4ltqcmdmieog4oupg2un2qvelk7uzxdgr7m3nwkarbvhpvzkayq"
+      },
+      {
+        "group": "county",
+        "shard": "s0009",
+        "kind": "tables",
+        "root": "baguqeera3ng62ybywkqp7wofxwkd4bvjd7zdfmimja4kyfzehoyibhgn2opq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3ng62ybywkqp7wofxwkd4bvjd7zdfmimja4kyfzehoyibhgn2opq"
+      },
+      {
+        "group": "county",
+        "shard": "s0015",
+        "kind": "archive",
+        "root": "baguqeeransdb76bw2dyfjurvemq6zvblm2ngmvw62lfm7j5oy2zqofx2w6yq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeransdb76bw2dyfjurvemq6zvblm2ngmvw62lfm7j5oy2zqofx2w6yq"
+      },
+      {
+        "group": "county",
+        "shard": "s0008",
+        "kind": "tables",
+        "root": "baguqeerab5kmrkkdzjuhic3fyuololzzh3j3q7c7p4q2zryf472fvxtixizq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerab5kmrkkdzjuhic3fyuololzzh3j3q7c7p4q2zryf472fvxtixizq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0015",
+        "kind": "archive",
+        "root": "baguqeeragvldbuocl6umryzmthsrobbb6iytnvxvounjos7j4v5646ukpl5q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeragvldbuocl6umryzmthsrobbb6iytnvxvounjos7j4v5646ukpl5q"
+      },
+      {
+        "group": "county",
+        "shard": "s0010",
+        "kind": "tables",
+        "root": "baguqeera63zekcx2atczvwsxm2m7sknqspnjonfrt2vuy247dl5ualxua4sa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera63zekcx2atczvwsxm2m7sknqspnjonfrt2vuy247dl5ualxua4sa"
+      },
+      {
+        "group": "county",
+        "shard": "s0016",
+        "kind": "archive",
+        "root": "baguqeerahiijkkzjmuvy2me66fy7v3oenjj73ax4a2hl7f2lmfm755nwxjfq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerahiijkkzjmuvy2me66fy7v3oenjj73ax4a2hl7f2lmfm755nwxjfq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0016",
+        "kind": "archive",
+        "root": "baguqeeraux223hcv66rzldpp4cf6lwk6hmkd7o63yzjvjgdhytfvxjf3f2iq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraux223hcv66rzldpp4cf6lwk6hmkd7o63yzjvjgdhytfvxjf3f2iq"
+      },
+      {
+        "group": "county",
+        "shard": "s0016",
+        "kind": "tables",
+        "root": "baguqeeraw2r5dflpi6midspjuni2za2i5altmfn4pszx2nge2pa57gzcpoxa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraw2r5dflpi6midspjuni2za2i5altmfn4pszx2nge2pa57gzcpoxa"
+      },
+      {
+        "group": "county",
+        "shard": "s0017",
+        "kind": "archive",
+        "root": "baguqeera3cxwrgmjywhfanvzno5ekfxcymupmirjloe46wsua2e4w6u5u5vq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3cxwrgmjywhfanvzno5ekfxcymupmirjloe46wsua2e4w6u5u5vq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0008",
+        "kind": "tables",
+        "root": "baguqeeradk42fqhdwczxjt32zknunxr6bnn4rujmv2pgdv4f7mhgik7kwd7a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeradk42fqhdwczxjt32zknunxr6bnn4rujmv2pgdv4f7mhgik7kwd7a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0017",
+        "kind": "archive",
+        "root": "baguqeerabrzqayi2rscoy77uwvoqkjzqb7wyqoh4qjmqwejvsllxnk77sdgq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerabrzqayi2rscoy77uwvoqkjzqb7wyqoh4qjmqwejvsllxnk77sdgq"
+      },
+      {
+        "group": "county",
+        "shard": "s0013",
+        "kind": "tables",
+        "root": "baguqeeradgbgiohcue5rzojwjq35ezboqpcrfwqx2i3bauywhcbsdmfsbv3q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeradgbgiohcue5rzojwjq35ezboqpcrfwqx2i3bauywhcbsdmfsbv3q"
+      },
+      {
+        "group": "county",
+        "shard": "s0018",
+        "kind": "archive",
+        "root": "baguqeeraicpxd6us6bk5cvqirhyvi3uflknrqr3pnpkid62gxmlhsnlja4ra",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraicpxd6us6bk5cvqirhyvi3uflknrqr3pnpkid62gxmlhsnlja4ra"
+      },
+      {
+        "group": "county",
+        "shard": "s0015",
+        "kind": "tables",
+        "root": "baguqeerak2zoxy3kfhs3yugtpptwxahdalvamcnskfnx6h3ye3g4xzfj5klq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerak2zoxy3kfhs3yugtpptwxahdalvamcnskfnx6h3ye3g4xzfj5klq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0018",
+        "kind": "archive",
+        "root": "baguqeerasatg3vpozdvk5n23qilp5nul6n2yts525wuajeyj4v4rmujselza",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerasatg3vpozdvk5n23qilp5nul6n2yts525wuajeyj4v4rmujselza"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0016",
+        "kind": "tables",
+        "root": "baguqeeragi7wexaict757lmysmlq67xcvzehntolxeq5gfl5bo4e32vzpgba",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeragi7wexaict757lmysmlq67xcvzehntolxeq5gfl5bo4e32vzpgba"
+      },
+      {
+        "group": "county",
+        "shard": "s0019",
+        "kind": "archive",
+        "root": "baguqeerakzw77pwcgkohx2hvesk262phkgmltl7yksf2uvq6mzm7n3rfkyiq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerakzw77pwcgkohx2hvesk262phkgmltl7yksf2uvq6mzm7n3rfkyiq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0015",
+        "kind": "tables",
+        "root": "baguqeerai6tgbjz6tj5ttp4krheo4jdcxycpxugd4crho2h2qlz2zfylxwca",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerai6tgbjz6tj5ttp4krheo4jdcxycpxugd4crho2h2qlz2zfylxwca"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0018",
+        "kind": "tables",
+        "root": "baguqeeraus7kystdj2bojzfwmu7ldxksy3ifdy5d3ceazow4qy2fmtns252a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraus7kystdj2bojzfwmu7ldxksy3ifdy5d3ceazow4qy2fmtns252a"
+      },
+      {
+        "group": "county",
+        "shard": "s0020",
+        "kind": "archive",
+        "root": "baguqeeragyrrhu4dht72yfm7wmrwoggk2r2glax4qiqp5umtshiijoxsompq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeragyrrhu4dht72yfm7wmrwoggk2r2glax4qiqp5umtshiijoxsompq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0017",
+        "kind": "tables",
+        "root": "baguqeerarualazvpkyehqe2qzryqwmfxviamnqo5nbyknbh4ugvufoy3cvcq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerarualazvpkyehqe2qzryqwmfxviamnqo5nbyknbh4ugvufoy3cvcq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0020",
+        "kind": "archive",
+        "root": "baguqeeragmh2yldv5ddrnzjtwuwjmb6sf6vpttqfm2x5xw45vxclx3f2gqla",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeragmh2yldv5ddrnzjtwuwjmb6sf6vpttqfm2x5xw45vxclx3f2gqla"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0019",
+        "kind": "archive",
+        "root": "baguqeeravd2pwa6z2nlrbwzmz4l5vemnknq25j7b2he55fprhgq6c7aiapdq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeravd2pwa6z2nlrbwzmz4l5vemnknq25j7b2he55fprhgq6c7aiapdq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0020",
+        "kind": "tables",
+        "root": "baguqeerai2iuxvyvso2k2l7jzuybb37nsjf5tmpy2466ybxoymjg6sjpijea",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerai2iuxvyvso2k2l7jzuybb37nsjf5tmpy2466ybxoymjg6sjpijea"
+      },
+      {
+        "group": "county",
+        "shard": "s0021",
+        "kind": "archive",
+        "root": "baguqeera4r3ss7xbgxrewgwscolbeoy4jhltyhjchb7z3krvxnzyxtusrdha",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera4r3ss7xbgxrewgwscolbeoy4jhltyhjchb7z3krvxnzyxtusrdha"
+      },
+      {
+        "group": "county",
+        "shard": "s0012",
+        "kind": "tables",
+        "root": "baguqeeraqutzhobwvgxk22xcqrk6vpp2wwzwbgv6nebkh5ucr56ar6j7hapq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraqutzhobwvgxk22xcqrk6vpp2wwzwbgv6nebkh5ucr56ar6j7hapq"
+      },
+      {
+        "group": "county",
+        "shard": "s0011",
+        "kind": "tables",
+        "root": "baguqeera6j46u3qddtu7o7luyvfwigikcalqr5h7hjq5smlkxzjtgqwamnqq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera6j46u3qddtu7o7luyvfwigikcalqr5h7hjq5smlkxzjtgqwamnqq"
+      },
+      {
+        "group": "county",
+        "shard": "s0021",
+        "kind": "tables",
+        "root": "baguqeerahq6tvrvqanjqmmvmseg6tyzzyddfits47pe3q2akvvu2nyr4up6a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerahq6tvrvqanjqmmvmseg6tyzzyddfits47pe3q2akvvu2nyr4up6a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0021",
+        "kind": "archive",
+        "root": "baguqeera5q4xjq5xr3h6eahhi6d724gisvprpba6d3gpl6e7pq2o7rk2xr7q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera5q4xjq5xr3h6eahhi6d724gisvprpba6d3gpl6e7pq2o7rk2xr7q"
+      },
+      {
+        "group": "county",
+        "shard": "s0022",
+        "kind": "archive",
+        "root": "baguqeeraep42wep33vear35yf2lm2n3bwtcpjvkesrz252qvhqhmfwnqtora",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraep42wep33vear35yf2lm2n3bwtcpjvkesrz252qvhqhmfwnqtora"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0022",
+        "kind": "archive",
+        "root": "baguqeera2i763ybf22u4rnqigejcgsvbzvq6ybao7ynhnzh77pjcsjo3ns3a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2i763ybf22u4rnqigejcgsvbzvq6ybao7ynhnzh77pjcsjo3ns3a"
+      },
+      {
+        "group": "county",
+        "shard": "s0019",
+        "kind": "tables",
+        "root": "baguqeera4umcl3xg2v4gh5ev6ml47rqh3pljhtosocjmic5vwnp6lhaf26qq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera4umcl3xg2v4gh5ev6ml47rqh3pljhtosocjmic5vwnp6lhaf26qq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0021",
+        "kind": "tables",
+        "root": "baguqeera2uexc6bbapn36rsbjopfkjsigw7trxxgw3mnttav4cqvkdzntqwq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2uexc6bbapn36rsbjopfkjsigw7trxxgw3mnttav4cqvkdzntqwq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0019",
+        "kind": "tables",
+        "root": "baguqeeraswrvumpdv6xomkq4k37ixr4sqruehymg54z4rrdvcj67yeulwc7a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraswrvumpdv6xomkq4k37ixr4sqruehymg54z4rrdvcj67yeulwc7a"
+      },
+      {
+        "group": "county",
+        "shard": "s0023",
+        "kind": "archive",
+        "root": "baguqeera7xdq4qlsbweiys47272ixrbadnlv2wr5o7t4i77ivpfwiag5zltq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7xdq4qlsbweiys47272ixrbadnlv2wr5o7t4i77ivpfwiag5zltq"
+      },
+      {
+        "group": "county",
+        "shard": "s0024",
+        "kind": "archive",
+        "root": "baguqeeraf5wxyeqbxb4kg67hxglhiy2h2co47teyqx7c736bs6wjkxf4hrvq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraf5wxyeqbxb4kg67hxglhiy2h2co47teyqx7c736bs6wjkxf4hrvq"
+      },
+      {
+        "group": "county",
+        "shard": "s0023",
+        "kind": "tables",
+        "root": "baguqeerahit4rnfhfqy7dg5bbi5ncmg772vaw5f3wiplwql2yxbd2l3fyttq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerahit4rnfhfqy7dg5bbi5ncmg772vaw5f3wiplwql2yxbd2l3fyttq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0024",
+        "kind": "archive",
+        "root": "baguqeeraqo3hiyduzj7reptjpe4vdjetlbaiisdleh6mn3xriahk4cwoaq6a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraqo3hiyduzj7reptjpe4vdjetlbaiisdleh6mn3xriahk4cwoaq6a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0023",
+        "kind": "archive",
+        "root": "baguqeerauwppz2m5xdfunxmrx2upk6ovkxyt3llk253vz5z3kyitdxcixdoq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerauwppz2m5xdfunxmrx2upk6ovkxyt3llk253vz5z3kyitdxcixdoq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0022",
+        "kind": "tables",
+        "root": "baguqeerawuiapsmwztpvlj23mdckwmtw2etwwkrmyjmke6p446mhwtqj2yma",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerawuiapsmwztpvlj23mdckwmtw2etwwkrmyjmke6p446mhwtqj2yma"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0023",
+        "kind": "tables",
+        "root": "baguqeeraxodci7iqnrqoh53ki4253nijhmjmniffgpakliw2hcn4jpmdhufq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraxodci7iqnrqoh53ki4253nijhmjmniffgpakliw2hcn4jpmdhufq"
+      },
+      {
+        "group": "county",
+        "shard": "s0025",
+        "kind": "archive",
+        "root": "baguqeerajaquaoi5zk27ubnw22vpbt4lumckrkc74xps45tg2n2wj4koiz3q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerajaquaoi5zk27ubnw22vpbt4lumckrkc74xps45tg2n2wj4koiz3q"
+      },
+      {
+        "group": "county",
+        "shard": "s0017",
+        "kind": "tables",
+        "root": "baguqeeraldxoe445dnj6tr3mg5qdjr4c7mdryloz7k6g4h6j2k5dmke7khtq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraldxoe445dnj6tr3mg5qdjr4c7mdryloz7k6g4h6j2k5dmke7khtq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0025",
+        "kind": "archive",
+        "root": "baguqeeraxtxr3f4xs3t5d53wafi2s5a5ir4e3jspbwynfjdzzujhkwpi2zyq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraxtxr3f4xs3t5d53wafi2s5a5ir4e3jspbwynfjdzzujhkwpi2zyq"
+      },
+      {
+        "group": "county",
+        "shard": "s0026",
+        "kind": "archive",
+        "root": "baguqeera3fpwj4derdvnho5h75ncr5sh5oimwa7w62fii5u7ogwvoyeu7o6a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3fpwj4derdvnho5h75ncr5sh5oimwa7w62fii5u7ogwvoyeu7o6a"
+      },
+      {
+        "group": "county",
+        "shard": "s0020",
+        "kind": "tables",
+        "root": "baguqeera2rduj3ovdcclwu5wiq2mtpfkp6ros3mazb6nw26qkbd47ja2kila",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2rduj3ovdcclwu5wiq2mtpfkp6ros3mazb6nw26qkbd47ja2kila"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0026",
+        "kind": "archive",
+        "root": "baguqeeraoun44wincx5d3hpq635yj4cm3t6l2gg5jkbbbhhog2kld5j7oyqq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraoun44wincx5d3hpq635yj4cm3t6l2gg5jkbbbhhog2kld5j7oyqq"
+      },
+      {
+        "group": "county",
+        "shard": "s0024",
+        "kind": "tables",
+        "root": "baguqeera7wus7j72ndyd2ryzk2ws6u4uhhzxbhkb7bnt33twtwrnwfxm3lva",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7wus7j72ndyd2ryzk2ws6u4uhhzxbhkb7bnt33twtwrnwfxm3lva"
+      },
+      {
+        "group": "county",
+        "shard": "s0027",
+        "kind": "archive",
+        "root": "baguqeera5zapijamktjjgwzbmxspgp4fde3uyehbwh4blqc4b7252kjcsojq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera5zapijamktjjgwzbmxspgp4fde3uyehbwh4blqc4b7252kjcsojq"
+      },
+      {
+        "group": "county",
+        "shard": "s0025",
+        "kind": "tables",
+        "root": "baguqeera4rohelc346lodib2poz6d4bjc4cdlwhsh7znzhi2sydyqtwq4exa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera4rohelc346lodib2poz6d4bjc4cdlwhsh7znzhi2sydyqtwq4exa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0027",
+        "kind": "archive",
+        "root": "baguqeeradekeadsmyrcbklkfrwwaaxzmkeki2rgnh3xu26s5gxxusnbgtpia",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeradekeadsmyrcbklkfrwwaaxzmkeki2rgnh3xu26s5gxxusnbgtpia"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0026",
+        "kind": "tables",
+        "root": "baguqeerao5ilts6fzc5prk4zk5mtnvufj6fahxuxxm5ghupyanho4bigghfa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerao5ilts6fzc5prk4zk5mtnvufj6fahxuxxm5ghupyanho4bigghfa"
+      },
+      {
+        "group": "county",
+        "shard": "s0028",
+        "kind": "archive",
+        "root": "baguqeera4dbnb7lezlu4lrdxalniqrvmhsvytsl556tyl6d2ucf2idizlmta",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera4dbnb7lezlu4lrdxalniqrvmhsvytsl556tyl6d2ucf2idizlmta"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0024",
+        "kind": "tables",
+        "root": "baguqeeraceqok2ss7xl5y2mndxgj3rr4wshevnwjzasiwcmcd6ors5qbouzq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraceqok2ss7xl5y2mndxgj3rr4wshevnwjzasiwcmcd6ors5qbouzq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0028",
+        "kind": "archive",
+        "root": "baguqeerau25ixufwbh7vmew2omywcnbulp45ttudtfmpytzhmqz2whtxifvq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerau25ixufwbh7vmew2omywcnbulp45ttudtfmpytzhmqz2whtxifvq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0025",
+        "kind": "tables",
+        "root": "baguqeeran4efx7g3rrsmsk7u5eongwislu2cwujcoxlkjwok22fwvxpw74cq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeran4efx7g3rrsmsk7u5eongwislu2cwujcoxlkjwok22fwvxpw74cq"
+      },
+      {
+        "group": "county",
+        "shard": "s0029",
+        "kind": "archive",
+        "root": "baguqeeraeom2q4i57zitf24zvi27e4c6wgdc6o6fuwqfod74djhlkfrtwvkq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraeom2q4i57zitf24zvi27e4c6wgdc6o6fuwqfod74djhlkfrtwvkq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0027",
+        "kind": "tables",
+        "root": "baguqeeravh74ovktljxs4eqtoa2jyxsfu6qah2qvivpug5gmx7gkegdyklwq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeravh74ovktljxs4eqtoa2jyxsfu6qah2qvivpug5gmx7gkegdyklwq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0029",
+        "kind": "archive",
+        "root": "baguqeera7lykkk4u545upryl4mlehkillkemp4uevn7aiansbolvmwlzcdkq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7lykkk4u545upryl4mlehkillkemp4uevn7aiansbolvmwlzcdkq"
+      },
+      {
+        "group": "county",
+        "shard": "s0026",
+        "kind": "tables",
+        "root": "baguqeeraz3k2i2lwzmnu64siswjmmtcdngfvyflgqh22wopful6ul7bgfkgq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraz3k2i2lwzmnu64siswjmmtcdngfvyflgqh22wopful6ul7bgfkgq"
+      },
+      {
+        "group": "county",
+        "shard": "s0030",
+        "kind": "archive",
+        "root": "baguqeeraezbrs4rqjpnutrr5hnqiqzvgwjh23cwooynyqf5syae5boh2iraq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraezbrs4rqjpnutrr5hnqiqzvgwjh23cwooynyqf5syae5boh2iraq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0028",
+        "kind": "tables",
+        "root": "baguqeeradpgsfkrpv2up5ni3ao3dtgliiow7khd2paaiabn3mfhyzwj6agoq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeradpgsfkrpv2up5ni3ao3dtgliiow7khd2paaiabn3mfhyzwj6agoq"
+      },
+      {
+        "group": "county",
+        "shard": "s0028",
+        "kind": "tables",
+        "root": "baguqeera5cqpal5gpat7sdv5iomogrcorzvgwnbywjicworua3bwalr7ocza",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera5cqpal5gpat7sdv5iomogrcorzvgwnbywjicworua3bwalr7ocza"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0030",
+        "kind": "archive",
+        "root": "baguqeeraznracgrjw4xjt7ugoezs4qkol6j7wjtezzceop5vcaq2no3zwbva",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraznracgrjw4xjt7ugoezs4qkol6j7wjtezzceop5vcaq2no3zwbva"
+      },
+      {
+        "group": "county",
+        "shard": "s0031",
+        "kind": "archive",
+        "root": "baguqeerabhzh3vfgydqg4uyfouamrjsbr25o3fafhes7au4he6jvzhbrb7ka",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerabhzh3vfgydqg4uyfouamrjsbr25o3fafhes7au4he6jvzhbrb7ka"
+      },
+      {
+        "group": "county",
+        "shard": "s0018",
+        "kind": "tables",
+        "root": "baguqeeraqzycc66vkexl5hghv5bkjbnud4vu5jjd2n3jaxceowhau3iwwvtq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraqzycc66vkexl5hghv5bkjbnud4vu5jjd2n3jaxceowhau3iwwvtq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0031",
+        "kind": "archive",
+        "root": "baguqeerangtdzss3onpmekxozn2fejbqagkyi2ms6oxksrf2gerfar3zraua",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerangtdzss3onpmekxozn2fejbqagkyi2ms6oxksrf2gerfar3zraua"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0031",
+        "kind": "tables",
+        "root": "baguqeerawzbzz62myhhnt6ftkaq4jasmn2sszs7gzt2gisqyh7sjdmoj2ulq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerawzbzz62myhhnt6ftkaq4jasmn2sszs7gzt2gisqyh7sjdmoj2ulq"
+      },
+      {
+        "group": "county",
+        "shard": "s0032",
+        "kind": "archive",
+        "root": "baguqeera6zvst5z3rluyoa5oipgpxv54mld42ndwewvvgfgsjdhudco4asva",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera6zvst5z3rluyoa5oipgpxv54mld42ndwewvvgfgsjdhudco4asva"
+      },
+      {
+        "group": "county",
+        "shard": "s0022",
+        "kind": "tables",
+        "root": "baguqeeravwsutdssfwe47ld4vauafcguio253lopleyaozml4ax6joookkia",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeravwsutdssfwe47ld4vauafcguio253lopleyaozml4ax6joookkia"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0032",
+        "kind": "archive",
+        "root": "baguqeerafu5af7ysoxymufrscf3z54cy4yfnoelcje7retv2cbpzjjqluw2q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerafu5af7ysoxymufrscf3z54cy4yfnoelcje7retv2cbpzjjqluw2q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0032",
+        "kind": "tables",
+        "root": "baguqeera2muodfhj5u6sqkovgqvbmoohirs45rwl5wg3ovjmo3xljpo2qxza",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2muodfhj5u6sqkovgqvbmoohirs45rwl5wg3ovjmo3xljpo2qxza"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0029",
+        "kind": "tables",
+        "root": "baguqeeracovva5d3vl2en2xneegn6wsfvdk5bzmduflfp5kn47yfh37oinha",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeracovva5d3vl2en2xneegn6wsfvdk5bzmduflfp5kn47yfh37oinha"
+      },
+      {
+        "group": "county",
+        "shard": "s0027",
+        "kind": "tables",
+        "root": "baguqeera5ikw5ruhkg7kruumzt3vnsozdfkxismya3gktdrf3k5lntqmnngq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera5ikw5ruhkg7kruumzt3vnsozdfkxismya3gktdrf3k5lntqmnngq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0033",
+        "kind": "archive",
+        "root": "baguqeera4erv4vh6nh23k3csn7iyzrfhvlum3t6mx5e3t3rzzfzgkzbvmrfa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera4erv4vh6nh23k3csn7iyzrfhvlum3t6mx5e3t3rzzfzgkzbvmrfa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0033",
+        "kind": "tables",
+        "root": "baguqeera6wdfnm3xc5ixwgvxkeo3mubdpgutikfyhmeos3eph4vipwhjwv2q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera6wdfnm3xc5ixwgvxkeo3mubdpgutikfyhmeos3eph4vipwhjwv2q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0034",
+        "kind": "archive",
+        "root": "baguqeerahdb7av5nr2ofq76krj4lb7rnnj54ajnmffqhsjbdda5xnd2pqw6a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerahdb7av5nr2ofq76krj4lb7rnnj54ajnmffqhsjbdda5xnd2pqw6a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0030",
+        "kind": "tables",
+        "root": "baguqeerak7u7bqpmk3ofazhjwt2q53bicrnaz4c24s7fh3qbcmtxriouotxq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerak7u7bqpmk3ofazhjwt2q53bicrnaz4c24s7fh3qbcmtxriouotxq"
+      },
+      {
+        "group": "county",
+        "shard": "s0033",
+        "kind": "archive",
+        "root": "baguqeeradgx2iccdgh6tymdtbysyvuvf2llduuat4c5fzsziblu2ordvhyeq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeradgx2iccdgh6tymdtbysyvuvf2llduuat4c5fzsziblu2ordvhyeq"
+      },
+      {
+        "group": "county",
+        "shard": "s0034",
+        "kind": "archive",
+        "root": "baguqeerawmchvlzko7txuopcksqw26pph7u3baplefxl34x54hc6ririj4ta",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerawmchvlzko7txuopcksqw26pph7u3baplefxl34x54hc6ririj4ta"
+      },
+      {
+        "group": "county",
+        "shard": "s0035",
+        "kind": "archive",
+        "root": "baguqeeranhucquhz2hhkn5wzsk22o257rowj5sr4m5532n6ztdnycxvs6nlq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeranhucquhz2hhkn5wzsk22o257rowj5sr4m5532n6ztdnycxvs6nlq"
+      },
+      {
+        "group": "county",
+        "shard": "s0033",
+        "kind": "tables",
+        "root": "baguqeerayljgaa62xjeu2kf6zztxbv26kro75los7v2phgo2knnhlitwefwa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerayljgaa62xjeu2kf6zztxbv26kro75los7v2phgo2knnhlitwefwa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0035",
+        "kind": "archive",
+        "root": "baguqeerahigjrbfjg6ezvdchxmmcjoksd36w347b5cwfbdlpb35wpah55uuq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerahigjrbfjg6ezvdchxmmcjoksd36w347b5cwfbdlpb35wpah55uuq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0035",
+        "kind": "tables",
+        "root": "baguqeera2nkuml5cxfmvnh2un5c42fp4fjawifdpr22mcl7cfrt7pxk2kpvq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2nkuml5cxfmvnh2un5c42fp4fjawifdpr22mcl7cfrt7pxk2kpvq"
+      },
+      {
+        "group": "county",
+        "shard": "s0036",
+        "kind": "archive",
+        "root": "baguqeeravpseju3mokqedi5ty6j42shcvicvtttwefbrnq2fksoq6inwg6uq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeravpseju3mokqedi5ty6j42shcvicvtttwefbrnq2fksoq6inwg6uq"
+      },
+      {
+        "group": "county",
+        "shard": "s0036",
+        "kind": "tables",
+        "root": "baguqeeravaofwtt4yscec226i7cd6yodaj6a3uqpcohiifdiucbtmfargwyq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeravaofwtt4yscec226i7cd6yodaj6a3uqpcohiifdiucbtmfargwyq"
+      },
+      {
+        "group": "county",
+        "shard": "s0031",
+        "kind": "tables",
+        "root": "baguqeeraxq3qk4twfmu563qpl4piiai6jjxnssbybtqeeb55ehm6x6iq6wta",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraxq3qk4twfmu563qpl4piiai6jjxnssbybtqeeb55ehm6x6iq6wta"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0036",
+        "kind": "archive",
+        "root": "baguqeeraitqnr2vhdfuftpxbl3igvcpbwhn3blkdtd5bcw5ztreh6mvldasa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraitqnr2vhdfuftpxbl3igvcpbwhn3blkdtd5bcw5ztreh6mvldasa"
+      },
+      {
+        "group": "county",
+        "shard": "s0037",
+        "kind": "archive",
+        "root": "baguqeerajgc7chpp7dx34qveqnojuflayuu53rmybxipfn73qrulq7bm3l7q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerajgc7chpp7dx34qveqnojuflayuu53rmybxipfn73qrulq7bm3l7q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0036",
+        "kind": "tables",
+        "root": "baguqeeranvqarbz2awe3oixs6iuftcldxfxmi5vn3y5gklw4ej4hpx74rmyq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeranvqarbz2awe3oixs6iuftcldxfxmi5vn3y5gklw4ej4hpx74rmyq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0037",
+        "kind": "archive",
+        "root": "baguqeeratg5n6gze3x7ibv7kyyb4zzyupofqrwv7nr2nkxt74t3b3genavmq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeratg5n6gze3x7ibv7kyyb4zzyupofqrwv7nr2nkxt74t3b3genavmq"
+      },
+      {
+        "group": "county",
+        "shard": "s0037",
+        "kind": "tables",
+        "root": "baguqeeraliwkxv6fppoxiqh6ohupoe6d5oigqo2zkfrqh3wzha2vsfjxgq6a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraliwkxv6fppoxiqh6ohupoe6d5oigqo2zkfrqh3wzha2vsfjxgq6a"
+      },
+      {
+        "group": "county",
+        "shard": "s0030",
+        "kind": "tables",
+        "root": "baguqeerasonpldl44i25jkvhnyifvzurvxivjsa46fdsofm74c7zkhnhr5xa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerasonpldl44i25jkvhnyifvzurvxivjsa46fdsofm74c7zkhnhr5xa"
+      },
+      {
+        "group": "county",
+        "shard": "s0038",
+        "kind": "archive",
+        "root": "baguqeera62vur6bd7ubny6vlz4xmcuyswfre3mit6gh3eousmvf26sacruoq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera62vur6bd7ubny6vlz4xmcuyswfre3mit6gh3eousmvf26sacruoq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0038",
+        "kind": "archive",
+        "root": "baguqeera3ebe7nzn6pk44leovr7ffojuh3kol4o2hpdab7f3f6yutkrbsbwa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3ebe7nzn6pk44leovr7ffojuh3kol4o2hpdab7f3f6yutkrbsbwa"
+      },
+      {
+        "group": "county",
+        "shard": "s0038",
+        "kind": "tables",
+        "root": "baguqeerawp2vtsargq3q3fb4lerbzy3wuak6iieinkfayntrzutbzkdmoqta",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerawp2vtsargq3q3fb4lerbzy3wuak6iieinkfayntrzutbzkdmoqta"
+      },
+      {
+        "group": "county",
+        "shard": "s0039",
+        "kind": "archive",
+        "root": "baguqeera33wulnc4wnz2vgnipntuhppdwa2fjko3ryoxdxvsdykdhzy7urya",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera33wulnc4wnz2vgnipntuhppdwa2fjko3ryoxdxvsdykdhzy7urya"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0034",
+        "kind": "tables",
+        "root": "baguqeerauf7xp5xp265x3xjfmulgr65ekfjqz3zb6sbpgdsvo4asvtoiiwxa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerauf7xp5xp265x3xjfmulgr65ekfjqz3zb6sbpgdsvo4asvtoiiwxa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0039",
+        "kind": "archive",
+        "root": "baguqeeragg5kjlrvzu6ms777bhuz5qyhhtt6mnec6m2pghyhykktcqrkqowa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeragg5kjlrvzu6ms777bhuz5qyhhtt6mnec6m2pghyhykktcqrkqowa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0039",
+        "kind": "tables",
+        "root": "baguqeerayqabnz6xugkrv6bd7eiqnt35b443i6wxulhugmodoqvwp4z3yy5a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerayqabnz6xugkrv6bd7eiqnt35b443i6wxulhugmodoqvwp4z3yy5a"
+      },
+      {
+        "group": "county",
+        "shard": "s0040",
+        "kind": "archive",
+        "root": "baguqeeraoxwdgtmzzigl34myi34d6rsn3jslsum2j5itdpsbabu7cdpndfbq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraoxwdgtmzzigl34myi34d6rsn3jslsum2j5itdpsbabu7cdpndfbq"
+      },
+      {
+        "group": "county",
+        "shard": "s0034",
+        "kind": "tables",
+        "root": "baguqeeraeg255qxmnldlrfafk43fx255wposjw3riwmj4a5kviim3x6ecl2a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraeg255qxmnldlrfafk43fx255wposjw3riwmj4a5kviim3x6ecl2a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0040",
+        "kind": "archive",
+        "root": "baguqeeraix52c5zqiryohcic7znmnsiqqfb3u3xeeb66b4p6cvnsn5kc6swa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraix52c5zqiryohcic7znmnsiqqfb3u3xeeb66b4p6cvnsn5kc6swa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0037",
+        "kind": "tables",
+        "root": "baguqeerans7frzldgbed5ohzw4vezmcdf67se2wwrszfnzcupinuowqnwnsa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerans7frzldgbed5ohzw4vezmcdf67se2wwrszfnzcupinuowqnwnsa"
+      },
+      {
+        "group": "county",
+        "shard": "s0041",
+        "kind": "archive",
+        "root": "baguqeerad43udweifnuwvsfkjh5ttqkyvdzw76fmcp74svotlqkonzml3f2a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerad43udweifnuwvsfkjh5ttqkyvdzw76fmcp74svotlqkonzml3f2a"
+      },
+      {
+        "group": "county",
+        "shard": "s0041",
+        "kind": "tables",
+        "root": "baguqeera5iktkzr2ay7hmvhrm7d3i4fs4wxnkzcuy3mmarcvi6iox4fvsiqa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera5iktkzr2ay7hmvhrm7d3i4fs4wxnkzcuy3mmarcvi6iox4fvsiqa"
+      },
+      {
+        "group": "county",
+        "shard": "s0032",
+        "kind": "tables",
+        "root": "baguqeera4cuwjpzmzourfny4dxrgddl5a6srukhx2iecluaewpzlpuxj4apa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera4cuwjpzmzourfny4dxrgddl5a6srukhx2iecluaewpzlpuxj4apa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0041",
+        "kind": "archive",
+        "root": "baguqeeravhgbc5discfwwhcgpqovdjkwr65jrpuoaj4umwmdrqyg2qaleowa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeravhgbc5discfwwhcgpqovdjkwr65jrpuoaj4umwmdrqyg2qaleowa"
+      },
+      {
+        "group": "county",
+        "shard": "s0042",
+        "kind": "archive",
+        "root": "baguqeera2s2aarfmcchi7jjka26e2tmzensaiajg3ysc4vfiwx6fla2oyqja",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2s2aarfmcchi7jjka26e2tmzensaiajg3ysc4vfiwx6fla2oyqja"
+      },
+      {
+        "group": "county",
+        "shard": "s0042",
+        "kind": "tables",
+        "root": "baguqeerawde7zyn3kzxedko5objj7usfewso62eoi4va4fsj4yrltmxkoxka",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerawde7zyn3kzxedko5objj7usfewso62eoi4va4fsj4yrltmxkoxka"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0042",
+        "kind": "archive",
+        "root": "baguqeera6s54mcitgbg55najn2s2ziticie4szcw2kmr3d6kprwov3dc2gwa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera6s54mcitgbg55najn2s2ziticie4szcw2kmr3d6kprwov3dc2gwa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0042",
+        "kind": "tables",
+        "root": "baguqeeraytfarklpbujvgplus7liszlqwxxtihimp55uw3a2hgfgsppa3keq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraytfarklpbujvgplus7liszlqwxxtihimp55uw3a2hgfgsppa3keq"
+      },
+      {
+        "group": "county",
+        "shard": "s0043",
+        "kind": "archive",
+        "root": "baguqeerancpu6phutiwjtm5nmprrblnb6hkfwttp3ikoy5quzsrgevk6dpya",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerancpu6phutiwjtm5nmprrblnb6hkfwttp3ikoy5quzsrgevk6dpya"
+      },
+      {
+        "group": "county",
+        "shard": "s0039",
+        "kind": "tables",
+        "root": "baguqeerawlxhcmbjxv6wikvksofilsgl5k2etm6tzhiv2bfd6ssu76safvyq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerawlxhcmbjxv6wikvksofilsgl5k2etm6tzhiv2bfd6ssu76safvyq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0043",
+        "kind": "archive",
+        "root": "baguqeera5e4eab4jwrqp4tzses5gztrw3dfk6bbz44pfvj3qa3dhij4vhh2q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera5e4eab4jwrqp4tzses5gztrw3dfk6bbz44pfvj3qa3dhij4vhh2q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0040",
+        "kind": "tables",
+        "root": "baguqeeraomjlenymqo2skkxyfvrviqtad2qxqojk6pa23iacwxplw4shmzzq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraomjlenymqo2skkxyfvrviqtad2qxqojk6pa23iacwxplw4shmzzq"
+      },
+      {
+        "group": "county",
+        "shard": "s0040",
+        "kind": "tables",
+        "root": "baguqeerasz5fscgq7yr4x4nst24snrpuqdfthjauf5lnuzmgmd2prktgsb6a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerasz5fscgq7yr4x4nst24snrpuqdfthjauf5lnuzmgmd2prktgsb6a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0044",
+        "kind": "archive",
+        "root": "baguqeeraynpelxlcuvef6acbm2ybvoilqpagiunwi2om76uoonsh6junas3q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraynpelxlcuvef6acbm2ybvoilqpagiunwi2om76uoonsh6junas3q"
+      },
+      {
+        "group": "county",
+        "shard": "s0044",
+        "kind": "archive",
+        "root": "baguqeera424r5eddykxuflucqq7cozp7i3zqz4n7zalhk4cqqj4chgrs7t7a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera424r5eddykxuflucqq7cozp7i3zqz4n7zalhk4cqqj4chgrs7t7a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0041",
+        "kind": "tables",
+        "root": "baguqeeram7gnuczebvpae7food3xdsf3tj3vk3psd6nvgqj3rbbykbt5nlbq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeram7gnuczebvpae7food3xdsf3tj3vk3psd6nvgqj3rbbykbt5nlbq"
+      },
+      {
+        "group": "county",
+        "shard": "s0045",
+        "kind": "archive",
+        "root": "baguqeerapabihpovt55j4gd7rsru4woso5lmzcb7c5obwzwgdjwvcwsiw73q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerapabihpovt55j4gd7rsru4woso5lmzcb7c5obwzwgdjwvcwsiw73q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0038",
+        "kind": "tables",
+        "root": "baguqeeraqsms3322edgf3e6yqnfqicgszlbn4jwj4ntoixszbqv5kuqk7uva",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraqsms3322edgf3e6yqnfqicgszlbn4jwj4ntoixszbqv5kuqk7uva"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0045",
+        "kind": "archive",
+        "root": "baguqeera4xpyom6ssjswpszaxrkbb7sudxfheiekq7z4adywn5pztj4us3lq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera4xpyom6ssjswpszaxrkbb7sudxfheiekq7z4adywn5pztj4us3lq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0043",
+        "kind": "tables",
+        "root": "baguqeera3oailu6lyj4iydtxjw4mv2bzx7l3idhjxq2dx4vuzedwqcnmltbq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3oailu6lyj4iydtxjw4mv2bzx7l3idhjxq2dx4vuzedwqcnmltbq"
+      },
+      {
+        "group": "county",
+        "shard": "s0046",
+        "kind": "archive",
+        "root": "baguqeera2k2jokpmypyz2sonk6jmaavv24r65mdsjhp2swbpw7zzwaevooaq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2k2jokpmypyz2sonk6jmaavv24r65mdsjhp2swbpw7zzwaevooaq"
+      },
+      {
+        "group": "county",
+        "shard": "s0029",
+        "kind": "tables",
+        "root": "baguqeeraugqhtkg36ei677nitzqqzi7hg3pbuqaqhahid6nown7hqr3qorhq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraugqhtkg36ei677nitzqqzi7hg3pbuqaqhahid6nown7hqr3qorhq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0046",
+        "kind": "archive",
+        "root": "baguqeeralwmstqibgr6pz5qyobtefhsrx327uujr6qfyxj7aar5kcauveiza",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeralwmstqibgr6pz5qyobtefhsrx327uujr6qfyxj7aar5kcauveiza"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0044",
+        "kind": "tables",
+        "root": "baguqeeracz7cty2zhhh26nqphhzrgauub7yholbpj74jtkw4fnpe3273oh2a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeracz7cty2zhhh26nqphhzrgauub7yholbpj74jtkw4fnpe3273oh2a"
+      },
+      {
+        "group": "county",
+        "shard": "s0047",
+        "kind": "archive",
+        "root": "baguqeera2wabrdz4nj6vfmu3m27ugxtzmblbnc4dydfs4hjt5o3fgrbb6apa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2wabrdz4nj6vfmu3m27ugxtzmblbnc4dydfs4hjt5o3fgrbb6apa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0045",
+        "kind": "tables",
+        "root": "baguqeera3au52xdfrdmpbm3btrv4ejwjglkl6x4hl5yqmiovdub5knpgv3da",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3au52xdfrdmpbm3btrv4ejwjglkl6x4hl5yqmiovdub5knpgv3da"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0047",
+        "kind": "archive",
+        "root": "baguqeeraqkoy3yryzkd5liv3gmwpyynu65ouzqui3kuldmlman4jqbwo2mpa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraqkoy3yryzkd5liv3gmwpyynu65ouzqui3kuldmlman4jqbwo2mpa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0047",
+        "kind": "tables",
+        "root": "baguqeeraegoffwvhugwyszed4h2qq7vhvlbfpq6ypsvsobehxwmanh6fxfcq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraegoffwvhugwyszed4h2qq7vhvlbfpq6ypsvsobehxwmanh6fxfcq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0046",
+        "kind": "tables",
+        "root": "baguqeeraohbkebwahbjs47l4hgzpn577pd733rnet6usjvvzfis2fbscbkwq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraohbkebwahbjs47l4hgzpn577pd733rnet6usjvvzfis2fbscbkwq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0048",
+        "kind": "archive",
+        "root": "baguqeerauumfkndcvtg3wsgchwtc7hpb5j7fxdo5y6jd7wjkqfz25zojcghq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerauumfkndcvtg3wsgchwtc7hpb5j7fxdo5y6jd7wjkqfz25zojcghq"
+      },
+      {
+        "group": "county",
+        "shard": "s0045",
+        "kind": "tables",
+        "root": "baguqeeraj5ygiarlol3oap724dpqnbx5evwfrvdpoquwso5sukunqpvidvxa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraj5ygiarlol3oap724dpqnbx5evwfrvdpoquwso5sukunqpvidvxa"
+      },
+      {
+        "group": "county",
+        "shard": "s0043",
+        "kind": "tables",
+        "root": "baguqeeravrlhyo2n4vnjaxv2ry5xjysafv3v4gvxkyzsyxneotegqnkq2t4q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeravrlhyo2n4vnjaxv2ry5xjysafv3v4gvxkyzsyxneotegqnkq2t4q"
+      },
+      {
+        "group": "county",
+        "shard": "s0049",
+        "kind": "archive",
+        "root": "baguqeeraou5ighj3jk35zvm5frkgxksawragdi4pf3xrfdehavkw2ggkmaia",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraou5ighj3jk35zvm5frkgxksawragdi4pf3xrfdehavkw2ggkmaia"
+      },
+      {
+        "group": "county",
+        "shard": "s0048",
+        "kind": "archive",
+        "root": "baguqeera23bbwljcgslwnzbwgjse2f44bra4edkhxq7qkc2ufgevfhfl765q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera23bbwljcgslwnzbwgjse2f44bra4edkhxq7qkc2ufgevfhfl765q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0049",
+        "kind": "archive",
+        "root": "baguqeeraort2lph7kuzgm2mu6thgp7rdmu56ok4sfrp6ljkfwglktfdncllq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraort2lph7kuzgm2mu6thgp7rdmu56ok4sfrp6ljkfwglktfdncllq"
+      },
+      {
+        "group": "county",
+        "shard": "s0049",
+        "kind": "tables",
+        "root": "baguqeerawlsstfmtvax3obibm4l6caenuadhelefl2vffmvdvfobu5jy42ba",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerawlsstfmtvax3obibm4l6caenuadhelefl2vffmvdvfobu5jy42ba"
+      },
+      {
+        "group": "county",
+        "shard": "s0050",
+        "kind": "archive",
+        "root": "baguqeeraaui45kptj2oa6i3ki53qyurucienkbmfrxbd7ki37akxc3iy2sqa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraaui45kptj2oa6i3ki53qyurucienkbmfrxbd7ki37akxc3iy2sqa"
+      },
+      {
+        "group": "county",
+        "shard": "s0046",
+        "kind": "tables",
+        "root": "baguqeerarjflzygftcr6njqdyaksemw6ce3knhkwump6mvdl2p5s6w5iezvq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerarjflzygftcr6njqdyaksemw6ce3knhkwump6mvdl2p5s6w5iezvq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0050",
+        "kind": "archive",
+        "root": "baguqeera47b6xwxqabina33tyruipjclfrlldb7wj6s7ts57nhi2jsfxlobq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera47b6xwxqabina33tyruipjclfrlldb7wj6s7ts57nhi2jsfxlobq"
+      },
+      {
+        "group": "county",
+        "shard": "s0044",
+        "kind": "tables",
+        "root": "baguqeera2o5dxegyiod76vi6gn55zda7rjmqzxofx5bwzrukfohuysfw5cqq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2o5dxegyiod76vi6gn55zda7rjmqzxofx5bwzrukfohuysfw5cqq"
+      },
+      {
+        "group": "county",
+        "shard": "s0051",
+        "kind": "archive",
+        "root": "baguqeerakksnxm5ywap6hems6nbxlzzf7syf2ug4hn2cktaoflgpwnxm4vpa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerakksnxm5ywap6hems6nbxlzzf7syf2ug4hn2cktaoflgpwnxm4vpa"
+      },
+      {
+        "group": "county",
+        "shard": "s0035",
+        "kind": "tables",
+        "root": "baguqeerakfpy5rad6ftlga56r3c6brlx35yrvl5hzotz55v4iwwpujsgsuzq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerakfpy5rad6ftlga56r3c6brlx35yrvl5hzotz55v4iwwpujsgsuzq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0051",
+        "kind": "archive",
+        "root": "baguqeerap4b2bwfz3lpblyvyc6fw6hbwlmethgmmmg4fw4wuswe3lqlhmcva",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerap4b2bwfz3lpblyvyc6fw6hbwlmethgmmmg4fw4wuswe3lqlhmcva"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0049",
+        "kind": "tables",
+        "root": "baguqeera54wnjelygqbkpbzabgxikarcxnuoe2h5iviylwokxlp6wsnggyiq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera54wnjelygqbkpbzabgxikarcxnuoe2h5iviylwokxlp6wsnggyiq"
+      },
+      {
+        "group": "county",
+        "shard": "s0052",
+        "kind": "archive",
+        "root": "baguqeeraliliudvpm6b36ngfnfclxjmv6rprt266jgrqhid7cq7kclgpqgmq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraliliudvpm6b36ngfnfclxjmv6rprt266jgrqhid7cq7kclgpqgmq"
+      },
+      {
+        "group": "county",
+        "shard": "s0052",
+        "kind": "tables",
+        "root": "baguqeerazn2v4kh75xca5tbysr4w25hi7q55zxajj4knyroxdnufx4sur4ba",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerazn2v4kh75xca5tbysr4w25hi7q55zxajj4knyroxdnufx4sur4ba"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0052",
+        "kind": "archive",
+        "root": "baguqeerajlgaiwa6wnfhphnxj6hxcxsxsqwop6dnxbuuutxgoeoxgilcjtba",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerajlgaiwa6wnfhphnxj6hxcxsxsqwop6dnxbuuutxgoeoxgilcjtba"
+      },
+      {
+        "group": "county",
+        "shard": "s0050",
+        "kind": "tables",
+        "root": "baguqeeraqfd3twd5mb6p24sxxb3strlzrztc3uhqoz5ozix7ewdctsuuixda",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraqfd3twd5mb6p24sxxb3strlzrztc3uhqoz5ozix7ewdctsuuixda"
+      },
+      {
+        "group": "county",
+        "shard": "s0053",
+        "kind": "archive",
+        "root": "baguqeeracritpmwbkmdlnrjdc6jursdum4tfufdfotet4otptlil5gik7rhq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeracritpmwbkmdlnrjdc6jursdum4tfufdfotet4otptlil5gik7rhq"
+      },
+      {
+        "group": "county",
+        "shard": "s0048",
+        "kind": "tables",
+        "root": "baguqeeradpbvxoqgeku6wbej6iwxkouthgxx33mlrgsqymvfjf7egkjzh33a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeradpbvxoqgeku6wbej6iwxkouthgxx33mlrgsqymvfjf7egkjzh33a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0053",
+        "kind": "archive",
+        "root": "baguqeerakrktewodt4sznnriwnhslufgojea66s26xv3prc4npyqv5c236gq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerakrktewodt4sznnriwnhslufgojea66s26xv3prc4npyqv5c236gq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0052",
+        "kind": "tables",
+        "root": "baguqeerajpg5pcjf35pnxd4a4tdfcb6eqs3aevj3cvfofgeqsbjugnupzmhq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerajpg5pcjf35pnxd4a4tdfcb6eqs3aevj3cvfofgeqsbjugnupzmhq"
+      },
+      {
+        "group": "county",
+        "shard": "s0054",
+        "kind": "archive",
+        "root": "baguqeeragikpei7bvoj3xbfquafxn2ijhvvztqdu7xtejvjbbowulw4y7aza",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeragikpei7bvoj3xbfquafxn2ijhvvztqdu7xtejvjbbowulw4y7aza"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0048",
+        "kind": "tables",
+        "root": "baguqeerajm24kyv736yhgxywma67en2p3jnbrmxnrjhavkuvdymt5zmrenka",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerajm24kyv736yhgxywma67en2p3jnbrmxnrjhavkuvdymt5zmrenka"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0054",
+        "kind": "archive",
+        "root": "baguqeerawec4275nse3eo7tpcn5kx3aty7znbdcfcfx4245ablbvxgaaffsq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerawec4275nse3eo7tpcn5kx3aty7znbdcfcfx4245ablbvxgaaffsq"
+      },
+      {
+        "group": "county",
+        "shard": "s0054",
+        "kind": "tables",
+        "root": "baguqeera2ji7odlu3kaoa7ljounebj2ygisqhamkuvvufk2zm5a2m4fklbtq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2ji7odlu3kaoa7ljounebj2ygisqhamkuvvufk2zm5a2m4fklbtq"
+      },
+      {
+        "group": "county",
+        "shard": "s0055",
+        "kind": "archive",
+        "root": "baguqeerac2qhnsagdxousqc3rblq27kf57fjux2ebiyluq42rymkom45liwq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerac2qhnsagdxousqc3rblq27kf57fjux2ebiyluq42rymkom45liwq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0053",
+        "kind": "tables",
+        "root": "baguqeera5n6ugdt52ppje33r3qeewm5rvonfu3xh53nkq7djukcvfwruzbba",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera5n6ugdt52ppje33r3qeewm5rvonfu3xh53nkq7djukcvfwruzbba"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0055",
+        "kind": "archive",
+        "root": "baguqeera6xpyde326nsjeodcwfcrxeyg7tmiqnu4t7zqowvaatl25dlddnuq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera6xpyde326nsjeodcwfcrxeyg7tmiqnu4t7zqowvaatl25dlddnuq"
+      },
+      {
+        "group": "county",
+        "shard": "s0047",
+        "kind": "tables",
+        "root": "baguqeera2ho7zm7c43qqls3yi6s5bjx6qa67ahn7k6vzfhuuox7dqiqq2uuq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2ho7zm7c43qqls3yi6s5bjx6qa67ahn7k6vzfhuuox7dqiqq2uuq"
+      },
+      {
+        "group": "county",
+        "shard": "s0056",
+        "kind": "archive",
+        "root": "baguqeerazah3qfxy6b6ajet33d3ynswws6ul66h5rddslacc4hqpmf6vxdwa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerazah3qfxy6b6ajet33d3ynswws6ul66h5rddslacc4hqpmf6vxdwa"
+      },
+      {
+        "group": "county",
+        "shard": "s0056",
+        "kind": "tables",
+        "root": "baguqeera34tjkcos2fd6rz7y7dcecosjoes6hclvbbaa3s46e6dh6dbpk35q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera34tjkcos2fd6rz7y7dcecosjoes6hclvbbaa3s46e6dh6dbpk35q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0056",
+        "kind": "archive",
+        "root": "baguqeera7wp5wtmlzyiiconc526mst6kmxqpsm5vbi33va5bibbok5ruwzdq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7wp5wtmlzyiiconc526mst6kmxqpsm5vbi33va5bibbok5ruwzdq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0050",
+        "kind": "tables",
+        "root": "baguqeerax6k5uwhpt5biab3zvpgrrhntsz4jtviwg2pwtlxvl4ogxov6syda",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerax6k5uwhpt5biab3zvpgrrhntsz4jtviwg2pwtlxvl4ogxov6syda"
+      },
+      {
+        "group": "county",
+        "shard": "s0057",
+        "kind": "archive",
+        "root": "baguqeeraxjv2jhi7lakefajaa2huxmikm4pvyawirghpllykagqy3tjf6uvq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraxjv2jhi7lakefajaa2huxmikm4pvyawirghpllykagqy3tjf6uvq"
+      },
+      {
+        "group": "county",
+        "shard": "s0053",
+        "kind": "tables",
+        "root": "baguqeerax65caz4vswjglbdp6mmmrgx2witlnukwzc3upp3yg5nbg4clwqrq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerax65caz4vswjglbdp6mmmrgx2witlnukwzc3upp3yg5nbg4clwqrq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0057",
+        "kind": "archive",
+        "root": "baguqeeraktyupf3czo5woxts2aspcz3nmcjnw2sw5hsuiw6o42ynkkhlw2gq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraktyupf3czo5woxts2aspcz3nmcjnw2sw5hsuiw6o42ynkkhlw2gq"
+      },
+      {
+        "group": "county",
+        "shard": "s0051",
+        "kind": "tables",
+        "root": "baguqeerao6fcwgmlqbb7f7y7p6evshn6wqrdt7a5gtas6vuttg5werx4uika",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerao6fcwgmlqbb7f7y7p6evshn6wqrdt7a5gtas6vuttg5werx4uika"
+      },
+      {
+        "group": "county",
+        "shard": "s0058",
+        "kind": "archive",
+        "root": "baguqeeran4yxpqwjacf4pqixwxkxsnjgleqajjqxuq7nqljsli7b5oaorb6q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeran4yxpqwjacf4pqixwxkxsnjgleqajjqxuq7nqljsli7b5oaorb6q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0057",
+        "kind": "tables",
+        "root": "baguqeera6ju6jh4wly4shw4gjo5aavipckz53s44akpgh3jxpaxlgmtfasqq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera6ju6jh4wly4shw4gjo5aavipckz53s44akpgh3jxpaxlgmtfasqq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0058",
+        "kind": "archive",
+        "root": "baguqeeratlh3xlwguyayk6e7w55ohumn4eyxtf43rva3otovgfpjmotu36fq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeratlh3xlwguyayk6e7w55ohumn4eyxtf43rva3otovgfpjmotu36fq"
+      },
+      {
+        "group": "county",
+        "shard": "s0058",
+        "kind": "tables",
+        "root": "baguqeeralygt5bgcx45ld7p7kgw32qbkfo5qwclwbuwn4z2nf3dvn6occ5zq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeralygt5bgcx45ld7p7kgw32qbkfo5qwclwbuwn4z2nf3dvn6occ5zq"
+      },
+      {
+        "group": "county",
+        "shard": "s0059",
+        "kind": "archive",
+        "root": "baguqeera7uxy5bvxevnbo7uyymokyrwnv2yv4z56s5ywq3yhg5qqv4gvyjsa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7uxy5bvxevnbo7uyymokyrwnv2yv4z56s5ywq3yhg5qqv4gvyjsa"
+      },
+      {
+        "group": "county",
+        "shard": "s0059",
+        "kind": "tables",
+        "root": "baguqeeray3hlh6ilcdkvsagutcdbo5jioipeyncwz7lwxolbuvbzjzgtgaja",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeray3hlh6ilcdkvsagutcdbo5jioipeyncwz7lwxolbuvbzjzgtgaja"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0059",
+        "kind": "archive",
+        "root": "baguqeeragpvstftrea2rrtdoknbxicyrkd27wzseevzximas3gkwmwtd5mzq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeragpvstftrea2rrtdoknbxicyrkd27wzseevzximas3gkwmwtd5mzq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0054",
+        "kind": "tables",
+        "root": "baguqeerawqzzkysni7xwf5tg4aijr7uaygr7m7ar3xerminzhylbcvfxbtca",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerawqzzkysni7xwf5tg4aijr7uaygr7m7ar3xerminzhylbcvfxbtca"
+      },
+      {
+        "group": "county",
+        "shard": "s0060",
+        "kind": "archive",
+        "root": "baguqeeraxmeii4rdxaonszi3aszalgwib5rvncdm7b3rjwlahrr5my376axa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraxmeii4rdxaonszi3aszalgwib5rvncdm7b3rjwlahrr5my376axa"
+      },
+      {
+        "group": "county",
+        "shard": "s0057",
+        "kind": "tables",
+        "root": "baguqeeraj22ggjxzs3l7xyqcxybyulv2xku4egzuo5allzinjsk7cx75wzhq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraj22ggjxzs3l7xyqcxybyulv2xku4egzuo5allzinjsk7cx75wzhq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0060",
+        "kind": "archive",
+        "root": "baguqeeraralcqb5pvvgqnn36mqzd7um2dwgjxxk2g36rpnr63rscoazzxpxa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraralcqb5pvvgqnn36mqzd7um2dwgjxxk2g36rpnr63rscoazzxpxa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0058",
+        "kind": "tables",
+        "root": "baguqeeradzfrxigbu5r4kqxjlvdgoxgfk3v7pfmhcefao6nwftrx6q77kv6a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeradzfrxigbu5r4kqxjlvdgoxgfk3v7pfmhcefao6nwftrx6q77kv6a"
+      },
+      {
+        "group": "county",
+        "shard": "s0061",
+        "kind": "archive",
+        "root": "baguqeeraclw5hn46k7mjahz6bl7fro7ztsmu2chuh64dgteqv5ncslx4hl5q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraclw5hn46k7mjahz6bl7fro7ztsmu2chuh64dgteqv5ncslx4hl5q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0055",
+        "kind": "tables",
+        "root": "baguqeera3c7o4n6bstdrzf6borogot3vjmqkyklv5vfvcjthtkclrcfaxyya",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3c7o4n6bstdrzf6borogot3vjmqkyklv5vfvcjthtkclrcfaxyya"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0061",
+        "kind": "archive",
+        "root": "baguqeeraocqrinlna5fsfjp4e3aceatlzf3qjmyw7tkawyw4lk2yvaqfbwta",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraocqrinlna5fsfjp4e3aceatlzf3qjmyw7tkawyw4lk2yvaqfbwta"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0059",
+        "kind": "tables",
+        "root": "baguqeerawvteldri7l2n2tniyglsbeuh26uxwbci23xa2zwlfjsrtynt5mnq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerawvteldri7l2n2tniyglsbeuh26uxwbci23xa2zwlfjsrtynt5mnq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0060",
+        "kind": "tables",
+        "root": "baguqeeraztgf4t4mpq4fceexig5pi6sikvwlulet3xj2bycoal6rp2lfyfqa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraztgf4t4mpq4fceexig5pi6sikvwlulet3xj2bycoal6rp2lfyfqa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0056",
+        "kind": "tables",
+        "root": "baguqeeranemlqrg6vzgshinhhrxbslvrjyu2lue2gbi76s6hesu2pzem5wma",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeranemlqrg6vzgshinhhrxbslvrjyu2lue2gbi76s6hesu2pzem5wma"
+      },
+      {
+        "group": "county",
+        "shard": "s0062",
+        "kind": "archive",
+        "root": "baguqeeraenhkjwwunckghgoghjxylsnotg7z7iwffmq42oz5jdwfv6gdn3rq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraenhkjwwunckghgoghjxylsnotg7z7iwffmq42oz5jdwfv6gdn3rq"
+      },
+      {
+        "group": "county",
+        "shard": "s0063",
+        "kind": "archive",
+        "root": "baguqeeraahtrnci32rlj7zfcwrav6uu3dgt3rfvkbzux4pvxopyjkycha3ua",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraahtrnci32rlj7zfcwrav6uu3dgt3rfvkbzux4pvxopyjkycha3ua"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0062",
+        "kind": "archive",
+        "root": "baguqeeralw7kcqfuxbuiplrfserwgxx5u4dvmnqol63e66vb7x26e2kgoavq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeralw7kcqfuxbuiplrfserwgxx5u4dvmnqol63e66vb7x26e2kgoavq"
+      },
+      {
+        "group": "county",
+        "shard": "s0063",
+        "kind": "tables",
+        "root": "baguqeera453wy332yotwnun7baatxigjgsiatjclcmvatyrmyxdo6ljgvu3a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera453wy332yotwnun7baatxigjgsiatjclcmvatyrmyxdo6ljgvu3a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0063",
+        "kind": "archive",
+        "root": "baguqeerawahzawcy6pzjxrm7qc3tn5rezlk4zor47ks4bzky3lhpzaqveszq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerawahzawcy6pzjxrm7qc3tn5rezlk4zor47ks4bzky3lhpzaqveszq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0051",
+        "kind": "tables",
+        "root": "baguqeeraw34tnfnx2ql77fu75zafexsc7whys5wnqrle5ekgc4nuuped5qma",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraw34tnfnx2ql77fu75zafexsc7whys5wnqrle5ekgc4nuuped5qma"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0061",
+        "kind": "tables",
+        "root": "baguqeera2rnohfzaayxnhoas5h7bx3flu5aumpftip75frvp5juq5rpihaqa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera2rnohfzaayxnhoas5h7bx3flu5aumpftip75frvp5juq5rpihaqa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0064",
+        "kind": "archive",
+        "root": "baguqeerablqnv3zgeuulc57tc6zml7hd53uvtfdfcanzjz45zqg6zuys6qmq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerablqnv3zgeuulc57tc6zml7hd53uvtfdfcanzjz45zqg6zuys6qmq"
+      },
+      {
+        "group": "county",
+        "shard": "s0055",
+        "kind": "tables",
+        "root": "baguqeera6jxy3lov5clmalk6zjoiipi7hadgjm7wawjcnmnbq7zwq5r6ya5a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera6jxy3lov5clmalk6zjoiipi7hadgjm7wawjcnmnbq7zwq5r6ya5a"
+      },
+      {
+        "group": "county",
+        "shard": "s0064",
+        "kind": "archive",
+        "root": "baguqeeraybe3ib5oqnoytlrlp6n5an75ywqbwq32rdig4fskmp7n5pk7dxga",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraybe3ib5oqnoytlrlp6n5an75ywqbwq32rdig4fskmp7n5pk7dxga"
+      },
+      {
+        "group": "county",
+        "shard": "s0065",
+        "kind": "archive",
+        "root": "baguqeeraml2eyw52p3hlqgglcg65tlxurwtbgzcp5h4d6tdw272zb4io6sbq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraml2eyw52p3hlqgglcg65tlxurwtbgzcp5h4d6tdw272zb4io6sbq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0062",
+        "kind": "tables",
+        "root": "baguqeeraao5ek4bw3ewtsuobzju2lbdf3gdiehfy2dzorcpeit7w6r5z4u5q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraao5ek4bw3ewtsuobzju2lbdf3gdiehfy2dzorcpeit7w6r5z4u5q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0065",
+        "kind": "archive",
+        "root": "baguqeeraw6fc7jksd4ylj5fye56htzuqqurckcx5samjzpfraqmmag5fcuoq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraw6fc7jksd4ylj5fye56htzuqqurckcx5samjzpfraqmmag5fcuoq"
+      },
+      {
+        "group": "county",
+        "shard": "s0064",
+        "kind": "tables",
+        "root": "baguqeeravkm2zhja2hayuaaqavuj66pdcpm3pmj2foyouhr74qyvwvvzs7oa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeravkm2zhja2hayuaaqavuj66pdcpm3pmj2foyouhr74qyvwvvzs7oa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0063",
+        "kind": "tables",
+        "root": "baguqeeratafwi4jwl3cdw43kdq6w66ucvydylqj23vqdq7bjn5a4rkhb7l4a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeratafwi4jwl3cdw43kdq6w66ucvydylqj23vqdq7bjn5a4rkhb7l4a"
+      },
+      {
+        "group": "county",
+        "shard": "s0066",
+        "kind": "archive",
+        "root": "baguqeerau5bdszsro66i4kkyr2cpmwjxlkx6ijkjyfh7j4dsnehreoy7badq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerau5bdszsro66i4kkyr2cpmwjxlkx6ijkjyfh7j4dsnehreoy7badq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0066",
+        "kind": "archive",
+        "root": "baguqeerawop6lflp333umy6qc55mp7bu63xki77vk2mva3wzd5v4e3onkh3q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerawop6lflp333umy6qc55mp7bu63xki77vk2mva3wzd5v4e3onkh3q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0066",
+        "kind": "tables",
+        "root": "baguqeerahhy6uqxb5tczdy2si7tak42i32v7lvuuig5gklzjah6wuq2xoera",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerahhy6uqxb5tczdy2si7tak42i32v7lvuuig5gklzjah6wuq2xoera"
+      },
+      {
+        "group": "county",
+        "shard": "s0066",
+        "kind": "tables",
+        "root": "baguqeeraahn5tak2dr243k6l3yjqyxunezoqf5pekmhdxarofhygkatjmcvq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraahn5tak2dr243k6l3yjqyxunezoqf5pekmhdxarofhygkatjmcvq"
+      },
+      {
+        "group": "county",
+        "shard": "s0067",
+        "kind": "archive",
+        "root": "baguqeeraeo7azvxutmv62bxm22pwam3zhenqae5qztpxyakwl7rxom33ekxa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraeo7azvxutmv62bxm22pwam3zhenqae5qztpxyakwl7rxom33ekxa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0067",
+        "kind": "archive",
+        "root": "baguqeerapck2nfpetruan3xerhmbclmkbakby42xr7tsouzy2cmiqc4qvxiq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerapck2nfpetruan3xerhmbclmkbakby42xr7tsouzy2cmiqc4qvxiq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0067",
+        "kind": "tables",
+        "root": "baguqeera3qfz2oxgu47d6e3dfxa5ysy5hmawzlrtpmgls7kiiuywxqfcw52a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3qfz2oxgu47d6e3dfxa5ysy5hmawzlrtpmgls7kiiuywxqfcw52a"
+      },
+      {
+        "group": "county",
+        "shard": "s0060",
+        "kind": "tables",
+        "root": "baguqeeratmq5y5iwfx7irqmyth6g2iiu55p7qpbxxmmrvs7cz5vgyxixqz3a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeratmq5y5iwfx7irqmyth6g2iiu55p7qpbxxmmrvs7cz5vgyxixqz3a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0068",
+        "kind": "archive",
+        "root": "baguqeera7gauiqzhsg5rocryic6wdjl7yw2vooqhlfakld4bekdrvp463gqq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7gauiqzhsg5rocryic6wdjl7yw2vooqhlfakld4bekdrvp463gqq"
+      },
+      {
+        "group": "county",
+        "shard": "s0068",
+        "kind": "archive",
+        "root": "baguqeeracc6vsrgmqpkgoykjpsv5vd626t4abgfunouu7wzoayogs7axnxra",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeracc6vsrgmqpkgoykjpsv5vd626t4abgfunouu7wzoayogs7axnxra"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0064",
+        "kind": "tables",
+        "root": "baguqeeravyc6nf27mfcnme2msadvey4ep2lsugutxvtt33pvvdigcxsbcy5a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeravyc6nf27mfcnme2msadvey4ep2lsugutxvtt33pvvdigcxsbcy5a"
+      },
+      {
+        "group": "county",
+        "shard": "s0069",
+        "kind": "archive",
+        "root": "baguqeeray3nciudla2k4xk72ausnruxgcaz4kizacdxamiu44m42nojiecra",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeray3nciudla2k4xk72ausnruxgcaz4kizacdxamiu44m42nojiecra"
+      },
+      {
+        "group": "county",
+        "shard": "s0061",
+        "kind": "tables",
+        "root": "baguqeera3uxwo3igpadybdqyx74vjfle53g64aesyg6ldygwrqbygywnw5la",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3uxwo3igpadybdqyx74vjfle53g64aesyg6ldygwrqbygywnw5la"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0069",
+        "kind": "archive",
+        "root": "baguqeeraq72o75jfhhcf2az5q4xq7dhzkg3e4y3pzht5wwqwf5xs5mtsr4ba",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraq72o75jfhhcf2az5q4xq7dhzkg3e4y3pzht5wwqwf5xs5mtsr4ba"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0065",
+        "kind": "tables",
+        "root": "baguqeera5jvcna5ise2xm6kt4s5l7znd7gcc2lqfo2mfbhjxvsb5vfgjatiq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera5jvcna5ise2xm6kt4s5l7znd7gcc2lqfo2mfbhjxvsb5vfgjatiq"
+      },
+      {
+        "group": "county",
+        "shard": "s0070",
+        "kind": "archive",
+        "root": "baguqeeraqqebsqc6bjaemu7zahvvwf2i55le44vzt7tbpkptpty5mkrbhbhq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraqqebsqc6bjaemu7zahvvwf2i55le44vzt7tbpkptpty5mkrbhbhq"
+      },
+      {
+        "group": "county",
+        "shard": "s0062",
+        "kind": "tables",
+        "root": "baguqeerat4iguu6fqurwqosha647qic6y7ynsz6ruko3cmhtirtbjwl7u5vq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerat4iguu6fqurwqosha647qic6y7ynsz6ruko3cmhtirtbjwl7u5vq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0070",
+        "kind": "archive",
+        "root": "baguqeerad37lnk4tnguhbcfcwla3wq2vl77sln2wnf4umllkj2rgutcof7ua",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerad37lnk4tnguhbcfcwla3wq2vl77sln2wnf4umllkj2rgutcof7ua"
+      },
+      {
+        "group": "county",
+        "shard": "s0070",
+        "kind": "tables",
+        "root": "baguqeerafocdj6r6di3o6g5fh7xw53l4xurrej34c7lmklmudezuir35pkwq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerafocdj6r6di3o6g5fh7xw53l4xurrej34c7lmklmudezuir35pkwq"
+      },
+      {
+        "group": "county",
+        "shard": "s0071",
+        "kind": "archive",
+        "root": "baguqeeraw2dbehap73xhmywjo4oi46mbtf5dwlwgai6miechab22uva7os3q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraw2dbehap73xhmywjo4oi46mbtf5dwlwgai6miechab22uva7os3q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0068",
+        "kind": "tables",
+        "root": "baguqeerah6yl2r67bfyrwtq4yegc4ty6ieiq7r4m6fmk5wfvpsthvc2aqa4q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerah6yl2r67bfyrwtq4yegc4ty6ieiq7r4m6fmk5wfvpsthvc2aqa4q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0071",
+        "kind": "archive",
+        "root": "baguqeera7eglftirob2mwxozkb3vjxhfyigvs5xum33zvg7cnuc6rtp3ladq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7eglftirob2mwxozkb3vjxhfyigvs5xum33zvg7cnuc6rtp3ladq"
+      },
+      {
+        "group": "county",
+        "shard": "s0071",
+        "kind": "tables",
+        "root": "baguqeeras2igjhsqswhxfs34bq7fnn4b6rvxe5f5afpjzjvwjperjtu6nz5a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeras2igjhsqswhxfs34bq7fnn4b6rvxe5f5afpjzjvwjperjtu6nz5a"
+      },
+      {
+        "group": "county",
+        "shard": "s0072",
+        "kind": "archive",
+        "root": "baguqeera7ph5obz2iwjldjnbjw4eakjtrg2bmagdxwxwgbqhmxu2lsc55b4q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7ph5obz2iwjldjnbjw4eakjtrg2bmagdxwxwgbqhmxu2lsc55b4q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0070",
+        "kind": "tables",
+        "root": "baguqeerakcse2zqtazepk5katpyxhqvkzxcgaksciafb2x5b6erwuqk7uzxa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerakcse2zqtazepk5katpyxhqvkzxcgaksciafb2x5b6erwuqk7uzxa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0072",
+        "kind": "archive",
+        "root": "baguqeeraiau4ahlvh6bf2xu6y5esefkyasxww2fmt5xadduuq2lbwfkmgxwq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraiau4ahlvh6bf2xu6y5esefkyasxww2fmt5xadduuq2lbwfkmgxwq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0069",
+        "kind": "tables",
+        "root": "baguqeerayl7mpqxkihu3zbjnc36f7mmk5r6zwwbmqppsgqp5mdqhcdbom4yq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerayl7mpqxkihu3zbjnc36f7mmk5r6zwwbmqppsgqp5mdqhcdbom4yq"
+      },
+      {
+        "group": "county",
+        "shard": "s0073",
+        "kind": "archive",
+        "root": "baguqeera3q42fgob7oagkrhxp5zxyoa4qif6erky7tg2w44cztqjrqsg5y3q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3q42fgob7oagkrhxp5zxyoa4qif6erky7tg2w44cztqjrqsg5y3q"
+      },
+      {
+        "group": "county",
+        "shard": "s0073",
+        "kind": "tables",
+        "root": "baguqeerakkmog2smi72tl6xewh4movetcq3mww2swbz3e75ksppwnfapd2ma",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerakkmog2smi72tl6xewh4movetcq3mww2swbz3e75ksppwnfapd2ma"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0073",
+        "kind": "archive",
+        "root": "baguqeerab73yu5mhtv4hr4j6ltcg3fwhpgssaswk2nqbamqfqhd77yhdrjia",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerab73yu5mhtv4hr4j6ltcg3fwhpgssaswk2nqbamqfqhd77yhdrjia"
+      },
+      {
+        "group": "county",
+        "shard": "s0065",
+        "kind": "tables",
+        "root": "baguqeera4376ayschuyfsjbcuzttkfk2g5w7eykkgxak7gzf3yfdsogq3rkq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera4376ayschuyfsjbcuzttkfk2g5w7eykkgxak7gzf3yfdsogq3rkq"
+      },
+      {
+        "group": "county",
+        "shard": "s0074",
+        "kind": "archive",
+        "root": "baguqeerahcvyzeqrlogj2gvjo25qq7hw35p35jo7px7qmhi5iqrsmld52nya",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerahcvyzeqrlogj2gvjo25qq7hw35p35jo7px7qmhi5iqrsmld52nya"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0071",
+        "kind": "tables",
+        "root": "baguqeeraovvexcbcyqfojdloipw6prbwskd47qk7lxsois23u3n2ixb6g7gq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraovvexcbcyqfojdloipw6prbwskd47qk7lxsois23u3n2ixb6g7gq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0074",
+        "kind": "archive",
+        "root": "baguqeera7yvfobkn2javfxnzu67xwyomxaebojzdflnlabo525j34qter6ja",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7yvfobkn2javfxnzu67xwyomxaebojzdflnlabo525j34qter6ja"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0073",
+        "kind": "tables",
+        "root": "baguqeeradvakaubc3mdwloe7ofdtbausuchouwxvnbaw5sxod6qxpbxfweha",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeradvakaubc3mdwloe7ofdtbausuchouwxvnbaw5sxod6qxpbxfweha"
+      },
+      {
+        "group": "county",
+        "shard": "s0075",
+        "kind": "archive",
+        "root": "baguqeerae4a2gy5xpdp2on3wz73imk5lkcoqspzkzeqjwr57j2s4selys62a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerae4a2gy5xpdp2on3wz73imk5lkcoqspzkzeqjwr57j2s4selys62a"
+      },
+      {
+        "group": "county",
+        "shard": "s0075",
+        "kind": "tables",
+        "root": "baguqeeradqactsnonvwylumszpk4thphz2acmsasmwkugix373dqecvhmhpa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeradqactsnonvwylumszpk4thphz2acmsasmwkugix373dqecvhmhpa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0074",
+        "kind": "tables",
+        "root": "baguqeeras4qhriq2a6sijkblikv5vshdkidbipafe4lvlstp5xnln26eaova",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeras4qhriq2a6sijkblikv5vshdkidbipafe4lvlstp5xnln26eaova"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0075",
+        "kind": "archive",
+        "root": "baguqeera23g4lek3kewdpcwj7efz3nygpikupovw2oyhs4symfx6ffmwplhq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera23g4lek3kewdpcwj7efz3nygpikupovw2oyhs4symfx6ffmwplhq"
+      },
+      {
+        "group": "county",
+        "shard": "s0069",
+        "kind": "tables",
+        "root": "baguqeeraldrbfcqozxd7mx5ioe4vfzxevcb3noraws6hjeck4dgudicfmyda",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraldrbfcqozxd7mx5ioe4vfzxevcb3noraws6hjeck4dgudicfmyda"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0076",
+        "kind": "archive",
+        "root": "baguqeeratb23umgwq7w3tfbh7ezx5fsmepqer22bpwgjkzaavw5xh56utjua",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeratb23umgwq7w3tfbh7ezx5fsmepqer22bpwgjkzaavw5xh56utjua"
+      },
+      {
+        "group": "county",
+        "shard": "s0076",
+        "kind": "archive",
+        "root": "baguqeerazwfwvzs6ep6ek53q4gaumo5wuvyxwcyknn2owbmhftedfdoplalq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerazwfwvzs6ep6ek53q4gaumo5wuvyxwcyknn2owbmhftedfdoplalq"
+      },
+      {
+        "group": "county",
+        "shard": "s0076",
+        "kind": "tables",
+        "root": "baguqeera3kxidaxg2dat5jfb5lja57n4hzcxys5x2azrjpqzdh7ybn673yza",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3kxidaxg2dat5jfb5lja57n4hzcxys5x2azrjpqzdh7ybn673yza"
+      },
+      {
+        "group": "county",
+        "shard": "s0077",
+        "kind": "archive",
+        "root": "baguqeerafowmovusdukgsi4kcqyufcrr6brjsb2dbwj6algmeumdpwsivqrq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerafowmovusdukgsi4kcqyufcrr6brjsb2dbwj6algmeumdpwsivqrq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0075",
+        "kind": "tables",
+        "root": "baguqeerapbdvck2ac3nuiucwmlkuj7tpxp5qmb2wcdcc2cbprpsvzgurif7a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerapbdvck2ac3nuiucwmlkuj7tpxp5qmb2wcdcc2cbprpsvzgurif7a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0077",
+        "kind": "archive",
+        "root": "baguqeerar276ol2qollwiwfstonmrn5eoslrllbun56q2a7p7rwlmmiqgoqq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerar276ol2qollwiwfstonmrn5eoslrllbun56q2a7p7rwlmmiqgoqq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0076",
+        "kind": "tables",
+        "root": "baguqeeragw6ykzgccvnfp2eoxs7hqqiamtmm5x22tvceweholwkkjtlqraza",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeragw6ykzgccvnfp2eoxs7hqqiamtmm5x22tvceweholwkkjtlqraza"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0077",
+        "kind": "tables",
+        "root": "baguqeerabfwitaa5f6rmkqwsslzmq4vbh5fj62udbeo4qtxxmcwggyv5cyeq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerabfwitaa5f6rmkqwsslzmq4vbh5fj62udbeo4qtxxmcwggyv5cyeq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0078",
+        "kind": "archive",
+        "root": "baguqeerai5siofvstu64k3bwpiguuizfbhtilz7ntug4v5kdbyietp2ingsa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerai5siofvstu64k3bwpiguuizfbhtilz7ntug4v5kdbyietp2ingsa"
+      },
+      {
+        "group": "county",
+        "shard": "s0078",
+        "kind": "archive",
+        "root": "baguqeeramzspzc7ln53jbqjfnscpa7uh25tzke6yvsiplb2ptxxwinoyu5jq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeramzspzc7ln53jbqjfnscpa7uh25tzke6yvsiplb2ptxxwinoyu5jq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0078",
+        "kind": "tables",
+        "root": "baguqeerakerdpaoqkcmbd7vymhqalwvmafz342eo5jefydhvbdxuujrbue4a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerakerdpaoqkcmbd7vymhqalwvmafz342eo5jefydhvbdxuujrbue4a"
+      },
+      {
+        "group": "county",
+        "shard": "s0079",
+        "kind": "archive",
+        "root": "baguqeerarfuybl2ygq7vdkqahqucofaumbdivvzwknhemyfich42cmexol5a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerarfuybl2ygq7vdkqahqucofaumbdivvzwknhemyfich42cmexol5a"
+      },
+      {
+        "group": "county",
+        "shard": "s0068",
+        "kind": "tables",
+        "root": "baguqeerald62bnm56mbgxvdqeu66nr46d4yh7dog3dppwnnwqbhsednhxsxa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerald62bnm56mbgxvdqeu66nr46d4yh7dog3dppwnnwqbhsednhxsxa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0079",
+        "kind": "archive",
+        "root": "baguqeerag7nurqm2ytwmklxmhlrvoxam5rxkqamq3jictlpgvuilwoyktbya",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerag7nurqm2ytwmklxmhlrvoxam5rxkqamq3jictlpgvuilwoyktbya"
+      },
+      {
+        "group": "county",
+        "shard": "s0079",
+        "kind": "tables",
+        "root": "baguqeerajtjt3shyb3jdhyv6vxdea7mshjggza3cbs4b46mrvebmc3swxmtq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerajtjt3shyb3jdhyv6vxdea7mshjggza3cbs4b46mrvebmc3swxmtq"
+      },
+      {
+        "group": "county",
+        "shard": "s0080",
+        "kind": "archive",
+        "root": "baguqeeraku37xraeg2zuckoynj2fbonlmnfquh3zcul6mtwuwsbdqpbsrdjq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraku37xraeg2zuckoynj2fbonlmnfquh3zcul6mtwuwsbdqpbsrdjq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0072",
+        "kind": "tables",
+        "root": "baguqeera7wetygjcztwikqygahqgnt77ehuaqugi5tfp6jcycaij5ypkwhpa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7wetygjcztwikqygahqgnt77ehuaqugi5tfp6jcycaij5ypkwhpa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0080",
+        "kind": "archive",
+        "root": "baguqeeraqo56tdzrtjmiccpc2dxkb63sg5w4xrhahmw2bnbc2kdrealrzwyq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraqo56tdzrtjmiccpc2dxkb63sg5w4xrhahmw2bnbc2kdrealrzwyq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0080",
+        "kind": "tables",
+        "root": "baguqeeranp7us4zuebwxt2zsngduv7nttjmz436mfxtxa533zhrjqlvis4pq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeranp7us4zuebwxt2zsngduv7nttjmz436mfxtxa533zhrjqlvis4pq"
+      },
+      {
+        "group": "county",
+        "shard": "s0081",
+        "kind": "archive",
+        "root": "baguqeeramkkib2yjcuqgh5i75yc73d6yuiupgdq6ofkrbp36kda6pe3bdelq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeramkkib2yjcuqgh5i75yc73d6yuiupgdq6ofkrbp36kda6pe3bdelq"
+      },
+      {
+        "group": "county",
+        "shard": "s0077",
+        "kind": "tables",
+        "root": "baguqeeragiiysio5cvispku24o32hj3hqfnnw4ksmoipaqlufowghn4pxw5a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeragiiysio5cvispku24o32hj3hqfnnw4ksmoipaqlufowghn4pxw5a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0081",
+        "kind": "archive",
+        "root": "baguqeeraou3qjizb4cqpwkk6sjg476rr5pge6hj2brjy26zqvr6hshvhsy3a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraou3qjizb4cqpwkk6sjg476rr5pge6hj2brjy26zqvr6hshvhsy3a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0079",
+        "kind": "tables",
+        "root": "baguqeeralmzlp3ru7vgwfbmrmis6b6g2pcd5xq4rds4w267qxmopu2wnac3a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeralmzlp3ru7vgwfbmrmis6b6g2pcd5xq4rds4w267qxmopu2wnac3a"
+      },
+      {
+        "group": "county",
+        "shard": "s0074",
+        "kind": "tables",
+        "root": "baguqeeraaoyu2ggah537k3qz4msahmst6cvt3z3iq7kj4uo667uubhz4ofxa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraaoyu2ggah537k3qz4msahmst6cvt3z3iq7kj4uo667uubhz4ofxa"
+      },
+      {
+        "group": "county",
+        "shard": "s0078",
+        "kind": "tables",
+        "root": "baguqeerabg2it5mp2252xtaipmdozrijoxoz7urggujyzgmh5lanif2ekvwa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerabg2it5mp2252xtaipmdozrijoxoz7urggujyzgmh5lanif2ekvwa"
+      },
+      {
+        "group": "county",
+        "shard": "s0082",
+        "kind": "archive",
+        "root": "baguqeera67fmmvrosbyalebuo4ckk2n57trxtf5lcioxa4yeobi3w7ih7qka",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera67fmmvrosbyalebuo4ckk2n57trxtf5lcioxa4yeobi3w7ih7qka"
+      },
+      {
+        "group": "county",
+        "shard": "s0083",
+        "kind": "archive",
+        "root": "baguqeera5l5pkg2lpkwfdoc4nsoumm3noh3nrfzn74huvmi4dea5xk6ryybq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera5l5pkg2lpkwfdoc4nsoumm3noh3nrfzn74huvmi4dea5xk6ryybq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0081",
+        "kind": "tables",
+        "root": "baguqeeraur56pjagdgo4ikyutveq5myqnwp6rvjqqypipszwzrmih3sqjkjq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraur56pjagdgo4ikyutveq5myqnwp6rvjqqypipszwzrmih3sqjkjq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0083",
+        "kind": "archive",
+        "root": "baguqeeramiuukwuanmqckj5mb3qj6o54exixghquerd6lw3s5i4c35jfrelq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeramiuukwuanmqckj5mb3qj6o54exixghquerd6lw3s5i4c35jfrelq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0082",
+        "kind": "archive",
+        "root": "baguqeerazk7ia5jlzmqamhwp6zgr2t23yvvtllumuuhnz6zbuoae3kkilphq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerazk7ia5jlzmqamhwp6zgr2t23yvvtllumuuhnz6zbuoae3kkilphq"
+      },
+      {
+        "group": "county",
+        "shard": "s0082",
+        "kind": "tables",
+        "root": "baguqeerahunf6h43kwpmgazghp4rce3n6bg23azk3idjihidhgxytsf5lwra",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerahunf6h43kwpmgazghp4rce3n6bg23azk3idjihidhgxytsf5lwra"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0083",
+        "kind": "tables",
+        "root": "baguqeerayckvmf6vdnclkm4btoxhqfecitu4u5ezujclcmd3sp57febwdznq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerayckvmf6vdnclkm4btoxhqfecitu4u5ezujclcmd3sp57febwdznq"
+      },
+      {
+        "group": "county",
+        "shard": "s0084",
+        "kind": "archive",
+        "root": "baguqeeraoacjaavqkbjkxze2phdysu3uhli42wwxuxhaut4pvkzmsxo52a2q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraoacjaavqkbjkxze2phdysu3uhli42wwxuxhaut4pvkzmsxo52a2q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0084",
+        "kind": "archive",
+        "root": "baguqeerakajcq5423eu6uv2srg47yu76ol3m2r7cw5vb3fqvg5aecrpj32xa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerakajcq5423eu6uv2srg47yu76ol3m2r7cw5vb3fqvg5aecrpj32xa"
+      },
+      {
+        "group": "county",
+        "shard": "s0084",
+        "kind": "tables",
+        "root": "baguqeera3awjgxnbnr6vhh6yu74lcd4exxnoylivvct7ina5vc3arectjenq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera3awjgxnbnr6vhh6yu74lcd4exxnoylivvct7ina5vc3arectjenq"
+      },
+      {
+        "group": "county",
+        "shard": "s0085",
+        "kind": "archive",
+        "root": "baguqeeraceim5hbq34hscohpdfzfkvwvgq7aagtiiyzafcpf7efuhgslmqqq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraceim5hbq34hscohpdfzfkvwvgq7aagtiiyzafcpf7efuhgslmqqq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0082",
+        "kind": "tables",
+        "root": "baguqeeraefqwwfdpgbahbdserehdxrc6gwqyhh4rwi44fjbzrmaafblp4f3q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraefqwwfdpgbahbdserehdxrc6gwqyhh4rwi44fjbzrmaafblp4f3q"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0085",
+        "kind": "archive",
+        "root": "baguqeeraogk36hvq7sukc6vz36l5dfpc7kwg6pm7m4xb23hx2ou2ppdatipq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraogk36hvq7sukc6vz36l5dfpc7kwg6pm7m4xb23hx2ou2ppdatipq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0085",
+        "kind": "tables",
+        "root": "baguqeerazjathwsn57axscoebvid6ceyapaxznpoj5cq7kxo4fkisgq2ekoa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerazjathwsn57axscoebvid6ceyapaxznpoj5cq7kxo4fkisgq2ekoa"
+      },
+      {
+        "group": "county",
+        "shard": "s0086",
+        "kind": "archive",
+        "root": "baguqeera4v6ighx4rvrumv2by7aaoyafz75lojjlr3zyhlywcp6frczkjnna",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera4v6ighx4rvrumv2by7aaoyafz75lojjlr3zyhlywcp6frczkjnna"
+      },
+      {
+        "group": "county",
+        "shard": "s0081",
+        "kind": "tables",
+        "root": "baguqeerae3uk5kwqwncwexeekalubaaqtnc2pej4hlrumkdznj576sczj75a",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerae3uk5kwqwncwexeekalubaaqtnc2pej4hlrumkdznj576sczj75a"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0086",
+        "kind": "archive",
+        "root": "baguqeerangytzkpwm3pll3ywhrd4lvth5lu6e3hhq4ei27fseenrgtvgjmaa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerangytzkpwm3pll3ywhrd4lvth5lu6e3hhq4ei27fseenrgtvgjmaa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0086",
+        "kind": "tables",
+        "root": "baguqeerawtskla4zmykq3zg2g7kcg3qqgandiobe2qw72dciyidswmjy6zxa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerawtskla4zmykq3zg2g7kcg3qqgandiobe2qw72dciyidswmjy6zxa"
+      },
+      {
+        "group": "county",
+        "shard": "s0067",
+        "kind": "tables",
+        "root": "baguqeerad3brwg3vnezopkr2plofp2poteb5jzhcuwkpxyppxm5c42nbfkua",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerad3brwg3vnezopkr2plofp2poteb5jzhcuwkpxyppxm5c42nbfkua"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0087",
+        "kind": "archive",
+        "root": "baguqeera7cttycjxvwjwxhnidlcxv63rbphbgfnkgvnq2bb3xy4smyyvtqiq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7cttycjxvwjwxhnidlcxv63rbphbgfnkgvnq2bb3xy4smyyvtqiq"
+      },
+      {
+        "group": "county",
+        "shard": "s0080",
+        "kind": "tables",
+        "root": "baguqeera7jkxsub2fk32owuhpkxhaps2tqj4crwpsr7xa73c2rviljssvrga",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeera7jkxsub2fk32owuhpkxhaps2tqj4crwpsr7xa73c2rviljssvrga"
+      },
+      {
+        "group": "county",
+        "shard": "s0087",
+        "kind": "archive",
+        "root": "baguqeerartzx3l43vdhkqogekzcshyr4bf7jnldojafimdxvhnzuwgg4hnka",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerartzx3l43vdhkqogekzcshyr4bf7jnldojafimdxvhnzuwgg4hnka"
+      },
+      {
+        "group": "county",
+        "shard": "s0088",
+        "kind": "archive",
+        "root": "baguqeeraiokfpvlbb32k7qjbvzsxbe5ozytkekuvrun5z3zkixagc44o3zlq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraiokfpvlbb32k7qjbvzsxbe5ozytkekuvrun5z3zkixagc44o3zlq"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0087",
+        "kind": "tables",
+        "root": "baguqeeraajd6yqguyoadvezwbk4dce5a4jzlwenafwaqbc5qu3vfddoo5wma",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraajd6yqguyoadvezwbk4dce5a4jzlwenafwaqbc5qu3vfddoo5wma"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0088",
+        "kind": "archive",
+        "root": "baguqeeraaamubymhdtdmhvhme6jlagnrrrphahj6525nkhz5pcg3ce6gy3wa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraaamubymhdtdmhvhme6jlagnrrrphahj6525nkhz5pcg3ce6gy3wa"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0088",
+        "kind": "tables",
+        "root": "baguqeerafh6li4vyowbpy6gbmv34bebdotpjsbwgaecc3tgv5rjjxmtkn7wa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerafh6li4vyowbpy6gbmv34bebdotpjsbwgaecc3tgv5rjjxmtkn7wa"
+      },
+      {
+        "group": "county",
+        "shard": "s0089",
+        "kind": "archive",
+        "root": "baguqeeracv7kxszsnemfwaxnm7zwsmnuvskgvnlfdkntuxryqjvspu4broeq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeracv7kxszsnemfwaxnm7zwsmnuvskgvnlfdkntuxryqjvspu4broeq"
+      },
+      {
+        "group": "county",
+        "shard": "s0072",
+        "kind": "tables",
+        "root": "baguqeeraq76gbc75irso4y3opnnfhs4zrk5vxpknbixwqiiijbjwrtzil34q",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeraq76gbc75irso4y3opnnfhs4zrk5vxpknbixwqiiijbjwrtzil34q"
+      },
+      {
+        "group": "county",
+        "shard": "s0083",
+        "kind": "tables",
+        "root": "baguqeerarwzayqjriwvknloyn2oqty4zi7cyqlrlybj7ttq4nqitadsg6jha",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerarwzayqjriwvknloyn2oqty4zi7cyqlrlybj7ttq4nqitadsg6jha"
+      },
+      {
+        "group": "county",
+        "shard": "s0085",
+        "kind": "tables",
+        "root": "baguqeeravgg4svyc2s3knt67fb5kxekmhw6oytxjccme3bjv5ql7iw6pupka",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeravgg4svyc2s3knt67fb5kxekmhw6oytxjccme3bjv5ql7iw6pupka"
+      },
+      {
+        "group": "county",
+        "shard": "s0089",
+        "kind": "tables",
+        "root": "baguqeerainf6mxzhrvmhwvzuig633zprirscu23rzxqtyhcvirkw5b2d3hfa",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerainf6mxzhrvmhwvzuig633zprirscu23rzxqtyhcvirkw5b2d3hfa"
+      },
+      {
+        "group": "county",
+        "shard": "s0087",
+        "kind": "tables",
+        "root": "baguqeeragptkddzkp555z4tjw7g47ejpkue23va4xaaydbpkn6jfvtxafpha",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeragptkddzkp555z4tjw7g47ejpkue23va4xaaydbpkn6jfvtxafpha"
+      },
+      {
+        "group": "county",
+        "shard": "s0088",
+        "kind": "tables",
+        "root": "baguqeeransuegvx6ha7ie2ositmtawimbsa3o3meml7jgu4zscde67ea2tja",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeeransuegvx6ha7ie2ositmtawimbsa3o3meml7jgu4zscde67ea2tja"
+      },
+      {
+        "group": "county",
+        "shard": "s0086",
+        "kind": "tables",
+        "root": "baguqeerauef4iwy2rhjpvgrjxnps4keuyagbvrgkhzl5u2mnezkdefe3sfja",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerauef4iwy2rhjpvgrjxnps4keuyagbvrgkhzl5u2mnezkdefe3sfja"
+      },
+      {
+        "group": "property_improvement",
+        "shard": "s0084",
+        "kind": "tables",
+        "root": "baguqeerag3nkawlbaligznulyheewo6vsoquynuw7t7gosyxy4frodml6avq",
+        "gateway_url": "https://ipfs.filebase.io/ipfs/baguqeerag3nkawlbaligznulyheewo6vsoquynuw7t7gosyxy4frodml6avq"
       }
     ],
-    "remaining": 325
+    "remaining": 0
   },
   "not_run": [
-    "filebase-pins of every CID",
-    "gateway checks",
+    "the full gateway checks",
     "Pinata pins",
     "manifest",
     "manifest pin"
-  ]
+  ],
+  "filebase_pins": {
+    "checked_at": "2026-10-19T20:39:24.561Z",
+    "cids": 3283,
+    "pinned": 3283,
+    "controls": 8,
+    "controls_pinned": 0,
+    "all_pinned": true
+  },
+  "gateway_sample": {
+    "started": "2026-10-19T20:39:24Z",
+    "stopped": "2026-10-19T21:04:18Z",
+    "jobs": "the first 5 raw roots (County archives s0001-s0005) and the first 5 parts, per gateway; deadline 10 minutes per object",
+    "per_gateway": {
+      "https://gateway.pinata.cloud": {
+        "rows": 10,
+        "match": 10,
+        "unverified": 0,
+        "mismatch": 0,
+        "statuses": {
+          "200": 10
+        }
+      },
+      "https://4everland.io": {
+        "rows": 10,
+        "match": 2,
+        "unverified": 8,
+        "mismatch": 0,
+        "statuses": {
+          "200": 2,
+          "504": 8
+        }
+      }
+    },
+    "cid_contact": "every sampled root listed 4-6 provider records on 2026-10-19 ~21:00Z",
+    "rows": [
+      {
+        "cid": "baguqeeraapcmfezjev6ux3twbhdaza5iykl5tj7ukriyravy3yn5b7cp6ueq",
+        "gateway": "https://gateway.pinata.cloud",
+        "check": "raw",
+        "status": 200,
+        "multihash": "match",
+        "attempts": 1,
+        "checked_at": "2026-10-19T20:39:30.174Z"
+      },
+      {
+        "cid": "baguqeeramtky5rdk5eqg7ms4wuc7ll4ljw3zpqq3lkdvu7xyk2e3pklwi6ua",
+        "gateway": "https://gateway.pinata.cloud",
+        "check": "raw",
+        "status": 200,
+        "multihash": "match",
+        "attempts": 1,
+        "checked_at": "2026-10-19T20:39:30.812Z"
+      },
+      {
+        "cid": "baguqeera2hk3k4txgzn6l4cs4k4zruc2dlsnl7jtqxd6pa7l6milfs6y73hq",
+        "gateway": "https://gateway.pinata.cloud",
+        "check": "raw",
+        "status": 200,
+        "multihash": "match",
+        "attempts": 1,
+        "checked_at": "2026-10-19T20:39:32.193Z"
+      },
+      {
+        "cid": "baguqeerajqevrlhfhnhl2llxyq7auibfmpmxosbrj5y2qedhxqudppfme6la",
+        "gateway": "https://gateway.pinata.cloud",
+        "check": "raw",
+        "status": 200,
+        "multihash": "match",
+        "attempts": 1,
+        "checked_at": "2026-10-19T20:39:32.607Z"
+      },
+      {
+        "cid": "baguqeerauwajllm55poebhkiz37fxwnumnxseqouqea7iqhzjxcmpjllbzcq",
+        "gateway": "https://gateway.pinata.cloud",
+        "check": "raw",
+        "status": 200,
+        "multihash": "match",
+        "attempts": 1,
+        "checked_at": "2026-10-19T20:39:34.652Z"
+      },
+      {
+        "cid": "bafybeicrnwfeaftbgcwhgr3rdm5xxogliaz3kgnczpkp6yvm7tkoe622xm",
+        "gateway": "https://gateway.pinata.cloud",
+        "check": "file",
+        "status": 200,
+        "multihash": null,
+        "bytes": "match",
+        "attempts": 1,
+        "checked_at": "2026-10-19T20:39:36.976Z"
+      },
+      {
+        "cid": "bafybeibuwrq5ono44czzf53vsn3pnhez57wf7etdjaunyb2hnw4hqgt3jy",
+        "gateway": "https://gateway.pinata.cloud",
+        "check": "file",
+        "status": 200,
+        "multihash": null,
+        "bytes": "match",
+        "attempts": 1,
+        "checked_at": "2026-10-19T20:39:37.697Z"
+      },
+      {
+        "cid": "bafybeiekvcyxt6pvc5erfqflh75amskhz7wxgjduuz4yg4trzlwl5exele",
+        "gateway": "https://gateway.pinata.cloud",
+        "check": "file",
+        "status": 200,
+        "multihash": null,
+        "bytes": "match",
+        "attempts": 1,
+        "checked_at": "2026-10-19T20:39:38.821Z"
+      },
+      {
+        "cid": "bafkreiaj25qr5e2jnijau4eflpo2hfrs2mpomzor3r5xkh7f225q3unyjq",
+        "gateway": "https://gateway.pinata.cloud",
+        "check": "file",
+        "status": 200,
+        "multihash": "match",
+        "bytes": "match",
+        "attempts": 1,
+        "checked_at": "2026-10-19T20:39:40.332Z"
+      },
+      {
+        "cid": "bafkreig3nqhry6wh4ftgahkyfpzyjnkfc5xajwedr5inumwoixf7wxwxaq",
+        "gateway": "https://gateway.pinata.cloud",
+        "check": "file",
+        "status": 200,
+        "multihash": "match",
+        "bytes": "match",
+        "attempts": 1,
+        "checked_at": "2026-10-19T20:39:41.420Z"
+      },
+      {
+        "cid": "baguqeeraapcmfezjev6ux3twbhdaza5iykl5tj7ukriyravy3yn5b7cp6ueq",
+        "gateway": "https://4everland.io",
+        "check": "raw",
+        "status": 200,
+        "multihash": "match",
+        "attempts": 3,
+        "checked_at": "2026-10-19T20:44:47.497Z"
+      },
+      {
+        "cid": "baguqeeramtky5rdk5eqg7ms4wuc7ll4ljw3zpqq3lkdvu7xyk2e3pklwi6ua",
+        "gateway": "https://4everland.io",
+        "check": "raw",
+        "status": 504,
+        "multihash": "unverified",
+        "attempts": 4,
+        "checked_at": "2026-10-19T20:47:26.277Z"
+      },
+      {
+        "cid": "baguqeera2hk3k4txgzn6l4cs4k4zruc2dlsnl7jtqxd6pa7l6milfs6y73hq",
+        "gateway": "https://4everland.io",
+        "check": "raw",
+        "status": 504,
+        "multihash": "unverified",
+        "attempts": 4,
+        "checked_at": "2026-10-19T20:47:26.282Z"
+      },
+      {
+        "cid": "baguqeerajqevrlhfhnhl2llxyq7auibfmpmxosbrj5y2qedhxqudppfme6la",
+        "gateway": "https://4everland.io",
+        "check": "raw",
+        "status": 504,
+        "multihash": "unverified",
+        "attempts": 4,
+        "checked_at": "2026-10-19T20:47:27.702Z"
+      },
+      {
+        "cid": "baguqeerauwajllm55poebhkiz37fxwnumnxseqouqea7iqhzjxcmpjllbzcq",
+        "gateway": "https://4everland.io",
+        "check": "raw",
+        "status": 504,
+        "multihash": "unverified",
+        "attempts": 4,
+        "checked_at": "2026-10-19T20:52:49.326Z"
+      },
+      {
+        "cid": "bafybeicrnwfeaftbgcwhgr3rdm5xxogliaz3kgnczpkp6yvm7tkoe622xm",
+        "gateway": "https://4everland.io",
+        "check": "file",
+        "status": 504,
+        "multihash": "unverified",
+        "bytes": "unverified",
+        "attempts": 4,
+        "checked_at": "2026-10-19T20:55:28.010Z"
+      },
+      {
+        "cid": "bafybeibuwrq5ono44czzf53vsn3pnhez57wf7etdjaunyb2hnw4hqgt3jy",
+        "gateway": "https://4everland.io",
+        "check": "file",
+        "status": 504,
+        "multihash": "unverified",
+        "bytes": "unverified",
+        "attempts": 4,
+        "checked_at": "2026-10-19T20:55:28.565Z"
+      },
+      {
+        "cid": "bafybeiekvcyxt6pvc5erfqflh75amskhz7wxgjduuz4yg4trzlwl5exele",
+        "gateway": "https://4everland.io",
+        "check": "file",
+        "status": 504,
+        "multihash": "unverified",
+        "bytes": "unverified",
+        "attempts": 4,
+        "checked_at": "2026-10-19T20:55:29.207Z"
+      },
+      {
+        "cid": "bafkreiaj25qr5e2jnijau4eflpo2hfrs2mpomzor3r5xkh7f225q3unyjq",
+        "gateway": "https://4everland.io",
+        "check": "file",
+        "status": 504,
+        "multihash": "unverified",
+        "bytes": "unverified",
+        "attempts": 4,
+        "checked_at": "2026-10-19T21:00:50.942Z"
+      },
+      {
+        "cid": "bafkreig3nqhry6wh4ftgahkyfpzyjnkfc5xajwedr5inumwoixf7wxwxaq",
+        "gateway": "https://4everland.io",
+        "check": "file",
+        "status": 200,
+        "multihash": "match",
+        "bytes": "match",
+        "attempts": 6,
+        "checked_at": "2026-10-19T21:04:09.197Z"
+      }
+    ]
+  }
 }
