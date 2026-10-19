@@ -557,3 +557,33 @@ the Socrata cross-checks. Run record `docs/evidence/travis-t4-run-2026-10-17.jso
   Under `query-db-loading-matching` it is a link (explicit fallback on official evidence), not a candidate; the
   reasoning is in `docs/evidence/travis-t4-ruling-10-tcad-listing-2026-10-18.json` and assignment decisions.md 25.10.
 
+
+## 15. T5 full run (2026-10-18/19): speed and constraints measured on the whole roll
+
+Run `20261018T143520Z-t5-full`, 89 shards of at most 5,000 accounts, 8 in flight, on the operator's Mac with swap at 5.5
+of 7 GB at the start. The whole record is kit `docs/evidence/travis-t5-run-20261018T143520Z.json`; the assignment's
+decisions.md section 27 rules on it.
+
+- **Wall time: 12.23 h to the run record** (projection 14.5 h). Stage time summed over the shards:
+  - `elephant-cli validate` of the County group: 65.9 h, 44.4 minutes per full shard. It is the bottleneck, as T4
+    measured.
+  - Property Improvement validate: 12.3 h.
+  - County hash: 5.3 h.
+  - The appraisal transform: 3.0 h; the permit transform: 1.7 h.
+  - The Loader merges: 2.5 h, serialized.
+  - Everything else: under 2 h together.
+
+  Source acquisition is none: every stage reads the T1–T4 captures; the only request is the lexicon manifest.
+- **Memory.** Peak 12.2 GB for the 8 CLI processes and 12.8 GB with the runner; the estimate was about 9 GB. Swap did
+  not grow (5.5 GB at the start, 4.9 GB at the end).
+- **Finalize.** 27 minutes, of which 25 count the run directory's bytes for the record (about 50 million entries, 569,504 in one full shard, one
+  `stat` each). That is a cost of the record, not of the data.
+- **Disk.** 125.8 GB allocated (du) for 66.1 GB of file bytes, plus 2.5 GB for the Loader scope; 44 GiB of the disk is left
+  free.
+- **Source constraints found on the whole roll:**
+  - 3 accounts print their situs street one column to the right: the name in the suffix column, the suffix in the unit
+    column.
+  - The 1,961 newest accounts (PROP_IDs from 1012767) are on no linked permit: each of the 7 geo_ids their permits print
+    is shared with an older account.
+- **A pipeline constraint found:** 12 county-line accounts fall outside the adapter's rounded validation box, although
+  the TNR layer draws them.

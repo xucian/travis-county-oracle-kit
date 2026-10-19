@@ -24,13 +24,24 @@
  * Operation: the runner holds `caffeinate -dimsu -w <pid>` while it lives, sets `ELEPHANT_SKIP_UPDATE_CHECK=1` for every
  * CLI call, runs the free-memory preflight (warnings only), prints a progress and ETA line every minute (also in
  * `progress.txt` and `progress.jsonl`), and holds `run.lock` (one writer per run directory). Starting it again with the
- * same label resumes the unfinished run of that label (`--new` starts a fresh one); `--resume <dir|latest>` names it.
+ * same label resumes the newest run of that label while it is unfinished; once it is finished, the same command only
+ * verifies it, read-only, in seconds (every marker's input recomputed, every output present, the Loader's generation,
+ * and `run.json` equal to the record rebuilt from the markers) and writes nothing. `--verify` does the same and also
+ * re-hashes every output a marker names; `--new` starts a fresh run; `--reopen` reruns a finished run in place (a
+ * fix: only stages whose inputs changed run, and `run.json` is rewritten with a new attempt); `--resume <dir|latest>`
+ * names the run. A verification compares the code each stage ran as of the run's kit commit (`run.json` `kit_commit`),
+ * so a later commit is reported (`code_since_run`) and not mistaken for a changed input.
+ *
+ * Exit: after `done` (or a failure, or a signal) the runner flushes its output and exits explicitly, so no stray handle
+ * can keep it alive, and first arms a detached exit watchdog: if the process is still there 30 seconds later (the T5
+ * full run of 2026-10-18 printed `done` and then stalled inside Node's own teardown, the main thread joining a libuv
+ * worker in `uv__threadpool_cleanup`, with every output written), the watchdog stops it with SIGTERM, then SIGKILL.
  *
  *   node --max-old-space-size=8192 src/counties/travis/t5-run.mjs --cli <elephant-cli> --eligibility __ALL__ \
  *     [--seed data/seeds/travis.csv] [--label full] [--shard-size 5000] [--concurrency 8] [--max-shards <n>] \
- *     [--loader-scope <name>] [--manifest <file>] [--resume <dir|latest>] [--new]
+ *     [--loader-scope <name>] [--manifest <file>] [--resume <dir|latest>] [--new] [--verify] [--reopen]
  *
- * No upload, pin or Atlas PR (T6). The only network request is the lexicon manifest.
+ * No upload, pin or Atlas PR (T6). The only network request is the lexicon manifest (none when verifying).
  *
  * @module counties/travis/t5-run
  */
@@ -97,6 +108,75 @@ export async function codeDigest(files) {
   const pairs = [];
   for (const file of files) pairs.push([file, await sha256File(path.join(RUNTIME_ROOT, file))]);
   return digestOf(pairs);
+}
+
+/**
+ * The same digest over the files as committed at `commit` (`git show <commit>:./<file>` in the runtime), so a finished
+ * run is verified against the code it ran, not the code checked out now.
+ *
+ * @param {string} commit - Kit commit (as `run.json` `kit_commit` records it).
+ * @param {string[]} files - Paths relative to the runtime root.
+ * @returns {Promise<string>} Hex digest.
+ */
+export async function codeDigestAtCommit(commit, files) {
+  const pairs = [];
+  for (const file of files) {
+    const bytes = await new Promise((resolve, reject) =>
+      execFile("git", ["-C", RUNTIME_ROOT, "show", `${commit}:./${file}`], { encoding: "buffer", maxBuffer: 256 * 1024 * 1024 }, (error, stdout) => (error ? reject(error) : resolve(stdout))),
+    );
+    pairs.push([file, sha256Hex(bytes)]);
+  }
+  return digestOf(pairs);
+}
+
+/** The exit watchdog (POSIX sh): waits for `pid` to go, else stops it if its command still names `match`. */
+const EXIT_WATCHDOG_SCRIPT = [
+  'pid=$1; code=$2; grace=$3; term=$4; match=$5; i=0',
+  'while kill -0 "$pid" 2>/dev/null; do',
+  '  if [ "$i" -ge "$grace" ]; then',
+  '    case "$(ps -o command= -p "$pid" 2>/dev/null)" in *"$match"*) ;; *) exit 0 ;; esac',
+  '    echo "[t5] exit watchdog: pid $pid is still alive ${grace} s after it exited with code $code (a stall in the Node process teardown; everything was written before the exit); sending SIGTERM" >&2',
+  '    kill -TERM "$pid" 2>/dev/null; j=0',
+  '    while kill -0 "$pid" 2>/dev/null && [ "$j" -lt "$term" ]; do sleep 1; j=$((j+1)); done',
+  '    if kill -0 "$pid" 2>/dev/null; then echo "[t5] exit watchdog: pid $pid ignored SIGTERM; sending SIGKILL" >&2; kill -KILL "$pid" 2>/dev/null; fi',
+  "    exit 0",
+  "  fi",
+  "  sleep 1; i=$((i+1))",
+  "done",
+].join("\n");
+
+/**
+ * Arm a detached watchdog that stops `pid` if it is still alive `graceSeconds` after its exit was requested (SIGTERM,
+ * then SIGKILL after `termSeconds`). It never touches a process whose command line no longer contains `match` (a reused
+ * pid), and it exits as soon as the process is gone. Its notice goes to the runner's stderr (the log).
+ *
+ * @param {{ pid?: number, code?: number, graceSeconds?: number, termSeconds?: number, match?: string }} [options] - Target.
+ * @returns {number | null} The watchdog's pid (null when it could not start).
+ */
+export function armExitWatchdog({ pid = process.pid, code = 0, graceSeconds = 30, termSeconds = 5, match = "t5-run" } = {}) {
+  try {
+    const child = spawn("/bin/sh", ["-c", EXIT_WATCHDOG_SCRIPT, "t5-exit-watchdog", String(pid), String(code), String(graceSeconds), String(termSeconds), match], { detached: true, stdio: ["ignore", "ignore", "inherit"] });
+    child.on("error", () => {});
+    child.unref();
+    return child.pid ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Leave the process now: flush stdout and stderr, arm the exit watchdog, then `process.exit(code)`. The explicit exit
+ * means no open handle can keep a finished runner alive; the watchdog covers a stall after that, inside Node's teardown.
+ *
+ * @param {number} code - Exit code.
+ * @param {{ graceSeconds?: number }} [options] - Watchdog delay.
+ * @returns {Promise<never>} Never returns.
+ */
+export async function exitProcess(code, { graceSeconds = Number(process.env.T5_EXIT_WATCHDOG_SECONDS ?? 30) } = {}) {
+  const flush = (stream) => new Promise((resolve) => (stream.writableLength === 0 && !stream.writableNeedDrain ? resolve(undefined) : stream.write("", () => resolve(undefined))));
+  await Promise.race([Promise.all([flush(process.stdout), flush(process.stderr)]), new Promise((resolve) => setTimeout(resolve, 5000).unref())]);
+  armExitWatchdog({ code, graceSeconds });
+  process.exit(code);
 }
 
 /**
@@ -318,7 +398,7 @@ export class T5Run {
       // A stage that runs no CLI (a shard's transform) finishes first; past 30 s, exit anyway: markers are atomic, so a
       // hard exit loses only the work in flight, exactly like a crash.
       setTimeout(() => {
-        this.unlock().finally(() => process.exit(signal === "SIGINT" ? 130 : 143));
+        this.unlock().finally(() => exitProcess(signal === "SIGINT" ? 130 : 143));
       }, 30000).unref();
     };
     for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) process.on(signal, () => handler(signal));
@@ -368,6 +448,16 @@ export class T5Run {
    * @returns {Promise<Record<string, any>>} The marker (existing or new).
    */
   async stage(dir, stage, input, task, meta = {}) {
+    if (this.verifying) {
+      // Verification: check the marker against the input recomputed now; never run the task, never write.
+      const verdict = await checkMarker(dir, stage, input, { rehash: this.verifying.full, stats: this.verifying });
+      this.verifying.stages += 1;
+      if (!verdict.valid) {
+        this.verifying.mismatches.push({ dir: rel(dir), stage, reason: verdict.reason });
+        throw Object.assign(new Error(`${rel(dir)} ${stage}: ${verdict.reason}`), { verifyMismatch: true });
+      }
+      return { ...verdict.marker, skipped: true };
+    }
     const check = await checkMarker(dir, stage, input);
     if (check.valid) {
       this.stageCounts.skipped += 1;
@@ -429,6 +519,7 @@ export class T5Run {
 
   /** Global stages: readiness, manifest, CLI version, plan, link pass. */
   async globalStages() {
+    if (this.verifying) return this.globalStagesVerified();
     const o = this.options;
     // Readiness (kit county-readiness-preflight: stop on a non-zero gate).
     const readiness = await new Promise((resolve) =>
@@ -469,6 +560,45 @@ export class T5Run {
     await atomicWrite(path.join(this.runDir, `preflight-a${this.attempt.attempt}.json`), `${JSON.stringify(this.preflight, null, 1)}\n`);
     for (const warning of this.preflight.warnings) this.log(`[t5] preflight warning: ${warning}`);
 
+    await this.planAndLink();
+  }
+
+  /**
+   * The global stages of a verification: the manifest as recorded (no request), the CLI version (reported, not a
+   * mismatch), no readiness run and no preflight, then the plan and link markers; the full mode also re-verifies the
+   * permit capture against its receipts.
+   */
+  async globalStagesVerified() {
+    const o = this.options;
+    const manifestPath = path.join(this.globalDir, "lexicon-manifest.json");
+    if (!existsSync(manifestPath)) {
+      this.verifying.mismatches.push({ dir: rel(this.globalDir), stage: "lexicon-manifest", reason: "no recorded manifest" });
+      throw Object.assign(new Error("no recorded lexicon manifest"), { verifyMismatch: true });
+    }
+    const manifestBytes = await readFile(manifestPath);
+    const manifestSha = sha256Hex(manifestBytes);
+    const recorded = this.state.lexicon_manifest ?? {};
+    for (const [name, value] of [["sha256_start", recorded.sha256_start], ["sha256_end", recorded.sha256_end]]) {
+      if (value && value !== manifestSha) this.verifying.mismatches.push({ dir: rel(this.globalDir), stage: "lexicon-manifest", reason: `the recorded manifest's SHA-256 differs from run-state ${name}` });
+    }
+    this.manifestSha = manifestSha;
+    this.lexicon = JSON.parse(manifestBytes.toString("utf8"));
+    this.roots = { ...resolveDataGroupCids(this.lexicon), ...resolvePermitGroupCids(this.lexicon) };
+    const version = await new Promise((resolve) => execFile(o.cli, ["--version"], { env: { ...process.env, ELEPHANT_SKIP_UPDATE_CHECK: "1" } }, (error, stdout) => resolve(error ? null : String(stdout).trim())));
+    const cliMarker = await this.stage(this.globalDir, "cli", { cli: o.cli }, null);
+    this.cliVersion = cliMarker.output.version;
+    this.verifying.cli = { recorded: cliMarker.output.version, now: version, since_run: version === cliMarker.output.version ? "same" : "changed" };
+    await this.planAndLink();
+    if (this.verifying.full) {
+      const verified = await verifyPermitCapture(this.captureDir);
+      this.verifying.capture = { ok: verified.ok, mismatches: verified.mismatches.length };
+      if (!verified.ok) this.verifying.mismatches.push({ dir: rel(this.captureDir), stage: "capture", reason: verified.mismatches.slice(0, 3).join("; ") });
+    }
+  }
+
+  /** The plan and link stages (shared by a run and a verification). */
+  async planAndLink() {
+    const o = this.options;
     // Plan.
     const extrasIndex = JSON.parse(await readFile(path.join(o.tcadExtrasDir, "index.json"), "utf8"));
     const seedSha = await sha256File(o.seedPath);
@@ -982,6 +1112,118 @@ export class T5Run {
     return { validate, hash, car_validate: carValidate, export_tables: exportTables, car: { path: rel(path.join(chainDir, `${name}.car`)), sha256: carSha, bytes: (await stat(path.join(chainDir, `${name}.car`))).size } };
   }
 
+  /** The Loader finalize stage's input: every shard's merge digest, the scope, the seed coverage and the code. */
+  loaderInput() {
+    return { merges: this.plan.shards.map((shard) => this.shardResults.get(shard.id)?.merge.output.digest), scope: this.options.loaderScope, whole_seed: this.wholeSeed, code: this.codeDigests.loader };
+  }
+
+  /**
+   * Verify the run without writing anything (no lock, no state, no progress file, no request). Every done-marker is
+   * checked against its input recomputed now, with each stage's code as of the run's kit commit; outputs must exist
+   * (`full`: and still hash to their recorded SHA-256); the Loader's generation must match its marker and be in the
+   * Loader history; `run.json` must equal the record rebuilt from the markers (except the fields that only the live run
+   * could sample: memory, disk, preflight, no-sleep, readiness and the kit commit, which are taken as recorded).
+   *
+   * @param {{ full?: boolean }} [options] - `full` re-hashes every output.
+   * @returns {Promise<Record<string, any>>} The verification report.
+   */
+  async verify({ full = false } = {}) {
+    const started = performance.now();
+    this.started = started;
+    this.phase = "verify";
+    this.verifying = { full, stages: 0, outputs: 0, files: 0, bytes: 0, mismatches: [], cli: null, capture: null };
+    if (!existsSync(this.statePath)) throw new Error(`no T5 run state at ${rel(this.statePath)}`);
+    this.state = JSON.parse(await readFile(this.statePath, "utf8"));
+    const lockPath = path.join(this.runDir, "run.lock");
+    if (existsSync(lockPath)) {
+      const holder = Number.parseInt((await readFile(lockPath, "utf8")).trim(), 10);
+      if (Number.isInteger(holder) && holder !== process.pid && alive(holder) && /t5-run/.test((await commandOf(holder)) ?? "")) throw new Error(`run ${rel(this.runDir)} is being written by live runner pid ${holder}; verify it after that runner stops`);
+    }
+    this.attempt = this.state.attempts.at(-1) ?? { started_at: this.state.created_at };
+    this.loaderDir = path.join(this.options.loaderRoot, this.options.loaderScope);
+    const recordPath = path.join(this.runDir, "run.json");
+    const saved = existsSync(recordPath) ? JSON.parse(await readFile(recordPath, "utf8")) : null;
+    // The code each stage ran: as of the run's kit commit when run.json names a clean one, else the working tree.
+    const commit = typeof saved?.kit_commit === "string" && /^[0-9a-f]{7,40}$/.test(saved.kit_commit) ? saved.kit_commit : null;
+    const codeSinceRun = {};
+    let codeBasis = commit ? `kit ${commit}` : "working tree (no clean kit commit recorded)";
+    for (const [name, files] of Object.entries(STAGE_CODE)) {
+      const now = await codeDigest(files);
+      let atRun = now;
+      if (commit) {
+        try {
+          atRun = await codeDigestAtCommit(commit, files);
+        } catch {
+          codeBasis = `working tree (kit ${commit} unreadable)`;
+        }
+      }
+      this.codeDigests[name] = atRun;
+      codeSinceRun[name] = atRun === now ? "same" : "changed";
+    }
+    let loaderReport = null;
+    let runJson = saved ? "not compared" : "missing";
+    try {
+      await this.globalStages();
+      const queue = [...this.plan.shards];
+      const worker = async () => {
+        while (queue.length > 0) {
+          const shard = queue.shift();
+          try {
+            await this.runShard(shard);
+          } catch (error) {
+            if (!error?.verifyMismatch) this.verifying.mismatches.push({ dir: rel(path.join(this.shardsDir, shard.id)), stage: "shard", reason: error instanceof Error ? error.message : String(error) });
+          }
+        }
+      };
+      await Promise.all(Array.from({ length: full ? Math.min(this.options.concurrency, queue.length) : 1 }, () => worker()));
+      if (this.shardResults.size === this.plan.shards.length) {
+        const loader = await this.stage(this.globalDir, "loader", this.loaderInput(), null);
+        const generationDir = path.join(RUNTIME_ROOT, loader.output.generation_dir);
+        const stateSha = existsSync(path.join(generationDir, "state.json")) ? await sha256File(path.join(generationDir, "state.json")) : null;
+        const history = await loadHistory(this.loaderDir);
+        const at = history.findIndex((item) => item.run_id === this.state.run_id && item.state_sha256 === loader.output.state_sha256);
+        const current = existsSync(path.join(this.loaderDir, "CURRENT")) ? (await readFile(path.join(this.loaderDir, "CURRENT"), "utf8")).trim() : null;
+        loaderReport = { generation: loader.output.generation_dir, state_sha256_matches: stateSha === loader.output.state_sha256, in_history: at >= 0, current_generation: current, later_loads: at >= 0 ? history.length - at - 1 : null };
+        if (stateSha !== loader.output.state_sha256) this.verifying.mismatches.push({ dir: loader.output.generation_dir, stage: "loader", reason: "the generation's state.json no longer matches the finalize marker" });
+        if (at < 0) this.verifying.mismatches.push({ dir: rel(this.loaderDir), stage: "loader", reason: "loads.jsonl holds no finalize of this run with that state" });
+        if (saved && this.verifying.mismatches.length === 0) {
+          this.readiness = saved.readiness_report;
+          this.preflight = saved.preflight;
+          this.noSleep = saved.no_sleep;
+          const rebuilt = await buildRunRecord({ run: this, loader: loader.output, history: history.slice(0, at + 1), t3: await t3Watermarks([path.join(RUNTIME_ROOT, "data", "travis", "registry"), path.join(RUNTIME_ROOT, "data", "travis", "licensing")]), diskBytes: 0 });
+          for (const key of ["memory", "disk", "preflight", "no_sleep", "readiness_report", "kit_commit"]) rebuilt[key] = saved[key];
+          const differs = [...new Set([...Object.keys(saved), ...Object.keys(rebuilt)])].filter((key) => digestOf(saved[key] ?? null) !== digestOf(rebuilt[key] ?? null));
+          runJson = differs.length === 0 ? "equal" : { differs };
+          if (differs.length > 0) this.verifying.mismatches.push({ dir: rel(recordPath), stage: "run.json", reason: `differs from the record rebuilt from the markers in ${differs.join(", ")}` });
+        }
+      }
+    } catch (error) {
+      if (!error?.verifyMismatch) this.verifying.mismatches.push({ dir: rel(this.runDir), stage: "verify", reason: error instanceof Error ? error.message : String(error) });
+    }
+    const v = this.verifying;
+    const counts = saved ? { seed: saved.counts.appraisal.seed, ready: saved.counts.appraisal.ready, dead: saved.counts.appraisal.dead, invalid: saved.counts.appraisal.invalid, reconciles: saved.counts.appraisal.reconciles, shards: saved.shards.total, cars: saved.cars.length, permits_published: saved.counts.permits.published, roof_age_eligible: saved.roof_age.eligible } : null;
+    return {
+      travis_t5_verify: this.state.run_id,
+      mode: full ? "full" : "quick",
+      status: v.mismatches.length > 0 ? "mismatch" : this.state.status === "finished" ? "verified" : "unfinished",
+      run_status: this.state.status,
+      stages_checked: v.stages,
+      outputs_checked: v.outputs,
+      outputs_rehashed: { files: v.files, bytes: v.bytes },
+      code_basis: codeBasis,
+      code_since_run: codeSinceRun,
+      cli: v.cli,
+      capture: v.capture,
+      loader: loaderReport,
+      run_json: runJson,
+      counts,
+      mismatch_count: v.mismatches.length,
+      mismatches: v.mismatches.slice(0, 20),
+      wrote: "nothing",
+      seconds: round((performance.now() - started) / 1000, 1),
+    };
+  }
+
   /** One progress line (stdout, `progress.txt`, `progress.jsonl`). */
   async progress() {
     const sample = await sampleCli();
@@ -1062,7 +1304,7 @@ export class T5Run {
       const loader = await this.stage(
         this.globalDir,
         "loader",
-        { merges: this.plan.shards.map((shard) => this.shardResults.get(shard.id)?.merge.output.digest), scope: this.options.loaderScope, whole_seed: this.wholeSeed, code: this.codeDigests.loader },
+        this.loaderInput(),
         async () => {
           const partitions = (await readFile(path.join(this.captureDir, "receipts.jsonl"), "utf8"))
             .split("\n")
@@ -1121,6 +1363,24 @@ export async function latestUnfinished(runsDir, label) {
   return null;
 }
 
+/**
+ * The newest T5 run directory with this label, finished or not (null when none).
+ *
+ * @param {string} runsDir - Runs root.
+ * @param {string} label - Label.
+ * @returns {Promise<{ dir: string, status: string } | null>} Run.
+ */
+export async function latestRun(runsDir, label) {
+  if (!existsSync(runsDir)) return null;
+  const names = (await readdir(runsDir)).filter((name) => name.endsWith(`-t5-${label}`)).sort().reverse();
+  for (const name of names) {
+    const statePath = path.join(runsDir, name, "run-state.json");
+    if (!existsSync(statePath)) continue;
+    return { dir: path.join(runsDir, name), status: JSON.parse(await readFile(statePath, "utf8")).status };
+  }
+  return null;
+}
+
 /** @param {string[]} argv @returns {Record<string, string | boolean>} */
 export function parseFlags(argv) {
   /** @type {Record<string, string | boolean>} */
@@ -1129,7 +1389,7 @@ export function parseFlags(argv) {
     const token = argv[index];
     if (!token.startsWith("--")) throw new Error(`unexpected argument ${token}`);
     const name = token.slice(2);
-    if (["new", "no-caffeinate"].includes(name)) flags[name] = true;
+    if (["new", "no-caffeinate", "verify", "reopen"].includes(name)) flags[name] = true;
     else {
       if (argv[index + 1] === undefined) throw new Error(`missing value for ${token}`);
       flags[name] = argv[index + 1];
@@ -1148,12 +1408,20 @@ export function parseFlags(argv) {
 export async function resolveOptions(flags) {
   const runsDir = path.resolve(typeof flags["runs-dir"] === "string" ? flags["runs-dir"] : path.join(RUNTIME_ROOT, "data", "travis", "runs"));
   const label = typeof flags.label === "string" ? flags.label : "full";
+  if (flags.new && (flags.verify || flags.reopen || typeof flags.resume === "string")) throw new Error("--new starts a fresh run; it does not combine with --verify, --reopen or --resume");
+  if (flags.verify && flags.reopen) throw new Error("--verify is read-only; it does not combine with --reopen");
   let runDir = null;
   if (typeof flags.resume === "string") runDir = flags.resume === "latest" ? await latestUnfinished(runsDir, label) : path.resolve(flags.resume);
-  else if (!flags.new) runDir = await latestUnfinished(runsDir, label);
+  else if (!flags.new) runDir = (await latestRun(runsDir, label))?.dir ?? null;
   if (typeof flags.resume === "string" && !runDir) throw new Error(`no unfinished T5 run with label ${label} under ${rel(runsDir)}`);
-  let saved = null;
-  if (runDir && existsSync(path.join(runDir, "run-state.json"))) saved = JSON.parse(await readFile(path.join(runDir, "run-state.json"), "utf8")).options;
+  let savedState = null;
+  if (runDir && existsSync(path.join(runDir, "run-state.json"))) savedState = JSON.parse(await readFile(path.join(runDir, "run-state.json"), "utf8"));
+  const saved = savedState?.options ?? null;
+  // A finished run is only verified (read-only) unless --reopen asks to rerun it in place; --verify verifies any run.
+  const finished = savedState?.status === "finished";
+  if (flags.verify && !savedState) throw new Error(`no T5 run with label ${label} under ${rel(runsDir)} to verify`);
+  if (flags.reopen && !finished) throw new Error("--reopen applies to a finished run; an unfinished one resumes with the same command");
+  const mode = flags.verify ? "verify-full" : finished && !flags.reopen ? "verify-quick" : "run";
   const pick = (flag, savedKey, fallback) => (typeof flags[flag] === "string" ? flags[flag] : saved?.[savedKey] ?? fallback);
   const eligibility = pick("eligibility", "eligibility", process.env[ELIGIBILITY_ENV] ?? null);
   if (!eligibility) throw new Error(`--eligibility is required (${ELIGIBILITY_ENV}): __ALL__ for the full run (decisions.md 25.9)`);
@@ -1192,6 +1460,8 @@ export async function resolveOptions(flags) {
     rollSeed: path.resolve(RUNTIME_ROOT, pick("roll-seed", "roll_seed", rel(DEFAULT_SEED))),
     progressIntervalMs: Number(typeof flags["progress-seconds"] === "string" ? flags["progress-seconds"] : 60) * 1000,
     noCaffeinate: flags["no-caffeinate"] === true,
+    mode,
+    reopen: flags.reopen === true,
   };
   if (!Number.isInteger(options.shardSize) || options.shardSize < 1 || options.shardSize > DEFAULT_SHARD_SIZE) throw new Error(`--shard-size must be 1-${DEFAULT_SHARD_SIZE} (the kit's CAR cap)`);
   if (!Number.isInteger(options.concurrency) || options.concurrency < 1) throw new Error("--concurrency must be a positive integer");
@@ -1200,34 +1470,46 @@ export async function resolveOptions(flags) {
 }
 
 async function main() {
-  const options = await resolveOptions(parseFlags(process.argv.slice(2)));
-  const run = new T5Run(options);
+  let options = null;
+  let code = 0;
   try {
-    const record = await run.run();
-    const county = record.counts.appraisal;
-    console.log(
-      JSON.stringify({
-        travis_t5_run: record.run_id,
-        status: "finished",
-        seed: county.seed,
-        ready: county.ready,
-        dead: county.dead,
-        invalid: county.invalid,
-        reconciles: county.reconciles,
-        shards: record.shards.total,
-        cars: record.cars.length,
-        permits_published: record.counts.permits.published,
-        roof_age_eligible: record.roof_age.eligible,
-        wall_h: round(record.timings.wall_ms / 3_600_000, 2),
-        run_record: rel(path.join(options.runDir, "run.json")),
-      }),
-    );
-    console.log(`[t5] done: ${rel(path.join(options.runDir, "run.json"))}`);
+    options = await resolveOptions(parseFlags(process.argv.slice(2)));
+    const run = new T5Run(options);
+    if (options.mode !== "run") {
+      if (options.mode === "verify-quick") console.log(`[t5] ${rel(options.runDir)} is finished: checking it read-only (no stage runs, nothing is written). --verify also re-hashes every output; --new starts a new run.`);
+      const report = await run.verify({ full: options.mode === "verify-full" });
+      console.log(JSON.stringify(report));
+      code = report.status === "verified" ? 0 : 3;
+    } else {
+      if (options.reopen) console.log(`[t5] reopening finished run ${rel(options.runDir)} (--reopen): stages whose inputs changed rerun and run.json is rewritten with a new attempt`);
+      const record = await run.run();
+      const county = record.counts.appraisal;
+      console.log(
+        JSON.stringify({
+          travis_t5_run: record.run_id,
+          status: "finished",
+          seed: county.seed,
+          ready: county.ready,
+          dead: county.dead,
+          invalid: county.invalid,
+          reconciles: county.reconciles,
+          shards: record.shards.total,
+          cars: record.cars.length,
+          permits_published: record.counts.permits.published,
+          roof_age_eligible: record.roof_age.eligible,
+          wall_h: round(record.timings.wall_ms / 3_600_000, 2),
+          run_record: rel(path.join(options.runDir, "run.json")),
+        }),
+      );
+      console.log(`[t5] done: ${rel(path.join(options.runDir, "run.json"))}`);
+    }
   } catch (error) {
     console.error(`[t5] ${error instanceof Error ? error.message : String(error)}`);
-    console.error(`[t5] run directory ${rel(options.runDir)}; to resume, run the same command again`);
-    process.exit(error?.exitCode ?? 1);
+    if (options?.runDir && options.mode === "run") console.error(`[t5] run directory ${rel(options.runDir)}; to resume, run the same command again`);
+    code = error?.exitCode ?? 1;
   }
+  // Exit explicitly (decisions.md section 27): nothing may keep a finished runner alive.
+  await exitProcess(code);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) main();

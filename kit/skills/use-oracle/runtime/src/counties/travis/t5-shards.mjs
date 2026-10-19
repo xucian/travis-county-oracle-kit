@@ -9,7 +9,8 @@
  *   digests, the lexicon manifest SHA-256, the CLI version, the code it ran) and its output digests. A resume recomputes
  *   the input digest and re-hashes the outputs: a matching marker is skipped, anything else is rerun under a new attempt
  *   number, so a crash or a sleep redoes only the stages that were in flight. Nothing a marker names is ever rewritten in
- *   place; a redone stage writes a new location.
+ *   place; a redone stage writes a new location. The same check, without writing, verifies a finished run
+ *   (`t5-run.mjs --verify`, or the start command on a finished run).
  *
  * @module counties/travis/t5-shards
  */
@@ -265,12 +266,16 @@ export async function writeMarker(dir, stage, body) {
  * names still has its recorded SHA-256 (`output.files[]`: `{path, sha256}`, relative to `dir`; a `tree` entry is checked
  * with {@link treeDigest}).
  *
+ * With `rehash: false` (the runner's quick, read-only check of a finished run) the outputs are only checked to exist;
+ * `stats`, when given, counts the outputs checked and the files and bytes re-hashed.
+ *
  * @param {string} dir - Shard (or global) directory.
  * @param {string} stage - Stage name.
  * @param {Record<string, any>} input - The stage's input now.
+ * @param {{ rehash?: boolean, stats?: { outputs: number, files: number, bytes: number } | null }} [options] - Check depth and counters.
  * @returns {Promise<{ marker: Record<string, any> | null, valid: boolean, reason: string }>} Verdict.
  */
-export async function checkMarker(dir, stage, input) {
+export async function checkMarker(dir, stage, input, { rehash = true, stats = null } = {}) {
   const file = markerPath(dir, stage);
   if (!existsSync(file)) return { marker: null, valid: false, reason: "no marker" };
   let marker;
@@ -284,7 +289,23 @@ export async function checkMarker(dir, stage, input) {
   for (const item of marker.output?.files ?? []) {
     const target = path.join(dir, item.path);
     if (!existsSync(target)) return { marker, valid: false, reason: `output ${item.path} missing` };
-    const digest = item.tree ? (await treeDigest(target)).sha256 : await sha256File(target);
+    if (stats) stats.outputs += 1;
+    if (!rehash) continue;
+    let digest;
+    if (item.tree) {
+      const tree = await treeDigest(target);
+      digest = tree.sha256;
+      if (stats) {
+        stats.files += tree.files;
+        stats.bytes += tree.bytes;
+      }
+    } else {
+      digest = await sha256File(target);
+      if (stats) {
+        stats.files += 1;
+        stats.bytes += (await stat(target)).size;
+      }
+    }
     if (digest !== item.sha256) return { marker, valid: false, reason: `output ${item.path} changed` };
   }
   return { marker, valid: true, reason: "matches" };

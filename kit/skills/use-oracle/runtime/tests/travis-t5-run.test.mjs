@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { readdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -9,7 +9,7 @@ import { ELIGIBILITY_ENV } from "../src/counties/travis/eligibility.mjs";
 import { harvestAustinPermits } from "../src/counties/travis/t4-permit-fetch.mjs";
 import { buildTcadPermitListing } from "../src/counties/travis/t4-tcad-permit-listing.mjs";
 import { IMP_ATR_FIELDS, IMP_INFO_FIELDS, LAND_DET_FIELDS, PROP_ENT_FIELDS, PROP_EXTRA_FIELDS, buildTcadExtras } from "../src/counties/travis/t5-tcad-extras.mjs";
-import { T5Run, estimateEta, formatDuration, invalidPropertiesFromErrors, parseFlags, resolveOptions } from "../src/counties/travis/t5-run.mjs";
+import { T5Run, armExitWatchdog, estimateEta, formatDuration, invalidPropertiesFromErrors, parseFlags, resolveOptions } from "../src/counties/travis/t5-run.mjs";
 import { currentGeneration, loadHistory } from "../src/counties/travis/t5-loader.mjs";
 import { context, socrata, tcadAccount, withOut, writeSpecialExport } from "./travis-t4-socrata-mock.mjs";
 
@@ -275,4 +275,156 @@ describe("T5 runner (fake elephant-cli, the replay seed in two shards)", () => {
       });
     }, 120000);
   }
+});
+
+/** Every file and directory under `dirs`: relative path to size and mtime (what a run would change). */
+async function snapshot(dirs) {
+  const out = {};
+  const walk = async (root, dir) => {
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      const info = await stat(full);
+      out[`${path.basename(root)}/${path.relative(root, full)}`] = `${info.size}:${info.mtimeMs}`;
+      if (entry.isDirectory()) await walk(root, full);
+    }
+  };
+  for (const dir of dirs) await walk(dir, dir);
+  return out;
+}
+
+const alivePid = (pid) => {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const waitFor = async (check, ms) => {
+  for (let waited = 0; waited < ms; waited += 100) {
+    if (await check()) return true;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  return check();
+};
+
+describe("T5 runner exit (decisions.md section 27: the full run printed done and did not exit)", () => {
+  it("the exit watchdog stops a process still alive past its grace, with SIGKILL when SIGTERM is ignored", async () => {
+    // A stand-in for a runner stuck after its exit: it ignores SIGTERM and keeps a timer; its command names t5-run.
+    const stuck = spawn(process.execPath, ["-e", "process.on('SIGTERM', () => {}); setInterval(() => {}, 1000);", "t5-run-stand-in"], { stdio: "ignore" });
+    const ended = new Promise((resolve) => stuck.on("exit", (code, signal) => resolve({ code, signal })));
+    await waitFor(() => alivePid(stuck.pid), 2000);
+    const watchdog = armExitWatchdog({ pid: stuck.pid, code: 0, graceSeconds: 1, termSeconds: 1 });
+    expect(watchdog).toBeGreaterThan(0);
+    const result = await Promise.race([ended, new Promise((resolve) => setTimeout(() => resolve("still alive"), 15000))]);
+    expect(result).toEqual({ code: null, signal: "SIGKILL" });
+  }, 20000);
+
+  it("the exit watchdog leaves a process alone once its command no longer names the runner (a reused pid), and leaves when its target exits", async () => {
+    const other = spawn(process.execPath, ["-e", "setInterval(() => {}, 1000);", "not-the-runner"], { stdio: "ignore" });
+    try {
+      await waitFor(() => alivePid(other.pid), 2000);
+      const watchdog = armExitWatchdog({ pid: other.pid, code: 0, graceSeconds: 1, termSeconds: 1 });
+      await new Promise((resolve) => setTimeout(resolve, 3500));
+      expect(alivePid(other.pid)).toBe(true);
+      expect(await waitFor(() => !alivePid(watchdog), 3000)).toBe(true);
+    } finally {
+      other.kill("SIGKILL");
+    }
+    const quick = spawn(process.execPath, ["-e", "setTimeout(() => {}, 300);", "t5-run-stand-in"], { stdio: "ignore" });
+    await waitFor(() => alivePid(quick.pid), 2000);
+    const watchdog = armExitWatchdog({ pid: quick.pid, code: 0, graceSeconds: 30, termSeconds: 1 });
+    expect(await waitFor(() => !alivePid(quick.pid), 5000)).toBe(true);
+    expect(await waitFor(() => !alivePid(watchdog), 4000)).toBe(true);
+  }, 20000);
+
+  it("a real runner process exits with code 0 right after done, even with a handle left open; the same command then only verifies, read-only", async () => {
+    await withOut(async (out) => {
+      const flags = await setup(out);
+      // A ref'd timer and interval loaded into the runner (--import): without the explicit exit they keep it alive.
+      const leak = path.join(out, "leak.mjs");
+      await writeFile(leak, "setInterval(() => {}, 1000);\nsetTimeout(() => {}, 1e9);\n");
+      const launch = () => {
+        const child = spawn(process.execPath, ["--import", leak, path.join(RUNTIME, "src", "counties", "travis", "t5-run.mjs"), ...flags, "--progress-seconds", "3600"], { env: { ...process.env, T5_EXIT_WATCHDOG_SECONDS: "5" }, stdio: ["ignore", "pipe", "pipe"] });
+        let stdout = "";
+        let doneAt = null;
+        child.stdout.on("data", (chunk) => {
+          stdout += chunk;
+          if (doneAt === null && /\[t5\] done:|"travis_t5_verify"/.test(stdout)) doneAt = Date.now();
+        });
+        child.stderr.on("data", () => {});
+        const exited = new Promise((resolve) => child.on("exit", (code, signal) => resolve({ code, signal, at: Date.now() })));
+        return { child, exited, output: () => stdout, doneAt: () => doneAt };
+      };
+      const first = launch();
+      const status = await Promise.race([first.exited, new Promise((resolve) => setTimeout(() => resolve("timeout"), 90000))]);
+      if (status === "timeout") first.child.kill("SIGKILL");
+      expect(status).not.toBe("timeout");
+      expect(status).toMatchObject({ code: 0, signal: null });
+      expect(first.output()).toMatch(/"status":"finished"/);
+      expect(status.at - first.doneAt()).toBeLessThan(4000);
+      const runsDir = path.join(out, "runs");
+      const runs = await readdir(runsDir);
+      expect(runs).toHaveLength(1);
+      // The same command on the finished run: a quick verification that writes nothing and exits 0.
+      const before = await snapshot([path.join(runsDir, runs[0]), path.join(out, "loader", "test")]);
+      const second = launch();
+      const again = await Promise.race([second.exited, new Promise((resolve) => setTimeout(() => resolve("timeout"), 60000))]);
+      if (again === "timeout") second.child.kill("SIGKILL");
+      expect(again).toMatchObject({ code: 0, signal: null });
+      const report = JSON.parse(second.output().trim().split("\n").at(-1));
+      expect(report).toMatchObject({ travis_t5_verify: runs[0], mode: "quick", status: "verified", run_json: "equal", mismatch_count: 0, wrote: "nothing" });
+      expect(report.stages_checked).toBeGreaterThan(20);
+      expect(await readdir(runsDir)).toEqual(runs);
+      expect(await snapshot([path.join(runsDir, runs[0]), path.join(out, "loader", "test")])).toEqual(before);
+    });
+  }, 180000);
+});
+
+describe("T5 runner verification of a finished run (read-only)", () => {
+  it("the quick and the full verification pass and write nothing; the full one names a changed CAR's stage, the quick one sees its size in run.json", async () => {
+    await withOut(async (out) => {
+      const flags = await setup(out);
+      const first = await runInProcess(flags);
+      const dirs = [first.options.runDir, path.join(out, "loader", "test")];
+      const before = await snapshot(dirs);
+      const quickOptions = await resolveOptions(parseFlags(flags));
+      expect(quickOptions).toMatchObject({ mode: "verify-quick", runDir: first.options.runDir });
+      const quick = await new T5Run({ ...quickOptions, log: () => {} }).verify({ full: false });
+      expect(quick).toMatchObject({ status: "verified", run_json: "equal", outputs_rehashed: { files: 0, bytes: 0 }, loader: { state_sha256_matches: true, in_history: true }, counts: { seed: 2, ready: 2, dead: 0, invalid: 0, reconciles: true } });
+      const fullOptions = await resolveOptions(parseFlags([...flags, "--verify"]));
+      expect(fullOptions.mode).toBe("verify-full");
+      const full = await new T5Run({ ...fullOptions, log: () => {} }).verify({ full: true });
+      expect(full).toMatchObject({ status: "verified", run_json: "equal", capture: { ok: true } });
+      expect(full.outputs_rehashed.files).toBeGreaterThan(full.outputs_checked - 1);
+      expect(await snapshot(dirs)).toEqual(before);
+      // Change one archive CAR after the run: the full verification names the stage, the quick one cannot see content.
+      const car = first.record.cars.find((item) => item.kind === "archive" && item.group === "county");
+      await writeFile(path.join(RUNTIME, car.path), "changed after the run\n");
+      const caught = await new T5Run({ ...fullOptions, log: () => {} }).verify({ full: true });
+      expect(caught.status).toBe("mismatch");
+      expect(caught.mismatches[0]).toMatchObject({ stage: "county.hash" });
+      expect(caught.mismatches[0].reason).toMatch(/changed/);
+      // The quick one re-hashes nothing, but the CAR's size is in run.json, so the rebuilt record no longer matches.
+      const quickAfter = await new T5Run({ ...quickOptions, log: () => {} }).verify({ full: false });
+      expect(quickAfter.status).toBe("mismatch");
+      expect(quickAfter.run_json).toEqual({ differs: ["cars"] });
+    });
+  });
+
+  it("refuses ambiguous flags: --new with --verify, --reopen on an unfinished run; --reopen on a finished run runs it in place", async () => {
+    await withOut(async (out) => {
+      const flags = await setup(out);
+      await expect(resolveOptions(parseFlags([...flags, "--new", "--verify"]))).rejects.toThrow(/--new starts a fresh run/);
+      await expect(resolveOptions(parseFlags([...flags, "--verify"]))).rejects.toThrow(/to verify/);
+      const first = await runInProcess(flags);
+      const reopen = await resolveOptions(parseFlags([...flags, "--reopen"]));
+      expect(reopen).toMatchObject({ mode: "run", reopen: true, runDir: first.options.runDir });
+      const statePath = path.join(first.options.runDir, "run-state.json");
+      await writeFile(statePath, JSON.stringify({ ...JSON.parse(await readFile(statePath, "utf8")), status: "interrupted" }));
+      await expect(resolveOptions(parseFlags([...flags, "--reopen"]))).rejects.toThrow(/--reopen applies to a finished run/);
+      expect((await resolveOptions(parseFlags(flags))).mode).toBe("run");
+    });
+  });
 });
