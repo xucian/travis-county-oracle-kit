@@ -404,7 +404,9 @@ export async function reconcileRun({ runDir, seedPath = null }) {
         } else if (entry.name === "tables.car") group.index_bytes += (await stat(full)).size;
       }
     };
-    await walk(path.join(RUNTIME_ROOT, path.dirname(car.path), "tables"));
+    // The tables directory the record names: a rerun whose CAR came out byte for byte the same keeps the earlier chain's.
+    const tablesCar = record.cars.find((item) => item.kind === "tables" && item.group === car.group && item.shard === car.shard);
+    await walk(path.join(RUNTIME_ROOT, tablesCar?.path ?? path.join(path.dirname(car.path), "tables")));
     group.tables_dirs += 1;
   }
   const gb = (bytes) => Math.round((bytes / 1e9) * 1000) / 1000;

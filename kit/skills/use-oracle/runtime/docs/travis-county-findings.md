@@ -587,3 +587,29 @@ decisions.md section 27 rules on it.
     is shared with an older account.
 - **A pipeline constraint found:** 12 county-line accounts fall outside the adapter's rounded validation box, although
   the TNR layer draws them.
+
+### 15.1 Rulings of 2026-10-19 applied: a scoped rerun of 7 shards (attempt 2)
+
+The assignment's decisions.md 27.9 to 27.11 were ruled; the record is the same evidence file, `rulings_27`.
+
+- **Validation box.** The adapter now validates against the seed builder's box (29.95-30.75 N, -98.25 to -97.30 W). No
+  point of the roll's 373,513 TNR geometries lies outside it.
+  The Census county line was weighed and not taken:
+  - 56 accounts TCAD appraises lie wholly outside the line (by up to 46 m);
+  - county-line parcels cross it by up to 2.35 km.
+
+  TCAD's parcel fabric does not follow the Census line.
+- **Shifted situs columns.** The 3 accounts that print the street one column to the right are read from those columns
+  (situs columns v1, exactly that pattern; the sidecar flags it). On the roll it matches those 3 rows and no other.
+- **Scoped rerun** (`t5-run.mjs --rerun-shards`): 7 shards reran (s0039, s0040, s0066, s0067, s0068, s0081, s0084) in
+  1 h 55 min, and 82 shards were re-certified in place.
+  - Each re-certified shard's appraisal and permits markers were rewritten only after three checks passed: a text
+    proof per changed file, the shard's own facts, and a re-hash of its outputs.
+  - The rerun shards' 34,984 earlier parcels came out byte for byte the same.
+  - The County validate took 48.5-49.9 minutes per shard, as in the full run.
+  - The Property Improvement CARs came out identical, so their tables were kept from attempt 1.
+- **Result.** 441,961 = 441,939 ready + 22 dead + 0 invalid. The 22 dead are source facts: 21 print no situs part,
+  1 only a house number.
+  - 7 County roots changed, with their tables roots; the other 340 of 354 roots are unchanged.
+  - The rerun allocated 8.8 GiB.
+  - The Node teardown stalled again after `done`, and the exit watchdog ended the process.

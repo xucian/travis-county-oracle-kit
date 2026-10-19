@@ -1,16 +1,17 @@
 {
- "record": "travis-t5-phase-b-run-record.v1",
- "written_at": "2026-10-19T05:36:21.564Z",
+ "record": "travis-t5-phase-b-run-record.v2",
+ "written_at": "2026-10-19T09:30:00Z",
  "run_id": "20261018T143520Z-t5-full",
  "run_dir": "data/travis/runs/20261018T143520Z-t5-full",
  "run_json": {
-  "sha256": "a0732ed3e34bf404918dda792150a06e44c4173835a4517a0d257b8fc0a27afb",
-  "bytes": 284435,
-  "copied_to": "assignment repository runs/20261018T143520Z-t5-full.json (identical bytes)"
+  "sha256": "15a43cb8f6ac0b4f46306106f6d59d8a903a02898474dc2060f2a2943bd3fc2b",
+  "bytes": 299752,
+  "copied_to": "assignment repository runs/20261018T143520Z-t5-full.json (identical bytes)",
+  "rewritten_by": "attempt 2, the scoped rerun of decisions.md 27.9 A (the attempt 1 record was a0732ed3...)"
  },
- "command": "node --max-old-space-size=12288 src/counties/travis/t5-run.mjs --cli <assignment repo>/node_modules/.bin/elephant-cli --eligibility __ALL__ --label full (runbook section 7; started detached with nohup by the coordinator at the operator's request)",
+ "command": "node --max-old-space-size=12288 src/counties/travis/t5-run.mjs --cli <assignment repo>/node_modules/.bin/elephant-cli --eligibility __ALL__ --label full (attempt 1; runbook section 7); attempt 2: the same command plus --rerun-shards s0039,s0040,s0066,s0067,s0068,s0081,s0084 (decisions.md 27.9 A, 27.10)",
  "versions": {
-  "kit_commit_of_the_run": "962f851",
+  "kit_commit_of_the_run": "962f851 (attempt 1); 1cf6ed1 (attempt 2, the scoped rerun; every re-certified marker carries this commit's code digests)",
   "cli": "1.58.1 (44bb182, project-local in the assignment repository)",
   "lexicon_manifest": {
    "url": "https://lexicon.elephant.xyz/api/manifest",
@@ -23,6 +24,9 @@
    "transform": "travis-transform-v4",
    "geometry_parts": "travis-geometry-parts-v1",
    "tcad_extras_mapping": "travis-tcad-extras-mapping-v2",
+   "situs_columns": "travis-situs-columns-v1",
+   "validation_box": "29.95-30.75 N, -98.25 to -97.3 W",
+   "recertify": "travis-t5-recertify.v1",
    "permit_transform": "travis-permit-transform-v2",
    "status_group": "travis-status-group-v1",
    "work_classifier": "travis-work-classifier-v2",
@@ -34,7 +38,9 @@
   },
   "phase_b_kit_commits": [
    "6107969 (exit fix, verify mode)",
-   "57a1795 (t5-reconcile.mjs)"
+   "57a1795 (t5-reconcile.mjs)",
+   "1cf6ed1 (rulings 27.9 and 27.10: validation box, situs columns v1, --rerun-shards with re-certification)",
+   "the evidence commit after 1cf6ed1 (t5-reconcile.mjs reads the tables where the record names them; this record)"
   ]
  },
  "timeline": {
@@ -43,7 +49,7 @@
   "loader_finalized_at": "2026-10-19T02:47:43.281Z",
   "run_state_finished_at": "2026-10-19T02:49:19.831Z",
   "done_printed_at": "2026-10-19T03:14:36Z (log)",
-  "wall_h_run_record": 12.23,
+  "wall_h_run_record": 17.89,
   "wall_log": "12h39m to done",
   "attempts": [
    {
@@ -55,44 +61,82 @@
     "resumed": false,
     "reaped_orphans": 0,
     "error": null
+   },
+   {
+    "attempt": 2,
+    "pid": 23637,
+    "started_at": "2026-10-19T07:08:37.474Z",
+    "ended_at": "2026-10-19T08:28:33.429Z",
+    "status": "finished",
+    "resumed": true,
+    "reaped_orphans": 0,
+    "error": null
    }
   ],
-  "finalize_note": "the Loader finalize took 1.6 min (02:47:43 to 02:49:19Z); the remaining 25 min before done are the run record's disk figure: bytesUnder walks every entry of the run directory (about 50 million: 569,504 in one full shard) one stat at a time"
+  "finalize_note": "the Loader finalize took 1.6 min (02:47:43 to 02:49:19Z); the remaining 25 min before done are the run record's disk figure: bytesUnder walks every entry of the run directory (about 50 million: 569,504 in one full shard) one stat at a time",
+  "scoped_rerun": {
+   "started_at": "2026-10-19T07:08:37.471Z",
+   "link_recertified_at": "2026-10-19T07:08:46.301Z",
+   "rerun_appraisal_and_permits_compared_by": "2026-10-19T07:16:48.936Z (the gate opened: 7 of 7 identical)",
+   "first_shard_recertified_at": "2026-10-19T07:18:37.604Z",
+   "rerun_shards_merged_by": "2026-10-19T08:22:42.506Z",
+   "shards_done_and_loader_finalized_at": "2026-10-19T08:25:22.446Z",
+   "attempt_ended_at": "2026-10-19T08:28:33.429Z",
+   "done_printed_at": "2026-10-19T09:02:39Z (run.json written; the record's disk figure took 34 min)",
+   "exit": "the Node teardown stalled again after done; the exit watchdog of 6107969 sent SIGTERM 30 s later, then SIGKILL (log lines 213-214); everything was written before",
+   "shard_phase_min": 76.6,
+   "county_validate_min": [
+    48.5,
+    49.9
+   ],
+   "command_wall_h": 1.91
+  },
+  "wall_note": "wall_ms runs from the first start to the last finish, so it spans the 19 h between the attempts; attempts_ms has each attempt",
+  "attempts_h": [
+   {
+    "attempt": 1,
+    "h": 12.23
+   },
+   {
+    "attempt": 2,
+    "h": 1.33
+   }
+  ]
  },
  "timings_by_stage": {
   "appraisal": {
    "shards": 89,
-   "total_h": 2.98,
-   "mean_min": 2
+   "total_h": 3.13,
+   "mean_min": 2.1
   },
   "permits": {
    "shards": 89,
-   "total_h": 1.72,
-   "mean_min": 1.2
+   "total_h": 1.87,
+   "mean_min": 1.3
   },
   "reconcile": {
    "shards": 89,
-   "total_h": 0.42,
+   "total_h": 0.46,
    "mean_min": 0.3
   },
   "cid_check": {
    "shards": 89,
    "total_h": 0.01,
-   "mean_min": 0
+   "mean_min": 0.0
   },
   "merge": {
    "shards": 89,
-   "total_h": 2.52,
+   "total_h": 2.53,
    "mean_min": 1.7
   },
   "cli_county_validate": {
    "shards": 89,
-   "total_h": 65.85,
-   "mean_min": 44.4
+   "total_h": 66.41,
+   "mean_min": 44.8
   },
   "cli_county_hash": {
    "shards": 89,
-   "total_h": 5.28,
+   "total_h": 5.3,
    "mean_min": 3.6
   },
   "cli_county_car_validate": {
@@ -107,12 +151,12 @@
   },
   "cli_property_improvement_validate": {
    "shards": 88,
-   "total_h": 12.3,
+   "total_h": 12.28,
    "mean_min": 8.4
   },
   "cli_property_improvement_hash": {
    "shards": 88,
-   "total_h": 2.22,
+   "total_h": 2.2,
    "mean_min": 1.5
   },
   "cli_property_improvement_car_validate": {
@@ -142,7 +186,15 @@
    "available_gb": 15.1,
    "free_gb": 6.4
   },
-  "phase_a_estimate": "about 9 GB for 8 full-size CLI processes and the runner (decisions.md 26.7)"
+  "phase_a_estimate": "about 9 GB for 8 full-size CLI processes and the runner (decisions.md 26.7)",
+  "attempt_2": {
+   "peak_cli_rss_gb": 9.5,
+   "peak_cli_processes": 7,
+   "peak_runner_rss_gb": 4.2,
+   "peak_combined_rss_gb": 9.8,
+   "peak_swap_used_gb": 4.6,
+   "sampled": "every progress tick (60 s) and shard completion; ps RSS"
+  }
  },
  "disk": {
   "run_dir_file_bytes_gb": 66.12,
@@ -153,18 +205,36 @@
   "preflight_available_gb_at_start": 211.5,
   "preflight_wanted_gb": 122.2,
   "free_after_run": "44 GiB of 1.8 TiB after the run (df, 2026-10-19 08:0x local); 42 GiB after phase B (its 60-parcel exit probe left 3.4 GB in the session scratchpad)",
-  "phase_a_estimate": "about 125 GB (290 KiB per property, t5-preflight.mjs): matched, 125.8 GB allocated (du), from 66.1 GB of file bytes (hard links counted per name) in about 50 million entries"
+  "phase_a_estimate": "about 125 GB (290 KiB per property, t5-preflight.mjs): matched, 125.8 GB allocated (du), from 66.1 GB of file bytes (hard links counted per name) in about 50 million entries",
+  "attempt_2": {
+   "free_before_gib": 36.09,
+   "free_before_at": "2026-10-19T07:08:37Z (37,842,696 KiB; the run started above the 25 GiB floor)",
+   "free_after_gib": 18.13,
+   "free_after_at": "after the verification and the reconciliation (19,012,984 KiB)",
+   "rerun_allocated_gib": 8.77,
+   "rerun_allocated_detail": {
+    "seven_shards_new_attempt_dirs_gib": 7.32,
+    "of_which_appraisal_a2_gib": 5.78,
+    "apparent_bytes_gib": 3.71,
+    "loader_second_generation_new_files_gib": 1.45,
+    "note": "du -sk in one invocation over the 28 new attempt directories (hard links counted once); the Loader's new files are those with one link (permits.parquet 1.16 GB rewritten, hash indexes 0.40 GB); its table parts are hard links to shard files"
+   },
+   "df_drop_gib": 17.96,
+   "outside_the_rerun_gib": 9.19,
+   "outside_note": "the drop beyond the rerun's own allocation came from elsewhere on the volume during the same two hours: 25 Time Machine local snapshots by the end (two new ones at 07:24Z and 07:31Z) hold freed blocks, and other processes wrote; the system temp directory holds 12 stale cdk.out directories (19 GB, not this pipeline's)",
+   "run_dir_file_bytes_gib": 69.81
+  }
  },
  "counts": {
   "appraisal": {
    "seed": 441961,
-   "ready": 441924,
-   "dead": 37,
+   "ready": 441939,
+   "dead": 22,
    "invalid": 0,
    "retryable": 0,
    "reconciles": true,
    "rule": "seed = ready + dead + invalid (kit county-ingest-run section 8)",
-   "with_geometry": 373482,
+   "with_geometry": 373497,
    "without_geometry": 68442
   },
   "permits": {
@@ -184,7 +254,7 @@
    },
    "permit_states": {
     "done": 237531,
-    "done_zero_permits": 204393,
+    "done_zero_permits": 204408,
     "not_eligible": 0,
     "failed_permanent": 0
    },
@@ -227,31 +297,31 @@
   },
   "tables": {
    "county": {
-    "properties": 441924,
-    "address_has_geometry": 373482,
-    "address": 883548,
-    "geometry": 375022,
-    "company_has_mailing_address": 97667,
-    "company": 97667,
-    "parcel_has_geometry": 375022,
-    "parcel": 441924,
-    "property_has_address": 441924,
-    "property": 441924,
-    "property_has_lot": 441587,
-    "lot": 441587,
-    "property_has_parcel": 441924,
-    "property_has_sales_history": 423970,
-    "sales_history": 423970,
+    "properties": 441939,
+    "address_has_geometry": 373497,
+    "address": 883578,
+    "geometry": 375037,
+    "company_has_mailing_address": 97673,
+    "company": 97673,
+    "parcel_has_geometry": 375037,
+    "parcel": 441939,
+    "property_has_address": 441939,
+    "property": 441939,
+    "property_has_lot": 441602,
+    "lot": 441602,
+    "property_has_parcel": 441939,
+    "property_has_sales_history": 423983,
+    "sales_history": 423983,
     "property_has_structure": 324617,
     "structure": 324617,
-    "property_has_tax": 441924,
-    "tax": 441924,
-    "sales_history_has_company": 82757,
-    "address_has_parcel": 441924,
-    "person_has_mailing_address": 343957,
-    "person": 343957,
-    "sales_history_has_person": 340944,
-    "person_has_property": 3013,
+    "property_has_tax": 441939,
+    "tax": 441939,
+    "sales_history_has_company": 82763,
+    "address_has_parcel": 441939,
+    "person_has_mailing_address": 343966,
+    "person": 343966,
+    "sales_history_has_person": 340951,
+    "person_has_property": 3015,
     "company_has_property": 14910
    },
    "property_improvement": {
@@ -264,63 +334,41 @@
     "property_improvement": 1986484
    },
    "internal": {
-    "query_table": 441924,
-    "roof_age": 441924,
+    "query_table": 441939,
+    "roof_age": 441939,
     "permits": 2380707
    }
-  },
-  "evidence_states": {
-   "completed_date": {
-    "confirmed_present": 2180217,
-    "unknown": 198488,
-    "invalid_quarantined": 2002
-   },
-   "status_current": {
-    "confirmed_present": 2380693,
-    "unknown": 14
-   },
-   "tcad_id": {
-    "confirmed_present": 2213641,
-    "unknown": 63019,
-    "invalid_quarantined": 104047
-   }
-  },
-  "unlinked_reasons": {
-   "no_candidate": 251888,
-   "multiple_candidates": 38249,
-   "invalid_quarantined": 178,
-   "out_of_county": 103869
   }
  },
  "roof_age": {
-  "parcels": 441924,
-  "eligible": 390210,
-  "ineligible": 51714,
+  "parcels": 441939,
+  "eligible": 390212,
+  "ineligible": 51727,
   "by_basis": {
    "new_construction": 96601,
-   "year_built": 281410,
-   "none": 51714,
+   "year_built": 281412,
+   "none": 51727,
    "completed_replacement": 12199
   },
   "by_confidence": {
    "medium": 96601,
-   "low": 281410,
-   "none": 51714,
+   "low": 281412,
+   "none": 51727,
    "high": 12199
   },
   "by_eligibility_reason": {
    "accepted_completed_primary_roof_new_construction": 96601,
-   "accepted_property_built_year": 281410,
-   "no_valid_anchor": 51714,
+   "accepted_property_built_year": 281412,
+   "no_valid_anchor": 51727,
    "accepted_completed_primary_roof_replacement": 12199
   },
   "by_historical_coverage": {
    "partial": 237531,
-   "unknown": 204393
+   "unknown": 204408
   },
   "caveats": {
    "partial_history": 237531,
-   "history_unknown": 204393,
+   "history_unknown": 204408,
    "anchor_link_tcad_permit_listing": 3086
   },
   "anchor_link_method": {
@@ -330,9 +378,9 @@
   "older_than_threshold": {
    "threshold_years": 15,
    "rule": "roof_age_years > threshold",
-   "total": 276667,
+   "total": 276668,
    "by_basis": {
-    "year_built": 202082,
+    "year_built": 202083,
     "new_construction": 64957,
     "completed_replacement": 9628
    }
@@ -362,7 +410,6 @@
    "anchor_eligible_permits_unlinked_on_retired_geo_ids": 15395,
    "note": "a parcel without a permit anchor falls back to the built year (low confidence) or to no age; the anchor-eligible permits that stay unlinked sit on parcels no public source names, so at most that many more parcels fall back because of them"
   },
-  "meaning": "eligible = the parcels the kit's estimator gives an age: a completed primary-roof replacement (high), a completed new-construction roof permit (medium), or else the published built year (low); none = no valid anchor and no built year. The anchor date is the permit's completed_date or, for a Final permit, its status date (the finaling date).",
   "anchors_reconciled": {
    "t4_rule": "completed primary-roof replacement or new construction with a confirmed completed_date (t4-permit-links.mjs)",
    "t4_rule_parcels": 108733,
@@ -385,10 +432,10 @@
    {
     "track": "appraisal",
     "path": "data/travis/runs/20261018T143520Z-t5-full/shards/*/appraisal-a*/*/data",
-    "artifact_hash": "99154fdde2c7a420e1d25143a8458bc3a009a31fcefbf4fe8256e896333d2356",
-    "merged_count": 441924,
-    "merged_rows": 441924,
-    "last_merged_at": "2026-10-19T02:47:43.281Z",
+    "artifact_hash": "b4fc203b1f230174155ea36a629ae9ad0d880b8d467fa007727209fbc02ecf78",
+    "merged_count": 441939,
+    "merged_rows": 441939,
+    "last_merged_at": "2026-10-19T08:25:22.446Z",
     "hash_index_path": "hash-index.appraisal.json"
    },
    {
@@ -397,16 +444,16 @@
     "artifact_hash": "a98bc15be64c4ba7e74d78ada63efbe45d446be33ff675b1a232931046716db3",
     "merged_count": 270,
     "merged_rows": 2380707,
-    "last_merged_at": "2026-10-19T02:47:43.281Z",
+    "last_merged_at": "2026-10-19T08:25:22.446Z",
     "hash_index_path": "hash-index.permits.json"
    },
    {
     "track": "permits",
     "path": "data/travis/runs/20261018T143520Z-t5-full/shards/*/appraisal-a*/*/permit-data-a*",
-    "artifact_hash": "674ada5404e838555a4df2cc2133e40c501e917a699f596be2c0e2b57737f395",
+    "artifact_hash": "b334bedd99fd2d4e6e6380ff5d73c19eab2bee8ab0cadb8c472e9077b5abc1a4",
     "merged_count": 237531,
     "merged_rows": 1986484,
-    "last_merged_at": "2026-10-19T02:47:43.281Z",
+    "last_merged_at": "2026-10-19T08:25:22.446Z",
     "hash_index_path": "hash-index.permit_groups.json"
    },
    {
@@ -467,39 +514,39 @@
    }
   ],
   "tombstones_consumed": {
-   "dead": 37,
+   "dead": 22,
    "invalid": 0
   },
   "tombstones": {
-   "total": 37,
+   "total": 22,
    "stale_rows_removed": 0,
    "by_reason": {
-    "dead": 37
+    "dead": 22
    }
   },
   "deltas": {
    "appraisal": {
-    "new": 441924,
+    "new": 15,
     "changed": 0,
-    "unchanged": 0,
+    "unchanged": 441924,
     "removed": 0,
-    "dead": 37,
+    "dead": 22,
     "invalid": 0,
     "retryable": 0
    },
    "permit_groups": {
-    "new": 237531,
+    "new": 0,
     "changed": 0,
-    "unchanged": 0,
+    "unchanged": 237531,
     "removed": 0,
     "dead": 0,
     "invalid": 0,
     "retryable": 0
    },
    "permits": {
-    "new": 2380707,
+    "new": 0,
     "changed": 0,
-    "unchanged": 0,
+    "unchanged": 2380707,
     "removed": 0,
     "dead": 0,
     "invalid": 0,
@@ -553,22 +600,70 @@
      }
     ],
     "state_sha256": "d4198e7adaa01f318f6e91ed141bf25a7c428f0a4f64737a1aadd0dd83454318"
+   },
+   {
+    "run_id": "20261018T143520Z-t5-full",
+    "finalized_at": "2026-10-19T08:25:22.446Z",
+    "prior_generation": "20261018T143520Z-t5-full",
+    "deltas": {
+     "appraisal": {
+      "new": 15,
+      "changed": 0,
+      "unchanged": 441924,
+      "removed": 0
+     },
+     "permit_groups": {
+      "new": 0,
+      "changed": 0,
+      "unchanged": 237531,
+      "removed": 0
+     },
+     "permits": {
+      "new": 0,
+      "changed": 0,
+      "unchanged": 2380707,
+      "removed": 0
+     }
+    },
+    "tombstones_consumed": {
+     "dead": 22,
+     "invalid": 0
+    },
+    "watermarks": [
+     {
+      "track": "appraisal",
+      "artifact_hash": "b4fc203b1f230174155ea36a629ae9ad0d880b8d467fa007727209fbc02ecf78",
+      "merged_count": 441939
+     },
+     {
+      "track": "permits",
+      "artifact_hash": "a98bc15be64c4ba7e74d78ada63efbe45d446be33ff675b1a232931046716db3",
+      "merged_count": 270
+     },
+     {
+      "track": "permits",
+      "artifact_hash": "b334bedd99fd2d4e6e6380ff5d73c19eab2bee8ab0cadb8c472e9077b5abc1a4",
+      "merged_count": 237531
+     }
+    ],
+    "state_sha256": "026a6975f1fc029c8c1f5046fccf3c093857a499593586bc171463ee83f751bf"
    }
   ],
   "generation": {
    "scope": "full",
    "generation": "data/travis/loader/full/generations/20261018T143520Z-t5-full",
-   "state_sha256": "d4198e7adaa01f318f6e91ed141bf25a7c428f0a4f64737a1aadd0dd83454318",
-   "prior_generation": null
-  }
+   "state_sha256": "026a6975f1fc029c8c1f5046fccf3c093857a499593586bc171463ee83f751bf",
+   "prior_generation": "20261018T143520Z-t5-full"
+  },
+  "note": "the second finalize of this run: its deltas are against the first (the generation it replaced is kept as generations/20261018T143520Z-t5-full.replaced-<ms>)"
  },
  "cars": {
   "archives": {
    "county": {
     "count": 89,
-    "blocks": 9689788,
-    "properties": 441924,
-    "bytes": 4295418929,
+    "blocks": 9690099,
+    "properties": 441939,
+    "bytes": 4295559822,
     "all_six_checks_zero": true
    },
    "property_improvement": {
@@ -598,6 +693,8 @@
     "first": "100008",
     "last": "106654",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerajqevrlhfhnhl2llxyq7auibfmpmxosbrj5y2qedhxqudppfme6la",
     "property_improvement_root": "baguqeeraapcmfezjev6ux3twbhdaza5iykl5tj7ukriyravy3yn5b7cp6ueq",
     "county_car_sha256": "87d0a3d307618697665239ab028025769b605f5f900c73e8e70e1db3d50c65c7",
@@ -609,6 +706,8 @@
     "first": "106655",
     "last": "112943",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera2hk3k4txgzn6l4cs4k4zruc2dlsnl7jtqxd6pa7l6milfs6y73hq",
     "property_improvement_root": "baguqeeramtky5rdk5eqg7ms4wuc7ll4ljw3zpqq3lkdvu7xyk2e3pklwi6ua",
     "county_car_sha256": "a22c9daad99281654464a872e7b0bfd4d75e42d9e7d3de09deb8575103a653e6",
@@ -620,6 +719,8 @@
     "first": "112944",
     "last": "118745",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerauwajllm55poebhkiz37fxwnumnxseqouqea7iqhzjxcmpjllbzcq",
     "property_improvement_root": "baguqeera2mo74uogow2gv6vsogc3b6mlj5v7hzqlkas4drx3cmpigobecbja",
     "county_car_sha256": "e58da23ea4cb47a58200b7c54a3e0de4e6dc3a8086dc7a37b305864bafbfeb39",
@@ -631,6 +732,8 @@
     "first": "118746",
     "last": "125365",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera7f2uylqkggn4vu5fmtxg5tevbeqevwmxdtkgo46fkem65fqsbhta",
     "property_improvement_root": "baguqeeraidfcn4k3ytddoddqsczdgt5jrtvfyizqmcuumrlgjf7ybhyx76sa",
     "county_car_sha256": "cfb7b48c5259eda37e2a80266af2bf910caf0db7282524828ffdb2dc339d36d7",
@@ -642,6 +745,8 @@
     "first": "125366",
     "last": "132056",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraykbm226xugtorc4zsmjpcw22jdbgw43wlvluk3mk7wiozickg63q",
     "property_improvement_root": "baguqeerahz4r5uaut5xwmr4rit76vsbdvh7ivufezpuyvlyjkvr2jnwrzpiq",
     "county_car_sha256": "2f2c81d3332d1c294983963eb7f954d37462a42f08655866ee6c56586a08fd56",
@@ -653,6 +758,8 @@
     "first": "132057",
     "last": "138183",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeral5gkkrkkhxd3463r22jfahlsp5jgbsb7boivub5cu2w22oyddkba",
     "property_improvement_root": "baguqeera3nkz32toev6wcl7ndmi6vshjvntcua56sm2ivjzxsbjo27rzi5zq",
     "county_car_sha256": "590dc18280f4fd671aa80832a2871312797dbe02dce57794113c3d7f446c9623",
@@ -664,6 +771,8 @@
     "first": "138184",
     "last": "144383",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera3x6gczwm4pnsvsd7oktrw7gsdscip4pr4ktu2xfdhjsv5udheudq",
     "property_improvement_root": "baguqeerarzncm7l6r6jqch2zb7hq6zk5vm3osruoe7q5jcin2pe3mebtxp4a",
     "county_car_sha256": "b2f6602a677225399a567f607f12446ec5b688e5f60f5465eec8659a9ea7f93e",
@@ -675,6 +784,8 @@
     "first": "144384",
     "last": "152305",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerangke3kvfscm5i3zpgjavjvkkx3cpstsujfam62q3ofggcvulvjea",
     "property_improvement_root": "baguqeerabh7o2iztatujgtxaj3cdi4urfb3dnhqilyshqakivf7hyvm6ay6a",
     "county_car_sha256": "229ded0054bc0dff4ed1f576508c81674274a2791354d0f027bc07922ec22057",
@@ -686,6 +797,8 @@
     "first": "152306",
     "last": "159235",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera2hvukoghetfggzfnlcyoq543isprhhbcp5ka2pottm72hrewjs5q",
     "property_improvement_root": "baguqeeraknjdcexsu5xkaplmkwttdxildljxsosqug5az3gjhyjah3dbdm3q",
     "county_car_sha256": "b7b1f9d4e7b06a6adea2bc8685823ac12232eeb2ed5dab22e6d0ba93111cfc1b",
@@ -697,6 +810,8 @@
     "first": "159236",
     "last": "165200",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeracngla5fqopwffqjllagzuncueriqtieyj5c6j4utmztxob6nhvqq",
     "property_improvement_root": "baguqeerai477fo64lsyspaxciwwjxtj3piin4h4aqlvndu7xz5sqveqekxhq",
     "county_car_sha256": "3d22115fef2b840bbbf3df43a6646635223f89d00d91fced2bebf69b76041151",
@@ -708,6 +823,8 @@
     "first": "165201",
     "last": "172220",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera2yzcnuakttywyycdeqc256hfkiogz3kkg6fq4237rjikrknnrd7a",
     "property_improvement_root": "baguqeera4phihney4f57f5r7n2kwvvo63b3vjgjpc6m5lehxfcbvxhx5zfqq",
     "county_car_sha256": "bfe76b1a8ae920e59bcba4bb374f017887eb1fb56f7e51d3a4a13d0c08c01ba1",
@@ -719,6 +836,8 @@
     "first": "172221",
     "last": "178931",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeransk6vaqdwnp3mduskpkppjobxvmqilncxtuviejmau76y4wwj52a",
     "property_improvement_root": "baguqeeraqpxn6mtexqgrt5u4vicbzvujcbl4drm7urjv72x2vrpycuvywsda",
     "county_car_sha256": "a873e8310cc48d63f970679cdfab9e3b8514f6a8bf08c9750f75cbc2ef75a1e4",
@@ -730,6 +849,8 @@
     "first": "178932",
     "last": "186179",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraga77bhjdfyrciukbfevx7v2vkabf5dmbg7v7n6jpdidg6uaqn3lq",
     "property_improvement_root": "baguqeera2fnd5gf22s3lkstmg2n7owqyi5w7wcwihtebuwpvmgtcx5i3zrzq",
     "county_car_sha256": "6cff4e89847e354e77f8bc6fbc1b82ed1014123ea278ba9ce1cfb5ef7e994076",
@@ -741,6 +862,8 @@
     "first": "186180",
     "last": "193065",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraonq6ruwb2wvq55mdy3fbfrxlntbl4dfcms6qlsnb3yw3srg5sznq",
     "property_improvement_root": "baguqeerajb6egaiwvavv6yvdpfobmdia463qo67em43d66hgni4cyvg4g65a",
     "county_car_sha256": "73015aa04763799fd8cfce8d7b7f42290d33119e2c7847ca93154b6d9331821b",
@@ -752,6 +875,8 @@
     "first": "193066",
     "last": "199466",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeransdb76bw2dyfjurvemq6zvblm2ngmvw62lfm7j5oy2zqofx2w6yq",
     "property_improvement_root": "baguqeeragvldbuocl6umryzmthsrobbb6iytnvxvounjos7j4v5646ukpl5q",
     "county_car_sha256": "8293fcde892f7f079628fc3771dce94b2e0249d4715c31b89d85c269559523a5",
@@ -763,6 +888,8 @@
     "first": "199467",
     "last": "206553",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerahiijkkzjmuvy2me66fy7v3oenjj73ax4a2hl7f2lmfm755nwxjfq",
     "property_improvement_root": "baguqeeraux223hcv66rzldpp4cf6lwk6hmkd7o63yzjvjgdhytfvxjf3f2iq",
     "county_car_sha256": "d0dec73664336c41d8bcec532f4cba2d9d65382b5ca835eef335b8c6b5414c1b",
@@ -774,6 +901,8 @@
     "first": "206554",
     "last": "213317",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera3cxwrgmjywhfanvzno5ekfxcymupmirjloe46wsua2e4w6u5u5vq",
     "property_improvement_root": "baguqeerabrzqayi2rscoy77uwvoqkjzqb7wyqoh4qjmqwejvsllxnk77sdgq",
     "county_car_sha256": "a5de8fa2d27c421b78d6dcb57f06ba714b7b3523f2d73aad86892158d7c21b76",
@@ -785,6 +914,8 @@
     "first": "213318",
     "last": "219575",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraicpxd6us6bk5cvqirhyvi3uflknrqr3pnpkid62gxmlhsnlja4ra",
     "property_improvement_root": "baguqeerasatg3vpozdvk5n23qilp5nul6n2yts525wuajeyj4v4rmujselza",
     "county_car_sha256": "25742dc30595baf4ce95c4c9f8f8b3b1fcea255f9c12572c1c73e3e78dab7ee5",
@@ -796,6 +927,8 @@
     "first": "219576",
     "last": "225272",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerakzw77pwcgkohx2hvesk262phkgmltl7yksf2uvq6mzm7n3rfkyiq",
     "property_improvement_root": "baguqeeravd2pwa6z2nlrbwzmz4l5vemnknq25j7b2he55fprhgq6c7aiapdq",
     "county_car_sha256": "d068749c8e33bce1b1e51f4883ef0c7968550b1fd9287a3ebb63d4d773e04d4e",
@@ -807,6 +940,8 @@
     "first": "225273",
     "last": "231209",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeragyrrhu4dht72yfm7wmrwoggk2r2glax4qiqp5umtshiijoxsompq",
     "property_improvement_root": "baguqeeragmh2yldv5ddrnzjtwuwjmb6sf6vpttqfm2x5xw45vxclx3f2gqla",
     "county_car_sha256": "9750873b2b0a4847d4dc34aa786280e207147956369575080ec8a4bb6f3dda7b",
@@ -818,6 +953,8 @@
     "first": "231210",
     "last": "237481",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera4r3ss7xbgxrewgwscolbeoy4jhltyhjchb7z3krvxnzyxtusrdha",
     "property_improvement_root": "baguqeera5q4xjq5xr3h6eahhi6d724gisvprpba6d3gpl6e7pq2o7rk2xr7q",
     "county_car_sha256": "51ca0257b238d8c737ac8252bfa4162f44ec7055f248b675bc568e9d9a2fd7c3",
@@ -829,6 +966,8 @@
     "first": "237482",
     "last": "243226",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraep42wep33vear35yf2lm2n3bwtcpjvkesrz252qvhqhmfwnqtora",
     "property_improvement_root": "baguqeera2i763ybf22u4rnqigejcgsvbzvq6ybao7ynhnzh77pjcsjo3ns3a",
     "county_car_sha256": "3d4fd9531ce5ef174965514ec339ff86fb7a41c378b06498c519715d9650d6ab",
@@ -840,6 +979,8 @@
     "first": "243227",
     "last": "248936",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera7xdq4qlsbweiys47272ixrbadnlv2wr5o7t4i77ivpfwiag5zltq",
     "property_improvement_root": "baguqeerauwppz2m5xdfunxmrx2upk6ovkxyt3llk253vz5z3kyitdxcixdoq",
     "county_car_sha256": "2ae63427194145acebc224c1e4bd6f6bcae68e36c36eb2f255b97c16463f601a",
@@ -851,6 +992,8 @@
     "first": "248937",
     "last": "255965",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraf5wxyeqbxb4kg67hxglhiy2h2co47teyqx7c736bs6wjkxf4hrvq",
     "property_improvement_root": "baguqeeraqo3hiyduzj7reptjpe4vdjetlbaiisdleh6mn3xriahk4cwoaq6a",
     "county_car_sha256": "c5ea0497b5d62988c830445f3ecfbc191747e22c2d2e97deb30374e2ec4cc382",
@@ -862,6 +1005,8 @@
     "first": "255966",
     "last": "263150",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerajaquaoi5zk27ubnw22vpbt4lumckrkc74xps45tg2n2wj4koiz3q",
     "property_improvement_root": "baguqeeraxtxr3f4xs3t5d53wafi2s5a5ir4e3jspbwynfjdzzujhkwpi2zyq",
     "county_car_sha256": "c1629079d17a6f7543691dd0ecfa47a6058e5d5b2a09c4b40c35f2865131484e",
@@ -873,6 +1018,8 @@
     "first": "263151",
     "last": "272688",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera3fpwj4derdvnho5h75ncr5sh5oimwa7w62fii5u7ogwvoyeu7o6a",
     "property_improvement_root": "baguqeeraoun44wincx5d3hpq635yj4cm3t6l2gg5jkbbbhhog2kld5j7oyqq",
     "county_car_sha256": "85a5e6d329eecb729e1e4f5cff73650c1d6b3c3681eccda6d3dbac941f54c590",
@@ -884,6 +1031,8 @@
     "first": "272689",
     "last": "278668",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera5zapijamktjjgwzbmxspgp4fde3uyehbwh4blqc4b7252kjcsojq",
     "property_improvement_root": "baguqeeradekeadsmyrcbklkfrwwaaxzmkeki2rgnh3xu26s5gxxusnbgtpia",
     "county_car_sha256": "649a7696302204035f30c3f66d2e8cdb9ffbbb0bea3da147898d6919f259ddc8",
@@ -895,6 +1044,8 @@
     "first": "278669",
     "last": "285448",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera4dbnb7lezlu4lrdxalniqrvmhsvytsl556tyl6d2ucf2idizlmta",
     "property_improvement_root": "baguqeerau25ixufwbh7vmew2omywcnbulp45ttudtfmpytzhmqz2whtxifvq",
     "county_car_sha256": "31f25580d491296fffccdd1aabe2cf40c753e2341033ecc9937faad151c0c926",
@@ -906,6 +1057,8 @@
     "first": "285449",
     "last": "292044",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraeom2q4i57zitf24zvi27e4c6wgdc6o6fuwqfod74djhlkfrtwvkq",
     "property_improvement_root": "baguqeera7lykkk4u545upryl4mlehkillkemp4uevn7aiansbolvmwlzcdkq",
     "county_car_sha256": "46ccb9be4bd4a58b1cdf95e1450a0c21f9596a08f9f799a492b4563424ca3af3",
@@ -917,6 +1070,8 @@
     "first": "292045",
     "last": "298357",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraezbrs4rqjpnutrr5hnqiqzvgwjh23cwooynyqf5syae5boh2iraq",
     "property_improvement_root": "baguqeeraznracgrjw4xjt7ugoezs4qkol6j7wjtezzceop5vcaq2no3zwbva",
     "county_car_sha256": "62c5effc03c516cbb8293c654dee7be195bfdce41690b23b6d92ffd2da193183",
@@ -928,6 +1083,8 @@
     "first": "298358",
     "last": "305191",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerabhzh3vfgydqg4uyfouamrjsbr25o3fafhes7au4he6jvzhbrb7ka",
     "property_improvement_root": "baguqeerangtdzss3onpmekxozn2fejbqagkyi2ms6oxksrf2gerfar3zraua",
     "county_car_sha256": "08c2da86f04a0ddd0450db5fd90fe7db93081a1109a8bcc5143dd7150a61b3f1",
@@ -939,6 +1096,8 @@
     "first": "305192",
     "last": "312384",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera6zvst5z3rluyoa5oipgpxv54mld42ndwewvvgfgsjdhudco4asva",
     "property_improvement_root": "baguqeerafu5af7ysoxymufrscf3z54cy4yfnoelcje7retv2cbpzjjqluw2q",
     "county_car_sha256": "29941826213ea06eb6c24857a84e8c89c1ef2645ea27376dad6c9bcfa113b59c",
@@ -950,6 +1109,8 @@
     "first": "312386",
     "last": "319427",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeradgx2iccdgh6tymdtbysyvuvf2llduuat4c5fzsziblu2ordvhyeq",
     "property_improvement_root": "baguqeera4erv4vh6nh23k3csn7iyzrfhvlum3t6mx5e3t3rzzfzgkzbvmrfa",
     "county_car_sha256": "b0eb258665307fd688d22abf9aca453746b309aca02f3e275a85e30d2521743d",
@@ -961,6 +1122,8 @@
     "first": "319428",
     "last": "325815",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerawmchvlzko7txuopcksqw26pph7u3baplefxl34x54hc6ririj4ta",
     "property_improvement_root": "baguqeerahdb7av5nr2ofq76krj4lb7rnnj54ajnmffqhsjbdda5xnd2pqw6a",
     "county_car_sha256": "6de921432b080683d2f69627e6cbe7e349ac6456b2fbbaeee548bce3ab7ade47",
@@ -972,6 +1135,8 @@
     "first": "325816",
     "last": "331338",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeranhucquhz2hhkn5wzsk22o257rowj5sr4m5532n6ztdnycxvs6nlq",
     "property_improvement_root": "baguqeerahigjrbfjg6ezvdchxmmcjoksd36w347b5cwfbdlpb35wpah55uuq",
     "county_car_sha256": "ca60e9f59aa9812f0f530bc034647409e65a0354fc2d68153c59d09553c830ac",
@@ -983,6 +1148,8 @@
     "first": "331339",
     "last": "337744",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeravpseju3mokqedi5ty6j42shcvicvtttwefbrnq2fksoq6inwg6uq",
     "property_improvement_root": "baguqeeraitqnr2vhdfuftpxbl3igvcpbwhn3blkdtd5bcw5ztreh6mvldasa",
     "county_car_sha256": "8d0fd9535289ae0fdbf321edb05f01f0ac160dff99bd6bdb62c86b8ffdc80d51",
@@ -994,6 +1161,8 @@
     "first": "337745",
     "last": "345185",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerajgc7chpp7dx34qveqnojuflayuu53rmybxipfn73qrulq7bm3l7q",
     "property_improvement_root": "baguqeeratg5n6gze3x7ibv7kyyb4zzyupofqrwv7nr2nkxt74t3b3genavmq",
     "county_car_sha256": "5ea5ada0b1b14bfb51b1aa72031380c5cae9a9ce4fa6aa7a70c65676ff236e8f",
@@ -1005,6 +1174,8 @@
     "first": "345186",
     "last": "351320",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera62vur6bd7ubny6vlz4xmcuyswfre3mit6gh3eousmvf26sacruoq",
     "property_improvement_root": "baguqeera3ebe7nzn6pk44leovr7ffojuh3kol4o2hpdab7f3f6yutkrbsbwa",
     "county_car_sha256": "f4bab5732c7f5997d4f082015dc6595fd85830a32431997e4fbb902ac987eecf",
@@ -1015,10 +1186,12 @@
     "rows": 5000,
     "first": "351321",
     "last": "358194",
-    "appraisal_attempt": 1,
-    "county_root": "baguqeeralccwvxhiouyituphjkefsjp4qonfaoxakshhtibkvj7a3go47x4q",
+    "appraisal_attempt": 2,
+    "rerun": true,
+    "recertified": false,
+    "county_root": "baguqeera33wulnc4wnz2vgnipntuhppdwa2fjko3ryoxdxvsdykdhzy7urya",
     "property_improvement_root": "baguqeeragg5kjlrvzu6ms777bhuz5qyhhtt6mnec6m2pghyhykktcqrkqowa",
-    "county_car_sha256": "60d186b87ed95303576aa5fba8f39661129d20862754c9e9bee06fa48a6b602a",
+    "county_car_sha256": "4be05b9d73b8370daccb9deb9eb16b437303141e86fe667354e4987a0208dea5",
     "property_improvement_car_sha256": "5b9f8259b4e9f6801126a13c7a72e46467a041a254d6535bd2587319ed0969d5"
    },
    {
@@ -1026,10 +1199,12 @@
     "rows": 5000,
     "first": "358195",
     "last": "367111",
-    "appraisal_attempt": 1,
-    "county_root": "baguqeeramfuejehk37s7gqwmbnbvrnpgesoy4qm5t5xhczbirpkwz5bbfclq",
+    "appraisal_attempt": 2,
+    "rerun": true,
+    "recertified": false,
+    "county_root": "baguqeeraoxwdgtmzzigl34myi34d6rsn3jslsum2j5itdpsbabu7cdpndfbq",
     "property_improvement_root": "baguqeeraix52c5zqiryohcic7znmnsiqqfb3u3xeeb66b4p6cvnsn5kc6swa",
-    "county_car_sha256": "898ea646975cbb8a28d9a55d01457247096604bf69d8e737bf03da34756c6fb9",
+    "county_car_sha256": "bdae39ce6739460e5502f6c3ebbe0b63a81bc23b67e98771695d1326d2bc347e",
     "property_improvement_car_sha256": "87f6e692635429870dff2c6a4bd49f6a119d6224b1d87ca8eaca5b80435b4bd2"
    },
    {
@@ -1038,6 +1213,8 @@
     "first": "367112",
     "last": "375531",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerad43udweifnuwvsfkjh5ttqkyvdzw76fmcp74svotlqkonzml3f2a",
     "property_improvement_root": "baguqeeravhgbc5discfwwhcgpqovdjkwr65jrpuoaj4umwmdrqyg2qaleowa",
     "county_car_sha256": "f25d5fb031aab7b3da3cb752e8daa7b12352800fdbd7e7d6cd27bd8392305df9",
@@ -1049,6 +1226,8 @@
     "first": "375532",
     "last": "423122",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera2s2aarfmcchi7jjka26e2tmzensaiajg3ysc4vfiwx6fla2oyqja",
     "property_improvement_root": "baguqeera6s54mcitgbg55najn2s2ziticie4szcw2kmr3d6kprwov3dc2gwa",
     "county_car_sha256": "d10262433c3f5e1f930bb779b3ed1cb89ae667137a0e6e04fa0205790aa69c65",
@@ -1060,6 +1239,8 @@
     "first": "423123",
     "last": "438144",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerancpu6phutiwjtm5nmprrblnb6hkfwttp3ikoy5quzsrgevk6dpya",
     "property_improvement_root": "baguqeera5e4eab4jwrqp4tzses5gztrw3dfk6bbz44pfvj3qa3dhij4vhh2q",
     "county_car_sha256": "8e9f548b241d7033358fbb37623c64271e20578fd0d1030668c8be7aeae847a1",
@@ -1071,6 +1252,8 @@
     "first": "438145",
     "last": "447578",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera424r5eddykxuflucqq7cozp7i3zqz4n7zalhk4cqqj4chgrs7t7a",
     "property_improvement_root": "baguqeeraynpelxlcuvef6acbm2ybvoilqpagiunwi2om76uoonsh6junas3q",
     "county_car_sha256": "581c7f14c767d54b2f9ee9bbcfdbfcdb209e99644e8b48122717d1b2beb7c840",
@@ -1082,6 +1265,8 @@
     "first": "447579",
     "last": "462087",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerapabihpovt55j4gd7rsru4woso5lmzcb7c5obwzwgdjwvcwsiw73q",
     "property_improvement_root": "baguqeera4xpyom6ssjswpszaxrkbb7sudxfheiekq7z4adywn5pztj4us3lq",
     "county_car_sha256": "daa096307445b4918dd98a1f578f7d72942da89f295e34a4f576ef4bbc7b6238",
@@ -1093,6 +1278,8 @@
     "first": "462088",
     "last": "474852",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera2k2jokpmypyz2sonk6jmaavv24r65mdsjhp2swbpw7zzwaevooaq",
     "property_improvement_root": "baguqeeralwmstqibgr6pz5qyobtefhsrx327uujr6qfyxj7aar5kcauveiza",
     "county_car_sha256": "6926852c0b923d069e344e93e05fac36f22e7a437125515fd3841342f741b13f",
@@ -1104,6 +1291,8 @@
     "first": "474853",
     "last": "485712",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera2wabrdz4nj6vfmu3m27ugxtzmblbnc4dydfs4hjt5o3fgrbb6apa",
     "property_improvement_root": "baguqeeraqkoy3yryzkd5liv3gmwpyynu65ouzqui3kuldmlman4jqbwo2mpa",
     "county_car_sha256": "d2ab6e8b1e76dc17c4080a37467a4194ae8fff2b6544b73b4cd635049bebc6cf",
@@ -1115,6 +1304,8 @@
     "first": "485713",
     "last": "499962",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera23bbwljcgslwnzbwgjse2f44bra4edkhxq7qkc2ufgevfhfl765q",
     "property_improvement_root": "baguqeerauumfkndcvtg3wsgchwtc7hpb5j7fxdo5y6jd7wjkqfz25zojcghq",
     "county_car_sha256": "dea64795fbdb4baff1d25175a9f46bc9fde40b87ed4337a097bd814e4ac2e94c",
@@ -1126,6 +1317,8 @@
     "first": "499963",
     "last": "506143",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraou5ighj3jk35zvm5frkgxksawragdi4pf3xrfdehavkw2ggkmaia",
     "property_improvement_root": "baguqeeraort2lph7kuzgm2mu6thgp7rdmu56ok4sfrp6ljkfwglktfdncllq",
     "county_car_sha256": "3b75c3228175690902a42a6c486b5ee8a8674b82cb94332fbedc701b0663edd2",
@@ -1137,6 +1330,8 @@
     "first": "506144",
     "last": "512648",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraaui45kptj2oa6i3ki53qyurucienkbmfrxbd7ki37akxc3iy2sqa",
     "property_improvement_root": "baguqeera47b6xwxqabina33tyruipjclfrlldb7wj6s7ts57nhi2jsfxlobq",
     "county_car_sha256": "ea7d197fcb1d2d6c4af51ae67f6f15dbf52361418b4f6c6180e194d4e55e3ce0",
@@ -1148,6 +1343,8 @@
     "first": "512649",
     "last": "528695",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerakksnxm5ywap6hems6nbxlzzf7syf2ug4hn2cktaoflgpwnxm4vpa",
     "property_improvement_root": "baguqeerap4b2bwfz3lpblyvyc6fw6hbwlmethgmmmg4fw4wuswe3lqlhmcva",
     "county_car_sha256": "5d9a5423aae928745fc065c6b6480a85ed32ed9eebc5c58b8a8c5489e0d86f12",
@@ -1159,6 +1356,8 @@
     "first": "528696",
     "last": "541085",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraliliudvpm6b36ngfnfclxjmv6rprt266jgrqhid7cq7kclgpqgmq",
     "property_improvement_root": "baguqeerajlgaiwa6wnfhphnxj6hxcxsxsqwop6dnxbuuutxgoeoxgilcjtba",
     "county_car_sha256": "8eef67a195a6b1c477ca9eaa85757196fbf279e44b2169715534622caa3f96de",
@@ -1170,6 +1369,8 @@
     "first": "541086",
     "last": "548268",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeracritpmwbkmdlnrjdc6jursdum4tfufdfotet4otptlil5gik7rhq",
     "property_improvement_root": "baguqeerakrktewodt4sznnriwnhslufgojea66s26xv3prc4npyqv5c236gq",
     "county_car_sha256": "a6e2f9963c71fd94821e208df8a4dd4aabb3b6ebbf24b85376dbd1909519056e",
@@ -1181,6 +1382,8 @@
     "first": "548269",
     "last": "554995",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeragikpei7bvoj3xbfquafxn2ijhvvztqdu7xtejvjbbowulw4y7aza",
     "property_improvement_root": "baguqeerawec4275nse3eo7tpcn5kx3aty7znbdcfcfx4245ablbvxgaaffsq",
     "county_car_sha256": "95e80bae26f0749825315c252ea305a2e853a5ee02df1f58f86cfecd22917b46",
@@ -1192,6 +1395,8 @@
     "first": "554996",
     "last": "567063",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerac2qhnsagdxousqc3rblq27kf57fjux2ebiyluq42rymkom45liwq",
     "property_improvement_root": "baguqeera6xpyde326nsjeodcwfcrxeyg7tmiqnu4t7zqowvaatl25dlddnuq",
     "county_car_sha256": "cce86d8e23447ba97c197686906f746bfeff23c7401c1e2f56ddfd7ea808e863",
@@ -1203,6 +1408,8 @@
     "first": "567066",
     "last": "575261",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerazah3qfxy6b6ajet33d3ynswws6ul66h5rddslacc4hqpmf6vxdwa",
     "property_improvement_root": "baguqeera7wp5wtmlzyiiconc526mst6kmxqpsm5vbi33va5bibbok5ruwzdq",
     "county_car_sha256": "069c2a4a4cdc68aa782dc45de7f77b20d00889297e3860b8bfa0047d6f27aff9",
@@ -1214,6 +1421,8 @@
     "first": "575262",
     "last": "587390",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraxjv2jhi7lakefajaa2huxmikm4pvyawirghpllykagqy3tjf6uvq",
     "property_improvement_root": "baguqeeraktyupf3czo5woxts2aspcz3nmcjnw2sw5hsuiw6o42ynkkhlw2gq",
     "county_car_sha256": "8a6b39a4becabeaf6fe815ac9c25d9c626a63befdd85f8a4ee931b0730b2fc8d",
@@ -1225,6 +1434,8 @@
     "first": "587391",
     "last": "705261",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeran4yxpqwjacf4pqixwxkxsnjgleqajjqxuq7nqljsli7b5oaorb6q",
     "property_improvement_root": "baguqeeratlh3xlwguyayk6e7w55ohumn4eyxtf43rva3otovgfpjmotu36fq",
     "county_car_sha256": "af36399c12d3efdff06535752b16d18eb23d9e29fcbefb41c01fc4627e649b9e",
@@ -1236,6 +1447,8 @@
     "first": "705274",
     "last": "717145",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera7uxy5bvxevnbo7uyymokyrwnv2yv4z56s5ywq3yhg5qqv4gvyjsa",
     "property_improvement_root": "baguqeeragpvstftrea2rrtdoknbxicyrkd27wzseevzximas3gkwmwtd5mzq",
     "county_car_sha256": "067ea596f7ec6531422abeea59f5739311336ac875887af5b50d6806b6335685",
@@ -1247,6 +1460,8 @@
     "first": "717146",
     "last": "728354",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraxmeii4rdxaonszi3aszalgwib5rvncdm7b3rjwlahrr5my376axa",
     "property_improvement_root": "baguqeeraralcqb5pvvgqnn36mqzd7um2dwgjxxk2g36rpnr63rscoazzxpxa",
     "county_car_sha256": "542fbd7467c07cb590ebcc5f85349d0f6e6a31dc4c2d44fdbfd1180cee709d7f",
@@ -1258,6 +1473,8 @@
     "first": "728355",
     "last": "736123",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraclw5hn46k7mjahz6bl7fro7ztsmu2chuh64dgteqv5ncslx4hl5q",
     "property_improvement_root": "baguqeeraocqrinlna5fsfjp4e3aceatlzf3qjmyw7tkawyw4lk2yvaqfbwta",
     "county_car_sha256": "7b8a2c435d9b3859d8d8b82fa9a74a8118f90d9036bef18591c40ec0614c351f",
@@ -1269,6 +1486,8 @@
     "first": "736124",
     "last": "750377",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraenhkjwwunckghgoghjxylsnotg7z7iwffmq42oz5jdwfv6gdn3rq",
     "property_improvement_root": "baguqeeralw7kcqfuxbuiplrfserwgxx5u4dvmnqol63e66vb7x26e2kgoavq",
     "county_car_sha256": "c7798ab4b673d678beb2c7676690bd2bcf7022dadb9db17cd2b386cdd469a32d",
@@ -1280,6 +1499,8 @@
     "first": "750378",
     "last": "757914",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraahtrnci32rlj7zfcwrav6uu3dgt3rfvkbzux4pvxopyjkycha3ua",
     "property_improvement_root": "baguqeerawahzawcy6pzjxrm7qc3tn5rezlk4zor47ks4bzky3lhpzaqveszq",
     "county_car_sha256": "165ddfb269a4439cd7905a943ab079fabacc03472abc7da0af99d908afdd2363",
@@ -1291,6 +1512,8 @@
     "first": "757915",
     "last": "771696",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraybe3ib5oqnoytlrlp6n5an75ywqbwq32rdig4fskmp7n5pk7dxga",
     "property_improvement_root": "baguqeerablqnv3zgeuulc57tc6zml7hd53uvtfdfcanzjz45zqg6zuys6qmq",
     "county_car_sha256": "3bf18070af89a331366dfff577af4ae995190878131e1cdcffe22a005ab0ee68",
@@ -1302,6 +1525,8 @@
     "first": "771697",
     "last": "784981",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraml2eyw52p3hlqgglcg65tlxurwtbgzcp5h4d6tdw272zb4io6sbq",
     "property_improvement_root": "baguqeeraw6fc7jksd4ylj5fye56htzuqqurckcx5samjzpfraqmmag5fcuoq",
     "county_car_sha256": "8dc97775acbe1c3e31d43224449f78cc8e3638e3db4dcacee870b0d4df2bd459",
@@ -1312,10 +1537,12 @@
     "rows": 5000,
     "first": "784982",
     "last": "808301",
-    "appraisal_attempt": 1,
-    "county_root": "baguqeerawsbqjsvpi5jqr7h4pq4o2n4lvmmaowfttwezfivdm6avzced6zwa",
+    "appraisal_attempt": 2,
+    "rerun": true,
+    "recertified": false,
+    "county_root": "baguqeerau5bdszsro66i4kkyr2cpmwjxlkx6ijkjyfh7j4dsnehreoy7badq",
     "property_improvement_root": "baguqeerawop6lflp333umy6qc55mp7bu63xki77vk2mva3wzd5v4e3onkh3q",
-    "county_car_sha256": "ac4572bce82a0a0e71d9aa739937c18f56ab4c2ce29f1af6876a7921941096e6",
+    "county_car_sha256": "16d419a83b14857e6171107a70b402d6ecf2ece174c103fd85d16a53d4506335",
     "property_improvement_car_sha256": "1184ccf2444a2a0db6c3d09ba713e02e3686ac33553e305d0098d6154e9f7f95"
    },
    {
@@ -1323,10 +1550,12 @@
     "rows": 5000,
     "first": "808302",
     "last": "822813",
-    "appraisal_attempt": 1,
-    "county_root": "baguqeera2slylzgewhrxx242f6fsilihfoykbdbkzmzhodblhwy6je4zhmcq",
+    "appraisal_attempt": 2,
+    "rerun": true,
+    "recertified": false,
+    "county_root": "baguqeeraeo7azvxutmv62bxm22pwam3zhenqae5qztpxyakwl7rxom33ekxa",
     "property_improvement_root": "baguqeerapck2nfpetruan3xerhmbclmkbakby42xr7tsouzy2cmiqc4qvxiq",
-    "county_car_sha256": "26b15575a9220bc59bfdcf1f0f2deace53d25508d254f31d5b24ecacbce904ff",
+    "county_car_sha256": "04021ba4763ef6f301d593ece162402de21a1083c83395e33f55cd066491048b",
     "property_improvement_car_sha256": "4e997ccc43e38d53cbd92efdbd3e81f59c1470a9e98f19c4a7242bd94072ecfa"
    },
    {
@@ -1334,10 +1563,12 @@
     "rows": 5000,
     "first": "822814",
     "last": "835946",
-    "appraisal_attempt": 1,
-    "county_root": "baguqeera6x47s2vvk7dxq6pyxlbjme3rtzs6qob5z6elhvlki5yv6m5h6hda",
+    "appraisal_attempt": 2,
+    "rerun": true,
+    "recertified": false,
+    "county_root": "baguqeeracc6vsrgmqpkgoykjpsv5vd626t4abgfunouu7wzoayogs7axnxra",
     "property_improvement_root": "baguqeera7gauiqzhsg5rocryic6wdjl7yw2vooqhlfakld4bekdrvp463gqq",
-    "county_car_sha256": "6d4f2260d517ec13a3c42f26ecc859f3f8f27510cc545ceeca60bf63e6279e82",
+    "county_car_sha256": "dc39fbd40a09c25ab02f027aafb77a678932baa9ccf93b1e86dc2f9015a0d063",
     "property_improvement_car_sha256": "436ad2e8b8bfecd48b56ca5dd32da2220c39e773078c40bb951127a143a50c92"
    },
    {
@@ -1346,6 +1577,8 @@
     "first": "835947",
     "last": "846154",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeray3nciudla2k4xk72ausnruxgcaz4kizacdxamiu44m42nojiecra",
     "property_improvement_root": "baguqeeraq72o75jfhhcf2az5q4xq7dhzkg3e4y3pzht5wwqwf5xs5mtsr4ba",
     "county_car_sha256": "251c2868dbcbf26d61a00fb80c46df56340d95f18e40004e3e1b85e7e665074b",
@@ -1357,6 +1590,8 @@
     "first": "846155",
     "last": "858078",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraqqebsqc6bjaemu7zahvvwf2i55le44vzt7tbpkptpty5mkrbhbhq",
     "property_improvement_root": "baguqeerad37lnk4tnguhbcfcwla3wq2vl77sln2wnf4umllkj2rgutcof7ua",
     "county_car_sha256": "d4f3bdb46a5cad2c5972ea2c510274fffa8c8e3f8f142edfc2f4d07ba8f85b5a",
@@ -1368,6 +1603,8 @@
     "first": "858079",
     "last": "865115",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraw2dbehap73xhmywjo4oi46mbtf5dwlwgai6miechab22uva7os3q",
     "property_improvement_root": "baguqeera7eglftirob2mwxozkb3vjxhfyigvs5xum33zvg7cnuc6rtp3ladq",
     "county_car_sha256": "f6793d429c2d12080cbbba9b28e4ac25158facdac0718e8892960ced6fc60100",
@@ -1379,6 +1616,8 @@
     "first": "865116",
     "last": "876739",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera7ph5obz2iwjldjnbjw4eakjtrg2bmagdxwxwgbqhmxu2lsc55b4q",
     "property_improvement_root": "baguqeeraiau4ahlvh6bf2xu6y5esefkyasxww2fmt5xadduuq2lbwfkmgxwq",
     "county_car_sha256": "118cf1e9407d94e4bc1bec51e16c89f3e2a6d1ddf29a2353222d86f45f699db8",
@@ -1390,6 +1629,8 @@
     "first": "876740",
     "last": "885511",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera3q42fgob7oagkrhxp5zxyoa4qif6erky7tg2w44cztqjrqsg5y3q",
     "property_improvement_root": "baguqeerab73yu5mhtv4hr4j6ltcg3fwhpgssaswk2nqbamqfqhd77yhdrjia",
     "county_car_sha256": "35616537d2ded563495adeba18da21cb87465f9f45711684c7e71fe2f0359be8",
@@ -1401,6 +1642,8 @@
     "first": "885512",
     "last": "895195",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerahcvyzeqrlogj2gvjo25qq7hw35p35jo7px7qmhi5iqrsmld52nya",
     "property_improvement_root": "baguqeera7yvfobkn2javfxnzu67xwyomxaebojzdflnlabo525j34qter6ja",
     "county_car_sha256": "21a66ebe5f56d9cf846e72dc55ccb9b9e5723167aa28e778717b44136c468b12",
@@ -1412,6 +1655,8 @@
     "first": "895196",
     "last": "905476",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerae4a2gy5xpdp2on3wz73imk5lkcoqspzkzeqjwr57j2s4selys62a",
     "property_improvement_root": "baguqeera23g4lek3kewdpcwj7efz3nygpikupovw2oyhs4symfx6ffmwplhq",
     "county_car_sha256": "d9dbc66607f530f7af03aa5797e18675332c32337494a8fa7a570c46cd76d616",
@@ -1423,6 +1668,8 @@
     "first": "905477",
     "last": "914983",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerazwfwvzs6ep6ek53q4gaumo5wuvyxwcyknn2owbmhftedfdoplalq",
     "property_improvement_root": "baguqeeratb23umgwq7w3tfbh7ezx5fsmepqer22bpwgjkzaavw5xh56utjua",
     "county_car_sha256": "2cc00e345d4083e2d9261201f8572a5d1ee8a7984385c9624b347eeb8b520d64",
@@ -1434,6 +1681,8 @@
     "first": "914984",
     "last": "922937",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerafowmovusdukgsi4kcqyufcrr6brjsb2dbwj6algmeumdpwsivqrq",
     "property_improvement_root": "baguqeerar276ol2qollwiwfstonmrn5eoslrllbun56q2a7p7rwlmmiqgoqq",
     "county_car_sha256": "2372cfd3b8838029376ba8cdc073e86ca219d8518c8f03dacccd462eec773965",
@@ -1445,6 +1694,8 @@
     "first": "922938",
     "last": "929473",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeramzspzc7ln53jbqjfnscpa7uh25tzke6yvsiplb2ptxxwinoyu5jq",
     "property_improvement_root": "baguqeerai5siofvstu64k3bwpiguuizfbhtilz7ntug4v5kdbyietp2ingsa",
     "county_car_sha256": "086250c11bd17e15158b989881f1db648a22d5024841b6e18852cd44fd0494dd",
@@ -1456,6 +1707,8 @@
     "first": "929474",
     "last": "939019",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerarfuybl2ygq7vdkqahqucofaumbdivvzwknhemyfich42cmexol5a",
     "property_improvement_root": "baguqeerag7nurqm2ytwmklxmhlrvoxam5rxkqamq3jictlpgvuilwoyktbya",
     "county_car_sha256": "737f1065e5bae1cb096d90f017234f8394e8676130f763f5d8c97a5c800273ce",
@@ -1467,6 +1720,8 @@
     "first": "939020",
     "last": "945907",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraku37xraeg2zuckoynj2fbonlmnfquh3zcul6mtwuwsbdqpbsrdjq",
     "property_improvement_root": "baguqeeraqo56tdzrtjmiccpc2dxkb63sg5w4xrhahmw2bnbc2kdrealrzwyq",
     "county_car_sha256": "62ee64031ed9f979ef388ab4c3393c09171514f95a374986df5f531fabc47d64",
@@ -1477,10 +1732,12 @@
     "rows": 5000,
     "first": "945908",
     "last": "955354",
-    "appraisal_attempt": 1,
-    "county_root": "baguqeeraqwueiy46cro7il4xedgnf5nit4eeq7h2vvjwmxkben3av6dgiy2q",
+    "appraisal_attempt": 2,
+    "rerun": true,
+    "recertified": false,
+    "county_root": "baguqeeramkkib2yjcuqgh5i75yc73d6yuiupgdq6ofkrbp36kda6pe3bdelq",
     "property_improvement_root": "baguqeeraou3qjizb4cqpwkk6sjg476rr5pge6hj2brjy26zqvr6hshvhsy3a",
-    "county_car_sha256": "fda9d0fa1f47008db590c0f7bb2551af82ccdb83b0171cfb65ab58fb52a2cf53",
+    "county_car_sha256": "d673aac754b2972d5627f7bdbd72479520c334ebcac70e36db87437a848095ea",
     "property_improvement_car_sha256": "e29b643032bf79bf96db759065a556a4c3fabbd6bf0654ccde8c7e2d3d3b832d"
    },
    {
@@ -1489,6 +1746,8 @@
     "first": "955355",
     "last": "961865",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera67fmmvrosbyalebuo4ckk2n57trxtf5lcioxa4yeobi3w7ih7qka",
     "property_improvement_root": "baguqeerazk7ia5jlzmqamhwp6zgr2t23yvvtllumuuhnz6zbuoae3kkilphq",
     "county_car_sha256": "72ef2e123237fa5962433e9b7de9c3638be4914825ea146b85a2c859708298f5",
@@ -1500,6 +1759,8 @@
     "first": "961866",
     "last": "969557",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera5l5pkg2lpkwfdoc4nsoumm3noh3nrfzn74huvmi4dea5xk6ryybq",
     "property_improvement_root": "baguqeeramiuukwuanmqckj5mb3qj6o54exixghquerd6lw3s5i4c35jfrelq",
     "county_car_sha256": "174b18a556a2bc46a894e629ecd48c45a6e51412ff570d7aa9a41d419d2b8207",
@@ -1510,10 +1771,12 @@
     "rows": 5000,
     "first": "969558",
     "last": "979328",
-    "appraisal_attempt": 1,
-    "county_root": "baguqeerad474lvhfluxfuhmzjgr3pequ433pdaqk3t36wjqfgf5sbr3bsdta",
+    "appraisal_attempt": 2,
+    "rerun": true,
+    "recertified": false,
+    "county_root": "baguqeeraoacjaavqkbjkxze2phdysu3uhli42wwxuxhaut4pvkzmsxo52a2q",
     "property_improvement_root": "baguqeerakajcq5423eu6uv2srg47yu76ol3m2r7cw5vb3fqvg5aecrpj32xa",
-    "county_car_sha256": "0385d95546231d608803d3538cab455a2ca3e25230b30055dc10e154b3e561ae",
+    "county_car_sha256": "f6064741f127dd6ad63bcbdbdf566ac9efbcf5fc977d0f40b805335b0fcd2ea2",
     "property_improvement_car_sha256": "4c486a9ccdd06c93f0c6af75022490546a224d8dc4c82ae43f6afdb39b4ed353"
    },
    {
@@ -1522,6 +1785,8 @@
     "first": "979329",
     "last": "986369",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraceim5hbq34hscohpdfzfkvwvgq7aagtiiyzafcpf7efuhgslmqqq",
     "property_improvement_root": "baguqeeraogk36hvq7sukc6vz36l5dfpc7kwg6pm7m4xb23hx2ou2ppdatipq",
     "county_car_sha256": "321342399b5096a29b75b02a3b62181a8efec71edb02fdad4bcd01eafa3c5626",
@@ -1533,6 +1798,8 @@
     "first": "986370",
     "last": "994896",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeera4v6ighx4rvrumv2by7aaoyafz75lojjlr3zyhlywcp6frczkjnna",
     "property_improvement_root": "baguqeerangytzkpwm3pll3ywhrd4lvth5lu6e3hhq4ei27fseenrgtvgjmaa",
     "county_car_sha256": "576fcb05fbe2a249dee1f97f816d5c9382443b963c2720023ca22c3a83741ce9",
@@ -1544,6 +1811,8 @@
     "first": "994897",
     "last": "1005466",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeerartzx3l43vdhkqogekzcshyr4bf7jnldojafimdxvhnzuwgg4hnka",
     "property_improvement_root": "baguqeera7cttycjxvwjwxhnidlcxv63rbphbgfnkgvnq2bb3xy4smyyvtqiq",
     "county_car_sha256": "8d60d43d98fa3b52adf1bcb2c1489a316063fd27ee81bd427af483ea0820e85b",
@@ -1555,6 +1824,8 @@
     "first": "1005467",
     "last": "1012766",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeraiokfpvlbb32k7qjbvzsxbe5ozytkekuvrun5z3zkixagc44o3zlq",
     "property_improvement_root": "baguqeeraaamubymhdtdmhvhme6jlagnrrrphahj6525nkhz5pcg3ce6gy3wa",
     "county_car_sha256": "46cdcc27f4325b208972f87a95933d6672ce767982ffe19289b77d5d2fd96d24",
@@ -1566,30 +1837,140 @@
     "first": "1012767",
     "last": "1020110",
     "appraisal_attempt": 1,
+    "rerun": false,
+    "recertified": true,
     "county_root": "baguqeeracv7kxszsnemfwaxnm7zwsmnuvskgvnlfdkntuxryqjvspu4broeq",
     "property_improvement_root": null,
     "county_car_sha256": "ed4f1c18872db32cad3600750e07775b8d6fef3055337ad31b9cd2c1ba2b92fd",
     "property_improvement_car_sha256": null
    }
-  ]
+  ],
+  "rerun_shards_roots": {
+   "s0039": {
+    "county_root": {
+     "before": "baguqeeralccwvxhiouyituphjkefsjp4qonfaoxakshhtibkvj7a3go47x4q",
+     "after": "baguqeera33wulnc4wnz2vgnipntuhppdwa2fjko3ryoxdxvsdykdhzy7urya"
+    },
+    "property_improvement_root": {
+     "before": "baguqeeragg5kjlrvzu6ms777bhuz5qyhhtt6mnec6m2pghyhykktcqrkqowa",
+     "after": "baguqeeragg5kjlrvzu6ms777bhuz5qyhhtt6mnec6m2pghyhykktcqrkqowa",
+     "unchanged": true
+    },
+    "county_car_sha256": {
+     "before": "60d186b87ed95303576aa5fba8f39661129d20862754c9e9bee06fa48a6b602a",
+     "after": "4be05b9d73b8370daccb9deb9eb16b437303141e86fe667354e4987a0208dea5"
+    }
+   },
+   "s0040": {
+    "county_root": {
+     "before": "baguqeeramfuejehk37s7gqwmbnbvrnpgesoy4qm5t5xhczbirpkwz5bbfclq",
+     "after": "baguqeeraoxwdgtmzzigl34myi34d6rsn3jslsum2j5itdpsbabu7cdpndfbq"
+    },
+    "property_improvement_root": {
+     "before": "baguqeeraix52c5zqiryohcic7znmnsiqqfb3u3xeeb66b4p6cvnsn5kc6swa",
+     "after": "baguqeeraix52c5zqiryohcic7znmnsiqqfb3u3xeeb66b4p6cvnsn5kc6swa",
+     "unchanged": true
+    },
+    "county_car_sha256": {
+     "before": "898ea646975cbb8a28d9a55d01457247096604bf69d8e737bf03da34756c6fb9",
+     "after": "bdae39ce6739460e5502f6c3ebbe0b63a81bc23b67e98771695d1326d2bc347e"
+    }
+   },
+   "s0066": {
+    "county_root": {
+     "before": "baguqeerawsbqjsvpi5jqr7h4pq4o2n4lvmmaowfttwezfivdm6avzced6zwa",
+     "after": "baguqeerau5bdszsro66i4kkyr2cpmwjxlkx6ijkjyfh7j4dsnehreoy7badq"
+    },
+    "property_improvement_root": {
+     "before": "baguqeerawop6lflp333umy6qc55mp7bu63xki77vk2mva3wzd5v4e3onkh3q",
+     "after": "baguqeerawop6lflp333umy6qc55mp7bu63xki77vk2mva3wzd5v4e3onkh3q",
+     "unchanged": true
+    },
+    "county_car_sha256": {
+     "before": "ac4572bce82a0a0e71d9aa739937c18f56ab4c2ce29f1af6876a7921941096e6",
+     "after": "16d419a83b14857e6171107a70b402d6ecf2ece174c103fd85d16a53d4506335"
+    }
+   },
+   "s0067": {
+    "county_root": {
+     "before": "baguqeera2slylzgewhrxx242f6fsilihfoykbdbkzmzhodblhwy6je4zhmcq",
+     "after": "baguqeeraeo7azvxutmv62bxm22pwam3zhenqae5qztpxyakwl7rxom33ekxa"
+    },
+    "property_improvement_root": {
+     "before": "baguqeerapck2nfpetruan3xerhmbclmkbakby42xr7tsouzy2cmiqc4qvxiq",
+     "after": "baguqeerapck2nfpetruan3xerhmbclmkbakby42xr7tsouzy2cmiqc4qvxiq",
+     "unchanged": true
+    },
+    "county_car_sha256": {
+     "before": "26b15575a9220bc59bfdcf1f0f2deace53d25508d254f31d5b24ecacbce904ff",
+     "after": "04021ba4763ef6f301d593ece162402de21a1083c83395e33f55cd066491048b"
+    }
+   },
+   "s0068": {
+    "county_root": {
+     "before": "baguqeera6x47s2vvk7dxq6pyxlbjme3rtzs6qob5z6elhvlki5yv6m5h6hda",
+     "after": "baguqeeracc6vsrgmqpkgoykjpsv5vd626t4abgfunouu7wzoayogs7axnxra"
+    },
+    "property_improvement_root": {
+     "before": "baguqeera7gauiqzhsg5rocryic6wdjl7yw2vooqhlfakld4bekdrvp463gqq",
+     "after": "baguqeera7gauiqzhsg5rocryic6wdjl7yw2vooqhlfakld4bekdrvp463gqq",
+     "unchanged": true
+    },
+    "county_car_sha256": {
+     "before": "6d4f2260d517ec13a3c42f26ecc859f3f8f27510cc545ceeca60bf63e6279e82",
+     "after": "dc39fbd40a09c25ab02f027aafb77a678932baa9ccf93b1e86dc2f9015a0d063"
+    }
+   },
+   "s0081": {
+    "county_root": {
+     "before": "baguqeeraqwueiy46cro7il4xedgnf5nit4eeq7h2vvjwmxkben3av6dgiy2q",
+     "after": "baguqeeramkkib2yjcuqgh5i75yc73d6yuiupgdq6ofkrbp36kda6pe3bdelq"
+    },
+    "property_improvement_root": {
+     "before": "baguqeeraou3qjizb4cqpwkk6sjg476rr5pge6hj2brjy26zqvr6hshvhsy3a",
+     "after": "baguqeeraou3qjizb4cqpwkk6sjg476rr5pge6hj2brjy26zqvr6hshvhsy3a",
+     "unchanged": true
+    },
+    "county_car_sha256": {
+     "before": "fda9d0fa1f47008db590c0f7bb2551af82ccdb83b0171cfb65ab58fb52a2cf53",
+     "after": "d673aac754b2972d5627f7bdbd72479520c334ebcac70e36db87437a848095ea"
+    }
+   },
+   "s0084": {
+    "county_root": {
+     "before": "baguqeerad474lvhfluxfuhmzjgr3pequ433pdaqk3t36wjqfgf5sbr3bsdta",
+     "after": "baguqeeraoacjaavqkbjkxze2phdysu3uhli42wwxuxhaut4pvkzmsxo52a2q"
+    },
+    "property_improvement_root": {
+     "before": "baguqeerakajcq5423eu6uv2srg47yu76ol3m2r7cw5vb3fqvg5aecrpj32xa",
+     "after": "baguqeerakajcq5423eu6uv2srg47yu76ol3m2r7cw5vb3fqvg5aecrpj32xa",
+     "unchanged": true
+    },
+    "county_car_sha256": {
+     "before": "0385d95546231d608803d3538cab455a2ca3e25230b30055dc10e154b3e561ae",
+     "after": "f6064741f127dd6ad63bcbdbdf566ac9efbcf5fc977d0f40b805335b0fcd2ea2"
+    }
+   }
+  },
+  "other_82_shards_unchanged": true
  },
  "sizes": {
   "method": "archive blocks parsed from each CAR; parts = the .parquet files of each tables directory; index = its tables.car; distinct = blocks + parts + index; Filebase counted = 2 x (blocks + parts) + index (decisions.md 25.9: the tables root DAG links the archive root and every part, each also pinned on its own)",
   "groups": {
    "county": {
     "archives": 89,
-    "car_bytes": 4295418929,
-    "blocks": 9689788,
-    "block_bytes": 3917510405,
-    "framing_bytes": 377908524,
+    "car_bytes": 4295559822,
+    "blocks": 9690099,
+    "block_bytes": 3917639169,
+    "framing_bytes": 377920653,
     "tables_dirs": 89,
     "parts": 2313,
-    "parts_bytes": 1055775023,
+    "parts_bytes": 1055813695,
     "index_bytes": 358774,
-    "distinct_bytes": 4973644202,
-    "filebase_counted_bytes": 9946929630,
+    "distinct_bytes": 4973811638,
+    "filebase_counted_bytes": 9947264502,
     "gb": {
-     "car": 4.295,
+     "car": 4.296,
      "blocks": 3.918,
      "parts": 1.056,
      "distinct": 4.974,
@@ -1618,11 +1999,11 @@
    }
   },
   "total": {
-   "car_bytes": 8605743281,
-   "block_bytes": 8017294142,
-   "parts_bytes": 1426792511,
-   "distinct_bytes": 9444558715,
-   "filebase_counted_bytes": 18888645368,
+   "car_bytes": 8605884174,
+   "block_bytes": 8017422906,
+   "parts_bytes": 1426831183,
+   "distinct_bytes": 9444726151,
+   "filebase_counted_bytes": 18888980240,
    "gb": {
     "car": 8.606,
     "blocks": 8.017,
@@ -1637,14 +2018,13 @@
    "note": "the property, address, parcel and Seed blocks a Property Improvement archive shares with its County archive (the same property CIDs)"
   },
   "distinct_across_groups": {
-   "blocks": 13900463,
-   "bytes": 9064613862,
+   "blocks": 13900774,
+   "bytes": 9064781298,
    "gb": 9.065
   }
  },
  "verification": {
   "quick": {
-   "command": "the start command, unchanged (the run is finished)",
    "travis_t5_verify": "20261018T143520Z-t5-full",
    "mode": "quick",
    "status": "verified",
@@ -1655,9 +2035,9 @@
     "files": 0,
     "bytes": 0
    },
-   "code_basis": "kit 962f851",
+   "code_basis": "kit 1cf6ed1",
    "code_since_run": {
-    "link": "changed",
+    "link": "same",
     "appraisal": "same",
     "permits": "same",
     "reconcile": "same",
@@ -1679,23 +2059,22 @@
    "run_json": "equal",
    "counts": {
     "seed": 441961,
-    "ready": 441924,
-    "dead": 37,
+    "ready": 441939,
+    "dead": 22,
     "invalid": 0,
     "reconciles": true,
     "shards": 89,
     "cars": 354,
     "permits_published": 1986484,
-    "roof_age_eligible": 390210
+    "roof_age_eligible": 390212
    },
    "mismatch_count": 0,
    "mismatches": [],
    "wrote": "nothing",
-   "seconds": 4.7,
-   "writes": "0 entries newer than a stamp taken before it, at every depth of the run directory and the Loader scope (find -newer, 25 min) and at depth 3"
+   "seconds": 5.8,
+   "command": "the start command, unchanged (the run is finished)"
   },
   "full": {
-   "command": "the start command plus --verify",
    "travis_t5_verify": "20261018T143520Z-t5-full",
    "mode": "full",
    "status": "verified",
@@ -1703,12 +2082,12 @@
    "stages_checked": 1157,
    "outputs_checked": 1688,
    "outputs_rehashed": {
-    "files": 683895,
-    "bytes": 28334269318
+    "files": 683910,
+    "bytes": 28544896999
    },
-   "code_basis": "kit 962f851",
+   "code_basis": "kit 1cf6ed1",
    "code_since_run": {
-    "link": "changed",
+    "link": "same",
     "appraisal": "same",
     "permits": "same",
     "reconcile": "same",
@@ -1733,24 +2112,25 @@
    "run_json": "equal",
    "counts": {
     "seed": 441961,
-    "ready": 441924,
-    "dead": 37,
+    "ready": 441939,
+    "dead": 22,
     "invalid": 0,
     "reconciles": true,
     "shards": 89,
     "cars": 354,
     "permits_published": 1986484,
-    "roof_age_eligible": 390210
+    "roof_age_eligible": 390212
    },
    "mismatch_count": 0,
    "mismatches": [],
    "wrote": "nothing",
-   "seconds": 270.8,
-   "writes": "0 entries newer than the stamp at depth 3; a second full-depth find after the full verification, the reconciliation and the size passes: 0 entries newer than the first stamp"
+   "seconds": 239.8,
+   "command": "the start command plus --verify"
   },
   "resume_is_a_no_op": "before phase B the same command would have started a new run in a new directory (latestUnfinished skipped finished runs); since kit 6107969 it verifies the finished run read-only, in seconds, and exits 0"
  },
  "reconciliation": {
+  "version": "travis-t5-reconcile.v2",
   "all_checks_pass": true,
   "checks": {
    "seed_equals_ready_dead_invalid": true,
@@ -1765,9 +2145,255 @@
    "roof_age_parcels_equal_ready": true,
    "roof_age_basis_sums": true,
    "every_archive_passed_car_validation": true,
-   "group_less_shards_have_no_linked_permit": true
+   "group_less_shards_have_no_linked_permit": true,
+   "county_line_accounts_ready": true,
+   "shifted_situs_accounts_ready_and_flagged": true,
+   "every_dead_account_is_a_source_fact": true
   },
-  "seconds": 71.7
+  "dead": {
+   "total": 22,
+   "by_class": {
+    "no_situs_street:nothing_printed": 21,
+    "no_situs_street:number_only": 1
+   },
+   "source_facts": 22,
+   "not_source_facts": 0,
+   "shards": [
+    "s0011",
+    "s0026",
+    "s0027",
+    "s0031",
+    "s0032",
+    "s0034",
+    "s0035",
+    "s0038",
+    "s0040",
+    "s0041",
+    "s0047",
+    "s0054",
+    "s0065",
+    "s0072",
+    "s0083",
+    "s0085",
+    "s0087"
+   ],
+   "linked_permits": {
+    "permits": 39,
+    "roofing": 6,
+    "open_roofing": 0,
+    "stalled_roofing": 0
+   }
+  },
+  "rulings": {
+   "county_line": {
+    "box": {
+     "minLat": 30.02,
+     "maxLat": 30.63,
+     "minLng": -98.17,
+     "maxLng": -97.37
+    },
+    "validation_box": {
+     "minLat": 29.95,
+     "maxLat": 30.75,
+     "minLng": -98.25,
+     "maxLng": -97.3
+    },
+    "accounts": 12,
+    "ready": 12,
+    "dead": 0,
+    "all_inside_validation_box": true,
+    "list": [
+     {
+      "prop_id": "355402",
+      "centroid_metres_outside": 0,
+      "vertices": 18,
+      "vertices_outside": 2,
+      "max_metres_outside": 721,
+      "inside_validation_box": true,
+      "shard": "s0039",
+      "state": "ready"
+     },
+     {
+      "prop_id": "355441",
+      "centroid_metres_outside": 0,
+      "vertices": 22,
+      "vertices_outside": 8,
+      "max_metres_outside": 1288,
+      "inside_validation_box": true,
+      "shard": "s0039",
+      "state": "ready"
+     },
+     {
+      "prop_id": "355648",
+      "centroid_metres_outside": 1,
+      "vertices": 11,
+      "vertices_outside": 3,
+      "max_metres_outside": 159,
+      "inside_validation_box": true,
+      "shard": "s0039",
+      "state": "ready"
+     },
+     {
+      "prop_id": "355650",
+      "centroid_metres_outside": 0,
+      "vertices": 30,
+      "vertices_outside": 2,
+      "max_metres_outside": 17,
+      "inside_validation_box": true,
+      "shard": "s0039",
+      "state": "ready"
+     },
+     {
+      "prop_id": "355656",
+      "centroid_metres_outside": 770,
+      "vertices": 70,
+      "vertices_outside": 61,
+      "max_metres_outside": 1501,
+      "inside_validation_box": true,
+      "shard": "s0039",
+      "state": "ready"
+     },
+     {
+      "prop_id": "355668",
+      "centroid_metres_outside": 0,
+      "vertices": 5,
+      "vertices_outside": 3,
+      "max_metres_outside": 53,
+      "inside_validation_box": true,
+      "shard": "s0039",
+      "state": "ready"
+     },
+     {
+      "prop_id": "358848",
+      "centroid_metres_outside": 0,
+      "vertices": 11,
+      "vertices_outside": 2,
+      "max_metres_outside": 19,
+      "inside_validation_box": true,
+      "shard": "s0040",
+      "state": "ready"
+     },
+     {
+      "prop_id": "787307",
+      "centroid_metres_outside": 0,
+      "vertices": 26,
+      "vertices_outside": 8,
+      "max_metres_outside": 427,
+      "inside_validation_box": true,
+      "shard": "s0066",
+      "state": "ready"
+     },
+     {
+      "prop_id": "808449",
+      "centroid_metres_outside": 0,
+      "vertices": 14,
+      "vertices_outside": 4,
+      "max_metres_outside": 201,
+      "inside_validation_box": true,
+      "shard": "s0067",
+      "state": "ready"
+     },
+     {
+      "prop_id": "808450",
+      "centroid_metres_outside": 0,
+      "vertices": 31,
+      "vertices_outside": 9,
+      "max_metres_outside": 204,
+      "inside_validation_box": true,
+      "shard": "s0067",
+      "state": "ready"
+     },
+     {
+      "prop_id": "832972",
+      "centroid_metres_outside": 0,
+      "vertices": 16,
+      "vertices_outside": 4,
+      "max_metres_outside": 189,
+      "inside_validation_box": true,
+      "shard": "s0068",
+      "state": "ready"
+     },
+     {
+      "prop_id": "947911",
+      "centroid_metres_outside": 0,
+      "vertices": 7,
+      "vertices_outside": 1,
+      "max_metres_outside": 15,
+      "inside_validation_box": true,
+      "shard": "s0081",
+      "state": "ready"
+     }
+    ]
+   },
+   "situs_columns_shifted": {
+    "seed_rows_matching": 3,
+    "ready": 3,
+    "sidecar_flagged": 3,
+    "list": [
+     {
+      "prop_id": "954255",
+      "printed": {
+       "situs_num": null,
+       "situs_street_prefx": "E",
+       "situs_street": null,
+       "situs_street_suffix": "PARMER",
+       "situs_unit": "LN"
+      },
+      "read_as": {
+       "street_prefix": "E",
+       "street_name": "PARMER",
+       "street_suffix": "LN",
+       "unit": null
+      },
+      "address": "E PARMER LN, TX 78753",
+      "shard": "s0081",
+      "state": "ready",
+      "sidecar_flag": "travis-situs-columns-v1"
+     },
+     {
+      "prop_id": "978103",
+      "printed": {
+       "situs_num": null,
+       "situs_street_prefx": null,
+       "situs_street": null,
+       "situs_street_suffix": "PINNACLE",
+       "situs_unit": "CV"
+      },
+      "read_as": {
+       "street_prefix": null,
+       "street_name": "PINNACLE",
+       "street_suffix": "CV",
+       "unit": null
+      },
+      "address": "PINNACLE CV, TX 78645",
+      "shard": "s0084",
+      "state": "ready",
+      "sidecar_flag": "travis-situs-columns-v1"
+     },
+     {
+      "prop_id": "978104",
+      "printed": {
+       "situs_num": null,
+       "situs_street_prefx": null,
+       "situs_street": null,
+       "situs_street_suffix": "PINNACLE",
+       "situs_unit": "CV"
+      },
+      "read_as": {
+       "street_prefix": null,
+       "street_name": "PINNACLE",
+       "street_suffix": "CV",
+       "unit": null
+      },
+      "address": "PINNACLE CV, TX 78645",
+      "shard": "s0084",
+      "state": "ready",
+      "sidecar_flag": "travis-situs-columns-v1"
+     }
+    ]
+   }
+  },
+  "seconds": 73.4
  },
  "deviations": [
   {
@@ -2500,7 +3126,8 @@
     "maxLat": 30.628682023639122,
     "minLng": -98.17801145314051,
     "maxLng": -97.37184423293633
-   }
+   },
+   "resolved": "2026-10-19, decisions.md 27.9 A and 27.10: the 12 county-line accounts and the 3 shifted-situs accounts are ready after the scoped rerun; 22 dead remain, all source facts (21 print no situs part, 1 only a house number)"
   },
   {
    "id": "cars_354_not_356",
@@ -2623,7 +3250,7 @@
   }
  ],
  "limitations": {
-  "listed": 18,
+  "listed": 20,
   "still_true": "every one; their numbers recomputed from the record's own counts",
   "recomputed": {
    "out_of_county": true,
@@ -2636,29 +3263,28 @@
    "no_parcel_polygon": true,
    "partial_history": true
   },
-  "missing": [
+  "missing": [],
+  "added_by_the_rerun": [
    {
     "source": "tcad-2026-certified-appraisal-export",
+    "availability": "supported_partial",
+    "source_access_status": "available",
     "incomplete_reason": "no_situs_street",
-    "detail": "22 accounts print no situs street (21 print no situs part at all, 1 only a house number): permanent failures, not published"
-   },
-   {
-    "source": "tcad-2026-certified-appraisal-export",
-    "incomplete_reason": "situs_columns_shifted",
-    "detail": "3 accounts print the street one column to the right (the name in the suffix column, the suffix in the unit column): refused as a blank street, not published (decisions.md 27)"
-   },
-   {
-    "source": "pipeline",
-    "incomplete_reason": "outside_validation_bbox",
-    "detail": "12 accounts on the county line refused by the adapter's rounded bounding box although TCAD appraises them and the TNR layer draws them: a pipeline defect, not a source gap (decisions.md 27)"
+    "detail": "22 accounts print no situs street (the roll prints no street for them, a source fact; a street printed one column to the right is read, decisions.md 27.10): permanent appraisal failures, tombstoned dead, not published",
+    "evidence": "the run's dead tombstones (Loader generation tombstones.jsonl)",
+    "records_request": null
    },
    {
     "source": "austin-issued-construction-permits/3syk-w9eu",
+    "availability": "supported_partial",
+    "source_access_status": "available",
     "incomplete_reason": "linked_to_dead_account",
-    "detail": "39 linked permits (6 roofing) sit on 2 dead accounts: loaded internally, shown on no property; with them 35,463 roofing permits are shown on no property, not 35,457"
+    "detail": "39 linked permits (6 roofing) sit on 2 dead accounts: loaded internally, shown on no property",
+    "evidence": "global/link per-shard files, the run's dead tombstones",
+    "records_request": null
    }
   ],
-  "note": "run.json is not edited: --verify proves it equals what the markers imply; the record builder gains the missing items with the fix of decisions.md 27, which rewrites run.json"
+  "roofing_not_on_a_property": "35,463 roofing permits are loaded internally and counted but shown on no property: 35,457 link to no property (780 open, 1,080 stalled) and 6 sit on dead accounts (0 open, 0 stalled)"
  },
  "readiness": {
   "overall": "PASS",
@@ -2672,6 +3298,375 @@
    "enrichment": "PASS"
   }
  },
- "tests": "npx vitest run tests/travis-* in the runtime: 33 files, 248 tests passed (phase A: 32 files, 239)",
- "no_publication": "nothing uploaded, pinned or registered; groups, manifest_cid, gateway_checks and atlas stay empty until T6"
+ "tests": "npx vitest run tests/travis-* in the runtime: 34 files, 265 tests passed (phase B: 33 files, 248)",
+ "no_publication": "nothing uploaded, pinned or registered; groups, manifest_cid, gateway_checks and atlas stay empty until T6",
+ "timings_by_stage_note": "each stage's time as its marker records it: the 82 re-certified shards keep attempt 1's, the 7 rerun shards have attempt 2's",
+ "rulings_27": {
+  "27.9": {
+   "ruling": "operator, 2026-10-19: option A approved; the wider seed box or, better if cheap and proven, the county boundary; never accept geometry genuinely outside Travis; rerun only the affected shards and re-certify the others in place without recomputing them, proven",
+   "guard": "TRAVIS_VALIDATION_BBOX = the seed builder's box 29.95-30.75 N, -98.25 to -97.30 W (validate.mjs, kit 1cf6ed1)",
+   "why_the_box_and_not_the_boundary": {
+    "boundary": "Census TIGERweb State_County layer 1, GEOID 48453 (GET https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/1/query?where=GEOID='48453'&outSR=4326&f=geojson, 2026-10-19, 79,915 bytes, SHA-256 1656dd6d50e4e1bcdeec319d604abe47d2bfb629e746777378a9a0c407456a17, one ring of 1,955 vertices, extent -98.1730 to -97.3695 W, 30.0235 to 30.6282 N); a scratch check, not kept, never a record's source",
+    "seed_geometries": 373513,
+    "points": 7053937,
+    "centroid_outside_the_line": 653,
+    "no_point_inside_the_line": 56,
+    "no_point_inside_max_distance_m": 46,
+    "points_outside_the_line": 20934,
+    "max_point_outside_m": 2352,
+    "max_point_outside_prop_id": "355656",
+    "the_12": "7 of the 12 have their centroid outside the line (9-967 m); every one has vertices inside it",
+    "conclusion": "the line TCAD's parcel fabric follows is not the Census line: an exact boundary test would refuse 56 accounts the run published (TCAD appraises them, the TNR layer draws them), and a tolerance would have to be calibrated on the data. Not cheap and not proven, so the seed box: 0 of 373,513 geometries has any point outside it, and it contains the contract box, so it refuses nothing that passed. The other identity checks (seed county and FIPS, source hosts, request identifiers, address state) still keep a wrong-county record out."
+   },
+   "accounts": [
+    {
+     "prop_id": "355402",
+     "centroid_metres_outside": 0,
+     "vertices": 18,
+     "vertices_outside": 2,
+     "max_metres_outside": 721,
+     "inside_validation_box": true,
+     "shard": "s0039",
+     "state": "ready"
+    },
+    {
+     "prop_id": "355441",
+     "centroid_metres_outside": 0,
+     "vertices": 22,
+     "vertices_outside": 8,
+     "max_metres_outside": 1288,
+     "inside_validation_box": true,
+     "shard": "s0039",
+     "state": "ready"
+    },
+    {
+     "prop_id": "355648",
+     "centroid_metres_outside": 1,
+     "vertices": 11,
+     "vertices_outside": 3,
+     "max_metres_outside": 159,
+     "inside_validation_box": true,
+     "shard": "s0039",
+     "state": "ready"
+    },
+    {
+     "prop_id": "355650",
+     "centroid_metres_outside": 0,
+     "vertices": 30,
+     "vertices_outside": 2,
+     "max_metres_outside": 17,
+     "inside_validation_box": true,
+     "shard": "s0039",
+     "state": "ready"
+    },
+    {
+     "prop_id": "355656",
+     "centroid_metres_outside": 770,
+     "vertices": 70,
+     "vertices_outside": 61,
+     "max_metres_outside": 1501,
+     "inside_validation_box": true,
+     "shard": "s0039",
+     "state": "ready"
+    },
+    {
+     "prop_id": "355668",
+     "centroid_metres_outside": 0,
+     "vertices": 5,
+     "vertices_outside": 3,
+     "max_metres_outside": 53,
+     "inside_validation_box": true,
+     "shard": "s0039",
+     "state": "ready"
+    },
+    {
+     "prop_id": "358848",
+     "centroid_metres_outside": 0,
+     "vertices": 11,
+     "vertices_outside": 2,
+     "max_metres_outside": 19,
+     "inside_validation_box": true,
+     "shard": "s0040",
+     "state": "ready"
+    },
+    {
+     "prop_id": "787307",
+     "centroid_metres_outside": 0,
+     "vertices": 26,
+     "vertices_outside": 8,
+     "max_metres_outside": 427,
+     "inside_validation_box": true,
+     "shard": "s0066",
+     "state": "ready"
+    },
+    {
+     "prop_id": "808449",
+     "centroid_metres_outside": 0,
+     "vertices": 14,
+     "vertices_outside": 4,
+     "max_metres_outside": 201,
+     "inside_validation_box": true,
+     "shard": "s0067",
+     "state": "ready"
+    },
+    {
+     "prop_id": "808450",
+     "centroid_metres_outside": 0,
+     "vertices": 31,
+     "vertices_outside": 9,
+     "max_metres_outside": 204,
+     "inside_validation_box": true,
+     "shard": "s0067",
+     "state": "ready"
+    },
+    {
+     "prop_id": "832972",
+     "centroid_metres_outside": 0,
+     "vertices": 16,
+     "vertices_outside": 4,
+     "max_metres_outside": 189,
+     "inside_validation_box": true,
+     "shard": "s0068",
+     "state": "ready"
+    },
+    {
+     "prop_id": "947911",
+     "centroid_metres_outside": 0,
+     "vertices": 7,
+     "vertices_outside": 1,
+     "max_metres_outside": 15,
+     "inside_validation_box": true,
+     "shard": "s0081",
+     "state": "ready"
+    }
+   ]
+  },
+  "27.10": {
+   "ruling": "operator, 2026-10-19: approved, exactly the pattern of 954255 and 978103/978104, nothing broader; tests; rerun with 27.9",
+   "rule": "situs columns v1 (transform.mjs readShiftedSitusColumns): the street column blank, one name (letters only, not itself a suffix word) in the suffix column, one of 19 suffix words (the 2-4 letter USPS standard abbreviations TCAD prints as a situs suffix on 1,000 or more accounts) in the unit column; the address stays the printed parts (unnormalized_address), the sidecar records the reading",
+   "seed_rows_matching": 3,
+   "accounts": [
+    {
+     "prop_id": "954255",
+     "printed": {
+      "situs_num": null,
+      "situs_street_prefx": "E",
+      "situs_street": null,
+      "situs_street_suffix": "PARMER",
+      "situs_unit": "LN"
+     },
+     "read_as": {
+      "street_prefix": "E",
+      "street_name": "PARMER",
+      "street_suffix": "LN",
+      "unit": null
+     },
+     "address": "E PARMER LN, TX 78753",
+     "shard": "s0081",
+     "state": "ready",
+     "sidecar_flag": "travis-situs-columns-v1"
+    },
+    {
+     "prop_id": "978103",
+     "printed": {
+      "situs_num": null,
+      "situs_street_prefx": null,
+      "situs_street": null,
+      "situs_street_suffix": "PINNACLE",
+      "situs_unit": "CV"
+     },
+     "read_as": {
+      "street_prefix": null,
+      "street_name": "PINNACLE",
+      "street_suffix": "CV",
+      "unit": null
+     },
+     "address": "PINNACLE CV, TX 78645",
+     "shard": "s0084",
+     "state": "ready",
+     "sidecar_flag": "travis-situs-columns-v1"
+    },
+    {
+     "prop_id": "978104",
+     "printed": {
+      "situs_num": null,
+      "situs_street_prefx": null,
+      "situs_street": null,
+      "situs_street_suffix": "PINNACLE",
+      "situs_unit": "CV"
+     },
+     "read_as": {
+      "street_prefix": null,
+      "street_name": "PINNACLE",
+      "street_suffix": "CV",
+      "unit": null
+     },
+     "address": "PINNACLE CV, TX 78645",
+     "shard": "s0084",
+     "state": "ready",
+     "sidecar_flag": "travis-situs-columns-v1"
+    }
+   ]
+  },
+  "27.11": {
+   "ruling": "operator, 2026-10-19: the operator diagnoses the disk separately; check free space before the rerun and stop under 25 GiB; report what T6, T7 and T10 need and the free-space target before T10",
+   "before_the_rerun_gib": 36.09,
+   "plan": {
+    "t6": {
+     "full_dag_tables_cars_gb": 10.03,
+     "detail": "one CAR per shard and group of the whole tables-root DAG (README.md:68): the archive's blocks with their framing (County 4.296 GB, Property Improvement 4.310 GB) plus the Parquet parts (1.056 and 0.371 GB) plus the tables index (0.5 MB): 177 CARs, about 10.0 GB (9.3 GiB)",
+     "upload_staging_gb": 0,
+     "upload_note": "elephant-cli upload streams each archive CAR and each part from the run directory to Filebase (Kubo dag/import and add); it reads one CAR into memory (at most about 60 MB a shard) and writes only JSON receipts; gateway checks and the manifest add well under 0.1 GB",
+     "total_gb": 10.1
+    },
+    "t7": {
+     "duckdb_file_gb": 3.2,
+     "measured": "a DuckDB 1.5.6 build of 10 sample shards (s0003, s0012, s0021, s0030, s0045, s0052, s0060, s0072, s0078, s0086; 33 tables): 158 MB of parts became 326 MB (x2.07), and a full-text index over their 210,853 permits' description, permit_class and work_class added 18.6 MB; scaled: 1.427 GB of parts x 2.07 = 2.95 GB, the index 0.18 GB, derived tables about 0.1 GB",
+     "peak_gb": 18,
+     "peak_detail": "the CID-verified parts if downloaded (1.4 GB), the DuckDB file (3.2 GB) and its build spill (up to 3 GB), the CDK asset copy of the image context (3.2 GB) and the image in the colima VM disk (context and layer, about 7 GB, which does not shrink by itself)",
+     "kept_gb": 15,
+     "note": "the file is above the 2 GB ephemeral figure of decisions.md section 5; the image-baked path of section 21 carries it, inside Lambda's 10 GB image limit"
+    },
+    "t10": {
+     "total_gb": 180,
+     "detail": "run 2 writes about 126 GB (run 1's 125.8 GB allocated), the Loader about 1.5 GB of new files, fresh captures about 3.7 GB (export 0.6, permits 1.7, TCAD extras 0.36, TNR 0.33, seed 0.7), T6 of run 2 about 10 GB, a T7 rebuild about 18 GB at peak, and 20 GB kept free for swap and local snapshots"
+    },
+    "now_gib": 18.13,
+    "targets": "before T6: at least 30 GiB free (T6 about 9.4 GiB, plus the 20 GiB margin); before T7: at least 40 GiB free (its 17 GiB peak plus the margin); together at least 50 GiB before T6. Before T10: at least 180 GB free, or data/ on a larger volume. Today 18.13 GiB are free: T6 fits only to about 8.7 GiB left, under the coordinator's 8 GiB stop line in practice, and T7 does not fit."
+   }
+  },
+  "scoped_rerun": "run.json scoped_reruns[0] (shards, commits, the three changed files with their proofs, the comparisons, 165 re-certified markers: the link pass and the appraisal and permits stages of 82 shards)"
+ },
+ "before_the_rulings": {
+  "counts_appraisal": {
+   "seed": 441961,
+   "ready": 441924,
+   "dead": 37,
+   "invalid": 0,
+   "retryable": 0,
+   "reconciles": true,
+   "rule": "seed = ready + dead + invalid (kit county-ingest-run section 8)",
+   "with_geometry": 373482,
+   "without_geometry": 68442
+  },
+  "dead_by_class": {
+   "no_situs_street:nothing_printed": 21,
+   "outside_validation_bbox": 12,
+   "no_situs_street:number_only": 1,
+   "no_situs_street:columns_shifted": 3
+  },
+  "run_json_sha256": "a0732ed3e34bf404918dda792150a06e44c4173835a4517a0d257b8fc0a27afb",
+  "per_shard_roots": {
+   "s0039": {
+    "id": "s0039",
+    "rows": 5000,
+    "first": "351321",
+    "last": "358194",
+    "appraisal_attempt": 1,
+    "county_root": "baguqeeralccwvxhiouyituphjkefsjp4qonfaoxakshhtibkvj7a3go47x4q",
+    "property_improvement_root": "baguqeeragg5kjlrvzu6ms777bhuz5qyhhtt6mnec6m2pghyhykktcqrkqowa",
+    "county_car_sha256": "60d186b87ed95303576aa5fba8f39661129d20862754c9e9bee06fa48a6b602a",
+    "property_improvement_car_sha256": "5b9f8259b4e9f6801126a13c7a72e46467a041a254d6535bd2587319ed0969d5"
+   },
+   "s0040": {
+    "id": "s0040",
+    "rows": 5000,
+    "first": "358195",
+    "last": "367111",
+    "appraisal_attempt": 1,
+    "county_root": "baguqeeramfuejehk37s7gqwmbnbvrnpgesoy4qm5t5xhczbirpkwz5bbfclq",
+    "property_improvement_root": "baguqeeraix52c5zqiryohcic7znmnsiqqfb3u3xeeb66b4p6cvnsn5kc6swa",
+    "county_car_sha256": "898ea646975cbb8a28d9a55d01457247096604bf69d8e737bf03da34756c6fb9",
+    "property_improvement_car_sha256": "87f6e692635429870dff2c6a4bd49f6a119d6224b1d87ca8eaca5b80435b4bd2"
+   },
+   "s0066": {
+    "id": "s0066",
+    "rows": 5000,
+    "first": "784982",
+    "last": "808301",
+    "appraisal_attempt": 1,
+    "county_root": "baguqeerawsbqjsvpi5jqr7h4pq4o2n4lvmmaowfttwezfivdm6avzced6zwa",
+    "property_improvement_root": "baguqeerawop6lflp333umy6qc55mp7bu63xki77vk2mva3wzd5v4e3onkh3q",
+    "county_car_sha256": "ac4572bce82a0a0e71d9aa739937c18f56ab4c2ce29f1af6876a7921941096e6",
+    "property_improvement_car_sha256": "1184ccf2444a2a0db6c3d09ba713e02e3686ac33553e305d0098d6154e9f7f95"
+   },
+   "s0067": {
+    "id": "s0067",
+    "rows": 5000,
+    "first": "808302",
+    "last": "822813",
+    "appraisal_attempt": 1,
+    "county_root": "baguqeera2slylzgewhrxx242f6fsilihfoykbdbkzmzhodblhwy6je4zhmcq",
+    "property_improvement_root": "baguqeerapck2nfpetruan3xerhmbclmkbakby42xr7tsouzy2cmiqc4qvxiq",
+    "county_car_sha256": "26b15575a9220bc59bfdcf1f0f2deace53d25508d254f31d5b24ecacbce904ff",
+    "property_improvement_car_sha256": "4e997ccc43e38d53cbd92efdbd3e81f59c1470a9e98f19c4a7242bd94072ecfa"
+   },
+   "s0068": {
+    "id": "s0068",
+    "rows": 5000,
+    "first": "822814",
+    "last": "835946",
+    "appraisal_attempt": 1,
+    "county_root": "baguqeera6x47s2vvk7dxq6pyxlbjme3rtzs6qob5z6elhvlki5yv6m5h6hda",
+    "property_improvement_root": "baguqeera7gauiqzhsg5rocryic6wdjl7yw2vooqhlfakld4bekdrvp463gqq",
+    "county_car_sha256": "6d4f2260d517ec13a3c42f26ecc859f3f8f27510cc545ceeca60bf63e6279e82",
+    "property_improvement_car_sha256": "436ad2e8b8bfecd48b56ca5dd32da2220c39e773078c40bb951127a143a50c92"
+   },
+   "s0081": {
+    "id": "s0081",
+    "rows": 5000,
+    "first": "945908",
+    "last": "955354",
+    "appraisal_attempt": 1,
+    "county_root": "baguqeeraqwueiy46cro7il4xedgnf5nit4eeq7h2vvjwmxkben3av6dgiy2q",
+    "property_improvement_root": "baguqeeraou3qjizb4cqpwkk6sjg476rr5pge6hj2brjy26zqvr6hshvhsy3a",
+    "county_car_sha256": "fda9d0fa1f47008db590c0f7bb2551af82ccdb83b0171cfb65ab58fb52a2cf53",
+    "property_improvement_car_sha256": "e29b643032bf79bf96db759065a556a4c3fabbd6bf0654ccde8c7e2d3d3b832d"
+   },
+   "s0084": {
+    "id": "s0084",
+    "rows": 5000,
+    "first": "969558",
+    "last": "979328",
+    "appraisal_attempt": 1,
+    "county_root": "baguqeerad474lvhfluxfuhmzjgr3pequ433pdaqk3t36wjqfgf5sbr3bsdta",
+    "property_improvement_root": "baguqeerakajcq5423eu6uv2srg47yu76ol3m2r7cw5vb3fqvg5aecrpj32xa",
+    "county_car_sha256": "0385d95546231d608803d3538cab455a2ca3e25230b30055dc10e154b3e561ae",
+    "property_improvement_car_sha256": "4c486a9ccdd06c93f0c6af75022490546a224d8dc4c82ae43f6afdb39b4ed353"
+   }
+  },
+  "cars": {
+   "county": {
+    "count": 89,
+    "blocks": 9689788,
+    "properties": 441924,
+    "bytes": 4295418929,
+    "all_six_checks_zero": true
+   },
+   "property_improvement": {
+    "count": 88,
+    "blocks": 5398330,
+    "properties": 237531,
+    "bytes": 4310324352,
+    "all_six_checks_zero": true
+   }
+  },
+  "sizes_total_gb": {
+   "car": 8.606,
+   "blocks": 8.017,
+   "parts": 1.427,
+   "distinct": 9.445,
+   "filebase_counted": 18.889
+  },
+  "limitations_listed": 18,
+  "verification_full": {
+   "stages_checked": 1157,
+   "outputs_checked": 1688,
+   "outputs_rehashed": {
+    "files": 683895,
+    "bytes": 28334269318
+   }
+  },
+  "loader_state_sha256": "d4198e7adaa01f318f6e91ed141bf25a7c428f0a4f64737a1aadd0dd83454318"
+ }
 }
