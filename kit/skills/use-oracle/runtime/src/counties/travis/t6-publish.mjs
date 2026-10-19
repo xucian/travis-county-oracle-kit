@@ -412,6 +412,38 @@ export async function runGatewayChecks({ jobs, gateways, jsonl, concurrency = 6,
 }
 
 /**
+ * Gateway checks paced to a gateway's quota (decisions.md 28.7, the operator's ruling 3): one request in flight; a row
+ * that ends `unverified` on a 429 is checked again after waiting out its `Retry-After` in full, up to `maxRounds` times.
+ * Rows go to `jsonl` as they are made, so a restart resumes; a job with a definitive row there is skipped. A mismatch
+ * or a 4xx other than 429 stops the run; a row still unverified after the paced rounds is kept with its status.
+ *
+ * @param {{ jobs: object[], gateway: string, jsonl: string, check?: Function, sleepImpl?: (ms: number) => Promise<void>, deadlineMs?: number, maxRounds?: number, onRow?: (row: object) => void }} options - Jobs, one gateway, the row log.
+ * @returns {Promise<{ stop: object | null, rows: object[] }>} Why it stopped (or null) and the standing rows of these jobs.
+ */
+export async function runPacedChecks({ jobs, gateway, jsonl, check = gatewayCheck, sleepImpl = sleep, deadlineMs = 20 * MINUTE, maxRounds = 6, onRow = () => {} }) {
+  const read = async () => (existsSync(jsonl) ? (await readFile(jsonl, "utf8")).split("\n").filter(Boolean).map((line) => JSON.parse(line)) : []);
+  const done = standingRows(await read());
+  let stop = null;
+  for (const job of jobs) {
+    if (definitive(done.get(`${gateway} ${job.check} ${job.cid}`) ?? {})) continue;
+    let row;
+    for (let round = 1; ; round += 1) {
+      row = { ...(await check({ ...job, gateway, deadlineMs })), paced_rounds: round };
+      if (definitive(row) || row.status !== 429 || round >= maxRounds) break;
+      await sleepImpl(((row.retry_after_s ?? 60) + 5) * 1000);
+    }
+    const { url, detail, ...kept } = row;
+    await appendFile(jsonl, `${JSON.stringify({ ...kept, ...(detail ? { detail } : {}) })}\n`);
+    onRow(row);
+    if (resultOf(row) === "mismatch") stop = { reason: "mismatch", cid: row.cid, check: row.check, status: row.status };
+    else if (row.status >= 400 && row.status < 500 && row.status !== 429) stop = { reason: `HTTP ${row.status}`, cid: row.cid, check: row.check, status: row.status, detail: row.detail ?? null };
+    if (stop) break;
+  }
+  const all = standingRows(await read());
+  return { stop, rows: jobs.map((job) => all.get(`${gateway} ${job.check} ${job.cid}`)).filter(Boolean) };
+}
+
+/**
  * Pinata pin-by-CID of every root: requests spaced out (429 retried), then the pinned list and the pin jobs polled
  * until every root is pinned or failed, or the bound passes. Nothing is dropped: each root keeps its exact outcome.
  *
@@ -472,6 +504,33 @@ export async function pinRoots({ roots, jwt, fetchImpl = fetch, waitMs = 45 * MI
 }
 
 /**
+ * Read-only: how many of `cids` Pinata lists as pinned now, and the job status of the rest.
+ *
+ * @param {{ cids: string[], jwt: string, fetchImpl?: typeof fetch }} options - Roots, JWT.
+ * @returns {Promise<{ roots: number, pinned: number, pending: Record<string, number>, not_listed: number }>} The counts.
+ */
+export async function pinStatus({ cids, jwt, fetchImpl = fetch }) {
+  const headers = { authorization: `Bearer ${jwt}` };
+  const pinned = new Set();
+  for (let offset = 0; ; offset += 1000) {
+    const response = await fetchImpl(`${PINATA_API}/data/pinList?status=pinned&pageLimit=1000&pageOffset=${offset}`, { headers });
+    if (!response.ok) throw new Error(`pinList HTTP ${response.status}`);
+    const rows = (await response.json())?.rows ?? [];
+    for (const row of rows) pinned.add(row.ipfs_pin_hash);
+    if (rows.length < 1000) break;
+  }
+  const jobs = await fetchImpl(`${PINATA_API}/pinning/pinJobs?limit=1000`, { headers });
+  const status = new Map(jobs.ok ? ((await jobs.json())?.rows ?? []).map((row) => [row.ipfs_pin_hash, row.status]) : []);
+  const pending = {};
+  let notListed = 0;
+  for (const cid of cids.filter((value) => !pinned.has(value))) {
+    if (status.has(cid)) pending[status.get(cid)] = (pending[status.get(cid)] ?? 0) + 1;
+    else notListed += 1;
+  }
+  return { roots: cids.length, pinned: cids.filter((value) => pinned.has(value)).length, pending, not_listed: notListed };
+}
+
+/**
  * The run's artifact manifest (assignment decisions.md 7.2 and 28): every root, part and schema, the CARs as release
  * assets, the upload, pin and gateway outcomes. It refuses a root that was not uploaded as planned, a missing tables
  * CAR, and any gateway row that is not a match.
@@ -479,7 +538,7 @@ export async function pinRoots({ roots, jwt, fetchImpl = fetch, waitMs = 45 * MI
  * @param {{ plan: object, uploads: object[], tablesCars: object[], filebase: object, gatewayRows: object[], gatewayFile: { path: string, sha256: string }, pins: object[], release: { tag: string, status: string } }} inputs - Outcomes of every step.
  * @returns {object} The manifest.
  */
-export function buildShardManifest({ plan, uploads, tablesCars, filebase, gatewayRows, gatewayFile, pins, release }) {
+export function buildShardManifest({ plan, uploads, tablesCars, filebase, gatewayRows, gatewayFile, pins, release, backgroundChecks = null, extraNotes = [] }) {
   const uploaded = new Map(uploads.map((entry) => [`${entry.kind} ${entry.root}`, entry]));
   for (const entry of plan.archives) if (!uploaded.has(`archive ${entry.root}`)) throw new Error(`archive ${entry.root} (${entry.group} ${entry.shard}) was not uploaded`);
   for (const entry of plan.tables) if (!uploaded.has(`tables ${entry.root}`)) throw new Error(`tables ${entry.root} (${entry.group} ${entry.shard}) were not uploaded`);
@@ -522,7 +581,7 @@ export function buildShardManifest({ plan, uploads, tablesCars, filebase, gatewa
     release,
     uploads: { api: "https://rpc.filebase.io", readback_gateway: "https://ipfs.filebase.io", archives: archives.length, tables: tables.length, all_read_back: true },
     filebase_pins: { checked_at: filebase.checked_at, cids: filebase.rows.length, pinned: filebase.rows.filter((row) => row.pinned).length, controls_unpinned: filebase.controls.every((control) => !control.pinned) },
-    gateway_checks: { scope: "the raw root block of every archive root, tables root and schema against its multihash; the full bytes of every table part against its size and sha256", file: gatewayFile, per_gateway: summarizeGateways(gatewayRows) },
+    gateway_checks: { scope: "the raw root block of every archive root, tables root and schema against its multihash; the full bytes of every table part against its size and sha256", file: gatewayFile, per_gateway: summarizeGateways(gatewayRows), ...(backgroundChecks ? { background: backgroundChecks } : {}) },
     second_pin: { vendor: "pinata", method: "pin-by-CID, recursive, of every archive and tables root", roots: roots.length, pinned: pins.filter((pin) => pin.pinned).length, unpinned_roots: unpinned },
     pins,
     notes: [
@@ -532,6 +591,7 @@ export function buildShardManifest({ plan, uploads, tablesCars, filebase, gatewa
       "No origins are listed: no candidate-operated node serves these blocks. Filebase (the upload) and Pinata (the second pin) are pinning vendors; gateway URLs are locators, never identities.",
       ...(unpinned.length > 0 ? [`The second pin is incomplete: ${unpinned.length} roots are not pinned on Pinata (outcomes verbatim in pins[]); Filebase pins every CID.`] : []),
       "No IPNS name is used and no Atlas PR is open (decisions.md 28.3); the manifest does not list itself, its CID is in the publication record.",
+      ...extraNotes,
     ],
   };
 }
@@ -623,8 +683,45 @@ async function main(argv) {
     const count = (predicate) => pins.filter(predicate).length;
     console.log(JSON.stringify({ roots: pins.length, pinned: count((pin) => pin.pinned), refused: count((pin) => pin.error), failed_jobs: count((pin) => TERMINAL_PIN_JOB.has(pin.job_status)), pending: count((pin) => !pin.pinned && !pin.error && !TERMINAL_PIN_JOB.has(pin.job_status)), statuses: [...new Set(pins.filter((pin) => !pin.pinned).map((pin) => pin.error ?? pin.job_status))] }));
     if (pins.some((pin) => !pin.pinned)) process.exitCode = 2;
+  } else if (command === "gateway-paced") {
+    const jsonl = path.join(out, flags.jsonl);
+    if (!existsSync(jsonl) && flags["seed-from"]) {
+      const seed = (await readFile(path.join(out, flags["seed-from"]), "utf8")).split("\n").filter(Boolean).filter((line) => JSON.parse(line).gateway === flags.gateway);
+      await writeFile(jsonl, seed.length > 0 ? `${seed.join("\n")}\n` : "");
+    }
+    const jobs = gatewayJobs(plan);
+    if (flags["extra-file"]) {
+      const [cid, size, sha256] = flags["extra-file"].split(",");
+      jobs.push({ cid, check: "file", expected: { size: Number(size), sha256 } });
+    }
+    const started = new Date().toISOString();
+    const { stop, rows } = await runPacedChecks({ jobs, gateway: flags.gateway, jsonl });
+    const summary = { gateway: flags.gateway, started, finished: new Date().toISOString(), jobs: jobs.length, stop, ...summarizeGateways(rows)[flags.gateway] };
+    await write(path.join(out, `${path.basename(jsonl, ".jsonl")}.summary.json`), summary);
+    if (flags["copy-to"]) await write(path.resolve(flags["copy-to"]), { summary, rows });
+    console.log(JSON.stringify(summary));
+    if (stop || summary.unverified > 0) process.exitCode = 1;
+  } else if (command === "gateway-status") {
+    const jsonl = path.join(out, flags.jsonl);
+    const rows = existsSync(jsonl) ? (await readFile(jsonl, "utf8")).split("\n").filter(Boolean).map((line) => JSON.parse(line)) : [];
+    const standing = [...standingRows(rows).values()].filter((row) => row.gateway === flags.gateway);
+    const total = gatewayJobs(plan).length + (flags["extra-jobs"] ? Number(flags["extra-jobs"]) : 0);
+    const summary = summarizeGateways(standing)[flags.gateway] ?? { match: 0, mismatch: 0, unverified: 0 };
+    const pidFile = path.join(out, `${path.basename(jsonl, ".jsonl")}.pid.json`);
+    const pid = existsSync(pidFile) ? (await read(pidFile)).pid : null;
+    let running = false;
+    try { running = pid ? process.kill(pid, 0) : false; } catch { running = false; }
+    const finished = existsSync(path.join(out, `${path.basename(jsonl, ".jsonl")}.summary.json`));
+    console.log(JSON.stringify({ gateway: flags.gateway, running, finished, jobs: total, match: summary.match, mismatch: summary.mismatch, unverified: summary.unverified, remaining: total - summary.match - summary.mismatch, last_row_at: rows.at(-1)?.checked_at ?? null }));
+  } else if (command === "pin-status") {
+    const cids = [...plan.archives.map((entry) => entry.root), ...plan.tables.map((entry) => entry.root), ...(flags["extra-cids"] ?? "").split(",").filter(Boolean)];
+    console.log(JSON.stringify({ checked_at: new Date().toISOString(), ...(await pinStatus({ cids, jwt: jwt() })) }));
   } else if (command === "manifest") {
     const gatewayRows = await read(path.join(out, "gateway-checks.json"));
+    if (flags["with-matches-of"]) {
+      const lines = (await readFile(path.join(out, "gateway-checks.jsonl"), "utf8")).split("\n").filter(Boolean).map((line) => JSON.parse(line));
+      gatewayRows.push(...[...standingRows(lines).values()].filter((row) => row.gateway === flags["with-matches-of"] && resultOf(row) === "match"));
+    }
     const gatewayCopy = path.resolve(flags["gateway-copy"]);
     await write(gatewayCopy, gatewayRows);
     const manifest = buildShardManifest({
@@ -636,6 +733,8 @@ async function main(argv) {
       gatewayFile: { path: flags["gateway-name"], sha256: sha256Hex(await readFile(gatewayCopy)) },
       pins: await read(path.join(out, "pins.json")),
       release: { tag: flags["release-tag"], status: "not created; a separate go at submission" },
+      backgroundChecks: flags["background-gateway"] ? { gateway: flags["background-gateway"], file: flags["background-file"], status: "running after this manifest was pinned; paced to the gateway's quota (decisions.md 28.7, ruling 3); its rows are kept outside this immutable manifest" } : null,
+      extraNotes: flags["background-gateway"] ? [`The ${gatewayRows.filter((row) => row.gateway === flags["background-gateway"]).length} ${flags["background-gateway"]} rows in gateway_checks were made before any Pinata pin, so that gateway fetched them from the public network; its remaining rows are checked in the background, paced to its quota, and recorded in ${flags["background-file"]}, not in this manifest.`] : [],
     });
     await write(path.resolve(flags.output), manifest);
     const bytes = await readFile(path.resolve(flags.output));
@@ -653,7 +752,7 @@ async function main(argv) {
     console.log(JSON.stringify({ cid, size: expected.size, filebase: filebase.hash === cid, pinata: pinata.pinned ? "pinned" : pinata.error ?? pinata.job_status, gateways: checks.map((row) => `${row.gateway} ${row.bytes}`) }));
     if (!pinata.pinned || checks.some((row) => row.bytes !== "match")) process.exitCode = 1;
   } else {
-    throw new Error("usage: t6-publish.mjs <plan|tables-cars|upload|filebase-pins|gateway-check|pin|manifest|pin-manifest> --out <dir> ...");
+    throw new Error("usage: t6-publish.mjs <plan|tables-cars|upload|filebase-pins|gateway-check|gateway-paced|gateway-status|pin|pin-status|manifest|pin-manifest> --out <dir> ...");
   }
 }
 

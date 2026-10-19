@@ -1,8 +1,8 @@
 {
   "schemaVersion": "travis.t6-publication.v1",
   "run_id": "20261018T143520Z-t5-full",
-  "status": "uploaded with readback; gateway checks stopped on Pinata's hourly 429 (decisions.md 28.7)",
-  "kit_commit": "bfb3b50, 3b86fc9, 387a324 (fetch-timeout preload), 2d45598 (bounded retry)",
+  "status": "published to IPFS as the README packet: every root uploaded with readback, Filebase pins every CID, every manifest CID checked on ipfs.filebase.io, the manifest pinned on Filebase and Pinata; the remaining gateway.pinata.cloud checks run in the background; no Atlas PR (decisions.md 28.3)",
+  "kit_commit": "bfb3b50, 3b86fc9, 387a324, 2d45598, d13f340 and the pin-status reader",
   "cli": "elephant-cli 1.58.1",
   "node": "v22.22.0",
   "layout": "D: 177 shard archives as they are, no Atlas PR (decisions.md 28.3, operator's go 2026-10-19)",
@@ -2686,12 +2686,6 @@
     ],
     "remaining": 0
   },
-  "not_run": [
-    "the rest of the gateway checks",
-    "Pinata pins",
-    "manifest",
-    "manifest pin"
-  ],
   "filebase_pins": {
     "checked_at": "2026-10-19T20:39:24.561Z",
     "cids": 3283,
@@ -2700,11 +2694,66 @@
     "controls_pinned": 0,
     "all_pinned": true
   },
-  "gateway_sample": {
-    "started": "2026-10-19T20:39:24Z",
-    "stopped": "2026-10-19T21:04:18Z",
-    "jobs": "the first 5 raw roots (County archives s0001-s0005) and the first 5 parts, per gateway; deadline 10 minutes per object",
+  "gateway_checks": {
+    "ruling": "28.7 (\u03b3) and ruling 3 (2026-10-20)",
+    "manifest_rows_file": {
+      "path": "runs/20261018T143520Z-t5-full.gateway-checks.json",
+      "sha256": "7f7b56b911690f90c97b2fe17abe13a8ae233d0b9b9ad5479fec31e3c169fd2e",
+      "bytes": 1917128
+    },
     "per_gateway": {
+      "https://ipfs.filebase.io": {
+        "rows": 3285,
+        "raw": 356,
+        "file": 2929,
+        "file_bytes": 1426831183,
+        "match": 3285,
+        "mismatch": 0,
+        "unverified": 0,
+        "retried": 1547,
+        "max_attempts": 6
+      },
+      "https://gateway.pinata.cloud": {
+        "rows": 250,
+        "raw": 250,
+        "file": 0,
+        "file_bytes": 0,
+        "match": 250,
+        "mismatch": 0,
+        "unverified": 0,
+        "retried": 77,
+        "max_attempts": 4
+      }
+    },
+    "filebase": {
+      "finished": "2026-10-19T22:58:00Z",
+      "rows": 3285,
+      "match": 3285,
+      "mismatch": 0,
+      "unverified": 0,
+      "rows_retried_within_the_deadline": 1547,
+      "max_attempts": 6,
+      "extra_slow_passes": "none needed (the operator's pre-approval, 28.7, was not used)"
+    },
+    "pinata_before_pins": {
+      "rows": 250,
+      "match": 250,
+      "window": "2026-10-19T21:28:28Z-21:37:31Z",
+      "note": "made before any Pinata pin, so the gateway fetched from the public network"
+    },
+    "pinata_background": {
+      "pid": 19109,
+      "log": "/Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime/data/travis/publish/20261018T143520Z-t5-full/gateway-checks-pinata.log",
+      "jsonl": "/Users/luti/dev/ateam/role1-prism/kit-travis/skills/use-oracle/runtime/data/travis/publish/20261018T143520Z-t5-full/gateway-checks-pinata.jsonl",
+      "started": "2026-10-19T22:59:43Z",
+      "command": "caffeinate -dimsu node src/counties/travis/t6-publish.mjs gateway-paced (1 in flight, Retry-After waited out in full)",
+      "jobs": 3286,
+      "already_matched": 250,
+      "eta": "about 12 h from the start (around 2026-10-20T11:00Z), set by the gateway's hourly quota of about 250 requests",
+      "status_command": "node src/counties/travis/t6-publish.mjs gateway-status --out data/travis/publish/20261018T143520Z-t5-full --jsonl gateway-checks-pinata.jsonl --gateway https://gateway.pinata.cloud --extra-jobs 1",
+      "result_file": "runs/20261018T143520Z-t5-full.gateway-checks-pinata.json (written when it finishes)"
+    },
+    "informational_4everland_sample": {
       "https://gateway.pinata.cloud": {
         "rows": 10,
         "match": 10,
@@ -2724,224 +2773,53 @@
           "504": 8
         }
       }
+    }
+  },
+  "pins": {
+    "vendor": "pinata",
+    "roots": 354,
+    "at_bound": {
+      "bound_minutes": 45,
+      "pinned": 214,
+      "pending": {
+        "retrieving": 97,
+        "prechecking": 41,
+        "searching": 1,
+        "backfilled": 1
+      },
+      "refused": 0
     },
-    "cid_contact": "every sampled root listed 4-6 provider records on 2026-10-19 ~21:00Z",
-    "rows": [
-      {
-        "cid": "baguqeeraapcmfezjev6ux3twbhdaza5iykl5tj7ukriyravy3yn5b7cp6ueq",
-        "gateway": "https://gateway.pinata.cloud",
-        "check": "raw",
-        "status": 200,
-        "multihash": "match",
-        "attempts": 1,
-        "checked_at": "2026-10-19T20:39:30.174Z"
+    "later": {
+      "checked_at": "2026-10-19T23:01:29Z",
+      "of": "354 roots and the manifest",
+      "pinned": 274,
+      "pending": {
+        "retrieving": 81
       },
-      {
-        "cid": "baguqeeramtky5rdk5eqg7ms4wuc7ll4ljw3zpqq3lkdvu7xyk2e3pklwi6ua",
-        "gateway": "https://gateway.pinata.cloud",
-        "check": "raw",
-        "status": 200,
-        "multihash": "match",
-        "attempts": 1,
-        "checked_at": "2026-10-19T20:39:30.812Z"
-      },
-      {
-        "cid": "baguqeera2hk3k4txgzn6l4cs4k4zruc2dlsnl7jtqxd6pa7l6milfs6y73hq",
-        "gateway": "https://gateway.pinata.cloud",
-        "check": "raw",
-        "status": 200,
-        "multihash": "match",
-        "attempts": 1,
-        "checked_at": "2026-10-19T20:39:32.193Z"
-      },
-      {
-        "cid": "baguqeerajqevrlhfhnhl2llxyq7auibfmpmxosbrj5y2qedhxqudppfme6la",
-        "gateway": "https://gateway.pinata.cloud",
-        "check": "raw",
-        "status": 200,
-        "multihash": "match",
-        "attempts": 1,
-        "checked_at": "2026-10-19T20:39:32.607Z"
-      },
-      {
-        "cid": "baguqeerauwajllm55poebhkiz37fxwnumnxseqouqea7iqhzjxcmpjllbzcq",
-        "gateway": "https://gateway.pinata.cloud",
-        "check": "raw",
-        "status": 200,
-        "multihash": "match",
-        "attempts": 1,
-        "checked_at": "2026-10-19T20:39:34.652Z"
-      },
-      {
-        "cid": "bafybeicrnwfeaftbgcwhgr3rdm5xxogliaz3kgnczpkp6yvm7tkoe622xm",
-        "gateway": "https://gateway.pinata.cloud",
-        "check": "file",
-        "status": 200,
-        "multihash": null,
-        "bytes": "match",
-        "attempts": 1,
-        "checked_at": "2026-10-19T20:39:36.976Z"
-      },
-      {
-        "cid": "bafybeibuwrq5ono44czzf53vsn3pnhez57wf7etdjaunyb2hnw4hqgt3jy",
-        "gateway": "https://gateway.pinata.cloud",
-        "check": "file",
-        "status": 200,
-        "multihash": null,
-        "bytes": "match",
-        "attempts": 1,
-        "checked_at": "2026-10-19T20:39:37.697Z"
-      },
-      {
-        "cid": "bafybeiekvcyxt6pvc5erfqflh75amskhz7wxgjduuz4yg4trzlwl5exele",
-        "gateway": "https://gateway.pinata.cloud",
-        "check": "file",
-        "status": 200,
-        "multihash": null,
-        "bytes": "match",
-        "attempts": 1,
-        "checked_at": "2026-10-19T20:39:38.821Z"
-      },
-      {
-        "cid": "bafkreiaj25qr5e2jnijau4eflpo2hfrs2mpomzor3r5xkh7f225q3unyjq",
-        "gateway": "https://gateway.pinata.cloud",
-        "check": "file",
-        "status": 200,
-        "multihash": "match",
-        "bytes": "match",
-        "attempts": 1,
-        "checked_at": "2026-10-19T20:39:40.332Z"
-      },
-      {
-        "cid": "bafkreig3nqhry6wh4ftgahkyfpzyjnkfc5xajwedr5inumwoixf7wxwxaq",
-        "gateway": "https://gateway.pinata.cloud",
-        "check": "file",
-        "status": 200,
-        "multihash": "match",
-        "bytes": "match",
-        "attempts": 1,
-        "checked_at": "2026-10-19T20:39:41.420Z"
-      },
-      {
-        "cid": "baguqeeraapcmfezjev6ux3twbhdaza5iykl5tj7ukriyravy3yn5b7cp6ueq",
-        "gateway": "https://4everland.io",
-        "check": "raw",
-        "status": 200,
-        "multihash": "match",
-        "attempts": 3,
-        "checked_at": "2026-10-19T20:44:47.497Z"
-      },
-      {
-        "cid": "baguqeeramtky5rdk5eqg7ms4wuc7ll4ljw3zpqq3lkdvu7xyk2e3pklwi6ua",
-        "gateway": "https://4everland.io",
-        "check": "raw",
-        "status": 504,
-        "multihash": "unverified",
-        "attempts": 4,
-        "checked_at": "2026-10-19T20:47:26.277Z"
-      },
-      {
-        "cid": "baguqeera2hk3k4txgzn6l4cs4k4zruc2dlsnl7jtqxd6pa7l6milfs6y73hq",
-        "gateway": "https://4everland.io",
-        "check": "raw",
-        "status": 504,
-        "multihash": "unverified",
-        "attempts": 4,
-        "checked_at": "2026-10-19T20:47:26.282Z"
-      },
-      {
-        "cid": "baguqeerajqevrlhfhnhl2llxyq7auibfmpmxosbrj5y2qedhxqudppfme6la",
-        "gateway": "https://4everland.io",
-        "check": "raw",
-        "status": 504,
-        "multihash": "unverified",
-        "attempts": 4,
-        "checked_at": "2026-10-19T20:47:27.702Z"
-      },
-      {
-        "cid": "baguqeerauwajllm55poebhkiz37fxwnumnxseqouqea7iqhzjxcmpjllbzcq",
-        "gateway": "https://4everland.io",
-        "check": "raw",
-        "status": 504,
-        "multihash": "unverified",
-        "attempts": 4,
-        "checked_at": "2026-10-19T20:52:49.326Z"
-      },
-      {
-        "cid": "bafybeicrnwfeaftbgcwhgr3rdm5xxogliaz3kgnczpkp6yvm7tkoe622xm",
-        "gateway": "https://4everland.io",
-        "check": "file",
-        "status": 504,
-        "multihash": "unverified",
-        "bytes": "unverified",
-        "attempts": 4,
-        "checked_at": "2026-10-19T20:55:28.010Z"
-      },
-      {
-        "cid": "bafybeibuwrq5ono44czzf53vsn3pnhez57wf7etdjaunyb2hnw4hqgt3jy",
-        "gateway": "https://4everland.io",
-        "check": "file",
-        "status": 504,
-        "multihash": "unverified",
-        "bytes": "unverified",
-        "attempts": 4,
-        "checked_at": "2026-10-19T20:55:28.565Z"
-      },
-      {
-        "cid": "bafybeiekvcyxt6pvc5erfqflh75amskhz7wxgjduuz4yg4trzlwl5exele",
-        "gateway": "https://4everland.io",
-        "check": "file",
-        "status": 504,
-        "multihash": "unverified",
-        "bytes": "unverified",
-        "attempts": 4,
-        "checked_at": "2026-10-19T20:55:29.207Z"
-      },
-      {
-        "cid": "bafkreiaj25qr5e2jnijau4eflpo2hfrs2mpomzor3r5xkh7f225q3unyjq",
-        "gateway": "https://4everland.io",
-        "check": "file",
-        "status": 504,
-        "multihash": "unverified",
-        "bytes": "unverified",
-        "attempts": 4,
-        "checked_at": "2026-10-19T21:00:50.942Z"
-      },
-      {
-        "cid": "bafkreig3nqhry6wh4ftgahkyfpzyjnkfc5xajwedr5inumwoixf7wxwxaq",
-        "gateway": "https://4everland.io",
-        "check": "file",
-        "status": 200,
-        "multihash": "match",
-        "bytes": "match",
-        "attempts": 6,
-        "checked_at": "2026-10-19T21:04:09.197Z"
-      }
+      "refused": 0
+    }
+  },
+  "manifest": {
+    "path": "publish/20261018T143520Z-t5-full/manifest.json",
+    "cid": "bafybeid6jqqzpo2ods6iehz5vgud2ust4fykfiozspzxb3xjmqiup36ud4",
+    "size": 1466902,
+    "sha256": "4a0f3231ed7131e925f484aeb6d1448f2586ac5c9dc520b974cff678f8c009fb",
+    "objects": 3285,
+    "cars": 354,
+    "filebase_add_cid_equal": true,
+    "pinata": "pinned",
+    "filebase_gateway_full_bytes": [
+      "match"
     ]
   },
-  "gateway_checks": {
-    "gateways": [
-      "https://gateway.pinata.cloud",
-      "https://ipfs.filebase.io"
-    ],
-    "ruling": "28.7 (\u03b3), the operator's go 2026-10-20",
-    "started": "2026-10-19T21:28:24Z",
-    "stopped": "2026-10-19T21:39:20Z",
-    "jobs_per_gateway": 3285,
-    "per_gateway": {
-      "https://ipfs.filebase.io": {
-        "raw_match": 356,
-        "file_match": 235,
-        "unverified": 0,
-        "mismatch": 0
-      },
-      "https://gateway.pinata.cloud": {
-        "raw_match": 250,
-        "file_match": 0,
-        "unverified": 39,
-        "mismatch": 0
-      }
-    },
-    "stop": "gateway.pinata.cloud answered 429 from 21:37:30Z with Retry-After about 3,540 s after 250 requests in 9 minutes; the runner gives up on a wait longer than the 20-minute deadline, so its rows went unverified; the chain was stopped by hand to send no more requests into the window"
+  "atlas": {
+    "pr": null,
+    "reason": "layout D, decisions.md 28.3"
+  },
+  "ipns": null,
+  "release": {
+    "tag": "run-20261018T143520Z-t5-full",
+    "status": "not created; a separate go at submission",
+    "assets": 354
   }
 }

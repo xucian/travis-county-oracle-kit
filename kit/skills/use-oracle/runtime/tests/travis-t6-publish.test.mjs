@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 import { rawCid, readCarBlocks } from "../src/counties/travis/publish.mjs";
-import { buildPlan, buildShardManifest, cliLibraries, gatewayJobs, importFromCli, pinRoots, runGatewayChecks, summarizeGateways, unixfsCid, uploadAll, writeTablesCar, cliEnv, retryableFailure } from "../src/counties/travis/t6-publish.mjs";
+import { buildPlan, buildShardManifest, cliLibraries, gatewayJobs, importFromCli, pinRoots, runGatewayChecks, summarizeGateways, unixfsCid, uploadAll, writeTablesCar, cliEnv, retryableFailure, runPacedChecks, pinStatus } from "../src/counties/travis/t6-publish.mjs";
 
 const CLI = process.env.ELEPHANT_CLI ?? "/Users/luti/dev/oracle-property-intelligence-platform-pipeline-travis-tx/node_modules/.bin/elephant-cli";
 const hasCli = existsSync(CLI);
@@ -263,5 +263,41 @@ describe("T6 gateway checks and Pinata pins", () => {
     } finally {
       await rm(out, { recursive: true, force: true });
     }
+  });
+
+  it("paces a gateway: waits out each 429's Retry-After in full, one at a time, and stops on a mismatch or another 4xx", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "travis-t6-paced-"));
+    try {
+      const jsonl = path.join(dir, "pinata.jsonl");
+      await writeFile(jsonl, `${JSON.stringify({ cid: "done", gateway: "https://p", check: "raw", multihash: "match", attempts: 1 })}\n`);
+      const answers = { a: [{ status: 429, retry_after_s: 3540 }, { status: 200 }], b: [{ status: 429, retry_after_s: 10 }, { status: 429, retry_after_s: 10 }], c: [{ status: 200, bad: true }], d: [{ status: 200 }] };
+      const calls = [];
+      const check = async ({ cid, gateway, check: kind }) => {
+        calls.push(cid);
+        const answer = answers[cid].shift();
+        const result = answer.status === 200 ? (answer.bad ? "mismatch" : "match") : "unverified";
+        return { cid, gateway, check: kind, status: answer.status, retry_after_s: answer.retry_after_s ?? null, multihash: result, attempts: 1, url: "u", detail: null };
+      };
+      const waits = [];
+      const jobs = ["done", "a", "b", "c", "d"].map((cid) => ({ cid, check: "raw" }));
+      const { stop, rows } = await runPacedChecks({ jobs, gateway: "https://p", jsonl, check, sleepImpl: async (ms) => { waits.push(ms); }, maxRounds: 2 });
+      expect(calls).toEqual(["a", "a", "b", "b", "c"]);
+      expect(waits).toEqual([3_545_000, 15_000]);
+      expect(stop).toMatchObject({ reason: "mismatch", cid: "c" });
+      expect(rows.map((row) => [row.cid, row.multihash])).toEqual([["done", "match"], ["a", "match"], ["b", "unverified"], ["c", "mismatch"]]);
+      const refused = await runPacedChecks({ jobs: [{ cid: "x", check: "raw" }], gateway: "https://p", jsonl, check: async ({ cid, gateway }) => ({ cid, gateway, check: "raw", status: 403, multihash: "unverified", attempts: 1, detail: "forbidden" }), sleepImpl: async () => {} });
+      expect(refused.stop).toMatchObject({ reason: "HTTP 403", cid: "x" });
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("reports, read-only, how many roots Pinata lists as pinned and the job status of the rest", async () => {
+    const fetchImpl = async (url, options = {}) => {
+      expect(options.method ?? "GET").toBe("GET");
+      const body = url.includes("/data/pinList") ? { rows: [{ ipfs_pin_hash: "a" }] } : { rows: [{ ipfs_pin_hash: "b", status: "retrieving" }] };
+      return { ok: true, status: 200, json: async () => body };
+    };
+    expect(await pinStatus({ cids: ["a", "b", "c"], jwt: "j", fetchImpl })).toEqual({ roots: 3, pinned: 1, pending: { retrieving: 1 }, not_listed: 1 });
   });
 });
