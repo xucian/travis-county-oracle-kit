@@ -60,6 +60,21 @@ describe("t5-shards: plan, markers, attempts", () => {
     });
   });
 
+  it("counts every output's bytes when shards are checked concurrently into one stats object", async () => {
+    await tmp(async (dir) => {
+      const { sha256File } = await import("../src/counties/travis/t5-shards.mjs");
+      const shards = Array.from({ length: 8 }, (_, i) => path.join(dir, `s${i}`));
+      for (const [i, shard] of shards.entries()) {
+        await mkdir(path.join(shard, "out"), { recursive: true });
+        await writeFile(path.join(shard, "out", "a.car"), "x".repeat(100 + i));
+        await writeMarker(shard, "hash", { input: { car: "x" }, output: { files: [{ path: "out/a.car", sha256: await sha256File(path.join(shard, "out", "a.car")) }] }, attempt: 1, started_at: "t", ms: 1 });
+      }
+      const stats = { outputs: 0, files: 0, bytes: 0 };
+      await Promise.all(shards.map((shard) => checkMarker(shard, "hash", { car: "x" }, { stats })));
+      expect(stats).toEqual({ outputs: 8, files: 8, bytes: 8 * 100 + 28 });
+    });
+  });
+
   it("never hands out an attempt twice, across crashes and attempt directories", async () => {
     await tmp(async (dir) => {
       expect(await reserveAttempt(dir, "appraisal", "appraisal-a", null)).toBe(1);

@@ -302,8 +302,11 @@ export async function checkMarker(dir, stage, input, { rehash = true, stats = nu
     } else {
       digest = await sha256File(target);
       if (stats) {
+        // Stat before touching the shared counters: `stats.bytes += await ...` reads the total before the await and
+        // loses the other shards' additions when several markers are checked at once.
+        const { size } = await stat(target);
         stats.files += 1;
-        stats.bytes += (await stat(target)).size;
+        stats.bytes += size;
       }
     }
     if (digest !== item.sha256) return { marker, valid: false, reason: `output ${item.path} changed` };
