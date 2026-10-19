@@ -18,6 +18,9 @@
  *   decisions.md 25.9 that reproduces the T2 pilot's 505,699 counted bytes); blocks shared by both groups.
  * - **Roof-age anchors.** The parcels T4's link-pass rule anchors (completed primary-roof replacement or new
  *   construction with a confirmed `completed_date`) against the estimator's anchors in the run, with the date field used.
+ * - **The rulings of decisions.md 27.9 and 27.10.** Every seed account with a point outside the API contract's rounded box
+ *   (`county_line`) and every seed row in the shifted situs-columns pattern (`situs_columns_shifted`, the transform's
+ *   own reader), with its state in the run: ready (and, for the shifted ones, flagged in its sidecar) or dead.
  * - **Checks.** `seed = ready + dead + invalid`; link outcomes and evidence states sum to the capture; published permits
  *   and Property Improvement properties against linked ones less those on dead accounts; geometry rows against the
  *   seed's points and polygon parts; the run record's limitations recomputed from its own counts, plus what they miss.
@@ -32,11 +35,14 @@ import { open, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { readShiftedSitusColumns } from "../../../counties/travis/transforms/transform.mjs";
 import { RUNTIME_ROOT } from "./t3-snapshot.mjs";
 import { readLines, sha256File, streamCsvRecords } from "./t5-shards.mjs";
 import { TRAVIS_VALIDATION_BBOX } from "./validate.mjs";
 
-export const T5_RECONCILE_VERSION = "travis-t5-reconcile.v1";
+export const T5_RECONCILE_VERSION = "travis-t5-reconcile.v2";
+/** The API contract's rounded box, which the T5 full run's guard used before decisions.md 27.9. */
+export const TRAVIS_CONTRACT_BBOX = Object.freeze({ minLat: 30.02, maxLat: 30.63, minLng: -98.17, maxLng: -97.37 });
 const METERS_PER_DEGREE_LAT = 111_320;
 const rel = (target) => path.relative(RUNTIME_ROOT, target).split(path.sep).join("/");
 const bump = (map, key, by = 1) => {
@@ -135,8 +141,9 @@ export function classifyNoSitus(row) {
   if (value("street") !== "") return "other_parts";
   const suffix = value("street_suffix");
   const unit = value("unit");
-  // The street printed one column to the right: its name in the suffix column, its suffix word in the unit column.
-  if (suffix !== "" && /^[A-Z]{2,4}$/.test(unit)) return "columns_shifted";
+  // The street printed one column to the right (its name in the suffix column, its suffix word in the unit column),
+  // exactly as the transform reads it (situs columns v1, decisions.md 27.10).
+  if (readShiftedSitusColumns(Object.fromEntries(["num", "street_prefx", "street", "street_suffix", "unit"].map((name) => [`situs_${name}`, value(name)])))) return "columns_shifted";
   if (value("num") !== "" && suffix === "" && value("street_prefx") === "") return "number_only";
   if (value("num") === "" && suffix === "" && value("street_prefx") === "" && unit === "") return "nothing_printed";
   return "other_parts";
@@ -254,6 +261,8 @@ export async function reconcileRun({ runDir, seedPath = null }) {
   /** @type {Map<string, number[]>} */
   const holders = new Map();
   const deadRows = new Map();
+  const countyLine = [];
+  const shifted = [];
   const extent = { minLat: 90, maxLat: -90, minLng: 180, maxLng: -180 };
   const geometry = { seed_rows: 0, with_point: 0, multi_part_parcels: 0, multi_part_parts: 0, dead_with_point: 0, dead_multi_part_parcels: 0, dead_multi_part_parts: 0 };
   let header = null;
@@ -275,6 +284,7 @@ export async function reconcileRun({ runDir, seedPath = null }) {
       extent.minLng = Math.min(extent.minLng, longitude);
       extent.maxLng = Math.max(extent.maxLng, longitude);
     }
+    let vertices = [];
     if (row.parcel_polygon) {
       try {
         const polygon = JSON.parse(row.parcel_polygon);
@@ -290,10 +300,28 @@ export async function reconcileRun({ runDir, seedPath = null }) {
           }
         }
         if (isDead) row.__polygon = polygon;
+        vertices = polygonVertices(polygon);
       } catch {
         // an unparsable polygon is the seed's concern (T1); counted as no polygon here
       }
     }
+    // The county line (27.9): any point past the contract's rounded box, and whether the validation box holds it.
+    const centroidOutside = row.latitude && Number.isFinite(latitude) ? metresOutside(latitude, longitude, TRAVIS_CONTRACT_BBOX) : 0;
+    let verticesOutside = 0;
+    let maxOutside = centroidOutside;
+    let insideValidation = !row.latitude || !Number.isFinite(latitude) || metresOutside(latitude, longitude) === 0;
+    for (const [lng, lat] of vertices) {
+      const metres = metresOutside(lat, lng, TRAVIS_CONTRACT_BBOX);
+      if (metres > 0) {
+        verticesOutside += 1;
+        if (metres > maxOutside) maxOutside = metres;
+        if (metresOutside(lat, lng) > 0) insideValidation = false;
+      }
+    }
+    if (centroidOutside > 0 || verticesOutside > 0) countyLine.push({ prop_id: row.parcel_id, centroid_metres_outside: centroidOutside, vertices: vertices.length, vertices_outside: verticesOutside, max_metres_outside: maxOutside, inside_validation_box: insideValidation });
+    const tcadSitus = Object.fromEntries(["num", "street_prefx", "street", "street_suffix", "unit"].map((name) => [`situs_${name}`, row[`source_situs_${name}`] ?? ""]));
+    const reading = readShiftedSitusColumns(tcadSitus);
+    if (reading) shifted.push({ prop_id: row.parcel_id, printed: reading.printed, read_as: reading.read_as, address: row.address ?? null });
     if (isDead) deadRows.set(row.parcel_id, row);
     const geo = String(row.geo_id ?? "").trim();
     if (printed.has(geo)) (holders.get(geo) ?? holders.set(geo, []).get(geo)).push(Number(row.parcel_id));
@@ -325,6 +353,27 @@ export async function reconcileRun({ runDir, seedPath = null }) {
     facts.printed_geo_ids = geos.map((geo) => ({ geo_id: geo, permits: facts.printed_geo_ids[geo], accounts_sharing_it: holders.get(geo)?.length ?? 0, prop_ids: (holders.get(geo) ?? []).sort((left, right) => left - right) }));
     facts.every_printed_geo_id_is_shared = facts.printed_geo_ids.every((item) => item.accounts_sharing_it > 1);
   }
+
+  // The accounts of the 27.9 and 27.10 rulings: ready or dead in this run (and the shifted ones' sidecar flag).
+  const appraisalOf = new Map();
+  for (const shard of plan.shards) appraisalOf.set(shard.id, (await readJson(path.join(runDir, "shards", shard.id, "appraisal.done.json"))).output);
+  const stateOf = async (propId, { sidecar = false } = {}) => {
+    const shard = shardOf(propId);
+    const output = appraisalOf.get(shard);
+    const ready = Boolean(output?.parcels?.[propId]);
+    const out = { shard, state: ready ? "ready" : deadKeys.has(propId) ? "dead" : "absent" };
+    if (sidecar && ready) {
+      const file = path.join(runDir, "shards", shard, output.dir, propId, "source-payload.json");
+      out.sidecar_flag = existsSync(file) ? (await readJson(file)).situs_columns_shifted?.version ?? null : null;
+    }
+    return out;
+  };
+  for (const item of countyLine) Object.assign(item, await stateOf(item.prop_id));
+  for (const item of shifted) Object.assign(item, await stateOf(item.prop_id, { sidecar: true }));
+  const rulings = {
+    county_line: { box: TRAVIS_CONTRACT_BBOX, validation_box: TRAVIS_VALIDATION_BBOX, accounts: countyLine.length, ready: countyLine.filter((item) => item.state === "ready").length, dead: countyLine.filter((item) => item.state === "dead").length, all_inside_validation_box: countyLine.every((item) => item.inside_validation_box), list: countyLine },
+    situs_columns_shifted: { seed_rows_matching: shifted.length, ready: shifted.filter((item) => item.state === "ready").length, sidecar_flagged: shifted.filter((item) => item.sidecar_flag).length, list: shifted },
+  };
 
   // Sizes, per group, from the CARs themselves and the tables directories.
   const groups = {};
@@ -421,6 +470,9 @@ export async function reconcileRun({ runDir, seedPath = null }) {
     roof_age_basis_sums: Object.values(record.roof_age.by_basis).reduce((total, value) => total + value, 0) === record.roof_age.parcels,
     every_archive_passed_car_validation: record.cars.filter((car) => car.kind === "archive").every((car) => car.car_validation?.passed && Object.entries(car.car_validation).filter(([key]) => key.endsWith("_errors")).every(([, value]) => value === 0)),
     group_less_shards_have_no_linked_permit: Object.values(grouplessFacts).every((facts) => facts.link_pass_rows === 0 && facts.permit_states.done === 0),
+    county_line_accounts_ready: rulings.county_line.ready === rulings.county_line.accounts && rulings.county_line.all_inside_validation_box,
+    shifted_situs_accounts_ready_and_flagged: rulings.situs_columns_shifted.ready === rulings.situs_columns_shifted.seed_rows_matching && rulings.situs_columns_shifted.sidecar_flagged === rulings.situs_columns_shifted.seed_rows_matching,
+    every_dead_account_is_a_source_fact: dead.every((item) => item.source_fact === true),
   };
 
   // The limitations, recomputed from the record's own counts, and what they do not say.
@@ -435,33 +487,38 @@ export async function reconcileRun({ runDir, seedPath = null }) {
       tcad_permit_listing_link: has("tcad_permit_listing_link", p.by_link_method.tcad_permit_listing, record.roof_age.caveats.anchor_link_tcad_permit_listing),
       multiple_candidates: has("multiple_candidates", p.unlinked_reasons.multiple_candidates),
       invalid_quarantined: has("invalid_quarantined", p.unlinked_reasons.invalid_quarantined),
-      roofing_not_on_a_property: has("roofing_not_on_a_property", roofing.permits - roofing.linked, roofing.by_status_group.open - roofing.by_status_group_linked.open, roofing.by_status_group.stalled - roofing.by_status_group_linked.stalled),
+      roofing_not_on_a_property: has("roofing_not_on_a_property", roofing.permits - roofing.linked, roofing.by_status_group.open - roofing.by_status_group_linked.open, roofing.by_status_group.stalled - roofing.by_status_group_linked.stalled, roofing.permits - roofing.linked + deadPermitTotals.roofing, deadPermitTotals.roofing),
       needs_review_status: has("needs_review_status", p.status_group.needs_review),
       no_parcel_polygon: has("no_parcel_polygon", a.without_geometry),
       partial_history: has("partial_history", record.roof_age.by_historical_coverage.partial, record.roof_age.by_historical_coverage.unknown, record.roof_age.by_basis.year_built, record.roof_age.by_basis.none),
     },
+    // What the record does not say: each class of dead account and the permits on them, unless an item names its count.
     missing: [
       {
         source: "tcad-2026-certified-appraisal-export",
         incomplete_reason: "no_situs_street",
+        count: dead.filter((item) => item.reason === "no_situs_street" && item.source_fact).length,
         detail: `${dead.filter((item) => item.reason === "no_situs_street" && item.source_fact).length} accounts print no situs street (${byClass["no_situs_street:nothing_printed"] ?? 0} print no situs part at all, ${byClass["no_situs_street:number_only"] ?? 0} only a house number): permanent failures, not published`,
       },
       {
         source: "tcad-2026-certified-appraisal-export",
         incomplete_reason: "situs_columns_shifted",
+        count: byClass["no_situs_street:columns_shifted"] ?? 0,
         detail: `${byClass["no_situs_street:columns_shifted"] ?? 0} accounts print the street one column to the right (the name in the suffix column, the suffix in the unit column): refused as a blank street, not published (decisions.md 27)`,
       },
       {
         source: "pipeline",
         incomplete_reason: "outside_validation_bbox",
-        detail: `${byClass.outside_validation_bbox ?? 0} accounts on the county line refused by the adapter's rounded bounding box although TCAD appraises them and the TNR layer draws them: a pipeline defect, not a source gap (decisions.md 27)`,
+        count: byClass.outside_validation_bbox ?? 0,
+        detail: `${byClass.outside_validation_bbox ?? 0} accounts on the county line refused by the validation box although TCAD appraises them and the TNR layer draws them: a pipeline defect, not a source gap (decisions.md 27)`,
       },
       {
         source: "austin-issued-construction-permits/3syk-w9eu",
         incomplete_reason: "linked_to_dead_account",
+        count: deadPermitTotals.permits,
         detail: `${deadPermitTotals.permits} linked permits (${deadPermitTotals.roofing} roofing) sit on ${Object.keys(deadPermits).length} dead accounts: loaded internally, shown on no property; with them ${(roofing.permits - roofing.linked + deadPermitTotals.roofing).toLocaleString("en-US")} roofing permits are shown on no property, not ${(roofing.permits - roofing.linked).toLocaleString("en-US")}`,
       },
-    ],
+    ].filter((item) => item.count > 0 && !has(item.incomplete_reason, item.count)),
   };
 
   return {
@@ -471,11 +528,12 @@ export async function reconcileRun({ runDir, seedPath = null }) {
     seed: rel(seed),
     dead: { total: dead.length, by_class: byClass, source_facts: dead.filter((item) => item.source_fact === true).length, not_source_facts: dead.filter((item) => item.source_fact === false).length, shards: [...new Set(dead.map((item) => item.shard))].sort(), linked_permits: deadPermitTotals, validation_bbox: TRAVIS_VALIDATION_BBOX, tnr_point_extent: extent, accounts: dead },
     shards_without_property_improvement: grouplessFacts,
+    rulings,
     geometry,
     sizes,
     roof_age_anchors: anchors,
     checks,
-    all_checks_pass: Object.values(checks).every(Boolean) && anchors.reconciles && Object.values(limitations.recomputed).every(Boolean),
+    all_checks_pass: Object.values(checks).every(Boolean) && anchors.reconciles && Object.values(limitations.recomputed).every(Boolean) && limitations.missing.length === 0,
     limitations,
     seconds: Math.round((Date.now() - started) / 100) / 10,
   };
@@ -508,6 +566,8 @@ async function main() {
       shards_without_property_improvement: Object.fromEntries(Object.entries(report.shards_without_property_improvement).map(([id, facts]) => [id, { accounts: facts.accounts, linked: facts.linked, permits_printing_a_geo_id: facts.permits_printing_a_geo_id, their_link_state: facts.their_link_state, every_printed_geo_id_is_shared: facts.every_printed_geo_id_is_shared }])),
       sizes_gb: { county: s.groups.county?.gb, property_improvement: s.groups.property_improvement?.gb, total: s.total.gb, distinct_across_groups: s.distinct_across_groups.gb },
       roof_age_anchors: { t4_rule: report.roof_age_anchors.t4_rule_parcels, estimator: report.roof_age_anchors.estimator_parcels, only_estimator: report.roof_age_anchors.only_estimator, only_t4_rule_dead: report.roof_age_anchors.only_t4_rule_dead },
+      rulings: { county_line: { accounts: report.rulings.county_line.accounts, ready: report.rulings.county_line.ready }, situs_columns_shifted: { seed_rows_matching: report.rulings.situs_columns_shifted.seed_rows_matching, ready: report.rulings.situs_columns_shifted.ready, sidecar_flagged: report.rulings.situs_columns_shifted.sidecar_flagged } },
+      failed_checks: Object.entries(report.checks).filter(([, ok]) => !ok).map(([name]) => name),
       limitations_missing: report.limitations.missing.length,
       seconds: report.seconds,
     }),

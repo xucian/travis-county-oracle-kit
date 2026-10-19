@@ -32,6 +32,15 @@
  * names the run. A verification compares the code each stage ran as of the run's kit commit (`run.json` `kit_commit`),
  * so a later commit is reported (`code_since_run`) and not mistaken for a changed input.
  *
+ * Scoped rerun (`--rerun-shards s0039,s0040,...`, decisions.md 27.9 option A): a finished run is reopened in place, the
+ * named shards rerun every stage whose input changed, and every other shard is re-certified, not recomputed
+ * (`t5-recertify.mjs`): a marker whose input changed only through the code digest is rewritten with the new input once
+ * the text proof of every changed file and the shard's own facts show the change cannot reach it, keeping its old input
+ * digest; anything else stops the run and names the shard. The rerun shards go first, and no marker is re-certified
+ * until each of them has shown that its earlier parcels came out byte for byte the same (`rerun_comparison`). The Loader
+ * finalizes again and `run.json` is rewritten with the new attempt. The kit must be committed (the record names the
+ * commit). A scoped rerun that stops resumes with the same command.
+ *
  * Exit: after `done` (or a failure, or a signal) the runner flushes its output and exits explicitly, so no stray handle
  * can keep it alive, and first arms a detached exit watchdog: if the process is still there 30 seconds later (the T5
  * full run of 2026-10-18 printed `done` and then stalled inside Node's own teardown, the main thread joining a libuv
@@ -39,7 +48,7 @@
  *
  *   node --max-old-space-size=8192 src/counties/travis/t5-run.mjs --cli <elephant-cli> --eligibility __ALL__ \
  *     [--seed data/seeds/travis.csv] [--label full] [--shard-size 5000] [--concurrency 8] [--max-shards <n>] \
- *     [--loader-scope <name>] [--manifest <file>] [--resume <dir|latest>] [--new] [--verify] [--reopen]
+ *     [--loader-scope <name>] [--manifest <file>] [--resume <dir|latest>] [--new] [--verify] [--reopen] [--rerun-shards <ids>]
  *
  * No upload, pin or Atlas PR (T6). The only network request is the lexicon manifest (none when verifying).
  *
@@ -75,6 +84,7 @@ import { atomicWrite, checkMarker, dataDirDigest, DEFAULT_SHARD_SIZE, digestOf, 
 import { DEFAULT_OUT_DIR as DEFAULT_TCAD_EXTRAS_DIR, EXTRAS_FILENAME } from "./t5-tcad-extras.mjs";
 import { TRAVIS_PERMIT_SOURCE_HOSTS, assertOutputContract, assertTravisIdentity } from "./validate.mjs";
 import { buildRunRecord } from "./t5-record.mjs";
+import { codeChanges, compareRerun, recertifyStage } from "./t5-recertify.mjs";
 
 export const T5_RUN_VERSION = "travis-t5-run.v1";
 export const LEXICON_MANIFEST_URL = "https://lexicon.elephant.xyz/api/manifest";
@@ -94,9 +104,70 @@ export const STAGE_CODE = Object.freeze({
   loader: ["src/counties/travis/t5-loader.mjs"],
 });
 
+/** The `STAGE_CODE` entry each stage's `code` input digests (stages without one take no code input). */
+export const CODE_STAGE_OF = Object.freeze({ link: "link", appraisal: "appraisal", permits: "permits", reconcile: "reconcile", merge: "loader", loader: "loader" });
+/** The stages a scoped rerun compares with the run's before anything is re-certified. */
+export const COMPARED_STAGES = Object.freeze(["appraisal", "permits"]);
+
 const rel = (target) => path.relative(RUNTIME_ROOT, target).split(path.sep).join("/");
 const round = (value, digits = 1) => Math.round(value * 10 ** digits) / 10 ** digits;
 const nowIso = () => new Date().toISOString();
+
+/**
+ * The state of one scoped rerun: which shards rerun, the code changes and their proofs, and the gate every
+ * re-certification waits on (it opens once each rerun shard's appraisal and permits stages compared identical).
+ */
+export class ScopedRerun {
+  /**
+   * @param {{ shards: string[], commit: string, changes: Record<string, any>, codeAtRun: Record<string, string> }} options - Scope.
+   */
+  constructor({ shards, commit, changes, codeAtRun }) {
+    this.shards = new Set(shards);
+    this.commit = commit;
+    this.changes = changes;
+    this.codeAtRun = codeAtRun;
+    this.settled = new Map();
+    this.comparisons = {};
+    this.recertified = { shards: new Set(), stages: {} };
+    this.failure = null;
+    this.gatePromise = new Promise((resolve, reject) => {
+      this.open = resolve;
+      this.close = reject;
+    });
+    this.gatePromise.catch(() => {});
+    if (this.shards.size === 0) this.open(undefined);
+  }
+
+  /** @param {string | undefined} shard @returns {boolean} Whether the shard reruns. */
+  reruns(shard) {
+    return Boolean(shard) && this.shards.has(/** @type {string} */ (shard));
+  }
+
+  /**
+   * Record a rerun shard's comparison of one stage; the gate opens when all are identical and closes on the first that is not.
+   *
+   * @param {string} shard - Shard id.
+   * @param {string} stage - `appraisal` or `permits`.
+   * @param {boolean} ok - Identical.
+   * @param {Record<string, any> | string | null} detail - The comparison, or why it failed.
+   */
+  settle(shard, stage, ok, detail = null) {
+    this.settled.set(`${shard}/${stage}`, ok);
+    if (detail && typeof detail === "object") (this.comparisons[shard] ??= {})[stage] = detail;
+    if (!ok && !this.failure) {
+      this.failure = `${shard} ${stage}: ${typeof detail === "string" ? detail : "the rerun changed earlier parcels"}`;
+      this.close(new Error(`the scoped rerun stops before re-certifying anything: ${this.failure}`));
+      return;
+    }
+    const needed = [...this.shards].flatMap((id) => COMPARED_STAGES.map((name) => `${id}/${name}`));
+    if (!this.failure && needed.every((key) => this.settled.get(key) === true)) this.open(undefined);
+  }
+
+  /** @returns {Promise<void>} Resolves once every rerun shard compared identical. */
+  gate() {
+    return this.gatePromise;
+  }
+}
 
 /**
  * Digest of the files a stage runs.
@@ -459,9 +530,26 @@ export class T5Run {
       return { ...verdict.marker, skipped: true };
     }
     const check = await checkMarker(dir, stage, input);
+    const scoped = this.scoped ?? null;
+    // In a scoped rerun, a rerun shard's appraisal and permits stages are compared with the run's (the gate).
+    const compared = Boolean(scoped?.reruns(meta.shard)) && COMPARED_STAGES.includes(stage);
     if (check.valid) {
       this.stageCounts.skipped += 1;
+      if (compared) scoped.settle(meta.shard, stage, check.marker.output?.rerun_comparison ? check.marker.output.rerun_comparison.identical === true : true, check.marker.output?.rerun_comparison ?? null);
       return { ...check.marker, skipped: true };
+    }
+    // Outside the scope (another shard, or the link pass) a stage is re-certified, never recomputed; the Loader's finalize reruns.
+    if (scoped && !scoped.reruns(meta.shard) && !(meta.shard === undefined && stage === "loader")) {
+      const label = meta.shard ?? "global";
+      if (check.reason !== "input changed") throw Object.assign(new Error(`${label} ${stage} is outside --rerun-shards and its marker does not hold (${check.reason}); add the shard to --rerun-shards or repair it`), { recertifyRefused: true });
+      if (meta.shard) await scoped.gate();
+      const codeStage = CODE_STAGE_OF[stage] ?? null;
+      const marker = await recertifyStage({ dir, stage, input, marker: check.marker, codeStage: codeStage ?? stage, codeAtRun: codeStage ? scoped.codeAtRun[codeStage] : "", changes: scoped.changes, attempt: this.attempt.attempt, label, appraisalMarker: meta.appraisalMarker ?? null });
+      this.stageCounts.recertified = (this.stageCounts.recertified ?? 0) + 1;
+      scoped.recertified.stages[stage] = (scoped.recertified.stages[stage] ?? 0) + 1;
+      if (meta.shard) scoped.recertified.shards.add(meta.shard);
+      await appendFile(path.join(this.runDir, "stages.jsonl"), `${JSON.stringify({ at: nowIso(), dir: rel(dir), stage, attempt: marker.attempt, recertified: true, from_input_digest: marker.recertified.at(-1).from_input_digest, pid: process.pid })}\n`);
+      return { ...marker, skipped: true };
     }
     if (this.stopping) throw new Error("interrupted");
     const attempt = await reserveAttempt(dir, stage, meta.attemptPrefix ?? null, check.marker);
@@ -470,7 +558,20 @@ export class T5Run {
     if (meta.shard) this.inFlight.set(meta.shard, stage);
     // A task that returns has finished its work (a CLI task throws when its process was stopped), so its marker is
     // written even while the run is stopping: that work is never redone.
-    const output = await task(attempt);
+    let output;
+    try {
+      output = await task(attempt);
+    } catch (error) {
+      if (compared) scoped.settle(meta.shard, stage, false, error instanceof Error ? error.message : String(error));
+      throw error;
+    }
+    if (compared) {
+      // The rerun's own evidence: every parcel the run had ready comes out byte for byte the same; only parcels that were dead change.
+      const comparison = check.marker ? await compareRerun({ dir, stage, before: check.marker, after: { output } }) : { stage, identical: false, reason: "no earlier marker to compare with" };
+      output.rerun_comparison = comparison;
+      scoped.settle(meta.shard, stage, comparison.identical === true, comparison);
+      if (comparison.identical !== true) throw new Error(`${meta.shard} ${stage}: the rerun changed what the run had written (${JSON.stringify(comparison.changed ?? comparison.reason ?? null).slice(0, 300)}); nothing is re-certified`);
+    }
     const marker = await writeMarker(dir, stage, { input, output, attempt, started_at: startedAt, ms: Math.round(performance.now() - started), redone_because: check.reason });
     this.stageCounts.run += 1;
     await appendFile(path.join(this.runDir, "stages.jsonl"), `${JSON.stringify({ at: marker.finished_at, dir: rel(dir), stage, attempt, ms: marker.ms, redone_because: check.reason, pid: process.pid })}\n`);
@@ -875,7 +976,7 @@ export class T5Run {
         }
         return { data_dir: `permit-data-a${attempt}`, counts, linked, published, conflicting, by_link_method: byMethod, states, failures, artifact_digest: digestOf(states), files: [] };
       },
-      { attemptPrefix: null, shard: shard.id },
+      { attemptPrefix: null, shard: shard.id, appraisalMarker: appraisal },
     );
 
     // Roof age and the internal query table.
@@ -1109,7 +1210,10 @@ export class T5Run {
       ],
       (result, parsed) => (result.code !== 0 ? "export-tables failed" : !parsed.tables ? "no Tables line" : null),
     );
-    return { validate, hash, car_validate: carValidate, export_tables: exportTables, car: { path: rel(path.join(chainDir, `${name}.car`)), sha256: carSha, bytes: (await stat(path.join(chainDir, `${name}.car`))).size } };
+    // A rerun whose CAR comes out byte for byte the same keeps the CAR validation and the tables of the earlier chain
+    // (their inputs, the CAR's SHA-256, are unchanged), so the tables are read where export-tables wrote them.
+    const tablesChain = path.join(dir, exportTables.output.chain_dir ?? validate.output.chain_dir);
+    return { validate, hash, car_validate: carValidate, export_tables: exportTables, car: { path: rel(path.join(chainDir, `${name}.car`)), sha256: carSha, bytes: (await stat(path.join(chainDir, `${name}.car`))).size }, tables: { dir: rel(path.join(tablesChain, "tables")), export_json: rel(path.join(tablesChain, "tables-export.json")) } };
   }
 
   /** The Loader finalize stage's input: every shard's merge digest, the scope, the seed coverage and the code. */
@@ -1250,11 +1354,59 @@ export class T5Run {
     await appendFile(path.join(this.runDir, "progress.jsonl"), `${JSON.stringify({ at: nowIso(), phase: this.phase, shards_done: done, shards_total: total, in_flight: Object.fromEntries(this.inFlight), parcels_done: parcelsDone, parcels_total: parcelsTotal, elapsed_ms: Math.round(elapsed), eta_ms: eta.eta_ms, parcels_per_hour: eta.parcels_per_hour, cli_processes: sample.cli_processes, cli_rss_bytes: sample.cli_rss_bytes, runner_rss_bytes: runnerRss, swap_used_bytes: swap })}\n`);
   }
 
+  /**
+   * Prepare a scoped rerun (`--rerun-shards`, or the one a stopped attempt left active), read-only: the run's kit commit,
+   * a committed Travis tree, the code changes since that commit with their proofs, and the code each stage ran. A refusal
+   * here writes nothing, so a finished run stays finished.
+   */
+  async prepareScope() {
+    const state = existsSync(this.statePath) ? JSON.parse(await readFile(this.statePath, "utf8")) : null;
+    const active = state?.scoped_rerun?.active ? state.scoped_rerun : null;
+    const asked = this.options.rerunShards ?? null;
+    if (!active && !asked) return;
+    if (active && asked && digestOf([...active.shards].sort()) !== digestOf([...asked].sort())) throw new Error(`run ${rel(this.runDir)} has a scoped rerun of ${active.shards.join(",")} in progress; resume it with those shards`);
+    const shards = [...(active?.shards ?? asked)].sort();
+    const planMarker = path.join(this.globalDir, "plan.done.json");
+    const planned = existsSync(planMarker) ? new Set(JSON.parse(await readFile(planMarker, "utf8")).output.shards.map((shard) => shard.id)) : new Set();
+    const unknown = shards.filter((id) => !planned.has(id));
+    if (unknown.length > 0) throw new Error(`--rerun-shards names ${unknown.join(", ")}, not shards of this run's plan`);
+    let commit = active?.kit_commit_at_run ?? null;
+    if (!commit) {
+      const saved = existsSync(path.join(this.runDir, "run.json")) ? JSON.parse(await readFile(path.join(this.runDir, "run.json"), "utf8")) : null;
+      commit = typeof saved?.kit_commit === "string" && /^[0-9a-f]{7,40}$/.test(saved.kit_commit) ? saved.kit_commit : null;
+      if (!commit) throw new Error(`run.json of ${rel(this.runDir)} names no clean kit commit (${String(saved?.kit_commit ?? "none")}): a scoped rerun re-certifies against the code the run ran`);
+    }
+    if (!this.options.allowDirty) {
+      const dirty = await new Promise((resolve) => execFile("git", ["-C", RUNTIME_ROOT, "status", "--porcelain", "--", "src/counties/travis", "counties/travis", "src/roof-age"], (error, stdout) => resolve(error ? "git status failed" : String(stdout).trim())));
+      if (dirty) throw new Error(`the Travis code has uncommitted changes (${dirty.split("\n").slice(0, 3).join("; ")}): commit them first; the record names the commit the rerun ran and every proof compares with it`);
+    }
+    const changes = this.options.codeChanges ?? (await codeChanges({ commit, stageCode: STAGE_CODE }));
+    const unproven = Object.entries(changes.files).filter(([, item]) => item.at_run_sha256 !== item.now_sha256 && !item.holds);
+    if (unproven.length > 0) throw new Error(`the stage code changed since kit ${commit} where no proof holds (${unproven.map(([file, item]) => `${file}: ${item.detail}`).join("; ")}); nothing was rerun`);
+    const codeAtRun = this.options.codeAtRun ?? Object.fromEntries(await Promise.all(Object.entries(STAGE_CODE).map(async ([name, files]) => [name, await codeDigestAtCommit(commit, files)])));
+    this.scoped = new ScopedRerun({ shards, commit, changes, codeAtRun });
+    this.scopeState = active ?? { active: true, shards, kit_commit_at_run: commit, started_at: nowIso(), attempts: [] };
+  }
+
+  /** The scoped rerun's summary for the record: the shards, the commits and every changed file with its proof. */
+  scopeSummary() {
+    const files = Object.entries(this.scoped.changes.files)
+      .filter(([, item]) => item.at_run_sha256 !== item.now_sha256)
+      .map(([file, item]) => ({ file, stages: item.stages, proof: item.proof, holds: item.holds, at_run_sha256: item.at_run_sha256, now_sha256: item.now_sha256, detail: item.detail }));
+    return { shards: [...this.scoped.shards], kit_commit_at_run: this.scoped.commit, started_at: this.scopeState.started_at, ended_at: this.attempt.ended_at, attempts: this.state.scoped_rerun.attempts, code_changes: files };
+  }
+
   /** The whole run. Returns the run record (or throws; markers keep what finished). */
   async run() {
     this.started = performance.now();
     this.phase = "starting";
+    await this.prepareScope();
     const resumed = await this.open();
+    if (this.scoped) {
+      this.state.scoped_rerun = { ...this.scopeState, attempts: [...(this.scopeState.attempts ?? []), this.attempt.attempt] };
+      await this.saveState();
+      this.log(`[t5] scoped rerun of ${[...this.scoped.shards].join(", ")}: every other shard is re-certified against kit ${this.scoped.commit} (${Object.values(this.scoped.changes.files).filter((item) => item.at_run_sha256 !== item.now_sha256).length} changed file(s), each with a proof that holds)`);
+    }
     if (this.options.installSignals !== false) this.installSignals();
     this.noSleep = this.holdNoSleep();
     process.env.ELEPHANT_SKIP_UPDATE_CHECK = "1";
@@ -1270,7 +1422,8 @@ export class T5Run {
       this.phase = "shards";
       // Shards whose merge marker already matches are skipped by their stages; count them for the ETA.
       this.poolStarted = performance.now();
-      const queue = [...this.plan.shards];
+      // A scoped rerun starts its rerun shards first: every re-certification waits on their comparisons.
+      const queue = this.scoped ? [...this.plan.shards.filter((shard) => this.scoped.reruns(shard.id)), ...this.plan.shards.filter((shard) => !this.scoped.reruns(shard.id))] : [...this.plan.shards];
       const failures = [];
       const worker = async () => {
         while (queue.length > 0 && !this.stopping) {
@@ -1324,6 +1477,10 @@ export class T5Run {
       this.attempt.ended_at = nowIso();
       this.state.status = "finished";
       this.state.finished_at = this.attempt.ended_at;
+      if (this.scoped) {
+        this.state.scoped_reruns = [...(this.state.scoped_reruns ?? []), this.scopeSummary()];
+        this.state.scoped_rerun = null;
+      }
       await this.saveState();
       const record = await buildRunRecord({ run: this, loader: loader.output, history: await loadHistory(this.loaderDir), t3: await t3Watermarks([path.join(RUNTIME_ROOT, "data", "travis", "registry"), path.join(RUNTIME_ROOT, "data", "travis", "licensing")]), diskBytes: await bytesUnder(this.runDir) });
       await atomicWrite(path.join(this.runDir, "run.json"), `${JSON.stringify(record, null, 1)}\n`);
@@ -1410,6 +1567,11 @@ export async function resolveOptions(flags) {
   const label = typeof flags.label === "string" ? flags.label : "full";
   if (flags.new && (flags.verify || flags.reopen || typeof flags.resume === "string")) throw new Error("--new starts a fresh run; it does not combine with --verify, --reopen or --resume");
   if (flags.verify && flags.reopen) throw new Error("--verify is read-only; it does not combine with --reopen");
+  const rerunShards = typeof flags["rerun-shards"] === "string" ? flags["rerun-shards"].split(",").map((id) => id.trim()).filter(Boolean) : null;
+  if (flags["rerun-shards"] !== undefined) {
+    if (flags.new || flags.verify || flags.reopen) throw new Error("--rerun-shards reruns some shards of an existing run in place; it does not combine with --new, --verify or --reopen");
+    if (!rerunShards || rerunShards.length === 0 || !rerunShards.every((id) => /^s\d{4}$/.test(id)) || new Set(rerunShards).size !== rerunShards.length) throw new Error("--rerun-shards takes distinct shard ids separated by commas (s0039,s0040)");
+  }
   let runDir = null;
   if (typeof flags.resume === "string") runDir = flags.resume === "latest" ? await latestUnfinished(runsDir, label) : path.resolve(flags.resume);
   else if (!flags.new) runDir = (await latestRun(runsDir, label))?.dir ?? null;
@@ -1421,7 +1583,9 @@ export async function resolveOptions(flags) {
   const finished = savedState?.status === "finished";
   if (flags.verify && !savedState) throw new Error(`no T5 run with label ${label} under ${rel(runsDir)} to verify`);
   if (flags.reopen && !finished) throw new Error("--reopen applies to a finished run; an unfinished one resumes with the same command");
-  const mode = flags.verify ? "verify-full" : finished && !flags.reopen ? "verify-quick" : "run";
+  const activeScope = savedState?.scoped_rerun?.active ? [...savedState.scoped_rerun.shards].sort() : null;
+  if (rerunShards && !finished && !(activeScope && activeScope.join(",") === [...rerunShards].sort().join(","))) throw new Error(`--rerun-shards applies to a finished run (or resumes the scoped rerun in progress with the same shards)${savedState ? "" : `; no T5 run with label ${label} under ${rel(runsDir)}`}`);
+  const mode = flags.verify ? "verify-full" : finished && !flags.reopen && !rerunShards ? "verify-quick" : "run";
   const pick = (flag, savedKey, fallback) => (typeof flags[flag] === "string" ? flags[flag] : saved?.[savedKey] ?? fallback);
   const eligibility = pick("eligibility", "eligibility", process.env[ELIGIBILITY_ENV] ?? null);
   if (!eligibility) throw new Error(`--eligibility is required (${ELIGIBILITY_ENV}): __ALL__ for the full run (decisions.md 25.9)`);
@@ -1461,7 +1625,8 @@ export async function resolveOptions(flags) {
     progressIntervalMs: Number(typeof flags["progress-seconds"] === "string" ? flags["progress-seconds"] : 60) * 1000,
     noCaffeinate: flags["no-caffeinate"] === true,
     mode,
-    reopen: flags.reopen === true,
+    reopen: flags.reopen === true || Boolean(rerunShards),
+    rerunShards: rerunShards ? [...rerunShards].sort() : null,
   };
   if (!Number.isInteger(options.shardSize) || options.shardSize < 1 || options.shardSize > DEFAULT_SHARD_SIZE) throw new Error(`--shard-size must be 1-${DEFAULT_SHARD_SIZE} (the kit's CAR cap)`);
   if (!Number.isInteger(options.concurrency) || options.concurrency < 1) throw new Error("--concurrency must be a positive integer");
@@ -1481,7 +1646,8 @@ async function main() {
       console.log(JSON.stringify(report));
       code = report.status === "verified" ? 0 : 3;
     } else {
-      if (options.reopen) console.log(`[t5] reopening finished run ${rel(options.runDir)} (--reopen): stages whose inputs changed rerun and run.json is rewritten with a new attempt`);
+      if (options.rerunShards) console.log(`[t5] scoped rerun of ${options.rerunShards.join(", ")} in ${rel(options.runDir)} (--rerun-shards): those shards rerun the stages whose inputs changed, every other shard is re-certified (never recomputed) or the run stops, and run.json is rewritten with a new attempt`);
+      else if (options.reopen) console.log(`[t5] reopening finished run ${rel(options.runDir)} (--reopen): stages whose inputs changed rerun and run.json is rewritten with a new attempt`);
       const record = await run.run();
       const county = record.counts.appraisal;
       console.log(
@@ -1498,6 +1664,8 @@ async function main() {
           permits_published: record.counts.permits.published,
           roof_age_eligible: record.roof_age.eligible,
           wall_h: round(record.timings.wall_ms / 3_600_000, 2),
+          last_attempt_h: round(record.timings.last_attempt_ms / 3_600_000, 2),
+          ...(record.scoped_reruns?.length ? { scoped_rerun: { shards: record.scoped_reruns.at(-1).shards, recertified: record.scoped_reruns.at(-1).recertified } } : {}),
           run_record: rel(path.join(options.runDir, "run.json")),
         }),
       );

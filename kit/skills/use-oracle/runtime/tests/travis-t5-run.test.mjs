@@ -9,8 +9,9 @@ import { ELIGIBILITY_ENV } from "../src/counties/travis/eligibility.mjs";
 import { harvestAustinPermits } from "../src/counties/travis/t4-permit-fetch.mjs";
 import { buildTcadPermitListing } from "../src/counties/travis/t4-tcad-permit-listing.mjs";
 import { IMP_ATR_FIELDS, IMP_INFO_FIELDS, LAND_DET_FIELDS, PROP_ENT_FIELDS, PROP_EXTRA_FIELDS, buildTcadExtras } from "../src/counties/travis/t5-tcad-extras.mjs";
-import { T5Run, armExitWatchdog, estimateEta, formatDuration, invalidPropertiesFromErrors, parseFlags, resolveOptions } from "../src/counties/travis/t5-run.mjs";
+import { STAGE_CODE, T5Run, armExitWatchdog, codeDigest, estimateEta, formatDuration, invalidPropertiesFromErrors, parseFlags, resolveOptions } from "../src/counties/travis/t5-run.mjs";
 import { currentGeneration, loadHistory } from "../src/counties/travis/t5-loader.mjs";
+import { digestOf } from "../src/counties/travis/t5-shards.mjs";
 import { context, socrata, tcadAccount, withOut, writeSpecialExport } from "./travis-t4-socrata-mock.mjs";
 
 const RUNTIME = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -425,6 +426,155 @@ describe("T5 runner verification of a finished run (read-only)", () => {
       await writeFile(statePath, JSON.stringify({ ...JSON.parse(await readFile(statePath, "utf8")), status: "interrupted" }));
       await expect(resolveOptions(parseFlags([...flags, "--reopen"]))).rejects.toThrow(/--reopen applies to a finished run/);
       expect((await resolveOptions(parseFlags(flags))).mode).toBe("run");
+    });
+  });
+});
+
+/**
+ * Make a finished test run look as if its link, appraisal and permits stages ran an earlier kit commit's code (the
+ * markers' `code` inputs), with 900002 refused by that code's guard in s0002; the run record names that commit.
+ */
+async function asIfEarlierCode(runDir, { refuseInRun = "s0002", extraRefusalIn = null, tamperRerunDigest = false } = {}) {
+  const patch = async (file, edit) => {
+    const marker = JSON.parse(await readFile(file, "utf8"));
+    edit(marker);
+    marker.input_digest = digestOf(marker.input);
+    await writeFile(file, `${JSON.stringify(marker, null, 1)}\n`);
+  };
+  await patch(path.join(runDir, "global", "link.done.json"), (marker) => (marker.input.code = "earlier-link"));
+  for (const shard of ["s0001", "s0002"]) {
+    await patch(path.join(runDir, "shards", shard, "appraisal.done.json"), (marker) => {
+      marker.input.code = "earlier-appraisal";
+      if (shard === refuseInRun) {
+        const [key] = Object.keys(marker.output.parcels);
+        if (tamperRerunDigest) marker.output.parcels[key] = "0".repeat(64);
+        else {
+          delete marker.output.parcels[key];
+          marker.output.dead.push({ key, reason: "permanent_failure", evidence: "coordinate 30.64,-97.9 is outside the Travis bbox" });
+        }
+        marker.output.artifact_digest = digestOf(marker.output.parcels);
+      }
+      if (shard === extraRefusalIn) marker.output.dead.push({ key: "900099", reason: "permanent_failure", evidence: "coordinate 30.64,-97.9 is outside the Travis bbox" });
+    });
+    await patch(path.join(runDir, "shards", shard, "permits.done.json"), (marker) => (marker.input.code = "earlier-permits"));
+  }
+  const recordPath = path.join(runDir, "run.json");
+  await writeFile(recordPath, JSON.stringify({ ...JSON.parse(await readFile(recordPath, "utf8")), kit_commit: "abc1234" }));
+}
+
+/** The code changes of decisions.md 27.9 and 27.10 as the scoped rerun sees them (each with a proof that holds). */
+const earlierChanges = (holds = true) => ({
+  commit: "abc1234",
+  files: {
+    "counties/travis/transforms/transform.mjs": { stages: ["appraisal"], at_run_sha256: "a1", now_sha256: "a2", proof: "situs_columns_branch", holds: true, detail: "test: the situs-columns blocks" },
+    "src/counties/travis/validate.mjs": { stages: ["appraisal", "permits"], at_run_sha256: "b1", now_sha256: "b2", proof: "validation_box_widened", holds, detail: holds ? "test: the box widened" : "test: validate.mjs changed outside the box declaration" },
+    "src/counties/travis/t5-run.mjs": { stages: ["link"], at_run_sha256: "c1", now_sha256: "c2", proof: "link_stage_unchanged", holds: true, detail: "test: the plan and link stages are the run's" },
+  },
+  stages: { link: ["src/counties/travis/t5-run.mjs"], appraisal: ["counties/travis/transforms/transform.mjs", "src/counties/travis/validate.mjs"], permits: ["src/counties/travis/validate.mjs"], reconcile: [], loader: [] },
+});
+
+async function scopedRun(flags, shards, extra = {}) {
+  const options = await resolveOptions(parseFlags([...flags, "--rerun-shards", shards]));
+  const codeAtRun = { link: "earlier-link", appraisal: "earlier-appraisal", permits: "earlier-permits", reconcile: await codeDigest(STAGE_CODE.reconcile), loader: await codeDigest(STAGE_CODE.loader) };
+  const run = new T5Run({ ...options, log: () => {}, installSignals: false, progressIntervalMs: 3_600_000, allowDirty: true, codeChanges: earlierChanges(), codeAtRun, ...extra });
+  return { run, options, record: await run.run() };
+}
+
+describe("T5 scoped rerun (--rerun-shards, decisions.md 27.9 option A)", () => {
+  it("reruns only the named shard, re-certifies the other shard and the link pass in place, and the record and a verification agree", async () => {
+    await withOut(async (out) => {
+      const flags = await setup(out);
+      const first = await runInProcess(flags);
+      await asIfEarlierCode(first.options.runDir);
+      const before = await markers(first.options.runDir);
+      const { run, record } = await scopedRun(flags, "s0002");
+      const after = await markers(first.options.runDir);
+      // s0001: every marker keeps its attempt and outputs; appraisal and permits are re-certified with the old digest kept.
+      for (const key of Object.keys(before).filter((name) => name.startsWith("shards/s0001/"))) {
+        expect(after[key].attempt, key).toBe(before[key].attempt);
+        expect(after[key].files, key).toEqual(before[key].files);
+      }
+      const recertified = JSON.parse(await readFile(path.join(first.options.runDir, "shards", "s0001", "appraisal.done.json"), "utf8"));
+      expect(recertified.recertified).toHaveLength(1);
+      expect(recertified.recertified[0]).toMatchObject({ from_input_digest: before["shards/s0001/appraisal.done.json"].input, from_code: "earlier-appraisal", kit_commit_at_run: "abc1234", parcels_rehashed: 1 });
+      expect(recertified.recertified[0].proofs.map((item) => item.proof).sort()).toEqual(["situs_columns_branch", "validation_box_widened"]);
+      expect(recertified.input.code).toBe(await codeDigest(STAGE_CODE.appraisal));
+      const link = JSON.parse(await readFile(path.join(first.options.runDir, "global", "link.done.json"), "utf8"));
+      expect(link.attempt).toBe(1);
+      expect(link.recertified[0].proofs.map((item) => item.proof)).toEqual(["link_stage_unchanged"]);
+      // s0002 reran: the parcel the earlier guard refused is ready, and the comparison shows nothing else changed.
+      const appraisal = JSON.parse(await readFile(path.join(first.options.runDir, "shards", "s0002", "appraisal.done.json"), "utf8"));
+      expect(appraisal.attempt).toBe(2);
+      expect(appraisal.output.rerun_comparison).toMatchObject({ identical: true, previously_ready: 0, newly_ready: ["900002"], newly_ready_were_dead: true, still_dead: [] });
+      expect(after["shards/s0002/permits.done.json"].attempt).toBe(2);
+      // Its CLI chain's inputs (the members and what produced them) equal the first run's here, so it is reused as is.
+      expect(after["shards/s0002/county.validate.done.json"].attempt).toBe(before["shards/s0002/county.validate.done.json"].attempt);
+      expect(run.stageCounts.recertified).toBe(3);
+      expect(record.counts.appraisal).toMatchObject({ seed: 2, ready: 2, dead: 0, invalid: 0, reconciles: true });
+      expect(record.attempts.map((item) => item.status)).toEqual(["finished", "finished"]);
+      expect(record.scoped_reruns).toHaveLength(1);
+      expect(record.scoped_reruns[0]).toMatchObject({ shards: ["s0002"], kit_commit_at_run: "abc1234", attempts: [2], recertified: { shards: 1, stages: { link: 1, appraisal: 1, permits: 1 } } });
+      expect(record.scoped_reruns[0].comparisons.s0002.appraisal).toMatchObject({ identical: true, newly_ready: ["900002"] });
+      expect(record.scoped_reruns[0].code_changes.map((item) => item.proof).sort()).toEqual(["link_stage_unchanged", "situs_columns_branch", "validation_box_widened"]);
+      expect(record.shards.per_shard.map((item) => [item.id, item.rerun, item.recertified])).toEqual([["s0001", false, true], ["s0002", true, false]]);
+      expect(record.timings.attempts_ms).toHaveLength(2);
+      // Here the rerun's merge equals the first run's (the parcel's files never changed on disk), so the Loader's input
+      // is unchanged and it is not finalized again; on the full run the 15 accounts change the merges and it is.
+      expect(record.deltas.appraisal).toMatchObject({ new: 2, changed: 0, unchanged: 0, removed: 0 });
+      expect(await loadHistory(path.join(out, "loader", "test"))).toHaveLength(1);
+      // The finished run now verifies, quick and full.
+      const quick = await new T5Run({ ...(await resolveOptions(parseFlags(flags))), log: () => {} }).verify({ full: false });
+      expect(quick).toMatchObject({ status: "verified", run_json: "equal", mismatch_count: 0 });
+      const full = await new T5Run({ ...(await resolveOptions(parseFlags([...flags, "--verify"]))), log: () => {} }).verify({ full: true });
+      expect(full).toMatchObject({ status: "verified", run_json: "equal", mismatch_count: 0 });
+    });
+  });
+
+  it("refuses to re-certify a shard the change can reach, and writes no re-certification", async () => {
+    await withOut(async (out) => {
+      const flags = await setup(out);
+      const first = await runInProcess(flags);
+      await asIfEarlierCode(first.options.runDir, { extraRefusalIn: "s0001" });
+      const markerPath = path.join(first.options.runDir, "shards", "s0001", "appraisal.done.json");
+      const before = await readFile(markerPath, "utf8");
+      await expect(scopedRun(flags, "s0002")).rejects.toThrow(/s0001/);
+      expect(await readFile(markerPath, "utf8")).toBe(before);
+      const failures = (await readFile(path.join(first.options.runDir, "failures.jsonl"), "utf8")).trim().split("\n").map((line) => JSON.parse(line));
+      expect(failures.at(-1)).toMatchObject({ shard: "s0001" });
+      expect(failures.at(-1).error).toMatch(/not re-certified .*validation_box_widened.*the guard refused 900099 here: rerun this shard/);
+    });
+  });
+
+  it("re-certifies nothing when a rerun shard's earlier parcels do not come out the same", async () => {
+    await withOut(async (out) => {
+      const flags = await setup(out);
+      const first = await runInProcess(flags);
+      await asIfEarlierCode(first.options.runDir, { tamperRerunDigest: true });
+      const markerPath = path.join(first.options.runDir, "shards", "s0001", "appraisal.done.json");
+      const before = await readFile(markerPath, "utf8");
+      await expect(scopedRun(flags, "s0002")).rejects.toThrow(/s0001, s0002|s0002, s0001/);
+      expect(await readFile(markerPath, "utf8")).toBe(before);
+      const failures = (await readFile(path.join(first.options.runDir, "failures.jsonl"), "utf8")).trim().split("\n").map((line) => JSON.parse(line));
+      expect(failures.find((item) => item.shard === "s0002").error).toMatch(/the rerun changed what the run had written/);
+      expect(failures.find((item) => item.shard === "s0001").error).toMatch(/stops before re-certifying anything/);
+    });
+  });
+
+  it("refuses before writing anything when a changed file's proof does not hold, and checks its flags", async () => {
+    await withOut(async (out) => {
+      const flags = await setup(out);
+      const first = await runInProcess(flags);
+      await asIfEarlierCode(first.options.runDir);
+      const statePath = path.join(first.options.runDir, "run-state.json");
+      const state = await readFile(statePath, "utf8");
+      await expect(scopedRun(flags, "s0002", { codeChanges: earlierChanges(false) })).rejects.toThrow(/no proof holds .*validate\.mjs/);
+      expect(await readFile(statePath, "utf8")).toBe(state);
+      await expect(scopedRun(flags, "s0007")).rejects.toThrow(/not shards of this run's plan/);
+      expect(await readFile(statePath, "utf8")).toBe(state);
+      await expect(resolveOptions(parseFlags([...flags, "--rerun-shards", "s0002", "--new"]))).rejects.toThrow(/does not combine/);
+      await expect(resolveOptions(parseFlags([...flags, "--rerun-shards", "s2"]))).rejects.toThrow(/distinct shard ids/);
+      await writeFile(statePath, JSON.stringify({ ...JSON.parse(state), status: "interrupted" }));
+      await expect(resolveOptions(parseFlags([...flags, "--rerun-shards", "s0002"]))).rejects.toThrow(/applies to a finished run/);
     });
   });
 });

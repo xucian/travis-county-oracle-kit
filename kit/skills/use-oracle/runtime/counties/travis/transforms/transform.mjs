@@ -59,6 +59,40 @@ export const OWNER_CLASSIFICATION_VERSION = "travis-owner-classification-v2";
 export const STATE_CODE_MAPPING_VERSION = "travis-state-code-v1";
 export const GEOMETRY_PARTS_VERSION = "travis-geometry-parts-v1";
 export const TCAD_EXTRAS_MAPPING_VERSION = "travis-tcad-extras-mapping-v2";
+// [travis-situs-columns-v1 (assignment decisions.md 27.10, ruled 2026-10-19). Everything between these two marker
+// lines, plus the one guard condition naming `situsShift`, is the whole change since the T5 full run's code (962f851):
+// `t5-recertify.mjs` checks that by text before it re-certifies a shard the change cannot reach.
+/**
+ * Situs columns v1: a roll row whose street column is blank but whose street is printed one column to the right (954255:
+ * prefix `E`, street blank, suffix `PARMER`, unit `LN`; 978103 and 978104: suffix `PINNACLE`, unit `CV`) is read from
+ * those columns, for exactly this pattern and nothing broader: the street column blank, one name in the suffix column
+ * (letters only, not itself a suffix word) and one suffix word of {@link SITUS_SHIFTED_SUFFIX_WORDS} in the unit column.
+ * The house number and prefix columns are read as printed. The address stays the printed parts in roll order
+ * (`unnormalized_address`); the sidecar records the reading (`situs_columns_shifted`). On the 2026 roll this pattern
+ * matches those 3 accounts and no other; every other blank street stays a permanent failure.
+ */
+export const SITUS_COLUMNS_VERSION = "travis-situs-columns-v1";
+/** The suffix words the unit column may hold: the 2-4 letter USPS standard suffix abbreviations TCAD prints as a situs street suffix on 1,000 or more 2026 accounts. */
+export const SITUS_SHIFTED_SUFFIX_WORDS = Object.freeze(["AVE", "BLVD", "BND", "CIR", "CT", "CV", "DR", "LN", "LOOP", "PASS", "PATH", "PKWY", "PL", "RD", "RUN", "ST", "TER", "TRL", "WAY"]);
+
+/**
+ * Read a street printed one column to the right (situs columns v1), or null when the row does not show exactly that
+ * pattern (a row with a street, or a blank street any other way).
+ *
+ * @param {Record<string, unknown> | null | undefined} tcad - The row's TCAD fields (`situs_*` as printed).
+ * @returns {{ version: string, printed: Record<string, string | null>, read_as: { street_prefix: string | null, street_name: string, street_suffix: string, unit: null } } | null} The reading.
+ */
+export function readShiftedSitusColumns(tcad) {
+  if (text(tcad?.situs_street) !== null) return null;
+  const name = text(tcad?.situs_street_suffix);
+  const suffix = text(tcad?.situs_unit);
+  if (name === null || suffix === null) return null;
+  if (!/^[A-Z]{2,}$/.test(name) || SITUS_SHIFTED_SUFFIX_WORDS.includes(name)) return null;
+  if (!/^[A-Z]{2,4}$/.test(suffix) || !SITUS_SHIFTED_SUFFIX_WORDS.includes(suffix)) return null;
+  const printed = Object.fromEntries(["situs_num", "situs_street_prefx", "situs_street", "situs_street_suffix", "situs_unit"].map((field) => [field, text(tcad?.[field])]));
+  return { version: SITUS_COLUMNS_VERSION, printed, read_as: { street_prefix: text(tcad?.situs_street_prefx), street_name: name, street_suffix: suffix, unit: null } };
+}
+// travis-situs-columns-v1]
 
 /**
  * `IMP_ATR.TXT` "Roof Covering" codes (as printed, cut at 10 characters) to the lexicon `structure` fields. A code names
@@ -474,7 +508,10 @@ export function buildTravisOutput(input, { manifest }) {
     }
   };
 
-  if (text(tcad.situs_street) === null) {
+  // [travis-situs-columns-v1
+  const situsShift = text(tcad.situs_street) === null ? readShiftedSitusColumns(tcad) : null;
+  // travis-situs-columns-v1]
+  if (text(tcad.situs_street) === null && situsShift === null) {
     throw new Error("no situs address: the roll prints no situs street for this account");
   }
 
@@ -567,6 +604,9 @@ export function buildTravisOutput(input, { manifest }) {
         }
       : null,
   };
+  // [travis-situs-columns-v1
+  if (situsShift !== null) sourcePayload.situs_columns_shifted = situsShift;
+  // travis-situs-columns-v1]
 
   files["property.json"] = {
     parcel_identifier: propId,

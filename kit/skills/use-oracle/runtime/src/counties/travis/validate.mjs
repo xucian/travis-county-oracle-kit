@@ -8,12 +8,19 @@
  * @module counties/travis/validate
  */
 
-/** Travis County bounding box from the API contract (30.02-30.63 N, -98.17 to -97.37 W). */
+/**
+ * Travis County validation box: the seed builder's box (`seed.mjs` `TRAVIS_SEED_BBOX`, 29.95-30.75 N, -98.25 to -97.30 W;
+ * assignment decisions.md 27.9, ruled 2026-10-19). The API contract's rounded box (30.02-30.63 N, -98.17 to -97.37 W)
+ * refused 12 county-line accounts TCAD appraises and the TNR layer draws (polygon vertices up to 1.5 km past it). This box
+ * holds every point of every TNR geometry of the 2026 roll and contains the rounded one, so it refuses nothing that
+ * passed before. The Census county line is not the guard: 56 TCAD accounts the TNR layer draws lie wholly outside it
+ * (by up to 46 m) and county-line parcels cross it by up to 2.4 km, so it would refuse accounts TCAD appraises.
+ */
 export const TRAVIS_VALIDATION_BBOX = Object.freeze({
-  minLat: 30.02,
-  maxLat: 30.63,
-  minLng: -98.17,
-  maxLng: -97.37,
+  minLat: 29.95,
+  maxLat: 30.75,
+  minLng: -98.25,
+  maxLng: -97.3,
 });
 
 /** Every successful Travis parcel must have these entity files. */

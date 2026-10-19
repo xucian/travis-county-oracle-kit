@@ -131,6 +131,7 @@ skills/use-oracle/runtime/src/counties/travis/t5-field-coverage.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-loader.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-preflight.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-projection.mjs
+skills/use-oracle/runtime/src/counties/travis/t5-recertify.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-reconcile.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-record.mjs
 skills/use-oracle/runtime/src/counties/travis/t5-roof-age.mjs
@@ -168,6 +169,7 @@ skills/use-oracle/runtime/tests/travis-t4-socrata-mock.mjs
 skills/use-oracle/runtime/tests/travis-t4-tcad-permit-listing.test.mjs
 skills/use-oracle/runtime/tests/travis-t5-fake-elephant-cli.mjs
 skills/use-oracle/runtime/tests/travis-t5-reconcile.test.mjs
+skills/use-oracle/runtime/tests/travis-t5-rulings-27.test.mjs
 skills/use-oracle/runtime/tests/travis-t5-run.test.mjs
 skills/use-oracle/runtime/tests/travis-t5-tcad-extras.test.mjs
 skills/use-oracle/runtime/tests/travis-t5-transform-fixes.test.mjs

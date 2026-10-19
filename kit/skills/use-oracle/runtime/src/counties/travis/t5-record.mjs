@@ -10,14 +10,18 @@
  * @module counties/travis/t5-record
  */
 import { execFile } from "node:child_process";
+import { existsSync } from "node:fs";
 import path from "node:path";
 
-import { GEOMETRY_PARTS_VERSION, TCAD_EXTRAS_MAPPING_VERSION, TRANSFORM_VERSION } from "../../../counties/travis/transforms/transform.mjs";
+import { GEOMETRY_PARTS_VERSION, SITUS_COLUMNS_VERSION, TCAD_EXTRAS_MAPPING_VERSION, TRANSFORM_VERSION } from "../../../counties/travis/transforms/transform.mjs";
 import { PERMIT_TRANSFORM_VERSION } from "../../../counties/travis/transforms/permit-transform.mjs";
-import { IMPROVEMENT_ENUMS_VERSION, PARCEL_LINK_VERSION, STATUS_GROUP_VERSION, TCAD_ID_EVIDENCE_VERSION, WORK_CLASSIFIER_VERSION, compiledTravisRoofAgeProfile } from "./permit-profile.mjs";
+import { IMPROVEMENT_ENUMS_VERSION, PARCEL_LINK_VERSION, STATUS_GROUP_VERSION, TCAD_ID_EVIDENCE_VERSION, WORK_CLASSIFIER_VERSION, compiledTravisRoofAgeProfile, summarizePermitRow } from "./permit-profile.mjs";
 import { RUNTIME_ROOT } from "./t3-snapshot.mjs";
 import { LOADER_VERSION } from "./t5-loader.mjs";
+import { RECERTIFY_VERSION } from "./t5-recertify.mjs";
 import { sumRoofAgeCounts, T5_ROOF_AGE_VERSION } from "./t5-roof-age.mjs";
+import { readLines } from "./t5-shards.mjs";
+import { TRAVIS_VALIDATION_BBOX } from "./validate.mjs";
 
 export const T5_RECORD_VERSION = "travis.t5-run-record.v1";
 const rel = (target) => path.relative(RUNTIME_ROOT, target).split(path.sep).join("/");
@@ -66,19 +70,69 @@ function stageTimings(results) {
 }
 
 /**
+ * The dead accounts by reason (from their tombstone evidence) and the linked permits that sit on them (internal only).
+ *
+ * @param {import("./t5-run.mjs").T5Run} run - The run (its link directory and as-of date).
+ * @param {Record<string, any>[]} results - Shard results.
+ * @returns {Promise<{ accounts: number, by_reason: Record<string, number>, permits: { accounts: number, permits: number, roofing: number, open_roofing: number, stalled_roofing: number } }>} Dead accounts.
+ */
+export async function deadAccounts(run, results) {
+  const byReason = {};
+  const permits = { accounts: 0, permits: 0, roofing: 0, open_roofing: 0, stalled_roofing: 0 };
+  let accounts = 0;
+  for (const result of results) {
+    const dead = result.appraisal.output.dead ?? [];
+    for (const item of dead) {
+      const reason = /no situs address/.test(item.evidence ?? "") ? "no_situs_street" : /outside the Travis bbox/.test(item.evidence ?? "") ? "outside_validation_bbox" : "other";
+      byReason[reason] = (byReason[reason] ?? 0) + 1;
+      accounts += 1;
+    }
+    const keys = new Set(dead.map((item) => String(item.key)));
+    const file = path.join(run.linkDir ?? "", `${result.shard}.jsonl`);
+    if (keys.size === 0 || !run.linkDir || !existsSync(file)) continue;
+    const needles = [...keys].map((key) => [key, `"propertyId":"${key}"`]);
+    const withPermits = new Set();
+    for await (const line of readLines(file)) {
+      if (!needles.some(([, needle]) => line.includes(needle))) continue;
+      const entry = JSON.parse(line);
+      const key = String(entry.link?.propertyId ?? "");
+      if (!keys.has(key)) continue;
+      withPermits.add(key);
+      permits.permits += 1;
+      const profile = summarizePermitRow(entry.row, { asOfDate: run.asOfDate });
+      if (profile.isRoofing) {
+        permits.roofing += 1;
+        if (profile.statusGroup === "open") permits.open_roofing += 1;
+        if (profile.statusGroup === "stalled") permits.stalled_roofing += 1;
+      }
+    }
+    permits.accounts += withPermits.size;
+  }
+  return { accounts, by_reason: byReason, permits };
+}
+
+/**
  * The limitations the run's own counts back (`Limitation` shape of `/v1/meta`).
  *
  * @param {Record<string, any>} link - The link pass summary.
  * @param {Record<string, any>} roofAge - Roof-age totals.
  * @param {Record<string, any>} appraisal - Appraisal counts.
+ * @param {Awaited<ReturnType<typeof deadAccounts>>} [dead] - The dead accounts and the permits on them.
  * @returns {Record<string, any>[]} Limitations.
  */
-export function buildLimitations(link, roofAge, appraisal) {
+export function buildLimitations(link, roofAge, appraisal, dead = { accounts: 0, by_reason: {}, permits: { accounts: 0, permits: 0, roofing: 0, open_roofing: 0, stalled_roofing: 0 } }) {
   const permits = "austin-issued-construction-permits/3syk-w9eu";
   const reasons = link.unlinked_reasons ?? {};
   const listing = link.tcad_permit_listing?.retired ?? {};
   const impact = link.readme_impact ?? {};
   const item = (source, availability, accessStatus, reason, detail, evidence, request = null) => ({ source, availability, source_access_status: accessStatus, incomplete_reason: reason, detail, evidence, records_request: request });
+  const roofingUnlinked = Number(impact.roofing?.not_on_a_property ?? 0);
+  const onDead = dead.permits;
+  const deadItems = [];
+  if (dead.by_reason.no_situs_street) deadItems.push(item("tcad-2026-certified-appraisal-export", "supported_partial", "available", "no_situs_street", `${fmt(dead.by_reason.no_situs_street)} accounts print no situs street (the roll prints no street for them, a source fact; a street printed one column to the right is read, decisions.md 27.10): permanent appraisal failures, tombstoned dead, not published`, "the run's dead tombstones (Loader generation tombstones.jsonl)"));
+  if (dead.by_reason.outside_validation_bbox) deadItems.push(item("pipeline", "supported_partial", "available", "outside_validation_bbox", `${fmt(dead.by_reason.outside_validation_bbox)} accounts refused by the validation box although TCAD appraises them: tombstoned dead, not published (decisions.md 27.9)`, "the run's dead tombstones"));
+  if (dead.by_reason.other) deadItems.push(item("pipeline", "supported_partial", "available", "dead_other", `${fmt(dead.by_reason.other)} accounts failed the appraisal stage permanently for another reason: tombstoned dead, not published`, "the run's dead tombstones"));
+  if (onDead.permits > 0) deadItems.push(item(permits, "supported_partial", "available", "linked_to_dead_account", `${fmt(onDead.permits)} linked permits (${fmt(onDead.roofing)} roofing) sit on ${fmt(onDead.accounts)} dead accounts: loaded internally, shown on no property`, "global/link per-shard files, the run's dead tombstones"));
   return [
     item("bbb.org", "unsupported", "blocked", "http_403_source_block", "BBB returns a bot challenge and 403 to scripted access; ratings ship as rating null, status blocked, until approved API access (decisions.md section 4)", "docs/travis-bbb-access-request.md"),
     item(permits, "supported_partial", "available", "jurisdiction_scope", "the Austin export covers Austin (full purpose and ETJ) and the cities whose permits it carries; unincorporated Travis and the other cities are not in it, so a property outside that scope shows no permit history", "docs/travis-sources.yaml"),
@@ -88,7 +142,7 @@ export function buildLimitations(link, roofAge, appraisal) {
     item(permits, "supported_partial", "available", "tcad_permit_listing_link", `${fmt(listing.linked)} permits on retired geo_ids are linked through TCAD's own permit listing (match_method tcad_permit_listing, confidence official_listing); a roof-age anchor from one carries the caveat anchor_link_tcad_permit_listing (${fmt(roofAge.caveats?.anchor_link_tcad_permit_listing)} parcels)`, "global/link summary.json"),
     item(permits, "supported_partial", "available", "multiple_candidates", `${fmt(reasons.multiple_candidates)} permits on geo_ids shared by several accounts (mostly condominium regimes): linked to no one property`, "global/link summary.json"),
     item(permits, "supported_partial", "available", "invalid_quarantined", `${fmt(reasons.invalid_quarantined)} permits with a malformed tcad_id`, "global/link summary.json"),
-    item(permits, "supported_partial", "available", "roofing_not_on_a_property", `${fmt(impact.roofing?.not_on_a_property)} roofing permits (${fmt(impact.open_roofing?.not_on_a_property)} open, ${fmt(impact.stalled_roofing?.not_on_a_property)} stalled) are loaded internally and counted but shown on no property`, "global/link summary.json"),
+    item(permits, "supported_partial", "available", "roofing_not_on_a_property", `${fmt(roofingUnlinked + onDead.roofing)} roofing permits are loaded internally and counted but shown on no property: ${fmt(roofingUnlinked)} link to no property (${fmt(impact.open_roofing?.not_on_a_property)} open, ${fmt(impact.stalled_roofing?.not_on_a_property)} stalled) and ${fmt(onDead.roofing)} sit on dead accounts (${fmt(onDead.open_roofing)} open, ${fmt(onDead.stalled_roofing)} stalled)`, "global/link summary.json"),
     item(permits, "supported_partial", "available", "status_indexed_only", "the status is the daily export's value with its capture time; open roofing permits are not refreshed from the permit's live page in v1", "docs/decisions.md section 5"),
     item(permits, "supported_partial", "available", "needs_review_status", `${fmt(link.status_group?.needs_review)} permits carry a status outside the profile's mapping (needs_review): left out of the open, stalled and closed counts`, "global/link summary.json"),
     item(permits, "supported_partial", "available", "applicant_not_collected", "the seven applicant fields are personal contact fields and are not collected (T1 privacy classification, decisions.md 25.8)", "docs/travis-sources.yaml"),
@@ -98,7 +152,49 @@ export function buildLimitations(link, roofAge, appraisal) {
     item("tcad-2026-certified-appraisal-export", "supported_partial", "available", "no_faithful_member", "special-district taxable values, per-entity exemptions, an account-wide taxable value, the improvement type as a property form or building count, and an exterior-wall attribute (not printed) have no faithful lexicon member and are not written", "docs/evidence/travis-t5-field-coverage-2026-10-18.json"),
     item("lexicon", "supported_partial", "available", "county_label", "no archive field names the county: address.county_name is omitted until lexicon#194; the Atlas page, the run record and the manifest name it (decisions.md section 22)", "docs/decisions.md section 22"),
     item("roof-age", "supported_partial", "available", "partial_history", `${fmt(roofAge.by_historical_coverage?.partial)} parcels have permit history (partial: one jurisdiction's system); ${fmt(roofAge.by_historical_coverage?.unknown)} have none in the export (history_unknown); ${fmt(roofAge.by_basis?.year_built)} roof ages fall back to the built year (low confidence) and ${fmt(roofAge.by_basis?.none)} parcels have no age`, "run.json roof_age"),
+    ...deadItems,
   ];
+}
+
+/**
+ * What the scoped reruns of the run did, from the state (shards, commits, changed files and proofs) and the markers
+ * (the stages re-certified, and each rerun shard's comparison with the run).
+ *
+ * @param {import("./t5-run.mjs").T5Run} run - The run.
+ * @param {Record<string, any>[]} results - Shard results.
+ * @returns {Promise<Record<string, any>[]>} One entry per scoped rerun.
+ */
+async function scopedReruns(run, results) {
+  const { readFile } = await import("node:fs/promises");
+  const linkMarkerPath = path.join(run.globalDir, "link.done.json");
+  const linkMarker = existsSync(linkMarkerPath) ? JSON.parse(await readFile(linkMarkerPath, "utf8")) : null;
+  return (run.state.scoped_reruns ?? []).map((scope) => {
+    const attempts = new Set(scope.attempts ?? []);
+    const stages = {};
+    const shards = new Set();
+    const count = (shard, stage, marker) => {
+      if (!(marker?.recertified ?? []).some((entry) => attempts.has(entry.attempt))) return;
+      stages[stage] = (stages[stage] ?? 0) + 1;
+      if (shard) shards.add(shard);
+    };
+    count(null, "link", linkMarker);
+    const comparisons = {};
+    for (const result of results) {
+      for (const name of ["appraisal", "permits", "reconcile", "cid_check", "merge"]) count(result.shard, name, result[name]);
+      for (const [group, steps] of Object.entries(result.groups)) for (const step of ["validate", "hash", "car_validate", "export_tables"]) count(result.shard, `${group}.${step}`, steps?.[step]);
+      if (scope.shards.includes(result.shard)) {
+        const a = result.appraisal.output.rerun_comparison ?? null;
+        const p = result.permits.output.rerun_comparison ?? null;
+        comparisons[result.shard] = {
+          appraisal: a ? { identical: a.identical, previously_ready: a.previously_ready, unchanged: a.unchanged, sidecars_compared: a.sidecars_compared, newly_ready: a.newly_ready, still_dead: a.still_dead } : null,
+          permits: p ? { identical: p.identical, previous_states: p.previous_states, unchanged: p.unchanged, added: p.added } : null,
+          county_root: result.groups.county?.hash?.output?.car?.root ?? null,
+          property_improvement_root: result.groups.property_improvement?.hash?.output?.car?.root ?? null,
+        };
+      }
+    }
+    return { ...scope, recertified: { shards: shards.size, stages }, comparisons };
+  });
 }
 
 /**
@@ -131,7 +227,7 @@ export async function buildRunRecord({ run, loader, history, t3, diskBytes }) {
       if (!steps?.hash) continue;
       const exported = steps.export_tables.output;
       cars.push({ root_cid: steps.hash.output.car.root, group, kind: "archive", shard: result.shard, schema_cid: group === "county" ? run.roots.countyCid : run.roots.propertyImprovementCid, block_count: steps.hash.output.car.blocks, properties: steps.validate.output.members, car_validation: steps.car_validate.output.car_validation, path: steps.car.path, size: steps.car.bytes, sha256: steps.car.sha256, readback_url: null });
-      cars.push({ root_cid: exported.tables.root, group, kind: "tables", shard: result.shard, schema_cid: group === "county" ? run.roots.countyCid : run.roots.propertyImprovementCid, tables: exported.tables.tables, parts: exported.tables.parts, path: `${path.dirname(steps.car.path)}/tables`, readback_url: null });
+      cars.push({ root_cid: exported.tables.root, group, kind: "tables", shard: result.shard, schema_cid: group === "county" ? run.roots.countyCid : run.roots.propertyImprovementCid, tables: exported.tables.tables, parts: exported.tables.parts, path: steps.tables?.dir ?? `${path.dirname(steps.car.path)}/tables`, readback_url: null });
     }
   }
   // Rows per table: the CLI's own tables-export.json of every shard.
@@ -139,7 +235,7 @@ export async function buildRunRecord({ run, loader, history, t3, diskBytes }) {
   for (const result of results) {
     for (const [group, steps] of Object.entries(result.groups)) {
       if (!steps?.export_tables) continue;
-      const exported = JSON.parse(await readFile(path.join(RUNTIME_ROOT, path.dirname(steps.car.path), "tables-export.json"), "utf8"));
+      const exported = JSON.parse(await readFile(path.join(RUNTIME_ROOT, steps.tables?.export_json ?? path.join(path.dirname(steps.car.path), "tables-export.json")), "utf8"));
       tables[group] = sumMaps([tables[group], Object.fromEntries(Object.entries(exported.tables).map(([name, value]) => [name, value.rows]))]);
     }
   }
@@ -148,6 +244,10 @@ export async function buildRunRecord({ run, loader, history, t3, diskBytes }) {
   const kitCommit = await git(["rev-parse", "--short", "HEAD"]);
   const kitDirty = (await git(["status", "--porcelain", "--", "src/counties/travis", "counties/travis", "src/roof-age"])) ?? "";
   const loaderDeltas = loader.deltas;
+  const deadInfo = await deadAccounts(run, results);
+  const reruns = await scopedReruns(run, results);
+  const rerunShards = new Set(reruns.flatMap((scope) => scope.shards));
+  const attemptMs = (attempt) => (attempt.ended_at ? new Date(attempt.ended_at).getTime() - new Date(attempt.started_at).getTime() : null);
   return {
     schemaVersion: T5_RECORD_VERSION,
     run_id: run.state.run_id,
@@ -189,17 +289,17 @@ export async function buildRunRecord({ run, loader, history, t3, diskBytes }) {
     evidence_states: link.evidence_states,
     unlinked_reasons: link.unlinked_reasons,
     roof_age: { ...roofAge, version: T5_ROOF_AGE_VERSION, estimator: "elephant.roof-age-estimate.v1", profile: { version: compiledTravisRoofAgeProfile.version, sha256: compiledTravisRoofAgeProfile.sha256 }, as_of_date: run.asOfDate, link_pass_anchor_parcels: link.readme_impact?.roof_age_anchor ?? null },
-    limitations: buildLimitations(link, roofAge, { without_geometry: readyAll - geometry }),
+    limitations: buildLimitations(link, roofAge, { without_geometry: readyAll - geometry }, deadInfo),
     shards: {
       total: run.plan.shards.length,
-      per_shard: results.map((result) => ({ id: result.shard, rows: result.rows, first: run.plan.shards.find((shard) => shard.id === result.shard).first, last: run.plan.shards.find((shard) => shard.id === result.shard).last, appraisal_attempt: result.appraisal.attempt, county_root: result.groups.county?.hash?.output?.car?.root ?? null, property_improvement_root: result.groups.property_improvement?.hash?.output?.car?.root ?? null, county_car_sha256: result.groups.county?.car?.sha256 ?? null, property_improvement_car_sha256: result.groups.property_improvement?.car?.sha256 ?? null })),
+      per_shard: results.map((result) => ({ id: result.shard, rows: result.rows, first: run.plan.shards.find((shard) => shard.id === result.shard).first, last: run.plan.shards.find((shard) => shard.id === result.shard).last, appraisal_attempt: result.appraisal.attempt, rerun: rerunShards.has(result.shard), recertified: (result.appraisal.recertified ?? []).length > 0, county_root: result.groups.county?.hash?.output?.car?.root ?? null, property_improvement_root: result.groups.property_improvement?.hash?.output?.car?.root ?? null, county_car_sha256: result.groups.county?.car?.sha256 ?? null, property_improvement_car_sha256: result.groups.property_improvement?.car?.sha256 ?? null })),
     },
     cars,
     groups: {},
     manifest_cid: null,
     atlas: null,
     gateway_checks: [],
-    timings: { unit: "ms", wall_ms: new Date(finishedAt).getTime() - new Date(startedAt).getTime(), last_attempt_ms: Math.round(new Date(finishedAt).getTime() - new Date(run.attempt.started_at).getTime()), stages: stageTimings(results) },
+    timings: { unit: "ms", wall_ms: new Date(finishedAt).getTime() - new Date(startedAt).getTime(), last_attempt_ms: Math.round(new Date(finishedAt).getTime() - new Date(run.attempt.started_at).getTime()), attempts_ms: run.state.attempts.map((attempt) => ({ attempt: attempt.attempt, ms: attemptMs(attempt) })), stages: stageTimings(results) },
     memory: { peak_cli_rss_gb: Math.round((run.peak.cli_rss_bytes / 1024 ** 3) * 10) / 10, peak_cli_processes: run.peak.cli_processes, peak_runner_rss_gb: Math.round((run.peak.runner_rss_bytes / 1024 ** 3) * 10) / 10, peak_combined_rss_gb: Math.round(((run.peak.combined_rss_bytes ?? 0) / 1024 ** 3) * 10) / 10, peak_swap_used_gb: Math.round((run.peak.swap_used_bytes / 1024 ** 3) * 10) / 10, sampled: "every progress tick (60 s) and shard completion; ps RSS" },
     disk: { run_dir_gb: Math.round((diskBytes / 1024 ** 3) * 100) / 100 },
     preflight: run.preflight,
@@ -209,10 +309,11 @@ export async function buildRunRecord({ run, loader, history, t3, diskBytes }) {
     lexicon_manifest_url: run.state.lexicon_manifest.url,
     lexicon_manifest: run.state.lexicon_manifest,
     kit_commit: kitDirty ? `${kitCommit} (+ uncommitted Travis changes)` : kitCommit,
-    versions: { run: "travis-t5-run.v1", record: T5_RECORD_VERSION, transform: TRANSFORM_VERSION, geometry_parts: GEOMETRY_PARTS_VERSION, tcad_extras_mapping: TCAD_EXTRAS_MAPPING_VERSION, permit_transform: PERMIT_TRANSFORM_VERSION, status_group: STATUS_GROUP_VERSION, work_classifier: WORK_CLASSIFIER_VERSION, tcad_id_evidence: TCAD_ID_EVIDENCE_VERSION, parcel_link: PARCEL_LINK_VERSION, improvement_enums: IMPROVEMENT_ENUMS_VERSION, loader: LOADER_VERSION, roof_age: T5_ROOF_AGE_VERSION },
+    versions: { run: "travis-t5-run.v1", record: T5_RECORD_VERSION, transform: TRANSFORM_VERSION, geometry_parts: GEOMETRY_PARTS_VERSION, tcad_extras_mapping: TCAD_EXTRAS_MAPPING_VERSION, situs_columns: SITUS_COLUMNS_VERSION, validation_box: `${TRAVIS_VALIDATION_BBOX.minLat}-${TRAVIS_VALIDATION_BBOX.maxLat} N, ${TRAVIS_VALIDATION_BBOX.minLng} to ${TRAVIS_VALIDATION_BBOX.maxLng} W`, recertify: RECERTIFY_VERSION, permit_transform: PERMIT_TRANSFORM_VERSION, status_group: STATUS_GROUP_VERSION, work_classifier: WORK_CLASSIFIER_VERSION, tcad_id_evidence: TCAD_ID_EVIDENCE_VERSION, parcel_link: PARCEL_LINK_VERSION, improvement_enums: IMPROVEMENT_ENUMS_VERSION, loader: LOADER_VERSION, roof_age: T5_ROOF_AGE_VERSION },
     inputs: { seed: run.plan.seed, tcad_extras: run.plan.extras, capture: { dir: rel(run.captureDir), rows: run.captureSummary.rows, rows_updated_at: run.captureSummary.rows_updated_at.end_iso }, tcad_permit_listing: run.listing },
     loader: { scope: run.options.loaderScope, generation: loader.generation_dir, state_sha256: loader.state_sha256, prior_generation: loader.prior_generation },
     run_history: history,
+    scoped_reruns: reruns,
     no_publication: "local files only: no upload, no pin, no Atlas PR (T6)",
   };
 }
