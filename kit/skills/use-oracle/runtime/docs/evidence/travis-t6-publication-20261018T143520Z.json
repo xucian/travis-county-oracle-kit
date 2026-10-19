@@ -1,7 +1,7 @@
 {
   "schemaVersion": "travis.t6-publication.v1",
   "run_id": "20261018T143520Z-t5-full",
-  "status": "uploaded with readback; stopped at the 4everland gateway sample (decisions.md 28.7)",
+  "status": "uploaded with readback; gateway checks stopped on Pinata's hourly 429 (decisions.md 28.7)",
   "kit_commit": "bfb3b50, 3b86fc9, 387a324 (fetch-timeout preload), 2d45598 (bounded retry)",
   "cli": "elephant-cli 1.58.1",
   "node": "v22.22.0",
@@ -2687,7 +2687,7 @@
     "remaining": 0
   },
   "not_run": [
-    "the full gateway checks",
+    "the rest of the gateway checks",
     "Pinata pins",
     "manifest",
     "manifest pin"
@@ -2918,5 +2918,30 @@
         "checked_at": "2026-10-19T21:04:09.197Z"
       }
     ]
+  },
+  "gateway_checks": {
+    "gateways": [
+      "https://gateway.pinata.cloud",
+      "https://ipfs.filebase.io"
+    ],
+    "ruling": "28.7 (\u03b3), the operator's go 2026-10-20",
+    "started": "2026-10-19T21:28:24Z",
+    "stopped": "2026-10-19T21:39:20Z",
+    "jobs_per_gateway": 3285,
+    "per_gateway": {
+      "https://ipfs.filebase.io": {
+        "raw_match": 356,
+        "file_match": 235,
+        "unverified": 0,
+        "mismatch": 0
+      },
+      "https://gateway.pinata.cloud": {
+        "raw_match": 250,
+        "file_match": 0,
+        "unverified": 39,
+        "mismatch": 0
+      }
+    },
+    "stop": "gateway.pinata.cloud answered 429 from 21:37:30Z with Retry-After about 3,540 s after 250 requests in 9 minutes; the runner gives up on a wait longer than the 20-minute deadline, so its rows went unverified; the chain was stopped by hand to send no more requests into the window"
   }
 }
