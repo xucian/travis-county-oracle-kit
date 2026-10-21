@@ -9,7 +9,7 @@ import { ELIGIBILITY_ENV } from "../src/counties/travis/eligibility.mjs";
 import { harvestAustinPermits } from "../src/counties/travis/t4-permit-fetch.mjs";
 import { buildTcadPermitListing } from "../src/counties/travis/t4-tcad-permit-listing.mjs";
 import { IMP_ATR_FIELDS, IMP_INFO_FIELDS, LAND_DET_FIELDS, PROP_ENT_FIELDS, PROP_EXTRA_FIELDS, buildTcadExtras } from "../src/counties/travis/t5-tcad-extras.mjs";
-import { STAGE_CODE, T5Run, armExitWatchdog, codeDigest, estimateEta, formatDuration, invalidPropertiesFromErrors, parseFlags, resolveOptions } from "../src/counties/travis/t5-run.mjs";
+import { STAGE_CODE, T5Run, armExitWatchdog, codeDigest, estimateEta, formatDuration, invalidPropertiesFromErrors, parseFlags, prepareNextRun, resolveOptions } from "../src/counties/travis/t5-run.mjs";
 import { currentGeneration, loadHistory } from "../src/counties/travis/t5-loader.mjs";
 import { digestOf } from "../src/counties/travis/t5-shards.mjs";
 import { context, socrata, tcadAccount, withOut, writeSpecialExport } from "./travis-t4-socrata-mock.mjs";
@@ -178,6 +178,57 @@ describe("T5 runner (fake elephant-cli, the replay seed in two shards)", () => {
       expect(again.watermarks.map((item) => [item.artifact_hash, item.last_merged_at])).toEqual(generation.state.watermarks.map((item) => [item.artifact_hash, item.last_merged_at]));
       expect(loaderMarker.output.watermarks.map((item) => item.artifact_hash)).toEqual(again.watermarks.map((item) => item.artifact_hash));
       expect(await loadHistory(loaderDir)).toHaveLength(2);
+    });
+  });
+
+  it("starts the next run from a newer capture: County carried, only the changed shard's Property Improvement reruns, the earlier run untouched", async () => {
+    await withOut(async (out) => {
+      const flags = await setup(out);
+      const first = await runInProcess(flags);
+      const before = await markers(first.options.runDir);
+      const beforeRecord = await readFile(path.join(first.options.runDir, "run.json"), "utf8");
+      // Three days later the export holds every row again; 900001's electrical permit is now final.
+      const changed = ROWS.map((row) => (row.permit_number === "2021-000002 EP" ? { ...row, status_current: "Final", completed_date: "2021-06-01T00:00:00.000", statusdate: "2021-06-01T00:00:00.000" } : row));
+      const capture = await harvestAustinPermits({ out: path.join(out, "permits"), context: context(socrata({ data: changed, versionOf: () => 1792499798 })) });
+      await new Promise((resolve) => setTimeout(resolve, 1100)); // a new run directory name (seconds)
+      const at = flags.indexOf("--capture");
+      const nextFlags = [...flags.slice(0, at), "--capture", capture.versionDir, ...flags.slice(at + 2), "--next-run", "latest"];
+      const options = await resolveOptions(parseFlags(nextFlags));
+      expect(options.nextOf).toBe(first.options.runDir);
+      const previous = await prepareNextRun({ fromDir: options.nextOf, toDir: options.runDir, captureDir: options.captureDir });
+      expect(previous.run_id).toBe(first.record.run_id);
+      const run = new T5Run({ ...options, log: () => {}, installSignals: false, progressIntervalMs: 3_600_000 });
+      const record = await run.run();
+      // The earlier run is untouched.
+      expect(await markers(first.options.runDir)).toEqual(before);
+      expect(await readFile(path.join(first.options.runDir, "run.json"), "utf8")).toBe(beforeRecord);
+      const after = await markers(options.runDir);
+      const kept = (key) => after[key].attempt === before[key].attempt && after[key].input === before[key].input;
+      for (const shard of ["s0001", "s0002"]) for (const step of ["validate", "hash", "car_validate", "export_tables"]) expect(kept(`shards/${shard}/county.${step}.done.json`), `${shard} county.${step}`).toBe(true);
+      for (const step of ["validate", "hash", "car_validate", "export_tables"]) {
+        expect(kept(`shards/s0002/property_improvement.${step}.done.json`), `s0002 ${step}`).toBe(true);
+        expect(kept(`shards/s0001/property_improvement.${step}.done.json`), `s0001 ${step}`).toBe(false);
+      }
+      expect(after["shards/s0001/property_improvement.hash.done.json"].root).not.toBe(before["shards/s0001/property_improvement.hash.done.json"].root);
+      expect(record.run_id).not.toBe(first.record.run_id);
+      expect(record.previous_run).toMatchObject({ run_id: first.record.run_id });
+      expect(record.changed_since_previous.groups).toEqual({
+        county: { archives: 2, unchanged: 2, new_roots: 0, shards_with_new_roots: [] },
+        property_improvement: { archives: 2, unchanged: 1, new_roots: 1, shards_with_new_roots: ["s0001"] },
+      });
+      expect(record.changed_since_previous.carried_stages).toMatchObject({ cli_county_validate: 2, cli_property_improvement_validate: 1 });
+      expect(record.timings.stages.cli_county_validate).toBeUndefined();
+      expect(record.timings.stages.cli_property_improvement_validate.shards).toBe(1);
+      expect(record.attempts.map((attempt) => attempt.attempt)).toEqual([1]);
+      expect(record.deltas.permits).toMatchObject({ new: 0, changed: 1, unchanged: 3, removed: 0 });
+      expect(record.deltas.appraisal).toMatchObject({ new: 0, changed: 0, unchanged: 2, removed: 0 });
+      expect(record.counts.appraisal).toEqual(first.record.counts.appraisal);
+      expect(record.loader.prior_generation).toBe(first.record.run_id);
+      expect(await loadHistory(path.join(out, "loader", "test"))).toHaveLength(2);
+      // The finished next run verifies read-only, and a second --next-run of the earlier run is refused.
+      const verify = new T5Run({ ...(await resolveOptions(parseFlags(flags.filter((flag, index) => index !== at && index !== at + 1)))), log: () => {}, installSignals: false });
+      expect((await verify.verify({ full: false })).status).toBe("verified");
+      await expect(resolveOptions(parseFlags([...nextFlags.slice(0, -2), "--next-run", first.options.runDir]))).rejects.toThrow(/is newer than/);
     });
   });
 

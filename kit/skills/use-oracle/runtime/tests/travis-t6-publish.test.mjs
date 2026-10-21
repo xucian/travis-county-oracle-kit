@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 import { rawCid, readCarBlocks } from "../src/counties/travis/publish.mjs";
-import { buildPlan, buildShardManifest, cliLibraries, gatewayJobs, importFromCli, pinRoots, runGatewayChecks, summarizeGateways, unixfsCid, uploadAll, writeTablesCar, cliEnv, retryableFailure, runPacedChecks, pinStatus } from "../src/counties/travis/t6-publish.mjs";
+import { buildPlan, buildShardManifest, cliLibraries, freshPlan, gatewayJobs, markCarried, importFromCli, pinRoots, runGatewayChecks, summarizeGateways, unixfsCid, uploadAll, writeTablesCar, cliEnv, retryableFailure, runPacedChecks, pinStatus } from "../src/counties/travis/t6-publish.mjs";
 
 const CLI = process.env.ELEPHANT_CLI ?? "/Users/luti/dev/oracle-property-intelligence-platform-pipeline-travis-tx/node_modules/.bin/elephant-cli";
 const hasCli = existsSync(CLI);
@@ -129,6 +129,41 @@ describe.skipIf(!hasCli)("T6 publication of a sharded run", () => {
       expect(manifest.gateway_checks.per_gateway["https://a"]).toMatchObject({ rows: 5, match: 5, mismatch: 0, unverified: 0 });
       expect(() => buildShardManifest({ ...inputs, gatewayRows: [{ ...rows[0], multihash: "unverified" }, ...rows.slice(1)] })).toThrow(/1 gateway rows are not a match/);
       expect(() => buildShardManifest({ ...inputs, uploads: inputs.uploads.slice(1) })).toThrow(/was not uploaded/);
+    } finally {
+      await f.cleanup();
+    }
+  });
+
+  it("a next run publishes only the roots the earlier run did not, and its manifest carries the rest with that run's evidence", async () => {
+    const f = await fixture();
+    try {
+      const plan = await buildPlan({ runDir: path.join(f.runtime, "data/travis/runs/r1"), runtimeDir: f.runtime, schemaCacheDir: path.join(f.runtime, "schema-cache") });
+      // The earlier run published the same archive but another tables root.
+      const earlier = { ...plan, run_id: "r0", tables: plan.tables.map((entry) => ({ ...entry, root: "bafyoldtables" })) };
+      const next = markCarried(plan, earlier, { out: "/prev", manifest_cid: "bafyprevmanifest", release_tag: "run-r0" });
+      expect(next.archives.map((entry) => entry.carried)).toEqual([true]);
+      expect(next.tables.map((entry) => entry.carried)).toEqual([false]);
+      expect(next.schemas.every((entry) => entry.carried)).toBe(true);
+      const fresh = freshPlan(next);
+      expect([fresh.archives.length, fresh.tables.length, fresh.schemas.length]).toEqual([0, 1, 0]);
+      expect(gatewayJobs(fresh).map((job) => job.cid)).toEqual([f.tablesRoot, ...plan.tables[0].parts.map((part) => part.cid)]);
+      const rows = gatewayJobs(next).flatMap((job) => ["https://a", "https://b"].map((gateway) => ({ ...job, gateway, multihash: job.check === "raw" ? "match" : null, bytes: job.check === "file" ? "match" : undefined, size: 10, attempts: 1 })));
+      const manifest = buildShardManifest({
+        plan: next,
+        uploads: [{ kind: "archive", root: f.archiveRoot, gateway_url: "https://ipfs.filebase.io/ipfs/x" }, { kind: "tables", root: f.tablesRoot, gateway_url: null }],
+        tablesCars: [{ root: f.tablesRoot, path: "/x/travis-county-s0001-tables.car", size: 1, sha256: "cd", block_count: 4, parts: 2 }],
+        filebase: { checked_at: "t", rows: [{ pinned: true }], controls: [{ pinned: false }], all_pinned: true },
+        gatewayRows: rows,
+        gatewayFile: { path: "runs/r1.gateway-checks.json", sha256: "ef" },
+        pins: [{ cid: f.archiveRoot, pinned: true }, { cid: f.tablesRoot, pinned: true }],
+        release: { tag: "run-r1", status: "not created", previous_tag: "run-r0" },
+      });
+      expect(manifest.previous_run).toEqual({ run_id: "r0", manifest_cid: "bafyprevmanifest" });
+      expect(manifest.cars.map((car) => [car.kind, car.release_tag, car.carried_from_previous_run])).toEqual([["archive", "run-r0", true], ["tables", "run-r1", false]]);
+      expect(manifest.label).toMatch(/next run of r0/);
+      expect(manifest.notes.some((note) => /1 of 2 archive and tables roots are carried/.test(note))).toBe(true);
+      // Run 1's manifest shape is unchanged when there is no earlier run.
+      expect(buildShardManifest({ plan, uploads: [{ kind: "archive", root: f.archiveRoot }, { kind: "tables", root: f.tablesRoot }], tablesCars: [{ root: f.tablesRoot, path: "/x/t.car", size: 1, sha256: "cd", block_count: 4, parts: 2 }], filebase: { all_pinned: true, rows: [], controls: [] }, gatewayRows: [], gatewayFile: {}, pins: [{ cid: f.archiveRoot, pinned: true }, { cid: f.tablesRoot, pinned: true }], release: { tag: "run-r1", status: "x" } }).cars[0]).not.toHaveProperty("release_tag");
     } finally {
       await f.cleanup();
     }

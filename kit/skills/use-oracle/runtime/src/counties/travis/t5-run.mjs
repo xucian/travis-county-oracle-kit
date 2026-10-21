@@ -56,7 +56,7 @@
  */
 import { execFile, spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { appendFile, link, mkdir, open, readdir, readFile, rename, stat, writeFile } from "node:fs/promises";
+import { appendFile, link, mkdir, open, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
@@ -1538,6 +1538,85 @@ export async function latestRun(runsDir, label) {
   return null;
 }
 
+/** Files of a finished run that belong to its own processes, not to the next run cloned from it. */
+const NEXT_RUN_DROPPED = [/^run\.lock/, /^run\.json$/, /^progress\.(txt|jsonl)$/, /^stages\.jsonl$/, /^preflight-a\d+\.json$/];
+
+/**
+ * Start the next incremental run of a finished run (README.md lines 19, 40-42; decisions.md section 6): an APFS clone
+ * of its directory (`cp -c`, copy-on-write, so nothing is copied on disk and the earlier run is never touched) under a
+ * new run id, pointed at a newer permit capture. Every stage then keeps its marker while its input is unchanged: the
+ * County chains stay as they are (their input is the County records' digest, which a permit capture does not reach)
+ * and only shards whose published permit records changed rerun their Property Improvement chain. The per-shard merges
+ * and the Loader finalize always rerun, so the Loader writes this run's own generation with its deltas against the
+ * earlier one. The new run's state names the earlier run (`previous_run`); its attempts start at 1.
+ *
+ * @param {{ fromDir: string, toDir: string, captureDir: string, now?: string, clone?: (from: string, to: string) => Promise<void> }} options - Finished run, new run directory, newer capture.
+ * @returns {Promise<Record<string, any>>} The new run's `previous_run`.
+ */
+export async function prepareNextRun({ fromDir, toDir, captureDir, now = nowIso(), clone = cloneDirectory }) {
+  const source = JSON.parse(await readFile(path.join(fromDir, "run-state.json"), "utf8"));
+  if (source.status !== "finished") throw new Error(`${rel(fromDir)} is not finished; only a finished run has a next run`);
+  if (!existsSync(path.join(fromDir, "run.json"))) throw new Error(`${rel(fromDir)} has no run.json`);
+  if (existsSync(toDir)) throw new Error(`${rel(toDir)} exists already`);
+  const sourceRecord = JSON.parse(await readFile(path.join(fromDir, "run.json"), "utf8"));
+  const recordedCapture = sourceRecord.inputs?.capture?.dir ? path.resolve(RUNTIME_ROOT, sourceRecord.inputs.capture.dir) : null;
+  if (recordedCapture && path.resolve(captureDir) === recordedCapture) throw new Error(`the capture ${rel(captureDir)} is the one ${source.run_id} ran on; capture a newer one first (t4-permit-fetch.mjs)`);
+  await clone(fromDir, toDir);
+  for (const name of await readdir(toDir)) if (NEXT_RUN_DROPPED.some((pattern) => pattern.test(name))) await rmPath(path.join(toDir, name));
+  for (const shard of await readdir(path.join(toDir, "shards"))) await rmPath(path.join(toDir, "shards", shard, "merge.done.json"));
+  await rmPath(path.join(toDir, "global", "loader.done.json"));
+  const previousRun = {
+    run_id: source.run_id,
+    dir: rel(fromDir),
+    run_json_sha256: await sha256File(path.join(fromDir, "run.json")),
+    finished_at: source.finished_at ?? null,
+    capture: recordedCapture ? rel(recordedCapture) : null,
+    cloned_at: now,
+    clone: "APFS clonefile (cp -c): the earlier run's files, copy-on-write; stages whose input is unchanged keep its markers",
+  };
+  const state = { version: T5_RUN_VERSION, run_id: path.basename(toDir), label: source.label, created_at: now, options: { ...source.options, capture: rel(captureDir) }, attempts: [], children: {}, status: "running", previous_run: previousRun, scoped_rerun: null, scoped_reruns: [] };
+  await atomicWrite(path.join(toDir, "run-state.json"), `${JSON.stringify(state, null, 2)}\n`);
+  return previousRun;
+}
+
+/** clonefile(2) on each entry, 4 at a time; ctypes releases the GIL during the call, so the threads clone in parallel. */
+const CLONEFILE_SCRIPT = [
+  "import ctypes, sys, concurrent.futures as futures",
+  "libc = ctypes.CDLL('/usr/lib/libSystem.dylib', use_errno=True)",
+  "def clone(pair):",
+  "    source, target = pair",
+  "    if libc.clonefile(source.encode(), target.encode(), 0) != 0:",
+  "        raise OSError(ctypes.get_errno(), 'clonefile ' + source)",
+  "pairs = [line.split('\\t') for line in sys.stdin.read().splitlines() if line]",
+  "with futures.ThreadPoolExecutor(4) as pool:",
+  "    list(pool.map(clone, pairs))",
+].join("\n");
+
+/**
+ * An APFS clone of a run directory (macOS): clonefile(2) on every top-level entry and on each shard directory, which
+ * clones a whole tree in one kernel call (a 409,090-file shard in 27 s, about 3.4 times `cp -c -R`). No fallback to a
+ * real copy.
+ */
+async function cloneDirectory(from, to) {
+  if (process.platform !== "darwin") throw new Error("--next-run clones the earlier run with APFS clonefile (macOS only)");
+  await mkdir(path.join(to, "shards"), { recursive: true });
+  const pairs = [];
+  for (const name of await readdir(from)) if (name !== "shards") pairs.push([path.join(from, name), path.join(to, name)]);
+  for (const name of await readdir(path.join(from, "shards"))) pairs.push([path.join(from, "shards", name), path.join(to, "shards", name)]);
+  await new Promise((resolve, reject) => {
+    const child = spawn("/usr/bin/python3", ["-I", "-c", CLONEFILE_SCRIPT], { stdio: ["pipe", "ignore", "pipe"] });
+    let stderr = "";
+    child.stderr.on("data", (chunk) => (stderr += chunk));
+    child.on("error", reject);
+    child.on("close", (code) => (code === 0 ? resolve() : reject(new Error(`clonefile failed (exit ${code}): ${stderr.trim().slice(-500)}`))));
+    child.stdin.end(pairs.map((pair) => pair.join("\t")).join("\n"));
+  });
+}
+
+async function rmPath(target) {
+  await rm(target, { recursive: true, force: true });
+}
+
 /** @param {string[]} argv @returns {Record<string, string | boolean>} */
 export function parseFlags(argv) {
   /** @type {Record<string, string | boolean>} */
@@ -1573,11 +1652,21 @@ export async function resolveOptions(flags) {
     if (!rerunShards || rerunShards.length === 0 || !rerunShards.every((id) => /^s\d{4}$/.test(id)) || new Set(rerunShards).size !== rerunShards.length) throw new Error("--rerun-shards takes distinct shard ids separated by commas (s0039,s0040)");
   }
   let runDir = null;
-  if (typeof flags.resume === "string") runDir = flags.resume === "latest" ? await latestUnfinished(runsDir, label) : path.resolve(flags.resume);
+  let nextOf = null;
+  if (flags["next-run"] !== undefined) {
+    if (flags.new || flags.verify || flags.reopen || typeof flags.resume === "string" || rerunShards) throw new Error("--next-run starts the next run of a finished run; it does not combine with --new, --verify, --reopen, --resume or --rerun-shards");
+    if (typeof flags.capture !== "string") throw new Error("--next-run needs --capture <the newer permit capture>");
+    const latest = await latestRun(runsDir, label);
+    nextOf = flags["next-run"] === "latest" ? latest?.dir ?? null : path.resolve(String(flags["next-run"]));
+    if (!nextOf) throw new Error(`no T5 run with label ${label} under ${rel(runsDir)}`);
+    if (latest && latest.dir !== nextOf) throw new Error(`${rel(latest.dir)} is newer than ${rel(nextOf)}; resume or verify it with the plain command`);
+    runDir = nextOf;
+  } else if (typeof flags.resume === "string") runDir = flags.resume === "latest" ? await latestUnfinished(runsDir, label) : path.resolve(flags.resume);
   else if (!flags.new) runDir = (await latestRun(runsDir, label))?.dir ?? null;
   if (typeof flags.resume === "string" && !runDir) throw new Error(`no unfinished T5 run with label ${label} under ${rel(runsDir)}`);
   let savedState = null;
   if (runDir && existsSync(path.join(runDir, "run-state.json"))) savedState = JSON.parse(await readFile(path.join(runDir, "run-state.json"), "utf8"));
+  if (nextOf && savedState?.status !== "finished") throw new Error(`${rel(nextOf)} is not finished; resume it with the plain command`);
   const saved = savedState?.options ?? null;
   // A finished run is only verified (read-only) unless --reopen asks to rerun it in place; --verify verifies any run.
   const finished = savedState?.status === "finished";
@@ -1585,7 +1674,7 @@ export async function resolveOptions(flags) {
   if (flags.reopen && !finished) throw new Error("--reopen applies to a finished run; an unfinished one resumes with the same command");
   const activeScope = savedState?.scoped_rerun?.active ? [...savedState.scoped_rerun.shards].sort() : null;
   if (rerunShards && !finished && !(activeScope && activeScope.join(",") === [...rerunShards].sort().join(","))) throw new Error(`--rerun-shards applies to a finished run (or resumes the scoped rerun in progress with the same shards)${savedState ? "" : `; no T5 run with label ${label} under ${rel(runsDir)}`}`);
-  const mode = flags.verify ? "verify-full" : finished && !flags.reopen && !rerunShards ? "verify-quick" : "run";
+  const mode = flags.verify ? "verify-full" : finished && !flags.reopen && !rerunShards && !nextOf ? "verify-quick" : "run";
   const pick = (flag, savedKey, fallback) => (typeof flags[flag] === "string" ? flags[flag] : saved?.[savedKey] ?? fallback);
   const eligibility = pick("eligibility", "eligibility", process.env[ELIGIBILITY_ENV] ?? null);
   if (!eligibility) throw new Error(`--eligibility is required (${ELIGIBILITY_ENV}): __ALL__ for the full run (decisions.md 25.9)`);
@@ -1630,7 +1719,8 @@ export async function resolveOptions(flags) {
   };
   if (!Number.isInteger(options.shardSize) || options.shardSize < 1 || options.shardSize > DEFAULT_SHARD_SIZE) throw new Error(`--shard-size must be 1-${DEFAULT_SHARD_SIZE} (the kit's CAR cap)`);
   if (!Number.isInteger(options.concurrency) || options.concurrency < 1) throw new Error("--concurrency must be a positive integer");
-  options.runDir = runDir ?? path.join(runsDir, `${compactTimestamp(new Date())}-t5-${label}`);
+  options.runDir = nextOf ? path.join(runsDir, `${compactTimestamp(new Date())}-t5-${label}`) : runDir ?? path.join(runsDir, `${compactTimestamp(new Date())}-t5-${label}`);
+  options.nextOf = nextOf;
   return options;
 }
 
@@ -1639,6 +1729,10 @@ async function main() {
   let code = 0;
   try {
     options = await resolveOptions(parseFlags(process.argv.slice(2)));
+    if (options.nextOf) {
+      const previous = await prepareNextRun({ fromDir: options.nextOf, toDir: options.runDir, captureDir: options.captureDir });
+      console.log(`[t5] next run ${rel(options.runDir)} of ${previous.run_id} (--next-run): cloned copy-on-write, capture ${rel(options.captureDir)}; stages whose input is unchanged keep the earlier run's markers. If it stops, resume with the same command without --next-run.`);
+    }
     const run = new T5Run(options);
     if (options.mode !== "run") {
       if (options.mode === "verify-quick") console.log(`[t5] ${rel(options.runDir)} is finished: checking it read-only (no stage runs, nothing is written). --verify also re-hashes every output; --new starts a new run.`);

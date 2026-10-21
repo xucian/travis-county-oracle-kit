@@ -32,7 +32,7 @@
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { createReadStream, createWriteStream, existsSync, openSync, closeSync } from "node:fs";
-import { appendFile, mkdir, readFile, realpath, rename, stat, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, readdir, readFile, realpath, rename, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
@@ -335,6 +335,33 @@ export async function uploadAll({ plan, out, cli, api, concurrency = 4, runtimeD
   return { failed: failures[0] ?? null, failures, retries, results };
 }
 
+/**
+ * A next run's plan against the earlier run's (assignment decisions.md 33): every archive, tables root and schema whose
+ * CID the earlier run published is `carried` (already uploaded, pinned and checked; never re-uploaded), the rest is new.
+ *
+ * @param {object} plan - This run's plan.
+ * @param {object} previous - The earlier run's plan.
+ * @param {{ out: string, manifest_cid: string | null, release_tag: string | null }} meta - Where the earlier run's evidence lives.
+ * @returns {object} The plan with `carried` flags and `previous`.
+ */
+export function markCarried(plan, previous, meta) {
+  const archives = new Set(previous.archives.map((entry) => entry.root));
+  const tables = new Set(previous.tables.map((entry) => entry.root));
+  const schemas = new Set(previous.schemas.map((entry) => entry.cid));
+  return {
+    ...plan,
+    previous: { run_id: previous.run_id, ...meta },
+    archives: plan.archives.map((entry) => ({ ...entry, carried: archives.has(entry.root) })),
+    tables: plan.tables.map((entry) => ({ ...entry, carried: tables.has(entry.root) })),
+    schemas: plan.schemas.map((entry) => ({ ...entry, carried: schemas.has(entry.cid) })),
+  };
+}
+
+/** The part of a plan this run publishes itself: everything not carried from the earlier run. */
+export function freshPlan(plan) {
+  return { ...plan, archives: plan.archives.filter((entry) => !entry.carried), tables: plan.tables.filter((entry) => !entry.carried), schemas: plan.schemas.filter((entry) => !entry.carried) };
+}
+
 /** Every root and part CID of the plan, once each. */
 export function planCids(plan) {
   return [...new Set([...plan.archives.map((entry) => entry.root), ...plan.tables.map((entry) => entry.root), ...plan.tables.flatMap((entry) => entry.parts.map((part) => part.cid))])];
@@ -555,10 +582,16 @@ export function buildShardManifest({ plan, uploads, tablesCars, filebase, gatewa
   const archives = [...plan.archives].sort(order);
   const tables = [...plan.tables].sort(order);
   const unpinned = pins.filter((pin) => !pin.pinned).map(({ cid, job_status, request_status, error }) => ({ cid, job_status, request_status, error }));
+  const previous = plan.previous ?? null;
+  const carriedCount = [...archives, ...tables].filter((entry) => entry.carried).length;
+  const releaseOf = (entry) => (previous ? { release_tag: entry.carried ? release.previous_tag : release.tag, carried_from_previous_run: entry.carried === true } : {});
   return {
     schemaVersion: "travis.publish-manifest.v2",
-    label: "run 1: the shard archives uploaded with readback and checked on two public gateways; no Atlas PR (decisions.md 28)",
+    label: previous
+      ? `the next run of ${previous.run_id}: the shard archives whose records changed uploaded with readback and checked on two public gateways; every other archive carried with its earlier CID; no Atlas PR (decisions.md 28, 33)`
+      : "run 1: the shard archives uploaded with readback and checked on two public gateways; no Atlas PR (decisions.md 28)",
     run_id: plan.run_id,
+    ...(previous ? { previous_run: { run_id: previous.run_id, manifest_cid: previous.manifest_cid } } : {}),
     county: { key: "travis", state: "TX", fips: "48453" },
     lexicon_manifest: plan.lexicon_manifest,
     layout: { kind: "shard archives", note: "one CountyIndex archive per group per shard of at most 5,000 properties (decisions.md 25.9, 28.3)", groups: Object.fromEntries(plan.schemas.flatMap((schema) => schema.groups.map((group) => [group, { schema: schema.cid, archives: archives.filter((entry) => entry.group === group).length, properties: archives.filter((entry) => entry.group === group).reduce((total, entry) => total + (entry.properties ?? 0), 0), blocks: archives.filter((entry) => entry.group === group).reduce((total, entry) => total + entry.block_count, 0) }]))) },
@@ -572,10 +605,10 @@ export function buildShardManifest({ plan, uploads, tablesCars, filebase, gatewa
     indexes: { county_index: archives.map((entry) => entry.root), county_tables: tables.map((entry) => entry.root) },
     sample_extract: plan.sample_extract,
     cars: [
-      ...archives.map((entry) => ({ kind: "archive", group: entry.group, shard: entry.shard, root_cid: entry.root, schema_cid: entry.schema, block_count: entry.block_count, properties: entry.properties, car_validation: entry.car_validation, size: entry.size, sha256: entry.sha256, release_asset: path.basename(entry.path), readback_url: uploaded.get(`archive ${entry.root}`).gateway_url })),
+      ...archives.map((entry) => ({ kind: "archive", group: entry.group, shard: entry.shard, root_cid: entry.root, schema_cid: entry.schema, block_count: entry.block_count, properties: entry.properties, car_validation: entry.car_validation, size: entry.size, sha256: entry.sha256, release_asset: path.basename(entry.path), ...releaseOf(entry), readback_url: uploaded.get(`archive ${entry.root}`).gateway_url })),
       ...tables.map((entry) => {
         const car = cars.get(entry.root);
-        return { kind: "tables", group: entry.group, shard: entry.shard, root_cid: entry.root, county_root: entry.county_root, schema_cid: entry.schema, block_count: car.block_count, parts: car.parts, size: car.size, sha256: car.sha256, release_asset: path.basename(car.path), readback_url: uploaded.get(`tables ${entry.root}`).gateway_url };
+        return { kind: "tables", group: entry.group, shard: entry.shard, root_cid: entry.root, county_root: entry.county_root, schema_cid: entry.schema, block_count: car.block_count, parts: car.parts, size: car.size, sha256: car.sha256, release_asset: path.basename(car.path), ...releaseOf(entry), readback_url: uploaded.get(`tables ${entry.root}`).gateway_url };
       }),
     ],
     release,
@@ -591,6 +624,11 @@ export function buildShardManifest({ plan, uploads, tablesCars, filebase, gatewa
       "No origins are listed: no candidate-operated node serves these blocks. Filebase (the upload) and Pinata (the second pin) are pinning vendors; gateway URLs are locators, never identities.",
       ...(unpinned.length > 0 ? [`The second pin is incomplete: ${unpinned.length} roots are not pinned on Pinata (outcomes verbatim in pins[]); Filebase pins every CID.`] : []),
       "No IPNS name is used and no Atlas PR is open (decisions.md 28.3); the manifest does not list itself, its CID is in the publication record.",
+      ...(previous
+        ? [
+            `This run is the next run of ${previous.run_id} (manifest ${previous.manifest_cid ?? "unrecorded"}), which stays immutable and pinned. ${carriedCount} of ${archives.length + tables.length} archive and tables roots are carried unchanged: the same CID, uploaded, pinned and checked on both gateways in that run, whose gateway rows are included here. ${archives.length + tables.length - carriedCount} are new in this run. A carried CAR is an asset of release ${release.previous_tag}; a new one of release ${release.tag}.`,
+          ]
+        : []),
       ...extraNotes,
     ],
   };
@@ -612,6 +650,27 @@ export async function filebaseAdd({ bytes, name, expectedCid, token, api = "http
   return { status: response.status, hash };
 }
 
+/**
+ * The earlier run's evidence for what a next run carries: its upload results, its full tables CARs and its gateway rows
+ * (the standing `match` rows of its checks, the paced background ones included) for the carried CIDs only.
+ *
+ * @param {object} plan - The next run's plan (with `previous.out`).
+ * @returns {Promise<{ uploads: object[], tablesCars: object[], gatewayRows: object[] }>} Evidence.
+ */
+export async function previousEvidence(plan) {
+  const dir = plan.previous.out;
+  const read = async (file) => JSON.parse(await readFile(path.join(dir, file), "utf8"));
+  const carriedRoots = new Set([...plan.archives, ...plan.tables].filter((entry) => entry.carried).map((entry) => entry.root));
+  const carriedCids = new Set([...carriedRoots, ...plan.tables.filter((entry) => entry.carried).flatMap((entry) => entry.parts.map((part) => part.cid)), ...plan.schemas.filter((entry) => entry.carried).map((entry) => entry.cid)]);
+  const rows = [...(await read("gateway-checks.json"))];
+  for (const name of (await readdir(dir)).filter((file) => /^gateway-checks.*\.jsonl$/.test(file))) rows.push(...(await readFile(path.join(dir, name), "utf8")).split("\n").filter(Boolean).map((line) => JSON.parse(line)));
+  return {
+    uploads: (await read("uploads.json")).results.filter((entry) => carriedRoots.has(entry.root)),
+    tablesCars: (await read("tables-cars.json")).filter((entry) => carriedRoots.has(entry.root)).map((entry) => ({ ...entry, path: path.join(dir, "tables-cars", path.basename(entry.path)) })),
+    gatewayRows: [...standingRows(rows).values()].filter((row) => carriedCids.has(row.cid) && resultOf(row) === "match"),
+  };
+}
+
 async function main(argv) {
   const [command, ...rest] = argv;
   const flags = {};
@@ -623,7 +682,9 @@ async function main(argv) {
     await mkdir(path.dirname(file), { recursive: true });
     await writeFile(file, `${JSON.stringify(value, null, 2)}\n`, "utf8");
   };
-  const plan = command === "plan" ? null : await read(path.join(out, "plan.json"));
+  const fullPlan = command === "plan" ? null : await read(path.join(out, "plan.json"));
+  // A next run uploads and checks only what is new; pins, Filebase pins and the manifest cover the whole run.
+  const plan = fullPlan && ["tables-cars", "upload", "gateway-check", "gateway-paced", "gateway-status"].includes(command) ? freshPlan(fullPlan) : fullPlan;
   const filebaseToken = () => {
     const { FILEBASE_ACCESS_KEY: key, FILEBASE_SECRET_KEY: secret, FILEBASE_BUCKET: bucket } = process.env;
     if (!key || !secret || !bucket) throw new Error("FILEBASE_ACCESS_KEY, FILEBASE_SECRET_KEY and FILEBASE_BUCKET are not all set in this shell");
@@ -635,9 +696,15 @@ async function main(argv) {
   };
   const gateways = (flags.gateways ?? "").split(",").filter(Boolean);
   if (command === "plan") {
-    const built = await buildPlan({ runDir: path.resolve(flags.run), runtimeDir, schemaCacheDir: flags["schema-cache"] });
+    let built = await buildPlan({ runDir: path.resolve(flags.run), runtimeDir, schemaCacheDir: flags["schema-cache"] });
+    if (flags.previous) {
+      const previousOut = path.resolve(flags.previous);
+      const previousPin = existsSync(path.join(previousOut, "manifest-pin.json")) ? await read(path.join(previousOut, "manifest-pin.json")) : null;
+      built = markCarried(built, await read(path.join(previousOut, "plan.json")), { out: previousOut, manifest_cid: previousPin?.cid ?? null, release_tag: flags["previous-release-tag"] ?? null });
+    }
     await write(path.join(out, "plan.json"), built);
-    console.log(JSON.stringify({ archives: built.archives.length, tables: built.tables.length, parts: built.tables.reduce((total, entry) => total + entry.parts.length, 0), schemas: built.schemas.length, sizes: built.sizes, problems: built.problems }));
+    const fresh = freshPlan(built);
+    console.log(JSON.stringify({ archives: built.archives.length, tables: built.tables.length, parts: built.tables.reduce((total, entry) => total + entry.parts.length, 0), schemas: built.schemas.length, ...(built.previous ? { previous: built.previous.run_id, new_archives: fresh.archives.length, new_tables: fresh.tables.length, new_parts: fresh.tables.reduce((total, entry) => total + entry.parts.length, 0), new_bytes: fresh.archives.reduce((total, entry) => total + entry.size, 0) + fresh.tables.reduce((total, entry) => total + entry.parts.reduce((sum, part) => sum + part.bytes, 0), 0) } : {}), sizes: built.sizes, problems: built.problems }));
     if (built.problems.length > 0) process.exitCode = 1;
   } else if (command === "tables-cars") {
     const libs = await cliLibraries(flags.cli);
@@ -722,17 +789,20 @@ async function main(argv) {
       const lines = (await readFile(path.join(out, "gateway-checks.jsonl"), "utf8")).split("\n").filter(Boolean).map((line) => JSON.parse(line));
       gatewayRows.push(...[...standingRows(lines).values()].filter((row) => row.gateway === flags["with-matches-of"] && resultOf(row) === "match"));
     }
+    // A next run lists what it carries with the earlier run's evidence (uploads, tables CARs, gateway rows).
+    const previous = plan.previous ? await previousEvidence(plan) : { uploads: [], tablesCars: [], gatewayRows: [] };
+    gatewayRows.unshift(...previous.gatewayRows);
     const gatewayCopy = path.resolve(flags["gateway-copy"]);
     await write(gatewayCopy, gatewayRows);
     const manifest = buildShardManifest({
       plan,
-      uploads: (await read(path.join(out, "uploads.json"))).results,
-      tablesCars: await read(path.join(out, "tables-cars.json")),
+      uploads: [...previous.uploads, ...(await read(path.join(out, "uploads.json"))).results],
+      tablesCars: [...previous.tablesCars, ...(await read(path.join(out, "tables-cars.json")))],
       filebase: await read(path.join(out, "filebase-pins.json")),
       gatewayRows,
       gatewayFile: { path: flags["gateway-name"], sha256: sha256Hex(await readFile(gatewayCopy)) },
       pins: await read(path.join(out, "pins.json")),
-      release: { tag: flags["release-tag"], status: "not created; a separate go at submission" },
+      release: { tag: flags["release-tag"], status: "not created; a separate go at submission", ...(plan.previous ? { previous_tag: plan.previous.release_tag } : {}) },
       backgroundChecks: flags["background-gateway"] ? { gateway: flags["background-gateway"], file: flags["background-file"], status: "running after this manifest was pinned; paced to the gateway's quota (decisions.md 28.7, ruling 3); its rows are kept outside this immutable manifest" } : null,
       extraNotes: flags["background-gateway"] ? [`The ${gatewayRows.filter((row) => row.gateway === flags["background-gateway"]).length} ${flags["background-gateway"]} rows in gateway_checks were made before any Pinata pin, so that gateway fetched them from the public network; its remaining rows are checked in the background, paced to its quota, and recorded in ${flags["background-file"]}, not in this manifest.`] : [],
     });

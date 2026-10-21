@@ -46,13 +46,22 @@ const sumMaps = (maps) => {
  * Per-stage timings over every shard (each stage's wall time as its marker records it, attempts that ran in this run's
  * processes; skipped stages count 0 for this attempt).
  *
+ * In a next run (`previous_run`), a marker that started before this run was created was carried from the earlier run:
+ * it counts under `carried`, not in the timings.
+ *
  * @param {Record<string, any>[]} results - Shard results.
+ * @param {string | null} [since] - The next run's creation time (null for a first run).
+ * @param {Record<string, number>} [carried] - Filled with the carried stages per stage name.
  * @returns {Record<string, { total_ms: number, shards: number, mean_ms: number }>} Timings.
  */
-function stageTimings(results) {
+export function stageTimings(results, since = null, carried = {}) {
   const out = {};
   const add = (name, marker) => {
     if (!marker || marker.ms === undefined) return;
+    if (since && marker.started_at && marker.started_at < since) {
+      carried[name] = (carried[name] ?? 0) + 1;
+      return;
+    }
     const entry = (out[name] ??= { total_ms: 0, shards: 0, mean_ms: 0 });
     entry.total_ms += marker.ms;
     entry.shards += 1;
@@ -67,6 +76,37 @@ function stageTimings(results) {
   }
   for (const entry of Object.values(out)) entry.mean_ms = Math.round(entry.total_ms / Math.max(1, entry.shards));
   return out;
+}
+
+/**
+ * What a next run changed against the run it was cloned from: per group, the shard archives whose root is new, and the
+ * stages it carried (their markers held, so they did not run).
+ *
+ * @param {Record<string, any>} previousRun - The run state's `previous_run`.
+ * @param {Record<string, any>[]} results - Shard results.
+ * @param {Record<string, number>} carried - Carried stages per stage name.
+ * @returns {Promise<Record<string, any>>} `changed_since_previous`.
+ */
+export async function sincePrevious(previousRun, results, carried) {
+  const { readFile } = await import("node:fs/promises");
+  const before = JSON.parse(await readFile(path.join(RUNTIME_ROOT, previousRun.dir, "run.json"), "utf8"));
+  const rootOf = new Map(before.shards.per_shard.map((entry) => [entry.id, entry]));
+  const groups = {};
+  for (const result of results) {
+    for (const group of ["county", "property_improvement"]) {
+      const now = result.groups[group]?.hash?.output?.car?.root ?? null;
+      const then = rootOf.get(result.shard)?.[`${group}_root`] ?? null;
+      if (!now && !then) continue;
+      const entry = (groups[group] ??= { archives: 0, unchanged: 0, new_roots: 0, shards_with_new_roots: [] });
+      entry.archives += 1;
+      if (now === then) entry.unchanged += 1;
+      else {
+        entry.new_roots += 1;
+        entry.shards_with_new_roots.push(result.shard);
+      }
+    }
+  }
+  return { changed_since_previous: { previous_run_id: previousRun.run_id, groups, carried_stages: carried } };
 }
 
 /**
@@ -248,6 +288,10 @@ export async function buildRunRecord({ run, loader, history, t3, diskBytes }) {
   const reruns = await scopedReruns(run, results);
   const rerunShards = new Set(reruns.flatMap((scope) => scope.shards));
   const attemptMs = (attempt) => (attempt.ended_at ? new Date(attempt.ended_at).getTime() - new Date(attempt.started_at).getTime() : null);
+  const previousRun = run.state.previous_run ?? null;
+  const carried = {};
+  const timings = stageTimings(results, previousRun ? startedAt : null, carried);
+  const nextRun = previousRun ? { previous_run: previousRun, ...(await sincePrevious(previousRun, results, carried)) } : {};
   return {
     schemaVersion: T5_RECORD_VERSION,
     run_id: run.state.run_id,
@@ -299,7 +343,7 @@ export async function buildRunRecord({ run, loader, history, t3, diskBytes }) {
     manifest_cid: null,
     atlas: null,
     gateway_checks: [],
-    timings: { unit: "ms", wall_ms: new Date(finishedAt).getTime() - new Date(startedAt).getTime(), last_attempt_ms: Math.round(new Date(finishedAt).getTime() - new Date(run.attempt.started_at).getTime()), attempts_ms: run.state.attempts.map((attempt) => ({ attempt: attempt.attempt, ms: attemptMs(attempt) })), stages: stageTimings(results) },
+    timings: { unit: "ms", wall_ms: new Date(finishedAt).getTime() - new Date(startedAt).getTime(), last_attempt_ms: Math.round(new Date(finishedAt).getTime() - new Date(run.attempt.started_at).getTime()), attempts_ms: run.state.attempts.map((attempt) => ({ attempt: attempt.attempt, ms: attemptMs(attempt) })), stages: timings },
     memory: { peak_cli_rss_gb: Math.round((run.peak.cli_rss_bytes / 1024 ** 3) * 10) / 10, peak_cli_processes: run.peak.cli_processes, peak_runner_rss_gb: Math.round((run.peak.runner_rss_bytes / 1024 ** 3) * 10) / 10, peak_combined_rss_gb: Math.round(((run.peak.combined_rss_bytes ?? 0) / 1024 ** 3) * 10) / 10, peak_swap_used_gb: Math.round((run.peak.swap_used_bytes / 1024 ** 3) * 10) / 10, sampled: "every progress tick (60 s) and shard completion; ps RSS" },
     disk: { run_dir_gb: Math.round((diskBytes / 1024 ** 3) * 100) / 100 },
     preflight: run.preflight,
@@ -313,6 +357,7 @@ export async function buildRunRecord({ run, loader, history, t3, diskBytes }) {
     inputs: { seed: run.plan.seed, tcad_extras: run.plan.extras, capture: { dir: rel(run.captureDir), rows: run.captureSummary.rows, rows_updated_at: run.captureSummary.rows_updated_at.end_iso }, tcad_permit_listing: run.listing },
     loader: { scope: run.options.loaderScope, generation: loader.generation_dir, state_sha256: loader.state_sha256, prior_generation: loader.prior_generation },
     run_history: history,
+    ...nextRun,
     scoped_reruns: reruns,
     no_publication: "local files only: no upload, no pin, no Atlas PR (T6)",
   };

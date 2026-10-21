@@ -105,6 +105,7 @@ skills/use-oracle/runtime/src/counties/travis/publish.mjs
 skills/use-oracle/runtime/src/counties/travis/query-table.mjs
 skills/use-oracle/runtime/src/counties/travis/record-ids.mjs
 skills/use-oracle/runtime/src/counties/travis/seed.mjs
+skills/use-oracle/runtime/src/counties/travis/t10-publish.sh
 skills/use-oracle/runtime/src/counties/travis/t3-absence-proofs.mjs
 skills/use-oracle/runtime/src/counties/travis/t3-austin-row-fetch.mjs
 skills/use-oracle/runtime/src/counties/travis/t3-fetch.mjs
