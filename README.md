@@ -1,3 +1,14 @@
+# Travis County oracle kit adapter
+
+This repository **is** the `oracle/travis/` tree from the pipeline assignment
+[`xucian/oracle-property-intelligence-platform-pipeline-travis-tx`](https://github.com/xucian/oracle-property-intelligence-platform-pipeline-travis-tx)
+(`assignment` at the split, `e11d60f`). Git history of that directory is kept.
+
+Pin a SHA. The pipeline's `oracle/travis/MIRROR_COMMIT` is the pin a reviewer should clone.
+`main` may move; the pin file is the contract.
+
+---
+
 # Travis county modules (mirror of the kit branch `travis`)
 
 The Travis County adapter lives on branch `travis` of a `soofi-xyz-team-kit` checkout pinned at
